@@ -1,25 +1,9 @@
-import { axiosServer } from "@/utils/axios";
+import { UserRequest } from "@/models/user/user.request";
+import { AllUsers, UserModel } from "@/models/user/user.response";
 import axios from "axios";
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  profileUrl: string;
-  status: string; // e.g. "active" | "inactive"
-  createdAt: string; // ISO date string
-  role: string; // e.g. "Admin" | "Editor" | "Viewer"
-}
-
-export interface PaginatedUsersResponse {
-  content: User[];
-  total: number; // total number of users across all pages
-  pageNo: number; // current page number
-  pageSize: number; // number of users per page
-  totalPages: number; // total number of pages
-}
-
-export const mockUsers: User[] = [
+// Standardized mock users
+export const mockUsers: UserModel[] = [
   {
     id: "1",
     name: "Alice Johnson",
@@ -35,7 +19,7 @@ export const mockUsers: User[] = [
     email: "bob.smith@example.com",
     role: "DEVELOPER",
     profileUrl: "",
-    status: "inACTIVE",
+    status: "INACTIVE",
     createdAt: "2023-11-22T14:45:00Z",
   },
   {
@@ -71,7 +55,7 @@ export const mockUsers: User[] = [
     email: "fiona.patel@example.com",
     role: "USER",
     profileUrl: "",
-    status: "active",
+    status: "ACTIVE",
     createdAt: "2024-04-01T10:05:00Z",
   },
   {
@@ -112,40 +96,49 @@ export const mockUsers: User[] = [
   },
 ];
 
-export async function getUsersService(
-  pageNo = 1,
-  pageSize = 5
-): Promise<PaginatedUsersResponse> {
+export async function getUsersService(request: UserRequest): Promise<AllUsers> {
   try {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Calculate pagination indices
+    // Default pagination
+    const pageNo = request?.pageNo ?? 1;
+    const pageSize = request?.pageSize ?? 10;
+
+    // Optional filtering by search or status
+    let filteredUsers = mockUsers;
+
+    if (request.search) {
+      filteredUsers = filteredUsers.filter((u) =>
+        u.name.toLowerCase().includes(request?.search?.toLowerCase() || "")
+      );
+    }
+
+    if (request.status) {
+      filteredUsers = filteredUsers.filter((u) => u.status === request?.status);
+    }
+
+    // Pagination
     const startIndex = (pageNo - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-
-    // Slice the mock users for current page
-    const paginatedUsers = mockUsers.slice(startIndex, endIndex);
+    const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
 
     // Return paginated data + metadata
     return {
       content: paginatedUsers,
-      total: mockUsers.length,
+      total: filteredUsers.length,
       pageNo,
       pageSize,
-      totalPages: Math.ceil(mockUsers.length / pageSize),
+      totalPages: Math.ceil(filteredUsers.length / pageSize),
     };
   } catch (error) {
-    // handle axios errors or unexpected errors
+    // Axios error handling (optional for mock)
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
       const message = raw?.message || "Failed to fetch users.";
       console.error("Axios error:", message);
 
-      throw {
-        errorMessage: message,
-        rawError: raw,
-      };
+      throw { errorMessage: message, rawError: raw };
     } else {
       console.error("Unexpected error:", error);
       throw {
@@ -154,4 +147,150 @@ export async function getUsersService(
       };
     }
   }
+}
+
+export const getUserByIdService = (id: string) => {
+  try {
+    const user = mockUsers.find((user) => user.id === id);
+    return user;
+  } catch (error: any) {
+    // Axios error handling (optional for mock)
+    if (axios.isAxiosError(error)) {
+      const raw = error.response?.data;
+      const message = raw?.message || "Failed to fetch user by id.";
+      console.error("Axios error:", message);
+
+      throw { errorMessage: message, rawError: raw };
+    } else {
+      console.error("Unexpected error:", error);
+      throw {
+        errorMessage: "An unexpected error occurred while fetching user by id.",
+        rawError: error,
+      };
+    }
+  }
+};
+
+export async function createUserService(
+  newUser: Omit<UserModel, "id" | "createdAt">
+): Promise<UserModel> {
+  try {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Generate a new unique ID (string)
+    const newId = (mockUsers.length + 1).toString();
+
+    // Build user object
+    const user: UserModel = {
+      ...newUser,
+      id: newId,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Push into in-memory array (mock DB)
+    mockUsers.push(user);
+
+    return user;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const raw = error.response?.data;
+      const message = raw?.message || "Failed to create user.";
+      console.error("Axios error:", message);
+
+      throw { errorMessage: message, rawError: raw };
+    } else {
+      console.error("Unexpected error:", error);
+      throw {
+        errorMessage: "An unexpected error occurred while creating user.",
+        rawError: error,
+      };
+    }
+  }
+}
+
+// 📝 Mock update user
+export async function updateUserService(
+  id: string,
+  updates: Partial<Omit<UserModel, "id" | "createdAt">>
+): Promise<UserModel> {
+  try {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Find user by id
+    const index = mockUsers.findIndex((u) => u.id === id);
+    if (index === -1) {
+      throw { errorMessage: `User with id ${id} not found.` };
+    }
+
+    // Update fields (don't allow id/createdAt overwrite)
+    const updatedUser: UserModel = {
+      ...mockUsers[index],
+      ...updates,
+      id: mockUsers[index].id,
+      createdAt: mockUsers[index].createdAt,
+    };
+
+    // Save back into array
+    mockUsers[index] = updatedUser;
+
+    return updatedUser;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const raw = error.response?.data;
+      const message = raw?.message || "Failed to update user.";
+      console.error("Axios error:", message);
+
+      throw { errorMessage: message, rawError: raw };
+    } else {
+      console.error("Unexpected error:", error);
+      throw {
+        errorMessage: "An unexpected error occurred while updating user.",
+        rawError: error,
+      };
+    }
+  }
+}
+
+// 🗑️ Mock delete user
+export async function deleteUserService(
+  id: string
+): Promise<{ success: boolean; message: string }> {
+  try {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const index = mockUsers.findIndex((u) => u.id === id);
+    if (index === -1) {
+      throw { errorMessage: `User with id ${id} not found.` };
+    }
+
+    // Remove from array
+    mockUsers.splice(index, 1);
+
+    return {
+      success: true,
+      message: `User with id ${id} deleted successfully.`,
+    };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const raw = error.response?.data;
+      const message = raw?.message || "Failed to delete user.";
+      console.error("Axios error:", message);
+
+      throw { errorMessage: message, rawError: raw };
+    } else {
+      console.error("Unexpected error:", error);
+      throw {
+        errorMessage: "An unexpected error occurred while deleting user.",
+        rawError: error,
+      };
+    }
+  }
+}
+
+export async function getUsersProfileService(): Promise<UserModel> {
+  await new Promise((resolve) => setTimeout(resolve, 500)); // simulate delay
+  return mockUsers[0]; // Alice Johnson (or whichever you want)
 }

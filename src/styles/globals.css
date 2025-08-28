@@ -6,89 +6,380 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* CPBank Custom Utilities */
+  .gradient-cpbank {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--cpbank-primary)) 0%,
+      hsl(var(--cpbank-secondary)) 100%
+    );
+  }
+
+  .gradient-cpbank-subtle {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--cpbank-primary) / 0.1) 0%,
+      hsl(var(--cpbank-secondary) / 0.1) 100%
+    );
+  }
+
+  .shadow-cpbank {
+    box-shadow: 0 4px 20px hsl(var(--cpbank-primary) / 0.15);
+  }
+
+  .border-gradient {
+    border-image: linear-gradient(
+        135deg,
+        hsl(var(--cpbank-primary)),
+        hsl(var(--cpbank-secondary))
+      )
+      1;
+  }
 }
-
-
 
 @layer base {
   :root {
+    /* CPBank Brand Colors */
+    --cpbank-primary: 220 85% 35%; /* Deep Professional Blue */
+    --cpbank-secondary: 195 100% 40%; /* Complementary Teal */
+    --cpbank-accent: 45 100% 50%; /* Gold Accent */
+    --cpbank-success: 142 71% 45%; /* Success Green */
+    --cpbank-warning: 38 92% 50%; /* Warning Orange */
+    --cpbank-error: 0 65% 51%; /* Error Red */
+
+    /* Light Theme */
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 222 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 222 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --popover-foreground: 222 84% 4.9%;
+    --primary: var(--cpbank-primary);
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 13% 65%;
+    --accent: var(--cpbank-accent);
+    --accent-foreground: 222 47% 11%;
+    --destructive: var(--cpbank-error);
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: var(--cpbank-primary);
+
+    /* CPBank Chart Colors */
+    --chart-1: var(--cpbank-primary);
+    --chart-2: var(--cpbank-secondary);
+    --chart-3: var(--cpbank-accent);
+    --chart-4: var(--cpbank-success);
+    --chart-5: var(--cpbank-warning);
+
+    /* Border Radius */
+    --radius: 0.75rem;
+
+    /* Sidebar Colors */
+    --sidebar-background: 220 24% 96%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: var(--cpbank-primary);
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 220 14% 93%;
+    --sidebar-accent-foreground: 222 47% 11%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: var(--cpbank-primary);
+
+    /* CPBank Typography Scale */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+
+    /* CPBank Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
   }
+
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Dark Theme */
+    --background: 222 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%; /* Lighter blue for dark mode */
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 32% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 45 100% 60%; /* Brighter gold for dark mode */
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 217 91% 60%;
+
+    /* Dark Chart Colors */
+    --chart-1: 217 91% 60%;
+    --chart-2: 195 100% 50%;
+    --chart-3: 45 100% 60%;
+    --chart-4: 142 71% 55%;
+    --chart-5: 38 92% 60%;
+
+    /* Dark Sidebar */
+    --sidebar-background: 222 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 32% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 32% 17%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
-
-
 
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* CPBank Typography */
+  h1,
+  .heading-1 {
+    @apply text-4xl font-bold tracking-tight text-foreground mb-6;
+    line-height: 1.1;
+  }
+
+  h2,
+  .heading-2 {
+    @apply text-3xl font-semibold tracking-tight text-foreground mb-4;
+    line-height: 1.2;
+  }
+
+  h3,
+  .heading-3 {
+    @apply text-2xl font-semibold text-foreground mb-3;
+    line-height: 1.3;
+  }
+
+  h4,
+  .heading-4 {
+    @apply text-xl font-semibold text-foreground mb-2;
+    line-height: 1.4;
+  }
+
+  p {
+    @apply text-base text-muted-foreground leading-relaxed mb-4;
+  }
+
+  .text-large {
+    @apply text-lg text-foreground leading-relaxed;
+  }
+
+  .text-small {
+    @apply text-sm text-muted-foreground;
+  }
+
+  /* CPBank Button Styles */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 
+           px-6 py-3 rounded-lg font-semibold transition-all duration-200 
+           shadow-md hover:shadow-lg active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 
+           border border-border px-6 py-3 rounded-lg font-semibold 
+           transition-all duration-200 shadow-sm hover:shadow-md active:scale-95;
+  }
+
+  .btn-outline {
+    @apply bg-transparent text-primary border-2 border-primary 
+           hover:bg-primary hover:text-primary-foreground px-6 py-3 
+           rounded-lg font-semibold transition-all duration-200 active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground 
+           px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  }
+
+  /* CPBank Card Styles */
+  .card-cpbank {
+    @apply bg-card text-card-foreground rounded-xl border border-border 
+           shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .card-premium {
+    @apply card-cpbank bg-gradient-to-br from-primary/5 to-secondary/5 
+           border-primary/20 shadow-cpbank;
+  }
+
+  /* CPBank Input Styles */
+  .input-cpbank {
+    @apply flex h-12 w-full rounded-lg border border-input 
+           bg-background px-4 py-2 text-base transition-colors 
+           file:border-0 file:bg-transparent file:text-sm file:font-medium 
+           placeholder:text-muted-foreground focus-visible:outline-none 
+           focus-visible:ring-2 focus-visible:ring-ring 
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* CPBank Status Colors */
+  .status-success {
+    @apply bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 
+           dark:text-green-300 dark:border-green-800;
+  }
+
+  .status-warning {
+    @apply bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 
+           dark:text-yellow-300 dark:border-yellow-800;
+  }
+
+  .status-error {
+    @apply bg-red-50 text-red-800 border-red-200 dark:bg-red-900/20 
+           dark:text-red-300 dark:border-red-800;
+  }
+
+  .status-info {
+    @apply bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/20 
+           dark:text-blue-300 dark:border-blue-800;
+  }
+
+  /* CPBank Navigation */
+  .nav-link {
+    @apply flex items-center px-4 py-2 text-sm font-medium rounded-lg 
+           text-muted-foreground hover:text-foreground hover:bg-accent 
+           transition-all duration-200;
+  }
+
+  .nav-link.active {
+    @apply bg-primary text-primary-foreground shadow-sm;
+  }
+
+  /* CPBank Tables */
+  .table-cpbank {
+    @apply w-full border-collapse border-spacing-0;
+  }
+
+  .table-cpbank th {
+    @apply bg-muted/50 text-muted-foreground text-left px-4 py-3 
+           text-sm font-semibold border-b border-border;
+  }
+
+  .table-cpbank td {
+    @apply px-4 py-3 text-sm border-b border-border;
+  }
+
+  .table-cpbank tr:hover {
+    @apply bg-muted/30;
+  }
+
+  /* CPBank Badges */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs 
+           font-medium border transition-colors;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary/10 text-primary border-primary/20;
+  }
+
+  .badge-secondary {
+    @apply badge bg-secondary text-secondary-foreground border-border;
+  }
+
+  .badge-success {
+    @apply badge status-success;
+  }
+
+  .badge-warning {
+    @apply badge status-warning;
+  }
+
+  .badge-error {
+    @apply badge status-error;
+  }
+
+  /* CPBank Forms */
+  .form-group {
+    @apply space-y-2;
+  }
+
+  .form-label {
+    @apply text-sm font-semibold text-foreground;
+  }
+
+  .form-error {
+    @apply text-sm text-red-600 dark:text-red-400;
+  }
+
+  .form-help {
+    @apply text-sm text-muted-foreground;
+  }
+
+  /* CPBank Loading States */
+  .loading-skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+  .loading-spinner {
+    @apply animate-spin h-4 w-4 border-2 border-muted border-t-primary rounded-full;
+  }
+
+  /* CPBank Responsive Utilities */
+  .container-cpbank {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* CPBank Focus States */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 
+           focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+
+  /* CPBank Animations */
+  .fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

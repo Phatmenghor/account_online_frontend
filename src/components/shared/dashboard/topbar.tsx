@@ -17,8 +17,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { logoutToken } from "@/utils/local-storage/token";
 import { logoutRole } from "@/utils/local-storage/roles";
-import { ThemeToggle } from "./theme-toggle";
 import LanguageSwitcher from "../common/language-switcher";
+import { ThemeToggle } from "./theme-toggle";
+import { useTranslations } from "next-intl";
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -28,6 +29,8 @@ export function TopBar({ onMenuClick }: TopBarProps) {
   const isMobile = useIsMobile();
   const router = useRouter();
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
+
+  const t = useTranslations();
 
   const handleLogout = () => {
     logoutToken();
@@ -47,17 +50,19 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         )}
 
         <div className="flex items-center gap-3 justify-end flex-1">
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
           <LanguageSwitcher variant="flag-only" />
 
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowLogoutAlert(true)}
-            className="flex items-center gap-2 hover:bg-destructive/10 hover:text-destructive transition-colors"
+            className="flex items-center gap-2 hover:text-destructive transition-colors"
           >
             <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline text-xs font-medium">Logout</span>
+            <span className="hidden sm:inline text-xs font-medium">
+              {t("auth.logout")}
+            </span>
           </Button>
         </div>
       </header>

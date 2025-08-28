@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
-import { User } from "@/services/dashboard/user/user.service";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { navItems, ROUTES } from "@/constants/AppRoutes/routes";
+import { ROUTES } from "@/constants/AppRoutes/routes";
+import { AppIcons } from "@/constants/AppResource/icons/app-icons";
+import { SidebarUserProfile } from "@/components/app/profile/sidebar-profile";
+import { UserModel } from "@/models/user/user.response";
+import { useNavItems } from "@/constants/AppResource/display-list/sidebar-item/sidebar-item";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -20,9 +22,9 @@ interface SidebarProps {
 export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const isMobile = useIsMobile();
-  const [authUser, setAuthUser] = useState<User | null>(null);
+  const [authUser, setAuthUser] = useState<UserModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const navItems = useNavItems();
   useEffect(() => {
     const loadUserProfile = async () => {
       setIsLoading(true);
@@ -66,11 +68,10 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
               )}
             >
               <img
-                src="/assets/favicon.ico"
+                src={AppIcons.APP.CPBANK}
                 alt="Special Account"
-                className="w-8 h-8"
+                className="w-48 h-12"
               />
-              <span>Template Account</span>
             </Link>
           )}
 
@@ -117,7 +118,9 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
             ))}
           </nav>
         </ScrollArea>
-        <div className="border-t p-4"></div>
+        <div className="border-t p-4">
+          <SidebarUserProfile user={authUser} isOpen={isOpen} />
+        </div>
       </div>
     </>
   );

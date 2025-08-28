@@ -1,485 +1,232 @@
-import React from "react";
-import {
-  AlertCircle,
-  X,
-  CheckCircle,
-  AlertTriangle,
-  Info,
-  XCircle,
-} from "lucide-react";
+"use client";
 
-type IconType = "alert" | "success" | "warning" | "info" | "error" | "custom";
-type ButtonVariant = "primary" | "secondary" | "danger" | "success" | "warning";
-type DialogSize = "sm" | "md" | "lg" | "xl";
+import { useState, useEffect } from "react";
+import { X, AlertCircle, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
-interface ButtonConfig {
-  text: string;
-  variant?: ButtonVariant;
-  onClick?: () => void;
-  disabled?: boolean;
-  loading?: boolean;
-  className?: string;
-}
-
-interface ConfirmDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+interface CustomDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
   title: string;
   description?: string;
-  children?: React.ReactNode;
-
-  // Icon customization
-  icon?: IconType | React.ReactNode;
-  iconColor?: string;
-  iconBackgroundColor?: string;
-  hideIcon?: boolean;
-
-  // Size and layout
-  size?: DialogSize;
-  centered?: boolean;
-
-  // Buttons
-  confirmButton?: ButtonConfig;
-  cancelButton?: ButtonConfig;
-  customButtons?: ButtonConfig[];
-  hideButtons?: boolean;
-
-  // Styling
+  confirmLabel?: string;
+  cancelLabel?: string;
+  confirmButtonIcon?: React.ReactNode;
+  onConfirm: () => Promise<void> | void;
+  variant?: "danger" | "warning" | "info";
   className?: string;
-  headerClassName?: string;
-  contentClassName?: string;
-  footerClassName?: string;
-
-  // Behavior
-  closeOnBackdropClick?: boolean;
-  showCloseButton?: boolean;
-  closeOnEscape?: boolean;
-
-  // Callbacks
-  onConfirm?: () => void;
-  onCancel?: () => void;
-  onClose?: () => void;
+  size?: "sm" | "md" | "lg" | "xl" | "full";
+  showIcon?: boolean;
 }
 
-const iconMap = {
-  alert: AlertCircle,
-  success: CheckCircle,
-  warning: AlertTriangle,
-  info: Info,
-  error: XCircle,
-};
-
-const iconColorMap = {
-  alert: "text-teal-600",
-  success: "text-green-600",
-  warning: "text-yellow-600",
-  info: "text-blue-600",
-  error: "text-red-600",
-};
-
-const iconBgColorMap = {
-  alert: "bg-teal-100",
-  success: "bg-green-100",
-  warning: "bg-yellow-100",
-  info: "bg-blue-100",
-  error: "bg-red-100",
-};
-
-const sizeMap = {
-  sm: "max-w-sm",
-  md: "max-w-md",
-  lg: "max-w-lg",
-  xl: "max-w-xl",
-};
-
-const buttonVariantMap = {
-  primary: "bg-blue-600 hover:bg-blue-700 text-white",
-  secondary: "bg-gray-600 hover:bg-gray-700 text-white",
-  danger: "bg-red-600 hover:bg-red-700 text-white",
-  success: "bg-green-600 hover:bg-green-700 text-white",
-  warning: "bg-yellow-600 hover:bg-yellow-700 text-white",
-};
-
-export function ConfirmDialog({
-  open,
-  onOpenChange,
+const ConfirmDialog = ({
+  isOpen,
+  onClose,
   title,
   description,
-  children,
-
-  // Icon props
-  icon = "alert",
-  iconColor,
-  iconBackgroundColor,
-  hideIcon = false,
-
-  // Size and layout
-  size = "md",
-  centered = true,
-
-  // Button props
-  confirmButton = { text: "Confirm", variant: "primary" },
-  cancelButton = { text: "Cancel", variant: "secondary" },
-  customButtons = [],
-  hideButtons = false,
-
-  // Styling
-  className = "",
-  headerClassName = "",
-  contentClassName = "",
-  footerClassName = "",
-
-  // Behavior
-  closeOnBackdropClick = true,
-  showCloseButton = true,
-  closeOnEscape = true,
-
-  // Callbacks
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   onConfirm,
-  onCancel,
-  onClose,
-}: ConfirmDialogProps) {
-  // Handle escape key
-  React.useEffect(() => {
-    if (!open || !closeOnEscape) return;
+  variant = "danger",
+  confirmButtonIcon,
+  className,
+  size = "md",
+  showIcon = true,
+}: CustomDialogProps) => {
+  const [isMounted, setIsMounted] = useState(false);
+  const [isConfirmLoading, setIsConfirmLoading] = useState(false);
 
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        handleClose();
+  // Handle escape key press
+  useEffect(() => {
+    setIsMounted(true);
+
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen && !isConfirmLoading) {
+        onClose();
       }
     };
 
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [open, closeOnEscape]);
+    window.addEventListener("keydown", handleEscapeKey);
 
-  const handleClose = () => {
-    onClose?.();
-    onOpenChange(false);
-  };
+    return () => {
+      window.removeEventListener("keydown", handleEscapeKey);
+    };
+  }, [isOpen, onClose, isConfirmLoading]);
 
-  const handleBackdropClick = () => {
-    if (closeOnBackdropClick) {
-      handleClose();
+  // Handle confirmation with loading state
+  const handleConfirm = async () => {
+    try {
+      setIsConfirmLoading(true);
+      const result = onConfirm();
+
+      // Check if it's a promise
+      if (result instanceof Promise) {
+        await result;
+      }
+    } catch (error) {
+      console.error("Confirmation error:", error);
+    } finally {
+      setIsConfirmLoading(false);
     }
   };
 
-  const handleConfirmClick = () => {
-    confirmButton.onClick?.();
-    onConfirm?.();
-    onOpenChange(false);
-  };
+  // Don't render on the server
+  if (!isMounted) return null;
 
-  const handleCancelClick = () => {
-    cancelButton.onClick?.();
-    onCancel?.();
-    onOpenChange(false);
-  };
-
-  const renderIcon = () => {
-    if (hideIcon) return null;
-
-    if (React.isValidElement(icon)) {
-      return <div className="flex items-center justify-center">{icon}</div>;
+  // Get variant styles
+  const getVariantStyles = () => {
+    switch (variant) {
+      case "danger":
+        return {
+          icon: <AlertCircle className="h-6 w-6 text-destructive" />,
+          confirmButtonVariant: "destructive" as const,
+          title: "text-destructive",
+        };
+      case "warning":
+        return {
+          icon: <AlertCircle className="h-6 w-6 text-amber-500" />,
+          confirmButtonVariant: "default" as const,
+          title: "text-amber-500",
+        };
+      case "info":
+      default:
+        return {
+          icon: <AlertCircle className="h-6 w-6 text-blue-500" />,
+          confirmButtonVariant: "default" as const,
+          title: "text-blue-500",
+        };
     }
-
-    const IconComponent = iconMap[icon as keyof typeof iconMap];
-    if (!IconComponent) return null;
-
-    const defaultIconColor = iconColorMap[icon as keyof typeof iconColorMap];
-    const defaultBgColor = iconBgColorMap[icon as keyof typeof iconBgColorMap];
-
-    return (
-      <div className="flex items-center justify-center">
-        <div
-          className={`w-12 h-12 rounded-full flex items-center justify-center ${
-            iconBackgroundColor || defaultBgColor
-          }`}
-        >
-          <IconComponent
-            className={`h-6 w-6 ${iconColor || defaultIconColor}`}
-          />
-        </div>
-      </div>
-    );
   };
 
-  const renderButton = (button: ButtonConfig, onClick: () => void) => {
-    const baseClasses =
-      "px-6 py-2.5 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
-    const variantClasses = buttonVariantMap[button.variant || "primary"];
-
-    return (
-      <button
-        key={button.text}
-        onClick={onClick}
-        disabled={button.disabled || button.loading}
-        className={`${baseClasses} ${variantClasses} ${button.className || ""}`}
-      >
-        {button.loading ? (
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            <span>Loading...</span>
-          </div>
-        ) : (
-          button.text
-        )}
-      </button>
-    );
-  };
-
-  const renderButtons = () => {
-    if (hideButtons) return null;
-
-    if (customButtons.length > 0) {
-      return (
-        <div
-          className={`flex flex-wrap gap-3 justify-center ${footerClassName}`}
-        >
-          {customButtons.map((button, index) =>
-            renderButton(button, () => {
-              button.onClick?.();
-              onOpenChange(false);
-            })
-          )}
-        </div>
-      );
+  // Get size class
+  const getSizeClass = () => {
+    switch (size) {
+      case "sm":
+        return "max-w-sm";
+      case "md":
+        return "max-w-md";
+      case "lg":
+        return "max-w-lg";
+      case "xl":
+        return "max-w-xl";
+      case "full":
+        return "max-w-[95vw] min-h-[95vh] md:max-w-[90vw] md:max-h-[90vh]";
+      default:
+        return "max-w-md";
     }
-
-    return (
-      <div className={`flex space-x-3 ${footerClassName}`}>
-        {renderButton(cancelButton, handleCancelClick)}
-        {renderButton(confirmButton, handleConfirmClick)}
-      </div>
-    );
   };
 
-  if (!open) return null;
+  const variantStyles = getVariantStyles();
+  const sizeClass = getSizeClass();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={handleBackdropClick}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            onClick={!isConfirmLoading ? onClose : undefined}
+            aria-hidden="true"
+          />
 
-      {/* Dialog */}
-      <div
-        className={`relative bg-white rounded-lg shadow-xl ${
-          sizeMap[size]
-        } w-full mx-4 p-6 ${
-          centered ? "text-center" : "text-left"
-        } ${className}`}
-      >
-        {/* Close button */}
-        {showCloseButton && (
-          <button
-            onClick={handleClose}
-            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X size={20} />
-          </button>
-        )}
+          {/* Dialog */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{
+                type: "spring",
+                damping: 20,
+                stiffness: 300,
+                duration: 0.2,
+              }}
+              className={cn(
+                "bg-background relative overflow-hidden rounded-lg shadow-xl w-full",
+                sizeClass,
+                className
+              )}
+              onClick={(e: any) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                onClick={!isConfirmLoading ? onClose : undefined}
+                className="absolute right-4 top-4 rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                aria-label="Close dialog"
+                disabled={isConfirmLoading}
+              >
+                <X className="h-4 w-4" />
+              </button>
 
-        <div
-          className={`flex flex-col ${
-            centered ? "items-center" : "items-start"
-          } space-y-6`}
-        >
-          {/* Icon */}
-          {renderIcon()}
+              {/* Content */}
+              <div className="p-6">
+                <div className="flex items-start gap-4">
+                  {showIcon && (
+                    <div className="flex-shrink-0 mt-0.5">
+                      {variantStyles.icon}
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <h2
+                      className={cn(
+                        "text-xl font-semibold mb-2",
+                        variantStyles.title
+                      )}
+                    >
+                      {title}
+                    </h2>
+                    {description && (
+                      <p className="text-muted-foreground mb-6">
+                        {description}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-          {/* Header */}
-          <div className={`space-y-3 ${headerClassName}`}>
-            <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
-            {description && (
-              <p className="text-gray-600 text-base">{description}</p>
-            )}
+                {/* Actions */}
+                <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={onClose}
+                    className="mt-3 sm:mt-0"
+                    disabled={isConfirmLoading}
+                  >
+                    {cancelLabel}
+                  </Button>
+                  <Button
+                    variant={variantStyles.confirmButtonVariant}
+                    onClick={handleConfirm}
+                    disabled={isConfirmLoading}
+                  >
+                    {isConfirmLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {confirmLabel}...
+                      </>
+                    ) : (
+                      <>
+                        {confirmButtonIcon && (
+                          <span className="mr-2">{confirmButtonIcon}</span>
+                        )}
+                        {confirmLabel}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
           </div>
-
-          {/* Custom Content */}
-          {children && (
-            <div className={`w-full ${contentClassName}`}>{children}</div>
-          )}
-
-          {/* Separator */}
-          {!hideButtons && <div className="w-full h-px bg-gray-200" />}
-
-          {/* Buttons */}
-          {renderButtons()}
-        </div>
-      </div>
-    </div>
+        </>
+      )}
+    </AnimatePresence>
   );
-}
+};
 
-// Demo component with multiple examples
-// export default function ConfirmDialogDemo() {
-//   const [dialogs, setDialogs] = React.useState({
-//     basic: false,
-//     custom: false,
-//     warning: false,
-//     success: false,
-//     multiButton: false,
-//     customContent: false,
-//     noIcon: false,
-//     loading: false,
-//   });
-
-//   const [loading, setLoading] = React.useState(false);
-
-//   const openDialog = (key: string) => {
-//     setDialogs(prev => ({ ...prev, [key]: true }));
-//   };
-
-//   const closeDialog = (key: string) => {
-//     setDialogs(prev => ({ ...prev, [key]: false }));
-//   };
-
-//   const handleAsyncAction = async () => {
-//     setLoading(true);
-//     // Simulate async operation
-//     await new Promise(resolve => setTimeout(resolve, 2000));
-//     setLoading(false);
-//     closeDialog('loading');
-//   };
-
-//   return (
-//     <div className="p-8 space-y-4">
-//       <h1 className="text-3xl font-bold text-gray-900 mb-8">Reusable Confirm Dialog</h1>
-
-//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-//         <button
-//           onClick={() => openDialog('basic')}
-//           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-//         >
-//           Basic Dialog
-//         </button>
-
-//         <button
-//           onClick={() => openDialog('warning')}
-//           className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
-//         >
-//           Warning Dialog
-//         </button>
-
-//         <button
-//           onClick={() => openDialog('success')}
-//           className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-//         >
-//           Success Dialog
-//         </button>
-
-//         <button
-//           onClick={() => openDialog('multiButton')}
-//           className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-//         >
-//           Multi-Button Dialog
-//         </button>
-
-//         <button
-//           onClick={() => openDialog('customContent')}
-//           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-//         >
-//           Custom Content
-//         </button>
-
-//         <button
-//           onClick={() => openDialog('loading')}
-//           className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-//         >
-//           Loading Dialog
-//         </button>
-//       </div>
-
-//       {/* Basic Dialog */}
-//       <ConfirmDialog
-//         open={dialogs.basic}
-//         onOpenChange={() => closeDialog('basic')}
-//         title="Delete Item"
-//         description="Are you sure you want to delete this item? This action cannot be undone."
-//         confirmButton={{ text: 'Delete', variant: 'danger' }}
-//         onConfirm={() => alert('Item deleted!')}
-//       />
-
-//       {/* Warning Dialog */}
-//       <ConfirmDialog
-//         open={dialogs.warning}
-//         onOpenChange={() => closeDialog('warning')}
-//         title="Warning"
-//         description="This action may have unintended consequences."
-//         icon="warning"
-//         confirmButton={{ text: 'Proceed', variant: 'warning' }}
-//         onConfirm={() => alert('Proceeded with warning!')}
-//       />
-
-//       {/* Success Dialog */}
-//       <ConfirmDialog
-//         open={dialogs.success}
-//         onOpenChange={() => closeDialog('success')}
-//         title="Success!"
-//         description="Your action was completed successfully."
-//         icon="success"
-//         confirmButton={{ text: 'Great!', variant: 'success' }}
-//         hideButtons={false}
-//         cancelButton={{ text: 'Close', variant: 'secondary' }}
-//       />
-
-//       {/* Multi-Button Dialog */}
-//       <ConfirmDialog
-//         open={dialogs.multiButton}
-//         onOpenChange={() => closeDialog('multiButton')}
-//         title="Choose an Option"
-//         description="What would you like to do?"
-//         customButtons={[
-//           { text: 'Save', variant: 'success', onClick: () => alert('Saved!') },
-//           { text: 'Save & Exit', variant: 'primary', onClick: () => alert('Saved and exited!') },
-//           { text: 'Discard', variant: 'danger', onClick: () => alert('Discarded!') },
-//           { text: 'Cancel', variant: 'secondary' },
-//         ]}
-//       />
-
-//       {/* Custom Content Dialog */}
-//       <ConfirmDialog
-//         open={dialogs.customContent}
-//         onOpenChange={() => closeDialog('customContent')}
-//         title="Custom Content Example"
-//         size="lg"
-//         centered={false}
-//         icon="info"
-//       >
-//         <div className="space-y-4">
-//           <div className="bg-blue-50 p-4 rounded-lg">
-//             <h3 className="font-semibold text-blue-900">Custom Content Area</h3>
-//             <p className="text-blue-800 mt-2">You can add any custom content here, including forms, lists, or other components.</p>
-//           </div>
-
-//           <div className="grid grid-cols-2 gap-4">
-//             <div className="bg-gray-50 p-3 rounded text-center">
-//               <div className="text-2xl font-bold text-gray-900">42</div>
-//               <div className="text-sm text-gray-600">Items</div>
-//             </div>
-//             <div className="bg-gray-50 p-3 rounded text-center">
-//               <div className="text-2xl font-bold text-gray-900">$1,234</div>
-//               <div className="text-sm text-gray-600">Total</div>
-//             </div>
-//           </div>
-//         </div>
-//       </ConfirmDialog>
-
-//       {/* Loading Dialog */}
-//       <ConfirmDialog
-//         open={dialogs.loading}
-//         onOpenChange={() => closeDialog('loading')}
-//         title="Processing..."
-//         description="Please wait while we process your request."
-//         icon="info"
-//         confirmButton={{ text: 'Process', variant: 'primary', loading: loading }}
-//         onConfirm={handleAsyncAction}
-//         closeOnBackdropClick={false}
-//         closeOnEscape={false}
-//       />
-//     </div>
-//   );
-// }
+export default ConfirmDialog;

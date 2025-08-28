@@ -1,12 +1,12 @@
-import { List, User2 } from "lucide-react";
+import { User2 } from "lucide-react";
 
 export const ROUTES = {
   AUTH: {
-    LOGIN: "/login",
+    LOGIN: "/auth/login",
   },
   DASHBOARD: {
     INDEX: "/user",
-    PRODUCT: "/product",
+    PROFILE: "/profile",
   },
 };
 
@@ -15,10 +15,5 @@ export const navItems = [
     title: "Users",
     href: ROUTES.DASHBOARD.INDEX,
     icon: User2,
-  },
-  {
-    title: "Products",
-    href: ROUTES.DASHBOARD.PRODUCT,
-    icon: List,
   },
 ];

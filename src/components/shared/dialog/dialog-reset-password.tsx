@@ -10,14 +10,15 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Shield, CheckCircle, AlertTriangle, Lock, User } from "lucide-react";
 
 export default function ResetPasswordModal({
   userId,
-  isOpen,
   userName,
+  isOpen,
   onClose,
 }: {
-  userId?: number;
+  userId?: string;
   userName?: string;
   isOpen: boolean;
   onClose: () => void;
@@ -26,25 +27,16 @@ export default function ResetPasswordModal({
   const [showSuccess, setShowSuccess] = useState(false);
 
   const onReset = async () => {
-    // if (!userId) return toast.error("User ID missing");
-    // setIsSubmitting(true);
-    // try {
-    //   const ok = await AdminChangePasswordService ({
-    //     id: userId,
-    //     newPassword: "88889999",
-    //     confirmNewPassword: "88889999",
-    //   });
-    //   if (ok) {
-    //     setShowSuccess(true);
-    //     toast.success("Password reset to default");
-    //   } else {
-    //     toast.error("Reset failed");
-    //   }
-    // } catch (error) {
-    //   toast.error("Reset failed");
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
+    setIsSubmitting(true);
+    try {
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setShowSuccess(true);
+    } catch (error) {
+      console.error("Reset failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -54,100 +46,156 @@ export default function ResetPasswordModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg w-[95vw] mx-auto rounded-2xl border-0 shadow-2xl bg-white p-0">
-        <div className="p-8 space-y-4">
-          {showSuccess ? (
-            // Success Dialog
-            <>
-              <div className="flex flex-col items-center space-y-2">
-                <div className="flex items-center justify-center">
-                  <img
-                    // src={AppIcons.Circle_alert_teal}
-                    alt="back Icon"
-                    className="h-10 w-10 text-muted-foreground"
-                  />{" "}
+      <DialogContent className="max-w-md w-[95vw] mx-auto rounded-2xl shadow-xl bg-white p-0 overflow-hidden border border-slate-200">
+        {showSuccess ? (
+          <div className="flex flex-col">
+            {/* Success Header */}
+            <div className="bg-gradient-to-r from-emerald-700 to-teal-700 p-4 text-center">
+              <div className="w-12 h-12 bg-white/95 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <CheckCircle className="w-6 h-6 text-emerald-600" />
+              </div>
+              <DialogTitle className="text-xl font-bold text-white mb-1">
+                Password Reset Successful
+              </DialogTitle>
+              <p className="text-emerald-100 text-sm">
+                Action completed successfully
+              </p>
+            </div>
+
+            {/* Success Content */}
+            <div className="p-4 space-y-5">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <span className="text-gray-900 font-semibold">
+                    {userName || "User Account"}
+                  </span>
                 </div>
-                <div className="text-center space-y-1">
-                  <DialogTitle className="text-xl font-bold text-gray-900">
-                    Password Reset!
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500 text-base">
-                    User password have been reset to default password
-                  </DialogDescription>
-                </div>
+                <DialogDescription className="text-gray-600 text-sm leading-relaxed">
+                  Password has been reset successfully. User can now login with
+                  the new credentials.
+                </DialogDescription>
               </div>
 
-              <Separator className="bg-slate-400" />
+              {/* New Password Display */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Lock className="w-4 h-4 text-blue-600" />
+                  <span className="font-semibold text-blue-900 text-sm">
+                    New Password
+                  </span>
+                </div>
+                <div className="text-center">
+                  <div className="inline-flex items-center bg-white border-2 border-blue-300 rounded-lg px-4 py-2">
+                    <span className="font-mono text-xl font-bold text-blue-800 tracking-wider">
+                      88889999
+                    </span>
+                  </div>
+                </div>
+                <p className="text-blue-700 text-xs text-center mt-2">
+                  Share securely with user
+                </p>
+              </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-center">
                 <Button
-                  type="button"
                   onClick={handleClose}
-                  className="bg-teal-900 hover:bg-teal-950 text-white font-medium px-8 py-2 rounded-lg"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors duration-200"
                 >
-                  Okay
+                  Complete
                 </Button>
               </div>
-            </>
-          ) : (
-            <>
-              <div className="flex flex-col items-center space-y-2">
-                <div className="flex items-center justify-center">
-                  <img
-                    // src={AppIcons.reset}
-                    alt="back Icon"
-                    className="h-10 w-10 text-muted-foreground"
-                  />{" "}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col">
+            {/* Warning Header */}
+            <div className="bg-gradient-to-r from-red-600 to-red-700 p-2 text-center">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-1">
+                <Shield className="w-6 h-6 text-red-600" />
+              </div>
+              <DialogTitle className="text-xl font-bold text-white mb-1">
+                Reset Password
+              </DialogTitle>
+              <p className="text-red-100 text-sm">Confirm security action</p>
+            </div>
+
+            {/* Confirmation Content */}
+            <div className="p-4 space-y-3">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-gray-600" />
+                  </div>
+                  <span className="text-gray-900 font-semibold">
+                    {userName || "Selected User"}
+                  </span>
                 </div>
-                <div className="text-center space-y-1">
-                  <DialogTitle className="text-xl font-bold text-gray-900">
-                    Confirm Reset!
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500 text-base">
-                    Are you sure you want to reset user password?
-                  </DialogDescription>
-                </div>
+                <DialogDescription className="text-gray-600 text-sm leading-relaxed">
+                  This will reset the user's password to default. User must
+                  login with new credentials.
+                </DialogDescription>
               </div>
 
-              <div className="bg-amber-50 border- border-amber-200 rounded-lg p-4 space-y-4">
-                <div className="flex justify-center items-center">
-                  <div className="flex gap-4">
-                    <DialogDescription className="text-yellow-600 text-sm">
-                      <span>Password will reset for: {userName || "User"}</span>
-                      <br />
-                      <span>Password reset: 88889999</span>
-                    </DialogDescription>
+              {/* Warning Box */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-2">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-amber-900 text-sm mb-2">
+                      Default Password
+                    </h4>
+                    <div className="inline-flex items-center bg-white border border-amber-300 rounded-lg px-3 py-1 mb-2">
+                      <span className="font-mono text-base font-bold text-amber-800">
+                        88889999
+                      </span>
+                    </div>
+                    <p className="text-amber-700 text-xs">
+                      User should change password after first login.
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <Separator className="bg-slate-200" />
+              <Separator className="bg-gray-200" />
 
-              {/* Action buttons */}
-              <DialogFooter className="flex flex-row justify-end items-center gap-3 flex-wrap">
+              {/* Action Buttons */}
+              <DialogFooter className="flex justify-end gap-3 pt-2">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={onClose}
+                  onClick={handleClose}
                   disabled={isSubmitting}
-                  className="min-w-[100px]"
+                  className="min-w-[100px] border-slate-300 text-slate-700 hover:bg-slate-50 font-medium py-2"
                 >
-                  Discard
+                  Cancel
                 </Button>
                 <Button
                   type="button"
-                  variant="default"
                   onClick={onReset}
                   disabled={isSubmitting}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium min-w-[100px]"
+                  className="bg-rose-600 hover:bg-rose-700 text-white font-semibold min-w-[100px] py-2 transition-colors duration-200"
                 >
-                  {isSubmitting ? "Resetting..." : "Reset"}
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Resetting...
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Reset
+                    </div>
+                  )}
                 </Button>
               </DialogFooter>
-            </>
-          )}
-          {/* Header with icon */}
-        </div>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
