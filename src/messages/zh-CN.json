@@ -26,29 +26,40 @@
       "inactive": "停用"
     }
   },
+
   "dashboard": {
     "title": "仪表盘",
     "welcome": "欢迎来到您的仪表盘",
     "overview": "概览"
   },
+
   "user": {
     "title": "用户",
     "search": "搜索用户...",
     "table-header": {
+      "id": "编号",
+      "idCard": "身份证",
       "profile": "个人资料",
-      "name": "姓名",
+      "fullName": "姓名",
       "email": "邮箱",
-      "role": "角色",
-      "status": "状态",
+      "userRole": "角色",
+      "userStatus": "状态",
+      "position": "职位",
       "createdAt": "创建时间",
+      "updatedAt": "更新时间",
       "actions": "操作"
     },
     "roles": {
       "admin": "管理员",
       "developer": "开发者",
       "user": "用户"
+    },
+    "status": {
+      "active": "启用",
+      "inactive": "停用"
     }
   },
+
   "auth": {
     "login": "登录",
     "logout": "退出",

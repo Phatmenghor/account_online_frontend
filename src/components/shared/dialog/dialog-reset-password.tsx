@@ -18,7 +18,7 @@ export default function ResetPasswordModal({
   isOpen,
   onClose,
 }: {
-  userId?: string;
+  userId?: number;
   userName?: string;
   isOpen: boolean;
   onClose: () => void;

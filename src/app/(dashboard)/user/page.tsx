@@ -9,6 +9,7 @@ import ModalUser, {
   UserFormData,
 } from "@/components/shared/modal/user-modal";
 import { CustomPagination } from "@/components/shared/pagination/custom-pagination";
+import { CustomSelect } from "@/components/shared/select/custom-select";
 import { DataTable } from "@/components/shared/table/data-table";
 import { createUserTableColumns } from "@/components/shared/table/table-content";
 import { AppToast } from "@/components/shared/toast/app-toast";
@@ -19,7 +20,7 @@ import { Separator } from "@/components/ui/separator";
 import { getUserTableHeaders } from "@/constants/AppResource/table/table";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { usePagination } from "@/hooks/use-pagination";
-import { AllUsers, UserModel } from "@/models/user/user.response";
+import { AllUserModel, UserModel } from "@/models/user/user.response";
 import {
   createUserService,
   deleteUserService,
@@ -34,21 +35,21 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import StatusFilter from "@/constants/AppResource/display-list/status/status-filter";
-import { Status } from "@/constants/AppResource/filter/filter";
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
 import {
   ExcelColumn,
   ExcelExporter,
   ExcelSheet,
 } from "@/utils/export-file/excel";
+import { CreateUserForm, UpdateUserForm } from "@/models/user/user.schema";
 
 export default function UserPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [users, setUsers] = useState<AllUsers | null>(null);
+  const [users, setUsers] = useState<AllUserModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExportingToExcel, setIsExportingToExcel] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
@@ -90,7 +91,7 @@ export default function UserPage() {
         search: debouncedSearchQuery,
         pageNo: currentPage,
         pageSize: 5,
-        status: statusFilter === "ALL" ? undefined : statusFilter,
+        status: statusFilter === "" ? undefined : statusFilter,
       });
       setUsers(response);
     } catch (error: any) {
@@ -119,7 +120,7 @@ export default function UserPage() {
     setIsLoading(true);
     try {
       const newStatus =
-        user.status.toUpperCase() === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+        user.userStatus.toUpperCase() === "ACTIVE" ? "INACTIVE" : "ACTIVE";
 
       // Optimistic update
       setUsers((prev) => {
@@ -154,13 +155,16 @@ export default function UserPage() {
     setIsSubmitting(true);
     try {
       if (mode === ModalMode.CREATE_MODE) {
-        const response: any = await createUserService({
-          email: formData?.email || "",
-          name: formData.name || "",
-          profileUrl: "",
-          role: formData.role || "ADMIN",
-          status: formData.status || Status.ACTIVE,
+        const createData = formData as CreateUserForm;
+        const response = await createUserService({
+          email: createData?.email || "",
+          fullName: createData.fullName || "",
+          password: createData.password || "",
+          role: createData.role || "ADMIN",
+          username: createData.username || "",
+          position: createData.position || "",
         });
+
         // Optimistic update
         setUsers((prev: any) =>
           prev
@@ -192,12 +196,14 @@ export default function UserPage() {
       } else if (mode === ModalMode.UPDATE_MODE && formData.id) {
         if (!formData.id) return;
 
-        const response = await updateUserService(formData?.id, {
-          name: formData.name,
-          email: formData.email,
-          role: formData.role,
-          profileUrl: "",
-          status: formData.status,
+        const updateUserForm = formData as UpdateUserForm;
+        const response = await updateUserService(updateUserForm?.id, {
+          fullName: updateUserForm.fullName,
+          email: updateUserForm.email,
+          position: updateUserForm.position,
+          username: updateUserForm.username,
+          profileUrl: updateUserForm.profileUrl,
+          status: updateUserForm.status,
         });
 
         setUsers((prev) =>
@@ -256,7 +262,7 @@ export default function UserPage() {
   };
 
   // FIXED EXCEL EXPORT FUNCTION
-  const handleExportToExcel = async (data: AllUsers | null) => {
+  const handleExportToExcel = async (data: AllUserModel | null) => {
     setIsExportingToExcel(true);
     try {
       // Define columns with proper types and styling
@@ -464,18 +470,18 @@ export default function UserPage() {
           onDelete={confirmDeleteUser}
           title="Delete Admin"
           description={`Are you sure you want to delete the admin`}
-          itemName={selectedUser?.name || selectedUser?.email}
+          itemName={selectedUser?.fullName || selectedUser?.email}
           isSubmitting={isSubmitting}
         />
 
         <ResetPasswordModal
           isOpen={isResetPasswordDialogOpen}
-          userName={selectedUser?.name || selectedUser?.email}
+          userName={selectedUser?.fullName || selectedUser?.email}
           onClose={() => {
             setIsResetPasswordDialogOpen(false);
             setSelectedUser(null);
           }}
-          userId={selectedUser?.id ?? ""}
+          userId={selectedUser?.id ?? 0}
         />
 
         <UserViewModal
@@ -495,7 +501,7 @@ export default function UserPage() {
             setIsModalOpen(false);
           }}
           onSave={handleSaveUser}
-          userId={selectedUser?.id ?? ""}
+          userId={selectedUser?.id ?? 0}
           isSubmitting={isSubmitting}
         />
 
@@ -508,8 +514,8 @@ export default function UserPage() {
           }}
           title="Change user status"
           description={`Are you sure you want to ${
-            selectedUserToggle?.status === "ACTIVE" ? "disable" : "enable"
-          } this user: ${selectedUserToggle?.name}?`}
+            selectedUserToggle?.userStatus === "ACTIVE" ? "disable" : "enable"
+          } this user: ${selectedUserToggle?.fullName}?`}
           cancelLabel="Cancel"
           onConfirm={() => handleStatusToggle(selectedUserToggle)}
           variant="warning"

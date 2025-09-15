@@ -1,17 +1,21 @@
-export interface UserModel {
-  id: string;
-  name: string;
-  email: string;
-  profileUrl: string;
-  status: string; // e.g. "active" | "inactive"
-  createdAt: string; // ISO date string
-  role: string; // e.g. "Admin" | "Editor" | "Viewer"
+export interface AllUserModel {
+  content: UserModel[];
+  pageNo: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
 }
 
-export interface AllUsers {
-  content: UserModel[];
-  total: number; // total number of users across all pages
-  pageNo: number; // current page number
-  pageSize: number; // number of users per page
-  totalPages: number; // total number of pages
+export interface UserModel {
+  id: number;
+  idCard: string;
+  email: string;
+  userRole: string;
+  userStatus: string;
+  fullName: string;
+  position: string;
+  profileUrl: string;
+  createdAt: string;
+  updatedAt: string;
 }

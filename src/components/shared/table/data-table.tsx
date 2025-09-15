@@ -15,7 +15,7 @@ interface DataTableProps<T = any> {
   emptyMessage?: string;
   className?: string;
   onRowClick?: (item: T) => void;
-  getRowKey?: (item: T, index: number) => string;
+  getRowKey?: (item: T, index: number) => number;
 }
 
 export function DataTable<T = any>({
@@ -25,7 +25,7 @@ export function DataTable<T = any>({
   emptyMessage = "No data found",
   className = "",
   onRowClick,
-  getRowKey = (_, index) => index.toString(),
+  getRowKey = (_, index) => index,
 }: DataTableProps<T>) {
   if (loading) {
     return (

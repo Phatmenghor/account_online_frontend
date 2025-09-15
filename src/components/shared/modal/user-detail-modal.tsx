@@ -67,7 +67,7 @@ export default function UserViewModal({
               {user?.profileUrl ? (
                 <img
                   src={user?.profileUrl || ""}
-                  alt={user?.name || "User"}
+                  alt={user?.fullName || "User"}
                   className="w-full h-full object-cover rounded-full"
                 />
               ) : (
@@ -88,32 +88,32 @@ export default function UserViewModal({
             {/* User Basic Info */}
             <div className="text-center">
               <h3 className="text-xl font-bold text-slate-900 mb-1">
-                {user?.name}
+                {user?.fullName}
               </h3>
 
               {/* Status and Role Badges */}
               <div className="flex justify-center gap-2 mb-4">
                 <span
                   className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                    user?.status || ""
+                    user?.userStatus || ""
                   )}`}
                 >
                   <div
                     className={`w-2 h-2 rounded-full mr-2 ${
-                      user?.status.toLowerCase() === "active"
+                      user?.userStatus.toLowerCase() === "active"
                         ? "bg-emerald-500"
                         : "bg-slate-400"
                     }`}
                   />
-                  {user?.status || "ACTIVE"}
+                  {user?.userStatus || "ACTIVE"}
                 </span>
                 <span
                   className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getRoleColor(
-                    user?.role || ""
+                    user?.userRole || ""
                   )}`}
                 >
                   <Shield className="w-3 h-3 mr-1" />
-                  {user?.role}
+                  {user?.userRole}
                 </span>
               </div>
             </div>

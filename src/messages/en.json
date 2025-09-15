@@ -32,24 +32,34 @@
     "welcome": "Welcome to your dashboard",
     "overview": "Overview"
   },
+
   "user": {
     "title": "Users",
     "search": "Search users...",
     "table-header": {
+      "id": "ID",
+      "idCard": "ID Card",
       "profile": "Profile",
-      "name": "Name",
+      "fullName": "Full Name",
       "email": "Email",
-      "role": "Role",
-      "status": "Status",
+      "userRole": "Role",
+      "userStatus": "Status",
+      "position": "Position",
       "createdAt": "Created At",
+      "updatedAt": "Updated At",
       "actions": "Actions"
     },
     "roles": {
       "admin": "Admin",
       "developer": "Developer",
       "user": "User"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
     }
   },
+
   "auth": {
     "login": "Login",
     "logout": "Logout",

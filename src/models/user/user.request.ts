@@ -1,21 +1,36 @@
-export interface UserRequest {
-  search?: string;
-  status?: string;
-  roles?: string[];
+export interface AllUserReq {
   pageNo?: number;
   pageSize?: number;
+  search?: string;
+  status?: string;
 }
 
-export interface CreateUser {
-  name: string;
-  email: string;
-  status: string; // e.g. "active" | "inactive"
-  role: string; // e.g. "Admin" | "Editor" | "Viewer"
-}
-
-export interface UpdateUser {
-  name?: string;
+export interface UpdateUserReq {
+  username?: string;
   email?: string;
-  status?: string; // e.g. "active" | "inactive"
-  role?: string; // e.g. "Admin" | "Editor" | "Viewer"
+  fullName?: string;
+  status?: string;
+  profileUrl?: string;
+  position?: string;
+}
+
+export interface CreateUserReq {
+  username: string;
+  email: string;
+  password: string;
+  fullName?: string;
+  role?: string;
+  position?: string;
+}
+
+export interface ChangePasswordReq {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+export interface ChangePasswordByAdminReq {
+  id: number;
+  newPassword: string;
+  confirmNewPassword: string;
 }

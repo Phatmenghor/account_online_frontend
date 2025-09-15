@@ -7,7 +7,7 @@ import { CustomAvatar } from "../image/custom-avatar";
 import { RoleBadge } from "../badge/role-badge";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { AllUsers, UserModel } from "@/models/user/user.response";
+import { AllUserModel, UserModel } from "@/models/user/user.response";
 import {
   Tooltip,
   TooltipContent,
@@ -25,7 +25,7 @@ interface userTableHandlers {
 }
 
 interface userTableOptions {
-  data: AllUsers | null;
+  data: AllUserModel | null;
   handlers: userTableHandlers;
 }
 
@@ -59,14 +59,25 @@ export const createUserTableColumns = ({
       label: t("user.table-header.profile"),
       className: "w-[80px]",
       render: (user) => (
-        <CustomAvatar imageUrl={user.profileUrl} name={user.name} size="md" />
+        <CustomAvatar
+          imageUrl={user.profileUrl}
+          name={user.fullName}
+          size="md"
+        />
       ),
     },
     {
-      key: "name",
-      label: t("user.table-header.name"),
+      key: "idCard",
+      label: t("user.table-header.idCard"),
       render: (user) => (
-        <span className="font-medium">{user.name || "---"}</span>
+        <span className="font-medium">{user.idCard || "---"}</span>
+      ),
+    },
+    {
+      key: "fullName",
+      label: t("user.table-header.fullName"),
+      render: (user) => (
+        <span className="font-medium">{user.fullName || "---"}</span>
       ),
     },
     {
@@ -77,11 +88,11 @@ export const createUserTableColumns = ({
       ),
     },
     {
-      key: "status",
-      label: t("user.table-header.status"),
-      render: (user: UserModel) => (
+      key: "userStatus",
+      label: t("user.table-header.userStatus"),
+      render: (user) => (
         <Switch
-          checked={user.status === "ACTIVE"}
+          checked={user.userStatus === "ACTIVE"}
           aria-label="Toggle user status"
           onCheckedChange={() => handleUserStatusToggle(user)}
           className={cn(
@@ -95,7 +106,7 @@ export const createUserTableColumns = ({
               "translate-x-1 data-[state=checked]:translate-x-5"
             )}
           >
-            {user.status === "ACTIVE" && (
+            {user.userStatus === "ACTIVE" && (
               <Check className="h-6 m-auto text-orange-600 dark:text-orange-300" />
             )}
           </div>
@@ -103,9 +114,9 @@ export const createUserTableColumns = ({
       ),
     },
     {
-      key: "role",
-      label: t("user.table-header.role"),
-      render: (user) => <RoleBadge role={user.role} />,
+      key: "userRole",
+      label: t("user.table-header.userRole"),
+      render: (user) => <RoleBadge role={user.userRole} />,
     },
     {
       key: "createdAt",
@@ -133,7 +144,7 @@ export const createUserTableColumns = ({
                   <Edit className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent> {t("common.edit")}</TooltipContent>
+              <TooltipContent>{t("common.edit")}</TooltipContent>
             </Tooltip>
 
             <Tooltip>

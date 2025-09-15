@@ -6,8 +6,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,84 +22,33 @@ import { Eye, EyeOff } from "lucide-react";
 import { getUserByIdService } from "@/services/dashboard/user/user.service";
 import { UserModel } from "@/models/user/user.response";
 import { Status } from "@/constants/AppResource/filter/filter";
+import {
+  CreateUserSchema,
+  UpdateUserSchema,
+  CreateUserForm,
+  UpdateUserForm,
+} from "@/models/user/user.schema";
+import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
+import { ROLE_FILTER } from "@/constants/AppResource/display-list/role/role";
 
-// Configuration - Customize these for your needs
+// Config
 export const STATUS_USER_OPTIONS = [
   { value: Status.ACTIVE, label: "Active" },
   { value: Status.INACTIVE, label: "Inactive" },
 ];
-
-export const DATA_ROLE_OPTIONS = [
-  { value: "ADMIN", label: "Admin" },
-  { value: "USER", label: "User" },
-  { value: "DEVELOPER", label: "Developer" },
-];
-
-// Validation Schemas
-const baseSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  status: z.string("Status is required"),
-});
-
-const createUserSchema = baseSchema.extend({
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.string("Role is required"),
-});
-
-const updateUserSchema = baseSchema;
 
 // Types
 export enum ModalMode {
   CREATE_MODE = "create",
   UPDATE_MODE = "update",
 }
-
-interface CreateUsers {
-  name: string;
-  email: string | undefined;
-  password: string | undefined;
-  role: string | undefined;
-  status: string | undefined;
-}
-
-export interface UpdateUsers {
-  id?: string;
-  name?: string;
-  email?: string;
-  role?: string;
-  status?: string | undefined;
-}
-
-export type UserForm = z.infer<typeof createUserSchema>;
-
-export type UserFormData = Partial<CreateUsers> &
-  Partial<UpdateUsers> & {
-    id?: string;
-    userRole?: string;
-    userStatus?: string;
-  };
-
 type Props = {
   mode: ModalMode;
-  userId: string | null;
+  userId: number | null;
   onClose: () => void;
   isOpen: boolean;
   isSubmitting?: boolean;
-  onSave: (data: Partial<CreateUsers> | Partial<UpdateUsers>) => void;
-};
-
-// Utility functions
-const getActiveStatusValue = () => {
-  const activeStatus = STATUS_USER_OPTIONS.find(
-    (status) =>
-      status.label.toLowerCase() === "active" ||
-      status.value.toLowerCase() === "active"
-  );
-  return activeStatus?.value || STATUS_USER_OPTIONS[0]?.value || "";
-};
-
-const getDefaultRoleValue = () => {
-  return DATA_ROLE_OPTIONS[0]?.value || "";
+  onSave: (data: UpdateUserForm | CreateUserForm) => void;
 };
 
 function ModalUser({
@@ -111,8 +60,8 @@ function ModalUser({
   isSubmitting = false,
 }: Props) {
   const isCreate = mode === ModalMode.CREATE_MODE;
-  const schema = isCreate ? createUserSchema : updateUserSchema;
-  const activeStatusValue = getActiveStatusValue();
+  const schema = isCreate ? CreateUserSchema : UpdateUserSchema;
+
   const [showPassword, setShowPassword] = useState(false);
   const [userDetail, setUserDetail] = useState<UserModel | null>(null);
 
@@ -121,87 +70,98 @@ function ModalUser({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<UserFormData>({
-    // resolver: zodResolver(schema),
+  } = useForm<CreateUserForm | UpdateUserForm>({
+    resolver: zodResolver(schema),
     defaultValues: {
-      name: "",
+      id: 0,
+      username: "",
+      fullName: "",
       email: "",
       password: "",
-      role: getDefaultRoleValue(),
-      status: activeStatusValue,
-    },
+      role: ROLE_FILTER[0]?.value ?? "",
+      status: STATUS_USER_OPTIONS[0]?.value ?? "",
+      position: "",
+      profileUrl: "",
+    } as any,
   });
 
-  const loadUserById = useCallback(() => {
+  // Load user detail if editing
+  const loadUserById = useCallback(async () => {
     if (!userId) return;
     try {
-      const response = getUserByIdService(userId);
-      if (response) {
-        setUserDetail(response);
-      }
+      const response = await getUserByIdService(userId);
+      setUserDetail(response);
     } catch (error) {
       console.log("Fail to fetch user by id", userId);
     }
-  }, [userId, isOpen, reset, isCreate]);
+  }, [userId]);
 
   useEffect(() => {
     loadUserById();
   }, [loadUserById]);
 
-  // Reset form when modal opens or data changes
+  // Reset form when opening
   useEffect(() => {
     if (isOpen) {
-      reset({
-        id: userId || "",
-        name: isCreate ? "" : userDetail?.name ?? "",
-        email: isCreate ? "" : userDetail?.email ?? "",
-        password: "",
-        role: isCreate
-          ? getDefaultRoleValue()
-          : userDetail?.role ?? getDefaultRoleValue(),
-        status: isCreate
-          ? activeStatusValue
-          : userDetail?.status ?? activeStatusValue,
-      });
+      reset(
+        isCreate
+          ? {
+              username: "",
+              email: "",
+              password: "",
+              fullName: "",
+              role: ROLE_FILTER[0]?.value ?? "",
+              status: STATUS_USER_OPTIONS[0]?.value ?? "",
+              position: "",
+            }
+          : {
+              id: userDetail?.id ?? 0,
+              username: userDetail?.idCard ?? "",
+              email: userDetail?.email ?? "",
+              fullName: userDetail?.fullName ?? "",
+              role: userDetail?.userRole ?? ROLE_FILTER[0]?.value ?? "",
+              status:
+                userDetail?.userStatus ?? STATUS_USER_OPTIONS[0]?.value ?? "",
+              position: userDetail?.position ?? "",
+              profileUrl: userDetail?.profileUrl ?? "",
+            }
+      );
     }
-  }, [userDetail, reset, isCreate, isOpen, activeStatusValue]);
+  }, [isOpen, isCreate, userDetail, reset]);
 
-  // Form submission handler
-  const onSubmit = (data: UserFormData) => {
+  // Submit
+  const onSubmit = (data: CreateUserForm | UpdateUserForm) => {
     if (isCreate) {
-      const payload = {
-        id: data?.id,
-        email: data?.email?.trim(),
-        name: data?.name?.trim() || "",
-        password: data?.password?.trim(),
-        role: data.role,
-        status: data.status,
+      const createData = data as CreateUserForm;
+      const payload: CreateUserForm = {
+        username: createData?.username?.trim() || "",
+        email: createData?.email?.trim() || "",
+        password: createData?.password!,
+        fullName: createData.fullName,
+        role: createData.role,
+        position: createData.position,
       };
       onSave(payload);
     } else {
-      const payload: UpdateUsers = {
-        id: data.id, // ✅ include id!
-        name: data.name,
-        email: data.email,
-        role: data.role, // if you allow editing role
-        status: data.status,
+      const updateData = data as UpdateUserForm;
+
+      const payload: UpdateUserForm = {
+        id: updateData.id || 0,
+        username: updateData.username,
+        email: updateData.email,
+        fullName: updateData.fullName,
+        status: updateData.status,
+        profileUrl: updateData.profileUrl,
+        position: updateData.position,
       };
       onSave(payload);
     }
     onClose();
   };
 
-  const handleClose = () => {
-    onClose();
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-full max-w-lg md:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isCreate ? "Create User" : "Edit User"}</DialogTitle>
           <DialogDescription>
@@ -212,36 +172,31 @@ function ModalUser({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-2 pt-4">
-          {/* Email Field */}
+          {/* Username */}
           <div className="space-y-1">
-            <Label htmlFor="name">
-              Name <span className="text-red-500">*</span>
-            </Label>
+            <Label htmlFor="username">Username *</Label>
             <Controller
               control={control}
-              name="name"
+              name="username"
               render={({ field }) => (
                 <Input
                   {...field}
-                  id="name"
-                  type="text"
-                  placeholder="john doe"
+                  id="username"
                   disabled={isSubmitting}
-                  autoComplete="off"
-                  className={errors.name ? "border-red-500" : ""}
+                  className={errors.username ? "border-red-500" : ""}
                 />
               )}
             />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
+            {errors.username && (
+              <p className="text-sm text-destructive">
+                {errors.username.message as string}
+              </p>
             )}
           </div>
 
-          {/* Email Field */}
+          {/* Email */}
           <div className="space-y-1">
-            <Label htmlFor="email">
-              Email <span className="text-red-500">*</span>
-            </Label>
+            <Label htmlFor="email">Email *</Label>
             <Controller
               control={control}
               name="email"
@@ -250,24 +205,22 @@ function ModalUser({
                   {...field}
                   id="email"
                   type="email"
-                  placeholder="email@example.com"
                   disabled={isSubmitting}
-                  autoComplete="off"
                   className={errors.email ? "border-red-500" : ""}
                 />
               )}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.email.message as string}
+              </p>
             )}
           </div>
 
-          {/* Password Field - Create Mode Only */}
+          {/* Password (Create only) */}
           {isCreate && (
             <div className="space-y-1">
-              <Label htmlFor="password">
-                Password <span className="text-red-500">*</span>
-              </Label>
+              <Label htmlFor="password">Password *</Label>
               <div className="relative">
                 <Controller
                   control={control}
@@ -277,83 +230,68 @@ function ModalUser({
                       {...field}
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
                       disabled={isSubmitting}
-                      autoComplete="new-password"
                       className={
-                        errors.password ? "border-red-500 pr-10" : "pr-10"
+                        errors.root?.message ? "border-red-500 pr-10" : ""
                       }
                     />
                   )}
                 />
                 <button
                   type="button"
-                  onClick={togglePasswordVisibility}
+                  onClick={() => setShowPassword((p) => !p)}
                   className="absolute inset-y-0 right-0 flex items-center pr-3"
-                  tabIndex={-1}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-500" />
-                  )}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              {errors.password && (
+              {errors.root?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.password.message}
+                  {errors.root.message as string}
                 </p>
               )}
             </div>
           )}
 
-          {/* Role Field - Create Mode Only */}
-          {!isCreate && (
-            <div className="space-y-1">
-              <Label htmlFor="role-select">
-                Role <span className="text-red-500">*</span>
-              </Label>
-              <Controller
-                control={control}
-                name="role"
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isSubmitting}
+          {/* Role (always required in schema, but optional in update) */}
+          <div className="space-y-1">
+            <Label htmlFor="role">Role</Label>
+            <Controller
+              control={control}
+              name="role"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger
+                    id="role"
+                    className={errors.root?.message ? "border-red-500" : ""}
                   >
-                    <SelectTrigger
-                      id="role-select"
-                      className={`bg-white dark:bg-inherit ${
-                        errors.role ? "border-red-500" : ""
-                      }`}
-                    >
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DATA_ROLE_OPTIONS.map((role) => (
-                        <SelectItem key={role.value} value={role.value}>
-                          {role.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.role && (
-                <p className="text-sm text-destructive">
-                  {errors.role.message}
-                </p>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLE_FILTER.map((role) => (
+                      <SelectItem key={role.value} value={role.value}>
+                        {role.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
-            </div>
-          )}
+            />
+            {errors.root?.message && (
+              <p className="text-sm text-destructive">
+                {errors.root.message as string}
+              </p>
+            )}
+          </div>
 
-          {/* Status Field */}
+          {/* Status (Update only) */}
           {!isCreate && (
             <div className="space-y-1">
-              <Label htmlFor="status-select">
-                Status <span className="text-red-500">*</span>
-              </Label>
+              <Label htmlFor="status">Status</Label>
               <Controller
                 control={control}
                 name="status"
@@ -364,10 +302,8 @@ function ModalUser({
                     disabled={isSubmitting}
                   >
                     <SelectTrigger
-                      id="status-select"
-                      className={`bg-white dark:bg-inherit ${
-                        errors.status ? "border-red-500" : ""
-                      }`}
+                      id="status"
+                      className={errors.root?.message ? "border-red-500" : ""}
                     >
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
@@ -381,9 +317,9 @@ function ModalUser({
                   </Select>
                 )}
               />
-              {errors.status && (
+              {errors.root?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.status.message}
+                  {errors.root.message as string}
                 </p>
               )}
             </div>
@@ -394,7 +330,7 @@ function ModalUser({
             <Button
               type="button"
               variant="outline"
-              onClick={handleClose}
+              onClick={onClose}
               disabled={isSubmitting}
             >
               Cancel
