@@ -7,11 +7,6 @@ import { z } from "zod";
 import { Key, User } from "lucide-react";
 import { AppToast } from "@/components/shared/toast/app-toast";
 import { UserModel } from "@/models/user/user.response";
-import {
-  getUsersProfileService,
-  updateUserService,
-} from "@/services/dashboard/user/user.service";
-import { UpdateUsers } from "@/components/shared/modal/user-modal";
 import Loading from "@/components/shared/common/loading";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileTab from "@/components/app/profile/profile-tab";

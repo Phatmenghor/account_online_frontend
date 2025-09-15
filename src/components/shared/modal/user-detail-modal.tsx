@@ -1,16 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Calendar, Shield, Badge, X, Edit3 } from "lucide-react";
+import { User, Mail, Calendar, Shield, Badge, X } from "lucide-react";
 import { UserModel } from "@/models/user/user.response";
 
 export default function UserViewModal({

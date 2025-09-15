@@ -444,7 +444,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
 
       if (err.response?.status === 401) {
         toast.message(err.message);
-        window.location.href = "/login";
+        window.location.href = "/auth/login";
       }
       // Get request ID from metadata
       const requestId = err.config?.metadata?.requestId || "unknown";

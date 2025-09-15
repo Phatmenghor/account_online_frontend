@@ -9,7 +9,6 @@ import ModalUser, {
   UserFormData,
 } from "@/components/shared/modal/user-modal";
 import { CustomPagination } from "@/components/shared/pagination/custom-pagination";
-import { CustomSelect } from "@/components/shared/select/custom-select";
 import { DataTable } from "@/components/shared/table/data-table";
 import { createUserTableColumns } from "@/components/shared/table/table-content";
 import { AppToast } from "@/components/shared/toast/app-toast";
@@ -28,11 +27,7 @@ import {
   updateUserService,
 } from "@/services/dashboard/user/user.service";
 import { useDebounce } from "@/utils/debounce/debounce";
-import {
-  ExcelColumn,
-  ExcelExporter,
-  ExcelSheet,
-} from "@/utils/export-file/excel";
+
 import { Download, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -41,6 +36,11 @@ import { toast } from "sonner";
 import StatusFilter from "@/constants/AppResource/display-list/status/status-filter";
 import { Status } from "@/constants/AppResource/filter/filter";
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
+import {
+  ExcelColumn,
+  ExcelExporter,
+  ExcelSheet,
+} from "@/utils/export-file/excel";
 
 export default function UserPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,8 +51,6 @@ export default function UserPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedBusinessToggle, setSelectedBusinessToggle] =
-    useState<UserModel | null>(null);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUserDetailOpen, setIsUserDetailOpen] = useState(false);
@@ -257,67 +255,89 @@ export default function UserPage() {
     }
   };
 
-  const handleExportToPdf = async (data: AllUsers | null) => {
+  // FIXED EXCEL EXPORT FUNCTION
+  const handleExportToExcel = async (data: AllUsers | null) => {
     setIsExportingToExcel(true);
     try {
+      // Define columns with proper types and styling
       const columns: ExcelColumn[] = [
         {
-          header: "Id",
+          header: "ID",
           key: "id",
-          width: 15,
-          style: { alignment: { horizontal: "right" } },
+          width: 8,
+          type: "number",
         },
-        { header: "Name", key: "name", width: 15 },
-        { header: "Email", key: "email", width: 30 },
-        { header: "Role", key: "role", width: 15 },
-        { header: "Status", key: "status", width: 15 },
         {
-          header: "Join Date",
-          key: "createdAt",
+          header: "Name",
+          key: "name",
           width: 25,
+          type: "text",
+        },
+        {
+          header: "Email",
+          key: "email",
+          width: 35,
+          type: "text",
+        },
+        {
+          header: "Role",
+          key: "role",
+          width: 15,
+          type: "text",
+        },
+        {
+          header: "Status",
+          key: "status",
+          width: 12,
+          type: "text",
+        },
+        {
+          header: "Created Date",
+          key: "createdAt",
+          width: 18,
           type: "date",
           format: "mm/dd/yyyy",
         },
       ];
 
-      // await quickExport(data?.content ?? [], {
-      //   filename: "users.xlsx",
-      //   title: "User List",
-      //   autoFilter: true,
-      //   columns: columns,
-      //   sortBy: [{ key: "createdAt", order: "desc" }],
-      // });
-
+      // Create exporter with professional settings
       const exporter = new ExcelExporter({
-        filename: "user.xlsx",
-        title: "User Report",
+        filename: "users.xlsx",
+        title: "User Management Report",
         author: "IT Department",
         useAlternateRows: true,
         protection: {
-          password: "Mak12pa12",
+          password: "UserData2024",
           deleteRows: false,
+          selectLockedCells: true,
+          selectUnlockedCells: true,
         },
       });
 
+      // Configure sheet with user data
       const sheetConfig: ExcelSheet = {
-        name: "User",
+        name: "Users",
         data: data?.content ?? [],
         columns,
         autoFilter: true,
         freezeRows: 1,
-        sortBy: [{ key: "createAt", order: "desc" }],
+        sortBy: [{ key: "id", order: "asc" }],
       };
 
+      // Generate and export
       exporter.addSheet(sheetConfig);
       await exporter.export();
 
       AppToast({
         type: "success",
-        message: "Successfully export to excel",
+        message: "Successfully exported to Excel",
       });
-    } catch (err: any) {
-      toast.success("Failed to export to excel");
-      console.log("Error exporting to excel: ", err);
+    } catch (error: any) {
+      AppToast({
+        type: "error",
+        message: "Failed to export to Excel",
+      });
+      console.log("Error exporting to Excel: ", error);
     } finally {
       setIsExportingToExcel(false);
     }
@@ -373,18 +393,22 @@ export default function UserPage() {
             />
           </div>
           <div>
+            {/* FIXED BUTTON WITH PROPER LOADING STATE AND TEXT */}
             <Button
-              onClick={() => handleExportToPdf(users)}
-              size="sm"
+              onClick={() => handleExportToExcel(users)}
+              size="lg"
               variant="outline"
-              className="gap-2 text-sm sm:text-base hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6 py-2 lg:py-3"
+              className="gap-2 text-sm sm:text-base hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6 py-2 lg:py-4"
+              disabled={isExportingToExcel}
             >
               <img
                 src={AppIcons.FILE.Excel}
-                alt="pdf Icon"
+                alt="Excel Icon"
                 className="h-4 w-4 lg:h-5 lg:w-5 text-muted-foreground flex-shrink-0"
               />
-              <span className="text-base">PDF</span>
+              <span className="text-sm gap-2">
+                {isExportingToExcel ? "Exporting..." : "Export"}
+              </span>
               <Download className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
             </Button>
           </div>

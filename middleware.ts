@@ -1,3 +1,4 @@
+// src/middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 import { ROUTES } from "./src/constants/AppRoutes/routes";
 
@@ -11,33 +12,23 @@ export default function middleware(req: NextRequest) {
   console.log("ROUTES.AUTH.LOGIN:", ROUTES.AUTH.LOGIN);
   console.log("========================");
 
-  // If already on login page, allow
-  if (pathname.startsWith(ROUTES.AUTH.LOGIN)) {
-    console.log("Already on login page, allowing...");
+  if (pathname === "/auth/login") {
     return NextResponse.next();
   }
 
-  // If accessing root without token, redirect to login
-  if (pathname === "/" && !token) {
-    console.log("No token on root, redirecting to:", ROUTES.AUTH.LOGIN);
-    const redirectUrl = new URL(ROUTES.AUTH.LOGIN, req.url);
-    console.log("Full redirect URL:", redirectUrl.toString());
-    return NextResponse.redirect(redirectUrl);
+  if (!token) {
+    return NextResponse.redirect(new URL(ROUTES.AUTH.LOGIN, req.url));
   }
 
-  // If not authenticated on protected routes
-  if (!token) {
-    console.log(
-      "No token on protected route, redirecting to:",
-      ROUTES.AUTH.LOGIN
-    );
-    return NextResponse.redirect(new URL(ROUTES.AUTH.LOGIN, req.url));
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   console.log("Proceeding normally...");
   return NextResponse.next();
 }
 
+// Apply middleware to all routes except _next, static files, and api routes if needed
 export const config = {
-  matcher: ["/((?!_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!.*\\..*|_next).*)", "/"],
 };
