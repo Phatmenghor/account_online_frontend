@@ -62,8 +62,8 @@ module.exports = {
       watch: false,
       env: {
         NODE_ENV: 'production',
-        PORT: '2333',
-        EXTERNAL_PORT: '2333'
+        PORT: '3015',
+        EXTERNAL_PORT: '9999'
       },
       env_file: '.env.production',
       log_file: './logs/app.log',
