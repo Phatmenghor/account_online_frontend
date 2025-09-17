@@ -311,7 +311,7 @@ export default function ModalProject({
           )}
 
           {/* Remark */}
-          <div className="space-y-1">
+          <div className="space-y-1 w-full">
             <Label htmlFor="remark">Remark</Label>
             <Controller
               control={control}
@@ -321,7 +321,10 @@ export default function ModalProject({
                   {...field}
                   id="remark"
                   disabled={isSubmitting}
-                  className={errors.remark ? "border-red-500" : ""}
+                  className={`w-full min-h-[100px] resize-y ${
+                    errors.remark ? "border-red-500" : ""
+                  }`}
+                  placeholder="Enter your remark here..."
                 />
               )}
             />

@@ -12,7 +12,6 @@ import { Separator } from "@/components/ui/separator";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { usePagination } from "@/hooks/use-pagination";
 import { useDebounce } from "@/utils/debounce/debounce";
-
 import { Download, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -42,6 +41,7 @@ import {
 } from "@/services/dashboard/project/project.service";
 import ModalProject from "@/components/shared/modal/project-modal";
 import { ModalMode } from "@/constants/AppResource/display-list/status/status";
+import Loading from "@/components/shared/common/loading";
 
 function ProjectPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +49,6 @@ function ProjectPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExportingToExcel, setIsExportingToExcel] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("");
   const [selectedProject, setSelectedProject] = useState<ProjectModel | null>(
     null
   );
@@ -57,7 +56,6 @@ function ProjectPageContent() {
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProjectDetailOpen, setIsProjectDetailOpen] = useState(false);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const t = useTranslations();
 
@@ -84,7 +82,7 @@ function ProjectPageContent() {
       const response = await getProjectService({
         search: debouncedSearchQuery,
         pageNo: currentPage,
-        pageSize: 5,
+        pageSize: 10,
       });
       setProjects(response);
     } catch (error: any) {
@@ -92,11 +90,11 @@ function ProjectPageContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [debouncedSearchQuery, statusFilter, currentPage]);
+  }, [debouncedSearchQuery, currentPage]);
 
   useEffect(() => {
     loadProjects();
-  }, [loadProjects, debouncedSearchQuery, statusFilter]);
+  }, [loadProjects, debouncedSearchQuery]);
 
   // Simplified search change handler - just updates the state, debouncing handles the rest
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +131,7 @@ function ProjectPageContent() {
             : {
                 content: [response],
                 pageNo: 1,
-                pageSize: itemsPerPage,
+                pageSize: 10,
                 totalElements: 1,
                 totalPages: 1,
                 hasNext: false,
@@ -368,7 +366,7 @@ function ProjectPageContent() {
                   className="h-4 w-4 lg:h-5 lg:w-5 text-muted-foreground flex-shrink-0"
                 />
                 <span className="text-sm gap-2">
-                  {isExportingToExcel ? "Exporting..." : "Export"}
+                  {isExportingToExcel ? <Loading /> : "Export"}
                 </span>
                 <Download className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
               </Button>
