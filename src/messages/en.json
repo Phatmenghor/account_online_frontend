@@ -35,8 +35,8 @@
 
   "user": {
     "title": "Users",
-    "search": "Search users...",
-    "table-header": {
+    "search-user": "Search users...",
+    "table-header-user": {
       "id": "ID",
       "idCard": "ID Card",
       "profile": "Profile",
@@ -48,7 +48,27 @@
       "createdAt": "Created At",
       "updatedAt": "Updated At",
       "actions": "Actions"
+    }
+  },
+  "project": {
+    "title": "Projects",
+    "search-project": "Search projects...",
+    "table-header-project": {
+      "id": "ID",
+      "projectName": "Project Name",
+      "type": "Type",
+      "hostServer": "Host Server",
+      "hostPort": "Host Port",
+      "dbName": "Database Name",
+      "dbType": "Database Type",
+      "dbServer": "Database Server",
+      "memberInvolved": "Members Involved",
+      "remark": "Remark",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "actions": "Actions"
     },
+
     "roles": {
       "admin": "Admin",
       "developer": "Developer",

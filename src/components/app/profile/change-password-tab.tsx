@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,27 +24,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ChangePasswordReq } from "@/models/user/user.request";
+import { ChangePasswordService } from "@/services/dashboard/user/user.service";
 
 const passwordFormSchema = z
   .object({
     currentPassword: z.string().min(4, {
       message: "Password must be at least 4 characters.",
     }),
-    newPassword: z
-      .string()
-      .min(4, "Password must be at least 4 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(
-        /[!@#$%^&*()]/,
-        "Password must contain at least one special character"
-      ),
-    confirmPassword: z.string().min(4, {
+    newPassword: z.string().min(4, "Password must be at least 4 characters"),
+    confirmNewPassword: z.string().min(4, {
       message: "Password must be at least 4 characters.",
     }),
   })
-  .refine((data) => data.newPassword === data.confirmPassword, {
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
@@ -60,8 +53,9 @@ export default function ChangePasswordTab({ value }: { value: string }) {
     defaultValues: {
       currentPassword: "",
       newPassword: "",
-      confirmPassword: "",
+      confirmNewPassword: "",
     },
+    mode: "onChange",
   });
 
   const {
@@ -73,24 +67,26 @@ export default function ChangePasswordTab({ value }: { value: string }) {
   async function onPasswordSubmit(values: z.infer<typeof passwordFormSchema>) {
     setIsLoading(true);
     try {
-      // const payload: ChangePassword = {
-      //   currentPassword: values.currentPassword.trim(),
-      //   newPassword: values.newPassword.trim(),
-      //   confirmPassword: values.confirmPassword.trim(),
-      // };
+      const payload: ChangePasswordReq = {
+        currentPassword: values.currentPassword.trim(),
+        newPassword: values.newPassword.trim(),
+        confirmNewPassword: values.confirmNewPassword.trim(),
+      };
 
-      // console.log("## Change password tab: ", payload);
+      console.log("## Change password tab: ", payload);
 
-      // const response = await changePasswordService(payload);
-      AppToast({
-        type: "success",
-        message: "Password changed successfully",
-      });
-      reset({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
+      const response = await ChangePasswordService(payload);
+      if (response) {
+        AppToast({
+          type: "success",
+          message: "Password changed successfully",
+        });
+        reset({
+          currentPassword: "",
+          newPassword: "",
+          confirmNewPassword: "",
+        });
+      }
     } catch (error) {
       console.error("Unexpected error during password change:", error);
     } finally {
@@ -153,7 +149,7 @@ export default function ChangePasswordTab({ value }: { value: string }) {
                       )}
                     />
                     <FormField
-                      name="confirmPassword"
+                      name="confirmNewPassword"
                       render={({ field }) => (
                         <FormItem className="space-y-2 mt-2">
                           <FormLabel htmlFor="confirm-new-password">

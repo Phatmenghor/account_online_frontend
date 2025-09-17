@@ -41,7 +41,8 @@ export const createUserTableColumns = ({
     handleResetPassword,
   } = handlers;
 
-  const t = useTranslations();
+  const tUser = useTranslations("user.table-header-user");
+  const tCommon = useTranslations("common");
 
   return [
     {
@@ -56,7 +57,7 @@ export const createUserTableColumns = ({
     },
     {
       key: "avatar",
-      label: t("user.table-header.profile"),
+      label: tUser("profile"),
       className: "w-[80px]",
       render: (user) => (
         <CustomAvatar
@@ -68,28 +69,28 @@ export const createUserTableColumns = ({
     },
     {
       key: "idCard",
-      label: t("user.table-header.idCard"),
+      label: tUser("idCard"),
       render: (user) => (
         <span className="font-medium">{user.idCard || "---"}</span>
       ),
     },
     {
       key: "fullName",
-      label: t("user.table-header.fullName"),
+      label: tUser("fullName"),
       render: (user) => (
         <span className="font-medium">{user.fullName || "---"}</span>
       ),
     },
     {
       key: "email",
-      label: t("user.table-header.email"),
+      label: tUser("email"),
       render: (user) => (
         <span className="font-medium">{user.email || "---"}</span>
       ),
     },
     {
       key: "userStatus",
-      label: t("user.table-header.userStatus"),
+      label: tUser("userStatus"),
       render: (user) => (
         <Switch
           checked={user.userStatus === "ACTIVE"}
@@ -115,12 +116,12 @@ export const createUserTableColumns = ({
     },
     {
       key: "userRole",
-      label: t("user.table-header.userRole"),
+      label: tUser("userRole"),
       render: (user) => <RoleBadge role={user.userRole} />,
     },
     {
       key: "createdAt",
-      label: t("user.table-header.createdAt"),
+      label: tUser("createdAt"),
       render: (user) => (
         <span className="text-muted-foreground">
           {DateTimeFormat(user.createdAt)}
@@ -129,7 +130,7 @@ export const createUserTableColumns = ({
     },
     {
       key: "actions",
-      label: t("user.table-header.actions"),
+      label: tUser("actions"),
       className: "w-[160px]",
       render: (user) => (
         <div className="flex items-center gap-2">
@@ -144,7 +145,7 @@ export const createUserTableColumns = ({
                   <Edit className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("common.edit")}</TooltipContent>
+              <TooltipContent>{tCommon("edit")}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -157,7 +158,7 @@ export const createUserTableColumns = ({
                   <RotateCcw className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("common.reset-password")}</TooltipContent>
+              <TooltipContent>{tCommon("reset-password")}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -170,7 +171,7 @@ export const createUserTableColumns = ({
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("common.view")}</TooltipContent>
+              <TooltipContent>{tCommon("view")}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -183,7 +184,7 @@ export const createUserTableColumns = ({
                   <Trash className="h-3 w-3" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("common.delete")}</TooltipContent>
+              <TooltipContent>{tCommon("delete")}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>

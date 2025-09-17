@@ -3,16 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { ROUTES } from "@/constants/AppRoutes/routes";
-import { AppIcons } from "@/constants/AppResource/icons/app-icons";
 import { SidebarUserProfile } from "@/components/app/profile/sidebar-profile";
 import { UserModel } from "@/models/user/user.response";
 import { useNavItems } from "@/constants/AppResource/display-list/sidebar-item/sidebar-item";
+import { AppIcons } from "@/constants/AppResource/icons/app-icons";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,20 +24,23 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [authUser, setAuthUser] = useState<UserModel | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navItems = useNavItems();
+
   useEffect(() => {
     const loadUserProfile = async () => {
       setIsLoading(true);
       try {
+        // Uncomment and replace with real API call
         // const response = await getUsersProfileService();
         // setAuthUser(response || null);
       } catch (error) {
-        return;
+        console.error("Failed to load user profile", error);
       } finally {
         setIsLoading(false);
       }
     };
+
     loadUserProfile();
   }, []);
 
@@ -45,7 +49,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
       {/* Mobile overlay */}
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
           onClick={onToggle}
         />
       )}
@@ -53,28 +57,38 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card transition-all duration-300 ease-in-out",
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card transition-all duration-300 ease-in-out shadow-lg",
           isOpen ? "w-64" : "w-[70px]",
           isMobile && !isOpen && "hidden"
         )}
       >
-        <div className="flex h-14 items-center justify-between border-b px-4">
-          {isOpen && (
-            <Link
-              href={ROUTES.DASHBOARD.INDEX}
+        {/* Sidebar header */}
+        <div className="flex h-14 items-center justify-between border-b px-3">
+          <Link
+            href={ROUTES.DASHBOARD.INDEX}
+            className={cn(
+              "flex items-center transition-all duration-300",
+              isOpen ? "gap-2" : "justify-center w-full"
+            )}
+          >
+            {/* Always show logo */}
+            <img
+              src={AppIcons.APP.APP_LOGO}
+              alt="Internal Dev Logo"
               className={cn(
-                "flex items-center gap-2 font-semibold",
-                !isOpen && "justify-center"
+                "w-10 h-10 transition-all duration-300",
+                isOpen ? "mr-0" : "mx-auto h-8 w-7"
               )}
-            >
-              <img
-                src={AppIcons.APP.CPBANK}
-                alt="Special Account"
-                className="w-48 h-12"
-              />
-            </Link>
-          )}
+            />
+            {/* Show app name only when sidebar is open */}
+            {isOpen && (
+              <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                Internal Dev
+              </span>
+            )}
+          </Link>
 
+          {/* Toggle button */}
           <Button
             variant="ghost"
             size="icon"
@@ -83,6 +97,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
               "transition-transform duration-300",
               !isOpen && "rotate-180"
             )}
+            aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {isOpen ? (
               <ChevronLeft className="h-4 w-4" />
@@ -91,6 +106,8 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
             )}
           </Button>
         </div>
+
+        {/* Navigation items */}
         <ScrollArea className="flex-1 py-2">
           <nav className="grid gap-1 px-2">
             {navItems.map((item) => (
@@ -98,7 +115,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground overflow-hidden",
+                  "flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
                   pathname === item.href && "bg-accent text-accent-foreground",
                   !isOpen && "justify-center px-0"
                 )}
@@ -118,8 +135,17 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
             ))}
           </nav>
         </ScrollArea>
+
+        {/* Sidebar footer / user profile */}
         <div className="border-t p-4">
-          <SidebarUserProfile user={authUser} isOpen={isOpen} />
+          {isLoading ? (
+            <div className="animate-pulse flex flex-col gap-2">
+              <div className="h-10 w-full bg-slate-200 rounded-md dark:bg-slate-700" />
+              <div className="h-4 w-3/4 bg-slate-200 rounded-md dark:bg-slate-700" />
+            </div>
+          ) : (
+            <SidebarUserProfile user={authUser} isOpen={isOpen} />
+          )}
         </div>
       </div>
     </>

@@ -18,10 +18,4 @@ export const localeConfig = {
     flag: AppLanguageFlag.kh,
     code: "KH",
   },
-  "zh-CN": {
-    name: "Chinese",
-    nativeName: "简体中文",
-    flag: AppLanguageFlag["zh-CN"],
-    code: "ZH",
-  },
 } as const;

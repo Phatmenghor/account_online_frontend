@@ -4,12 +4,7 @@ import ConfirmDialog from "@/components/shared/dialog/dialog-confirm";
 import { DeleteConfirmationDialog } from "@/components/shared/dialog/dialog-delete";
 import ResetPasswordModal from "@/components/shared/dialog/dialog-reset-password";
 import UserViewModal from "@/components/shared/modal/user-detail-modal";
-import ModalUser, {
-  ModalMode,
-  UserFormData,
-} from "@/components/shared/modal/user-modal";
 import { CustomPagination } from "@/components/shared/pagination/custom-pagination";
-import { CustomSelect } from "@/components/shared/select/custom-select";
 import { DataTable } from "@/components/shared/table/data-table";
 import { createUserTableColumns } from "@/components/shared/table/table-content";
 import { AppToast } from "@/components/shared/toast/app-toast";
@@ -17,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { getUserTableHeaders } from "@/constants/AppResource/table/table";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { usePagination } from "@/hooks/use-pagination";
 import { AllUserModel, UserModel } from "@/models/user/user.response";
@@ -31,7 +25,7 @@ import { useDebounce } from "@/utils/debounce/debounce";
 
 import { Download, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import StatusFilter from "@/constants/AppResource/display-list/status/status-filter";
@@ -41,7 +35,9 @@ import {
   ExcelExporter,
   ExcelSheet,
 } from "@/utils/export-file/excel";
-import { CreateUserForm, UpdateUserForm } from "@/models/user/user.schema";
+import { ModalMode } from "@/constants/AppResource/display-list/status/status";
+import ModalUser from "@/components/shared/modal/user-modal";
+import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
 
 export default function UserPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,8 +60,6 @@ export default function UserPage() {
     useState(false);
 
   const t = useTranslations();
-  const headers = getUserTableHeaders(t);
-  const pathname = usePathname();
 
   const searchParams = useSearchParams();
 
@@ -151,18 +145,21 @@ export default function UserPage() {
     }
   };
 
-  const handleSaveUser = async (formData: UserFormData) => {
+  const handleSaveUser = async (
+    formData: CreateUserReq | { id: number; updates: UpdateUserReq }
+  ) => {
     setIsSubmitting(true);
     try {
       if (mode === ModalMode.CREATE_MODE) {
-        const createData = formData as CreateUserForm;
+        const createData = formData as CreateUserReq;
+
         const response = await createUserService({
-          email: createData?.email || "",
-          fullName: createData.fullName || "",
-          password: createData.password || "",
-          role: createData.role || "ADMIN",
-          username: createData.username || "",
-          position: createData.position || "",
+          email: createData.email,
+          fullName: createData.fullName,
+          password: createData.password,
+          role: createData.role,
+          username: createData.username,
+          position: createData.position,
         });
 
         // Optimistic update
@@ -193,25 +190,26 @@ export default function UserPage() {
             description: "New User",
           });
         });
-      } else if (mode === ModalMode.UPDATE_MODE && formData.id) {
-        if (!formData.id) return;
+      } else if (mode === ModalMode.UPDATE_MODE) {
+        const updateData = formData as { id: number; updates: UpdateUserReq };
 
-        const updateUserForm = formData as UpdateUserForm;
-        const response = await updateUserService(updateUserForm?.id, {
-          fullName: updateUserForm.fullName,
-          email: updateUserForm.email,
-          position: updateUserForm.position,
-          username: updateUserForm.username,
-          profileUrl: updateUserForm.profileUrl,
-          status: updateUserForm.status,
-        });
+        if (!updateData.id) {
+          console.error("Missing user id in update form");
+          setIsSubmitting(false);
+          return;
+        }
+
+        const response = await updateUserService(
+          updateData.id,
+          updateData.updates
+        );
 
         setUsers((prev) =>
           prev
             ? {
                 ...prev,
                 content: prev.content.map((user) =>
-                  user.id === formData.id ? response : user
+                  user.id === updateData.id ? response : user
                 ),
               }
             : prev
@@ -225,6 +223,7 @@ export default function UserPage() {
           });
         });
       }
+
       setIsModalOpen(false);
       setSelectedUser(null);
       loadUsers();
@@ -391,7 +390,7 @@ export default function UserPage() {
               aria-label="search-user"
               autoComplete="search-user"
               type="search"
-              placeholder={t("user.search")}
+              placeholder={t("user.search-user")}
               value={searchQuery}
               onChange={handleSearchChange}
               className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"

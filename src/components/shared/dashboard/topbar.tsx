@@ -20,6 +20,10 @@ import { logoutRole } from "@/utils/local-storage/roles";
 import LanguageSwitcher from "../common/language-switcher";
 import { ThemeToggle } from "./theme-toggle";
 import { useTranslations } from "next-intl";
+import { ROUTES } from "@/constants/AppRoutes/routes";
+import { cn } from "@/lib/utils";
+import { AppIcons } from "@/constants/AppResource/icons/app-icons";
+import Link from "next/link";
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -48,6 +52,17 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             <span className="sr-only">Toggle menu</span>
           </Button>
         )}
+
+        <Link
+          href={ROUTES.DASHBOARD.INDEX}
+          className="flex items-center gap-2 font-semibold"
+        >
+          <img
+            src={AppIcons.APP.CPBANK}
+            alt="Special Account"
+            className="w-72 h-12"
+          />
+        </Link>
 
         <div className="flex items-center gap-3 justify-end flex-1">
           <ThemeToggle />

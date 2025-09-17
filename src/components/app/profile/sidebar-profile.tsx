@@ -47,7 +47,7 @@ export function SidebarUserProfile({
             {isOpen && (
               <div className="grid gap-0.5 text-sm overflow-hidden">
                 <div className="font-medium capitalize truncate">
-                  {user?.name || "User"}
+                  {user?.fullName || "User"}
                 </div>
                 <div className="text-xs text-muted-foreground truncate max-w-[150px]">
                   {user?.email || "user@example.com"}
@@ -61,7 +61,7 @@ export function SidebarUserProfile({
         {!isOpen && (
           <TooltipContent side="right">
             <div className="flex flex-col">
-              <span className="font-medium">{user?.name || "User"}</span>
+              <span className="font-medium">{user?.fullName || "User"}</span>
               <span className="text-xs text-muted-foreground">
                 {user?.email || "user@example.com"}
               </span>

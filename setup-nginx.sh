@@ -3,12 +3,12 @@
 # ========================================================================
 # 🔧 CUSTOMIZABLE VARIABLES - CHANGE THESE FOR YOUR PROJECT
 # ========================================================================
-PROJECT_NAME="MENU Scanner App"
-APP_NAME="menu-scanner"
-SERVER_IP="152.42.219.13"
-FRONTEND_PORT="8443"
-BACKEND_PORT="9090"
-PM2_INTERNAL_PORT="3000"
+PROJECT_NAME="Internal dev Frontend"
+APP_NAME="internal_dev_frontend"
+SERVER_IP="192.168.103.106"
+FRONTEND_PORT="2333"
+BACKEND_PORT="8888"
+PM2_INTERNAL_PORT="3221"
 MAX_UPLOAD_SIZE="50M"
 PROXY_TIMEOUT="90s"
 

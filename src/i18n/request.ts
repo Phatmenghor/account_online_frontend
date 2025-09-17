@@ -1,6 +1,6 @@
 import { getRequestConfig } from "next-intl/server";
 
-export const locales = ["en", "kh", "zh-CN"] as const;
+export const locales = ["en", "kh"] as const;
 export const defaultLocale = "en" as const;
 export type Locale = (typeof locales)[number];
 
@@ -8,7 +8,6 @@ export type Locale = (typeof locales)[number];
  * Normalize locale codes so "zh-CN" -> "zh", "en-US" -> "en", etc.
  */
 export function normalizeLocale(locale: string): Locale {
-  if (locale.startsWith("zh")) return "zh-CN";
   if (locale.startsWith("en")) return "en";
   if (locale.startsWith("kh")) return "kh";
   return defaultLocale;

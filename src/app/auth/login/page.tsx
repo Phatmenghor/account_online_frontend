@@ -23,7 +23,7 @@ import { AppToast } from "@/components/shared/toast/app-toast";
 import { useTranslations } from "next-intl";
 
 const formSchema = z.object({
-  username: z.string().email({ message: "Please enter a valid email address" }),
+  username: z.string({ message: "Please enter a valid email address" }),
   password: z.string().min(8, {
     message: "Password must be at least 8 characters",
   }),

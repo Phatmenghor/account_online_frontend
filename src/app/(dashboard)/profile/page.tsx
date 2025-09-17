@@ -1,84 +1,68 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Key, User } from "lucide-react";
+import { User, Key } from "lucide-react";
 import { AppToast } from "@/components/shared/toast/app-toast";
-import { UserModel } from "@/models/user/user.response";
 import Loading from "@/components/shared/common/loading";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileTab from "@/components/app/profile/profile-tab";
 import ChangePasswordTab from "@/components/app/profile/change-password-tab";
-
-export const mockUser: UserModel = {
-  id: "u-001",
-  name: "Jane",
-  email: "jane.smith@example.com",
-  status: "active",
-  role: "ADMIN",
-  profileUrl: "https://i.pravatar.cc/150?img=5",
-  createdAt: new Date().toISOString(),
-};
+import { getUserProfileService } from "@/services/dashboard/user/user.service";
+import { updateUserProfileService } from "@/services/auth/login.service";
+import { uploadImageService } from "@/services/dashboard/image/image.service";
+import { UpdateUserForm, UpdateUserSchema } from "@/models/user/user.schema";
+import { Status } from "@/constants/AppResource/filter/filter";
+import { UserModel } from "@/models/user/user.response";
 
 export interface Image {
   type: string;
   base64: string;
 }
 
-const profileFormSchema = z.object({
-  name: z.string().optional(),
-  profileUrl: z.string().optional(),
-  email: z
-    .string()
-    .email({
-      message: "Please enter a valid username address.",
-    })
-    .optional(),
-  role: z.string().optional(),
-  status: z.string().optional(),
-});
-
-export type ProfileFormData = z.infer<typeof profileFormSchema>;
-
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageData, setImageData] = useState<Image | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<UserModel | null>(null);
-  const profileForm = useForm<ProfileFormData>({
-    resolver: zodResolver(profileFormSchema),
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const profileForm = useForm<UpdateUserForm>({
+    resolver: zodResolver(UpdateUserSchema),
     defaultValues: {
-      name: "",
+      username: "",
       email: "",
-      status: "",
+      fullName: "",
+      status: Status.ACTIVE,
+      position: "",
       profileUrl: "",
+      id: 0,
     },
   });
 
-  // Load user profile on component mount
-  // replace both useEffects with this one 👇
+  const { handleSubmit, reset, formState } = profileForm;
+  const { isSubmitting } = formState;
+
+  // Load user profile
   useEffect(() => {
     const loadUserProfile = async () => {
       setIsLoading(true);
       try {
-        // ✅ use mockUser instead of hitting service
-        const response = mockUser;
-        console.log("Loaded mock user profile:", response);
-
+        const response: UserModel = await getUserProfileService();
         setUser(response);
-        // set to context/state if you need
 
-        // Initialize form with user data
-        profileForm.reset({
-          name: response.name || "",
-          email: response.email || "",
-          status: response.status || "",
-          role: response.role,
-          profileUrl: response.profileUrl || "",
-        });
+        reset(
+          {
+            username: response.idCard || "",
+            email: response.email || "",
+            fullName: response.fullName || "",
+            status: response.userStatus || Status.ACTIVE,
+            position: response.position || "",
+            profileUrl: response.profileUrl || "",
+          },
+          { keepDefaultValues: true } // ensures isDirty works correctly
+        );
       } catch (error) {
         console.error("Failed to load profile:", error);
         AppToast({ type: "error", message: "Failed to load profile." });
@@ -88,136 +72,141 @@ export default function ProfilePage() {
     };
 
     loadUserProfile();
-  }, [profileForm, setUser]);
+  }, [reset]);
 
-  // Trigger file input click when avatar is clicked
-  // in ProfilePage
+  // Avatar click triggers file input
   const handleAvatarClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    fileInputRef.current?.click();
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        AppToast({
-          type: "error",
-          message: "File too large, Image must be less than 5MB.",
-        });
-        return;
-      }
+    if (!file) return;
 
-      try {
-        const base64 = await convertToBase64(file);
-        setImageData({
-          type: file.type,
-          base64: base64,
-        });
-        setImagePreview(URL.createObjectURL(file));
-      } catch (error) {
-        console.error("Error converting image to base64", error);
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      AppToast({ type: "error", message: "File too large, must be <5MB." });
+      return;
+    }
 
-        AppToast({
-          type: "error",
-          message:
-            "Image processing error. Failed to process the image. Please try again.",
-        });
-      }
+    try {
+      const base64 = await convertToBase64(file);
+      setImageData({ type: file.type, base64 });
+      setImagePreview(URL.createObjectURL(file));
+    } catch (error) {
+      console.error("Error processing image:", error);
+      AppToast({ type: "error", message: "Failed to process image." });
     }
   };
 
-  // Function to convert file to base64
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
+  const convertToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
         if (typeof reader.result === "string") {
-          // Remove the data:image/jpeg;base64, prefix
-          const base64String = reader.result.split(",")[1];
-          resolve(base64String);
+          resolve(reader.result.split(",")[1]);
+        } else {
+          reject("Failed to convert image");
         }
       };
-      reader.onerror = (error) => reject(error);
+      reader.onerror = reject;
     });
-  };
 
-  const onProfileSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+  // Form submission
+  const onProfileSubmit = async (values: UpdateUserForm) => {
     try {
-      // ✅ just update the mock locally
-      console.log("Updated profile (mock only):", values);
+      let uploadedProfileUrl: string = values.profileUrl || "";
 
-      // update user context
-      setUser?.({
-        ...mockUser,
-        ...values, // merge changes
-      });
+      if (imageData) {
+        const imageResponse = await uploadImageService(imageData);
+        if (imageResponse?.imageUrl) {
+          uploadedProfileUrl = imageResponse.imageUrl;
+        } else {
+          throw new Error("Failed to upload image");
+        }
+      }
 
-      AppToast({ type: "success", message: "Profile updated (mock)!" });
+      // Map correctly for API
+      const payload = {
+        username: values.username, // 👈 map username back to idCard
+        email: values.email,
+        fullName: values.fullName,
+        position: values.position,
+        status: values.status, // 👈 map status back to userStatus
+        profileUrl: uploadedProfileUrl,
+      };
+
+      const response = await updateUserProfileService(payload);
+
+      if (response) {
+        AppToast({ type: "success", message: "Profile updated successfully!" });
+        setUser({
+          ...user!,
+          ...response, // trust backend response
+          profileUrl: uploadedProfileUrl,
+        });
+
+        reset(
+          {
+            username: payload.username,
+            email: payload.email,
+            fullName: payload.fullName,
+            status: payload.status,
+            position: payload.position,
+            profileUrl: payload.profileUrl,
+          },
+          { keepDefaultValues: true }
+        );
+        setImageData(null);
+        setImagePreview(null);
+      }
     } catch (error) {
       console.error(error);
-      AppToast({ type: "error", message: "Failed to update profile (mock)." });
+      AppToast({ type: "error", message: "Failed to update profile." });
     }
   };
 
-  // Cleanup effect for image preview URL
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
+  // Cleanup image preview
+  useEffect(
+    () => () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    },
+    [imagePreview]
+  );
+
+  if (isLoading) return <Loading />;
 
   return (
     <div className="p-3">
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold tracking-tight">My Profile</h1>
-          </div>
+      <div className="flex flex-col gap-4">
+        <h1 className="text-2xl font-bold tracking-tight">My Profile</h1>
 
-          <div className="grid gap-6">
-            <Tabs defaultValue="account" className="space-y-4">
-              <TabsList>
-                <TabsTrigger
-                  value="account"
-                  className="flex items-center gap-2"
-                >
-                  <User className="h-4 w-4" />
-                  <span>Account</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="password"
-                  className="flex items-center gap-2"
-                >
-                  <Key className="h-4 w-4" />
-                  <span>Password</span>
-                </TabsTrigger>
-              </TabsList>
+        <Tabs defaultValue="account" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="account" className="flex items-center gap-2">
+              <User className="h-4 w-4" /> Account
+            </TabsTrigger>
+            <TabsTrigger value="password" className="flex items-center gap-2">
+              <Key className="h-4 w-4" /> Password
+            </TabsTrigger>
+          </TabsList>
 
-              <ProfileTab
-                user={user}
-                fileInputRef={fileInputRef}
-                form={profileForm}
-                imageData={imageData}
-                onProfileSubmit={onProfileSubmit}
-                tabValue="account"
-                handleAvatarClick={handleAvatarClick}
-                handleImageUpload={handleImageUpload}
-                imagePreview={imagePreview}
-              />
+          <ProfileTab
+            tabValue="account"
+            fileInputRef={fileInputRef}
+            handleAvatarClick={handleAvatarClick}
+            handleImageUpload={handleImageUpload}
+            imageData={imageData}
+            imagePreview={imagePreview}
+            user={user}
+            form={profileForm}
+            onProfileSubmit={onProfileSubmit}
+          />
 
-              <ChangePasswordTab value="password" />
-            </Tabs>
-          </div>
-        </div>
-      )}
+          <ChangePasswordTab value="password" />
+        </Tabs>
+      </div>
     </div>
   );
 }

@@ -11,6 +11,8 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Shield, CheckCircle, AlertTriangle, Lock, User } from "lucide-react";
+import { ChangeUserPasswordByAdminService } from "@/services/dashboard/user/user.service";
+import { AppToast } from "../toast/app-toast";
 
 export default function ResetPasswordModal({
   userId,
@@ -26,12 +28,26 @@ export default function ResetPasswordModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const DEFAULT_PASSWORD = "88889999";
   const onReset = async () => {
+    if (!userId) {
+      console.log("Missing userId found!");
+      return;
+    }
     setIsSubmitting(true);
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setShowSuccess(true);
+      const response = await ChangeUserPasswordByAdminService({
+        id: userId,
+        confirmNewPassword: DEFAULT_PASSWORD,
+        newPassword: DEFAULT_PASSWORD,
+      });
+      if (response) {
+        AppToast({
+          type: "success",
+          message: "User password reset successfully",
+        });
+        onClose();
+      }
     } catch (error) {
       console.error("Reset failed:", error);
     } finally {
