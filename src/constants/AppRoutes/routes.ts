@@ -2,7 +2,7 @@ import { Code, User2 } from "lucide-react";
 
 export const ROUTES = {
   AUTH: {
-    LOGIN: "/auth/login",
+    LOGIN: "/login",
   },
   DASHBOARD: {
     INDEX: "/user",

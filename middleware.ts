@@ -12,7 +12,7 @@ export default function middleware(req: NextRequest) {
   console.log("ROUTES.AUTH.LOGIN:", ROUTES.AUTH.LOGIN);
   console.log("========================");
 
-  if (pathname === "/auth/login") {
+  if (pathname === "/login") {
     return NextResponse.next();
   }
 
