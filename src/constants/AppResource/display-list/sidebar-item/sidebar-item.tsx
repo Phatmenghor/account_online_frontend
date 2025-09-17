@@ -14,7 +14,7 @@ export function useNavItems() {
       icon: User2,
     },
     {
-      title: "Project",
+      title: t("project"),
       href: ROUTES.DASHBOARD.PROJECT,
       icon: Folder,
     },
