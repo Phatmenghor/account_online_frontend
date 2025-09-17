@@ -61,7 +61,6 @@ export default function LoginPage() {
           AppToast({
             type: "success",
             message: "Login successfully",
-            description: "Login",
           });
         });
       }
