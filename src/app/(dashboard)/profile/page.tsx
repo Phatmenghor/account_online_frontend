@@ -12,9 +12,12 @@ import ChangePasswordTab from "@/components/app/profile/change-password-tab";
 import { getUserProfileService } from "@/services/dashboard/user/user.service";
 import { updateUserProfileService } from "@/services/auth/login.service";
 import { uploadImageService } from "@/services/dashboard/image/image.service";
-import { UpdateUserForm, UpdateUserSchema } from "@/models/user/user.schema";
 import { Status } from "@/constants/AppResource/filter/filter";
 import { UserModel } from "@/models/user/user.response";
+import {
+  UpdateUserProfileForm,
+  UpdateUserProfileSchema,
+} from "@/models/auth/profile.schema";
 
 export interface Image {
   type: string;
@@ -28,8 +31,8 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserModel | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const profileForm = useForm<UpdateUserForm>({
-    resolver: zodResolver(UpdateUserSchema),
+  const profileForm = useForm<UpdateUserProfileForm>({
+    resolver: zodResolver(UpdateUserProfileSchema),
     defaultValues: {
       username: "",
       email: "",
@@ -60,8 +63,9 @@ export default function ProfilePage() {
             status: response.userStatus || Status.ACTIVE,
             position: response.position || "",
             profileUrl: response.profileUrl || "",
+            id: response.id,
           },
-          { keepDefaultValues: true } // ensures isDirty works correctly
+          { keepDefaultValues: true }
         );
       } catch (error) {
         console.error("Failed to load profile:", error);
@@ -74,10 +78,7 @@ export default function ProfilePage() {
     loadUserProfile();
   }, [reset]);
 
-  // Avatar click triggers file input
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleAvatarClick = () => fileInputRef.current?.click();
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -89,14 +90,9 @@ export default function ProfilePage() {
       return;
     }
 
-    try {
-      const base64 = await convertToBase64(file);
-      setImageData({ type: file.type, base64 });
-      setImagePreview(URL.createObjectURL(file));
-    } catch (error) {
-      console.error("Error processing image:", error);
-      AppToast({ type: "error", message: "Failed to process image." });
-    }
+    const base64 = await convertToBase64(file);
+    setImageData({ type: file.type, base64 });
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const convertToBase64 = (file: File): Promise<string> =>
@@ -113,27 +109,24 @@ export default function ProfilePage() {
       reader.onerror = reject;
     });
 
-  // Form submission
-  const onProfileSubmit = async (values: UpdateUserForm) => {
+  // Submit profile form
+  const onProfileSubmit = async (values: UpdateUserProfileForm) => {
     try {
-      let uploadedProfileUrl: string = values.profileUrl || "";
+      let uploadedProfileUrl = values.profileUrl || "";
 
       if (imageData) {
         const imageResponse = await uploadImageService(imageData);
-        if (imageResponse?.imageUrl) {
+        if (imageResponse?.imageUrl)
           uploadedProfileUrl = imageResponse.imageUrl;
-        } else {
-          throw new Error("Failed to upload image");
-        }
+        else throw new Error("Failed to upload image");
       }
 
-      // Map correctly for API
       const payload = {
-        username: values.username, // 👈 map username back to idCard
+        username: values.username,
         email: values.email,
         fullName: values.fullName,
         position: values.position,
-        status: values.status, // 👈 map status back to userStatus
+        status: values.status,
         profileUrl: uploadedProfileUrl,
       };
 
@@ -141,23 +134,8 @@ export default function ProfilePage() {
 
       if (response) {
         AppToast({ type: "success", message: "Profile updated successfully!" });
-        setUser({
-          ...user!,
-          ...response, // trust backend response
-          profileUrl: uploadedProfileUrl,
-        });
-
-        reset(
-          {
-            username: payload.username,
-            email: payload.email,
-            fullName: payload.fullName,
-            status: payload.status,
-            position: payload.position,
-            profileUrl: payload.profileUrl,
-          },
-          { keepDefaultValues: true }
-        );
+        setUser({ ...user!, ...response, profileUrl: uploadedProfileUrl });
+        reset({ ...payload, id: user?.id }, { keepDefaultValues: true });
         setImageData(null);
         setImagePreview(null);
       }
@@ -168,12 +146,11 @@ export default function ProfilePage() {
   };
 
   // Cleanup image preview
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    return () => {
       if (imagePreview) URL.revokeObjectURL(imagePreview);
-    },
-    [imagePreview]
-  );
+    };
+  }, [imagePreview]);
 
   if (isLoading) return <Loading />;
 

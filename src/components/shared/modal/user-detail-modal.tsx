@@ -74,7 +74,7 @@ export default function UserViewModal({
             <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
               {user?.profileUrl ? (
                 <img
-                  src={user.profileUrl}
+                  src={process.env.NEXT_PUBLIC_API_BASE_URL + user.profileUrl}
                   alt={user.fullName || "User"}
                   className="w-full h-full object-cover rounded-full"
                 />

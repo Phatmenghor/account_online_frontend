@@ -23,7 +23,7 @@
     "status": {
       "all": "All Status",
       "active": "Active",
-      "inactive": "Inactive"
+      "delete": "Delete"
     }
   },
 
@@ -76,7 +76,7 @@
     },
     "status": {
       "active": "Active",
-      "inactive": "Inactive"
+      "delete": "Delete"
     }
   },
 

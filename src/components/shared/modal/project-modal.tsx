@@ -21,6 +21,7 @@ import {
 } from "@/models/project/project.schema";
 import { getProjectByIdService } from "@/services/dashboard/project/project.service";
 import { ModalMode } from "@/constants/AppResource/display-list/status/status";
+import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
   mode: ModalMode;
@@ -316,7 +317,7 @@ export default function ModalProject({
               control={control}
               name="remark"
               render={({ field }) => (
-                <Input
+                <Textarea
                   {...field}
                   id="remark"
                   disabled={isSubmitting}

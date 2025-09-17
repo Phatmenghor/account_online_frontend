@@ -16,16 +16,15 @@ export default function StatusFilter({
   const t = useTranslations("common.status");
 
   const STATUS_FILTER = [
-    { value: "ALL", label: t("all") },
     { value: Status.ACTIVE, label: t("active") },
-    { value: Status.INACTIVE, label: t("inactive") },
+    { value: Status.DELETE, label: t("delete") },
   ];
 
   return (
     <CustomSelect
       options={STATUS_FILTER}
       value={statusFilter}
-      placeholder={t("all")}
+      placeholder={t("active")}
       onValueChange={(value) => setStatusFilter(value as Status)}
     />
   );

@@ -2,11 +2,9 @@ import { TableColumn } from "@/components/shared/table/table";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
-import { Check, Edit, Eye, RotateCcw, Trash } from "lucide-react";
+import { Edit, Eye, RotateCcw, Trash } from "lucide-react";
 import { CustomAvatar } from "../image/custom-avatar";
 import { RoleBadge } from "../badge/role-badge";
-import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
 import { AllUserModel, UserModel } from "@/models/user/user.response";
 import {
   Tooltip,
@@ -21,7 +19,6 @@ interface userTableHandlers {
   handleViewUserDetail: (user: UserModel) => void;
   handleDeleteUser: (user: UserModel) => void;
   handleResetPassword: (user: UserModel) => void;
-  handleUserStatusToggle: (user: UserModel) => void;
 }
 
 interface userTableOptions {
@@ -37,7 +34,6 @@ export const createUserTableColumns = ({
     handleEditUser,
     handleViewUserDetail,
     handleDeleteUser,
-    handleUserStatusToggle,
     handleResetPassword,
   } = handlers;
 
@@ -88,32 +84,7 @@ export const createUserTableColumns = ({
         <span className="font-medium">{user.email || "---"}</span>
       ),
     },
-    {
-      key: "userStatus",
-      label: tUser("userStatus"),
-      render: (user) => (
-        <Switch
-          checked={user.userStatus === "ACTIVE"}
-          aria-label="Toggle user status"
-          onCheckedChange={() => handleUserStatusToggle(user)}
-          className={cn(
-            "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
-            "bg-gray-300 dark:bg-gray-600 data-[state=checked]:bg-orange-500 dark:data-[state=checked]:bg-orange-400"
-          )}
-        >
-          <div
-            className={cn(
-              "inline-block h-6 w-11 transform rounded-full bg-white dark:bg-gray-100 shadow-md transition-transform",
-              "translate-x-1 data-[state=checked]:translate-x-5"
-            )}
-          >
-            {user.userStatus === "ACTIVE" && (
-              <Check className="h-6 m-auto text-orange-600 dark:text-orange-300" />
-            )}
-          </div>
-        </Switch>
-      ),
-    },
+
     {
       key: "userRole",
       label: tUser("userRole"),

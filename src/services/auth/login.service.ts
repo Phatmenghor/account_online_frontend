@@ -2,7 +2,8 @@ import { LoginCredentials } from "@/models/auth/auth.request";
 import { UpdateUserReq } from "@/models/user/user.request";
 import { axiosClient } from "@/utils/axios";
 import { storeRole } from "@/utils/local-storage/roles";
-import { storeToken } from "@/utils/local-storage/token";
+import { getToken, storeToken } from "@/utils/local-storage/token";
+import { storeUserInfo } from "@/utils/local-storage/userInfo";
 
 export async function loginService(credentials: LoginCredentials) {
   try {
@@ -12,6 +13,7 @@ export async function loginService(credentials: LoginCredentials) {
     // On success, store token and role (simulate your original behavior)
     storeToken(response.data.data.accessToken);
     storeRole(response.data.data.userRole.userRole);
+    storeUserInfo(response.data.userRole);
 
     return response.data.data;
   } catch (error) {
@@ -30,7 +32,12 @@ export async function updateUserProfileService(updateData: UpdateUserReq) {
     // Simulate async call and delay
     const response = await axiosClient.post(
       "/api/v1/auth/token/update-profile",
-      updateData
+      updateData,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
     );
 
     return response.data.data;

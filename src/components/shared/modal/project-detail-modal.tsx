@@ -163,6 +163,7 @@ export default function ProjectViewModal({
                       icon: <StickyNote />,
                       label: "Remark",
                       value: project?.remark,
+                      isLongText: true, // Mark this as a long text field
                     },
                   ]}
                 />
@@ -199,17 +200,60 @@ function Section({
 
 function InfoGrid({
   rows,
+  useVerticalLayout = false,
 }: {
-  rows: { icon: React.ReactNode; label: string; value?: string }[];
+  rows: {
+    icon: React.ReactNode;
+    label: string;
+    value?: string;
+    isLongText?: boolean;
+  }[];
+  useVerticalLayout?: boolean;
 }) {
+  // Use vertical layout if explicitly requested OR if any row has isLongText
+  const shouldUseVertical =
+    useVerticalLayout || rows.some((row) => row.isLongText);
+
+  if (shouldUseVertical) {
+    return (
+      <div className="space-y-4">
+        {rows.map((row, idx) => (
+          <div
+            key={idx}
+            className={`flex gap-3 items-start ${
+              row.isLongText ? "flex-col sm:flex-row" : ""
+            }`}
+          >
+            <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
+              {row.icon}
+            </div>
+            <div className={`flex-1 min-w-0 ${row.isLongText ? "w-full" : ""}`}>
+              <p className="text-xs text-muted-foreground mb-1">{row.label}</p>
+              <p
+                className={`text-sm text-foreground ${
+                  row.isLongText
+                    ? "whitespace-pre-wrap break-words leading-relaxed"
+                    : "break-words"
+                }`}
+              >
+                {row.value || "N/A"}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Use grid layout for normal fields
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {rows.map((row, idx) => (
         <div key={idx} className="flex gap-2 items-start">
-          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center">
+          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
             {row.icon}
           </div>
-          <div>
+          <div className="flex-1 min-w-0">
             <p className="text-xs text-muted-foreground">{row.label}</p>
             <p className="text-sm text-foreground break-words">
               {row.value || "N/A"}

@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import { TabsContent } from "@/components/ui/tabs";
 import {
@@ -30,20 +31,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useForm } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { UserModel } from "@/models/user/user.response";
-import { UpdateUserForm } from "@/models/user/user.schema";
+import { UpdateUserProfileForm } from "@/models/auth/profile.schema";
 import { Image } from "@/app/(dashboard)/profile/page";
+import { Status } from "@/constants/AppResource/filter/filter";
 
 interface Props {
   tabValue: string;
   handleAvatarClick: () => void;
   user?: UserModel | null;
   imagePreview: string | null;
-  form: ReturnType<typeof useForm<UpdateUserForm>>;
+  form: UseFormReturn<UpdateUserProfileForm>;
   imageData: Image | null;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onProfileSubmit: (values: UpdateUserForm) => void;
+  onProfileSubmit: (values: UpdateUserProfileForm) => void;
   fileInputRef: React.LegacyRef<HTMLInputElement> | undefined;
 }
 
@@ -62,26 +64,54 @@ export default function ProfileTab({
 
   const {
     control,
-    formState: { isSubmitting },
     handleSubmit,
     reset,
+    formState: { isSubmitting },
   } = form;
 
-  const handleEditModeToggle = () => {
+  const readOnlyFields = ["username", "status"]; // fields that are never editable
+
+  // Reset form to current user values
+  const resetFormToUser = () => {
+    if (!user) return;
+    reset(
+      {
+        username: user.idCard || "",
+        email: user.email || "",
+        fullName: user.fullName || "",
+        status: user.userStatus || Status.ACTIVE,
+        position: user.position || "",
+        profileUrl: user.profileUrl || "",
+        id: user.id || 0,
+      },
+      { keepDefaultValues: true }
+    );
+  };
+
+  const toggleEditMode = () => {
     if (editMode) {
-      reset(undefined, { keepDefaultValues: true });
+      resetFormToUser(); // cancel edits
       setEditMode(false);
     } else {
       setEditMode(true);
     }
   };
 
-  const handleFormSubmit = async (values: UpdateUserForm) => {
+  const submitForm = async (values: UpdateUserProfileForm) => {
     try {
-      await onProfileSubmit(values);
+      await onProfileSubmit({
+        ...values,
+        username: values.username || undefined,
+        email: values.email || undefined,
+        fullName: values.fullName || undefined,
+        position: values.position || undefined,
+        profileUrl: values.profileUrl || undefined,
+        status: values.status || undefined,
+        id: values.id || undefined,
+      });
       setEditMode(false);
     } catch (error) {
-      console.error("Form submission error:", error);
+      console.error("Error updating profile:", error);
     }
   };
 
@@ -90,7 +120,7 @@ export default function ProfileTab({
       <div className="grid gap-6 md:grid-cols-12">
         {/* Profile Banner */}
         <Card className="md:col-span-12 overflow-hidden border-enhanced">
-          <div className="h-24 bg-gradient-to-r from-primary/90 to-primary/70 dark:from-primary/80 dark:to-primary/60"></div>
+          <div className="h-24 bg-gradient-to-r from-primary/90 to-primary/70 dark:from-primary/80 dark:to-primary/60" />
           <CardContent className="relative pt-0">
             <div className="flex flex-col md:flex-row gap-6 -mt-12 items-start">
               <div
@@ -135,38 +165,23 @@ export default function ProfileTab({
               <div className="flex-1 pt-12 md:pt-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between">
                   <div className="space-y-1">
-                    <h2 className="text-2xl font-bold">
-                      {user?.fullName?.trim()}
-                    </h2>
+                    <h2 className="text-2xl font-bold">{user?.fullName}</h2>
                   </div>
                   <div className="mt-3 md:mt-0 flex items-center gap-3">
-                    <Badge
-                      variant="outline"
-                      className={`badge ${
-                        user?.userStatus === "ACTIVE"
-                          ? "bg-green-100 text-green-700 border-green-300 dark:bg-green-950/50 dark:text-green-400 dark:border-green-800"
-                          : "bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-800"
-                      }`}
-                    >
-                      {user?.userStatus || "PENDING"}
-                    </Badge>
-
                     <Button
                       variant={editMode ? "outline" : "secondary"}
                       size="sm"
-                      onClick={handleEditModeToggle}
+                      onClick={toggleEditMode}
                       disabled={isSubmitting}
                       className="gap-1.5"
                     >
                       {editMode ? (
                         <>
-                          <X className="h-4 w-4" />
-                          Cancel
+                          <X className="h-4 w-4" /> Cancel
                         </>
                       ) : (
                         <>
-                          <Edit3 className="h-4 w-4" />
-                          Edit Profile
+                          <Edit3 className="h-4 w-4" /> Edit Profile
                         </>
                       )}
                     </Button>
@@ -212,8 +227,7 @@ export default function ProfileTab({
               </div>
               {editMode && (
                 <Badge variant="secondary" className="gap-1">
-                  <Edit3 className="h-3 w-3" />
-                  Edit Mode
+                  <Edit3 className="h-3 w-3" /> Edit Mode
                 </Badge>
               )}
             </div>
@@ -221,99 +235,43 @@ export default function ProfileTab({
 
           <CardContent className="mb-5">
             <Form {...form}>
-              <form
-                onSubmit={handleSubmit(handleFormSubmit)}
-                className="space-y-6"
-              >
+              <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="username">Id Card</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            readOnly={!editMode}
-                            disabled={isSubmitting}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="email">Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            readOnly={!editMode}
-                            disabled={isSubmitting}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="fullName">Full Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            readOnly={!editMode}
-                            disabled={isSubmitting}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name="position"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="position">Position</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            readOnly={!editMode}
-                            disabled={isSubmitting}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="status">Status</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            readOnly
-                            disabled
-                            className="bg-muted/50"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {["username", "email", "fullName", "position", "status"].map(
+                    (fieldName) => (
+                      <FormField
+                        key={fieldName}
+                        control={control}
+                        name={fieldName as keyof UpdateUserProfileForm}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {fieldName === "username"
+                                ? "Id Card"
+                                : fieldName.charAt(0).toUpperCase() +
+                                  fieldName.slice(1)}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                readOnly={
+                                  !editMode ||
+                                  readOnlyFields.includes(fieldName)
+                                }
+                                disabled={isSubmitting}
+                                className={
+                                  readOnlyFields.includes(fieldName)
+                                    ? "bg-muted/50"
+                                    : ""
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )
+                  )}
                 </div>
 
                 {editMode && (
@@ -321,12 +279,11 @@ export default function ProfileTab({
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={handleEditModeToggle}
+                      onClick={toggleEditMode}
                       disabled={isSubmitting}
                       className="gap-1"
                     >
-                      <X className="h-4 w-4" />
-                      Cancel
+                      <X className="h-4 w-4" /> Cancel
                     </Button>
                     <Button
                       type="submit"

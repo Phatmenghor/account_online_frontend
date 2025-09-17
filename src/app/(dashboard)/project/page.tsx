@@ -350,13 +350,16 @@ export default function ProjectPage() {
                 disabled={isSubmitting}
               />
             </div>
+          </div>
+
+          <div className="flex gap-4">
             <div>
               {/* FIXED BUTTON WITH PROPER LOADING STATE AND TEXT */}
               <Button
                 onClick={() => handleExportToExcel(projects?.content ?? [])}
                 size="lg"
                 variant="outline"
-                className="gap-2 text-sm sm:text-base hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6 py-2 lg:py-4"
+                className="gap-2 text-sm sm:text-base h-10 hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6"
                 disabled={isExportingToExcel}
               >
                 <img
@@ -370,9 +373,9 @@ export default function ProjectPage() {
                 <Download className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
               </Button>
             </div>
-          </div>
-          <div>
-            <Button onClick={handleAddProject}>{t("common.new")}</Button>
+            <Button className="h-10" onClick={handleAddProject}>
+              {t("common.new")}
+            </Button>
           </div>
         </div>
 

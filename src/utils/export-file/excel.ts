@@ -54,18 +54,17 @@ export class ExcelExporter {
 
   // Visible borders for all cells - changed to darker color
   private readonly CELL_BORDER_STYLE = {
-    top: { style: "medium" as const, color: { argb: "FF666666" } },
-    left: { style: "medium" as const, color: { argb: "FF666666" } },
-    bottom: { style: "medium" as const, color: { argb: "FF666666" } },
-    right: { style: "medium" as const, color: { argb: "FF666666" } },
+    top: { style: "thin" as const, color: { argb: "FF666666" } },
+    left: { style: "thin" as const, color: { argb: "FF666666" } },
+    bottom: { style: "thin" as const, color: { argb: "FF666666" } },
+    right: { style: "thin" as const, color: { argb: "FF666666" } },
   };
 
   // Thick outer borders
   private readonly OUTER_BORDER_STYLE = {
-    style: "thick" as const,
+    style: "medium" as const,
     color: { argb: "FF000000" },
   };
-
   // Professional styling
   private readonly STYLES = {
     header: {

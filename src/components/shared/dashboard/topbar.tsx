@@ -40,7 +40,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
     logoutToken();
     logoutRole();
 
-    router.replace("/login");
+    router.replace(ROUTES.AUTH.LOGIN);
   };
 
   return (
@@ -65,7 +65,6 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         </Link>
 
         <div className="flex items-center gap-3 justify-end flex-1">
-          <ThemeToggle />
           <LanguageSwitcher variant="flag-only" />
 
           <Button

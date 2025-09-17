@@ -149,10 +149,6 @@ export default function ResetPasswordModal({
                     {userName || "Selected User"}
                   </span>
                 </div>
-                <DialogDescription className="text-gray-600 text-sm leading-relaxed">
-                  This will reset the user's password to default. User must
-                  login with new credentials.
-                </DialogDescription>
               </div>
 
               {/* Warning Box */}

@@ -34,7 +34,7 @@ export function SidebarUserProfile({
               <AvatarImage
                 src={
                   user?.profileUrl
-                    ? `${process.env.NEXT_PUBLIC_API_IMAGE}${user.profileUrl}`
+                    ? `${process.env.NEXT_PUBLIC_API_BASE_URL_IMAGE}${user.profileUrl}`
                     : ""
                 }
                 alt="Profile"

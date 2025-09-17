@@ -14,6 +14,7 @@ import { SidebarUserProfile } from "@/components/app/profile/sidebar-profile";
 import { UserModel } from "@/models/user/user.response";
 import { useNavItems } from "@/constants/AppResource/display-list/sidebar-item/sidebar-item";
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
+import { getUserProfileService } from "@/services/dashboard/user/user.service";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -31,9 +32,8 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
     const loadUserProfile = async () => {
       setIsLoading(true);
       try {
-        // Uncomment and replace with real API call
-        // const response = await getUsersProfileService();
-        // setAuthUser(response || null);
+        const response = await getUserProfileService();
+        setAuthUser(response || null);
       } catch (error) {
         console.error("Failed to load user profile", error);
       } finally {
