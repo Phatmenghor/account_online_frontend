@@ -160,6 +160,7 @@ function ProjectPageContent() {
           projectName: updateProjectForm.projectName,
           remark: updateProjectForm.remark || "",
           type: updateProjectForm.type,
+          memberInvolved: updateProjectForm?.memberInvolved || "",
           dbType: updateProjectForm.dbType,
           dbServer: updateProjectForm.dbServer,
           dbName: updateProjectForm.dbName,
@@ -380,30 +381,34 @@ function ProjectPageContent() {
         <div className="w-full">
           <Separator className="bg-gray-300" />
         </div>
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 rounded-md border overflow-hidden flex flex-col">
+            <div className="flex-1 overflow-x-auto">
+              <DataTable
+                data={projects?.content || []}
+                columns={createProjectTableColumns({
+                  data: projects,
+                  handlers: {
+                    handleEditProject,
+                    handleViewProjectDetail,
+                    handleDeleteProject,
+                  },
+                })}
+                loading={isLoading}
+                emptyMessage="No project found"
+                getRowKey={(project) => project.id}
+              />
 
-        <div>
-          <div className="rounded-md border overflow-x-auto whitespace-nowrap">
-            <DataTable
-              data={projects?.content || []}
-              columns={createProjectTableColumns({
-                data: projects,
-                handlers: {
-                  handleEditProject,
-                  handleViewProjectDetail,
-                  handleDeleteProject,
-                },
-              })}
-              loading={isLoading}
-              emptyMessage="No project found"
-              getRowKey={(project) => project.id}
-            />
-
-            <CustomPagination
-              currentPage={currentPage}
-              totalPages={projects?.totalPages || 1}
-              onPageChange={handlePageChange}
-              size="md"
-            />
+              {/* Pagination positioned to the right and outside the scrollable area */}
+              <div className="border-t bg-background p-2 flex justify-end">
+                <CustomPagination
+                  currentPage={currentPage}
+                  totalPages={projects?.totalPages || 1}
+                  onPageChange={handlePageChange}
+                  size="md"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -447,13 +452,7 @@ function ProjectPageContent() {
 
 export default function ProjectPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center p-8">
-          Loading projects...
-        </div>
-      }
-    >
+    <Suspense fallback={<Loading />}>
       <ProjectPageContent />
     </Suspense>
   );

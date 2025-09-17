@@ -18,6 +18,7 @@ export interface UpdateProjectReq {
   dbName?: string;
   dbType?: string;
   dbServer?: string;
+  memberInvolved?: string;
   remark?: string;
 }
 

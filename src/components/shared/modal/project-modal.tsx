@@ -125,7 +125,10 @@ export default function ModalProject({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-2 pt-4">
           {/* Project Name */}
           <div className="space-y-1">
-            <Label htmlFor="projectName">Project Name *</Label>
+            <Label htmlFor="projectName">
+              Project Name{" "}
+              {isCreate ? <span className="text-red-700">*</span> : ""}
+            </Label>
             <Controller
               control={control}
               name="projectName"
@@ -147,7 +150,7 @@ export default function ModalProject({
 
           {/* Type */}
           <div className="space-y-1">
-            <Label htmlFor="type">Type *</Label>
+            <Label htmlFor="type">Type</Label>
             <Controller
               control={control}
               name="type"
@@ -169,7 +172,7 @@ export default function ModalProject({
 
           {/* Host Server */}
           <div className="space-y-1">
-            <Label htmlFor="hostServer">Host Server *</Label>
+            <Label htmlFor="hostServer">Host Server</Label>
             <Controller
               control={control}
               name="hostServer"
@@ -191,7 +194,7 @@ export default function ModalProject({
 
           {/* Host Port */}
           <div className="space-y-1">
-            <Label htmlFor="hostPort">Host Port *</Label>
+            <Label htmlFor="hostPort">Host Port</Label>
             <Controller
               control={control}
               name="hostPort"
@@ -215,7 +218,7 @@ export default function ModalProject({
 
           {/* DB Name */}
           <div className="space-y-1">
-            <Label htmlFor="dbName">Database Name *</Label>
+            <Label htmlFor="dbName">Database Name</Label>
             <Controller
               control={control}
               name="dbName"
@@ -237,7 +240,7 @@ export default function ModalProject({
 
           {/* DB Type */}
           <div className="space-y-1">
-            <Label htmlFor="dbType">Database Type *</Label>
+            <Label htmlFor="dbType">Database Type</Label>
             <Controller
               control={control}
               name="dbType"
@@ -259,7 +262,7 @@ export default function ModalProject({
 
           {/* DB Server */}
           <div className="space-y-1">
-            <Label htmlFor="dbServer">Database Server *</Label>
+            <Label htmlFor="dbServer">Database Server</Label>
             <Controller
               control={control}
               name="dbServer"
@@ -280,9 +283,9 @@ export default function ModalProject({
           </div>
 
           {/* Member Involved */}
-          {isCreate && (
+          {
             <div className="space-y-1">
-              <Label htmlFor="memberInvolved">Members Involved *</Label>
+              <Label htmlFor="memberInvolved">Members Involved</Label>
               <Controller
                 control={control}
                 name={"memberInvolved" as keyof CreateProjectForm}
@@ -308,7 +311,7 @@ export default function ModalProject({
                 </p>
               )}
             </div>
-          )}
+          }
 
           {/* Remark */}
           <div className="space-y-1 w-full">

@@ -1,208 +1,276 @@
-"use client";
-
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
-import { DialogTitle } from "@radix-ui/react-dialog";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import type React from "react";
 import {
   User,
   Mail,
   Calendar,
   Shield,
-  Badge,
-  Briefcase,
   Hash,
-  X,
+  Briefcase,
+  CheckCircle,
+  XCircle,
+  Award,
+  Crown,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserModel } from "@/models/user/user.response";
 
-export default function UserViewModal({
-  user,
-  isOpen = true,
-  onClose = () => {},
-}: {
+interface UserViewModalProps {
   user?: UserModel;
-  isOpen?: boolean;
-  onClose?: () => void;
-}) {
-  const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("en-US", {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "active":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "inactive":
+        return "bg-gray-100 text-gray-800 border-gray-200";
+      case "suspended":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role?.toLowerCase()) {
+      case "developer":
+        return "bg-rose-100 text-rose-800 border-rose-200";
+      case "admin":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "user":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "active":
-        return "bg-emerald-100 text-emerald-800 border-emerald-200";
-      case "inactive":
-        return "bg-slate-100 text-slate-600 border-slate-200";
-      default:
-        return "bg-slate-100 text-slate-600 border-slate-200";
-    }
   };
 
-  const getRoleColor = (role: string) => {
-    switch (role.toLowerCase()) {
-      case "developer":
-        return "bg-rose-100 text-rose-800 border-rose-200";
+  const getRoleIcon = (role: string) => {
+    switch (role?.toLowerCase()) {
       case "admin":
-        return "bg-indigo-100 text-indigo-800 border-indigo-200";
-      case "user":
-        return "bg-amber-100 text-amber-800 border-amber-200";
+        return <Crown className="h-4 w-4" />;
+      case "developer":
+        return <Briefcase className="h-4 w-4" />;
       default:
-        return "bg-slate-100 text-slate-600 border-slate-200";
+        return <Shield className="h-4 w-4" />;
     }
   };
+
+  const handleClose = () => {
+    onClose();
+  };
+
+  const profileImageUrl =
+    user?.profileUrl && process.env.NEXT_PUBLIC_API_BASE_URL
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${user.profileUrl}`
+      : undefined;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto rounded-2xl shadow-xl bg-white p-0 overflow-y-auto h-screen border border-slate-200">
-        <div className="flex flex-col">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-4 text-center relative">
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-2xl h-[90vh] p-0 gap-0 flex flex-col">
+        {/* Header */}
+        <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
+          <div className="flex items-center gap-4 pr-8">
+            <Avatar className="h-12 w-12">
+              <AvatarImage
+                src={user?.profileUrl ? profileImageUrl : ""}
+                alt={user?.fullName}
+              />
+              <AvatarFallback className="text-lg bg-primary/10 text-primary">
+                {user?.fullName?.[0] || user?.email?.[0] || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <DialogTitle className="text-xl font-semibold">
+                User Profile
+              </DialogTitle>
+              <DialogDescription className="text-base text-muted-foreground">
+                {user?.fullName
+                  ? `Profile information for "${user.fullName}"`
+                  : user?.email
+                  ? `Profile information for "${user.email}"`
+                  : "User profile information"}
+              </DialogDescription>
 
-            <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
-              {user?.profileUrl ? (
-                <img
-                  src={process.env.NEXT_PUBLIC_API_BASE_URL + user.profileUrl}
-                  alt={user.fullName || "User"}
-                  className="w-full h-full object-cover rounded-full"
-                />
-              ) : (
-                <User className="w-10 h-10 text-white" />
-              )}
+              <Badge className={getRoleColor(user?.userRole ?? "")}>
+                {getRoleIcon(user?.userRole ?? "")}
+                <span className="ml-1">{user?.userRole || "USER"}</span>
+              </Badge>
             </div>
-
-            <DialogTitle className="text-xl font-bold text-white mb-1">
-              {user?.fullName || "User Profile"}
-            </DialogTitle>
-            <p className="text-slate-300 text-sm">View user details</p>
           </div>
+        </DialogHeader>
 
-          {/* User Details */}
-          <div className="p-6 space-y-5">
-            {/* Status & Role */}
-            <div className="flex justify-center gap-3">
-              <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                  user?.userStatus || ""
-                )}`}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full mr-2 ${
-                    user?.userStatus?.toLowerCase() === "active"
-                      ? "bg-emerald-500"
-                      : "bg-slate-400"
-                  }`}
-                />
-                {user?.userStatus || "ACTIVE"}
-              </span>
-
-              <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getRoleColor(
-                  user?.userRole || ""
-                )}`}
-              >
-                <Shield className="w-3 h-3 mr-1" />
-                {user?.userRole || "USER"}
-              </span>
-            </div>
-
-            <Separator className="bg-slate-200" />
-
-            {/* Contact Info */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-slate-700">
-                Contact Info
-              </h4>
-
-              <InfoRow
-                icon={<Mail className="w-4 h-4 text-slate-600" />}
-                label="Email"
-                value={user?.email || "N/A"}
-              />
-              <InfoRow
-                icon={<Calendar className="w-4 h-4 text-slate-600" />}
-                label="Created At"
-                value={formatDate(user?.createdAt || "")}
-              />
-              <InfoRow
-                icon={<Calendar className="w-4 h-4 text-slate-600" />}
-                label="Updated At"
-                value={formatDate(user?.updatedAt || "")}
-              />
-              <InfoRow
-                icon={<Briefcase className="w-4 h-4 text-slate-600" />}
-                label="Position"
-                value={user?.position || "N/A"}
-              />
-              <InfoRow
-                icon={<Hash className="w-4 h-4 text-slate-600" />}
-                label="ID Card"
-                value={user?.idCard || "N/A"}
-              />
-            </div>
-
-            <Separator className="bg-slate-200" />
-
-            {/* Account Summary */}
-            <div className="bg-slate-50 rounded-xl p-3">
-              <h4 className="text-sm font-semibold text-slate-700 mb-3">
-                Account Summary
-              </h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <Badge className="w-4 h-4 text-emerald-600" />
+        {/* Content */}
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="p-6">
+            {user ? (
+              <div className="space-y-6">
+                {/* Personal Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                    <h3 className="text-lg font-semibold">
+                      Personal Information
+                    </h3>
                   </div>
-                  <p className="text-xs text-slate-500">Access Level</p>
-                  <p className="text-sm font-semibold text-slate-900">
-                    Full Access
-                  </p>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Email:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        {user?.email || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Full Name:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        {user?.fullName || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Position:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        <Briefcase className="h-4 w-4" />
+                        {user?.position || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        ID Card:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {user?.idCard || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Account Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+                    <h3 className="text-lg font-semibold">
+                      Account Information
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        User Role:
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        {getRoleIcon(user?.userRole ?? "")}
+                        <span className="text-sm">
+                          {user?.userRole || "USER"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Access Level:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {user.userRole === "SUPER" ? (
+                          <>
+                            <Award className="h-4 w-4 text-yellow-500" />
+                            Full Access
+                          </>
+                        ) : (
+                          <>
+                            <Award className="h-4 w-4 text-gray-500" />
+                            Limited Access
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* System Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
+                    <h3 className="text-lg font-semibold">
+                      System Information
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Created At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(user?.createdAt ?? "")}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Last Updated:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(user?.updatedAt ?? "")}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Footer Button */}
-            <DialogFooter className="flex justify-center">
-              <Button variant="outline" onClick={onClose}>
-                Close
-              </Button>
-            </DialogFooter>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No user data available</p>
+              </div>
+            )}
           </div>
-        </div>
+        </ScrollArea>
+
+        {/* Footer */}
+        <DialogFooter className="px-6 py-4 border-t bg-muted/30 flex-shrink-0">
+          <Button variant="outline" onClick={handleClose}>
+            Close
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
-
-// Reusable info row component
-const InfoRow = ({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) => (
-  <div className="flex items-center gap-3">
-    <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-      {icon}
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-xs font-medium text-slate-500 mb-1">{label}</p>
-      <p className="text-sm text-slate-900 break-all">{value}</p>
-    </div>
-  </div>
-);

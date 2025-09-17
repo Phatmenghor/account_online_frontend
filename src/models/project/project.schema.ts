@@ -23,6 +23,7 @@ export const UpdateProjectSchema = z.object({
   dbName: z.string().optional(),
   dbType: z.string().optional(),
   dbServer: z.string().optional(),
+  memberInvolved: z.string().optional(),
   remark: z.string().optional(),
 });
 

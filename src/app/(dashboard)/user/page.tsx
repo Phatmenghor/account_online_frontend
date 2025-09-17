@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import ConfirmDialog from "@/components/shared/dialog/dialog-confirm";
 import { DeleteConfirmationDialog } from "@/components/shared/dialog/dialog-delete";
 import ResetPasswordModal from "@/components/shared/dialog/dialog-reset-password";
-import UserViewModal from "@/components/shared/modal/user-detail-modal";
 import { CustomPagination } from "@/components/shared/pagination/custom-pagination";
 import { DataTable } from "@/components/shared/table/data-table";
 import { createUserTableColumns } from "@/components/shared/table/table-content";
@@ -32,6 +31,8 @@ import { toast } from "sonner";
 import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import ModalUser from "@/components/shared/modal/user-modal";
 import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
+import Loading from "@/components/shared/common/loading";
+import { UserViewModal } from "@/components/shared/modal/user-detail-modal";
 
 function UserPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,7 +61,6 @@ function UserPageContent() {
 
   const { currentPage, updateUrlWithPage, handlePageChange } = usePagination({
     baseRoute: ROUTES.DASHBOARD.INDEX,
-    defaultPageSize: 10,
   });
 
   useEffect(() => {
@@ -96,10 +96,6 @@ function UserPageContent() {
     setSearchQuery(e.target.value);
   };
 
-  const handleUserStatusToggle = (user: UserModel) => {
-    setSelectedUserToggle(user);
-    setIsToggleStatusDialogOpen(true);
-  };
   const handleStatusToggle = async (user: UserModel | null) => {
     if (!user?.id) return;
     setIsLoading(true);
@@ -283,8 +279,8 @@ function UserPageContent() {
   };
 
   return (
-    <Card>
-      <CardContent className="space-y-6 p-6">
+    <Card className="h-full flex flex-col">
+      <CardContent className="space-y-6 p-6 flex flex-col h-full">
         <div className="flex justify-between">
           <div className="flex flex-wrap items-center justify-start gap-4 w-full">
             <div className="relative w-full md:w-[350px]">
@@ -317,30 +313,35 @@ function UserPageContent() {
           <Separator className="bg-gray-300" />
         </div>
 
-        <div>
-          <div className="rounded-md border overflow-x-auto whitespace-nowrap">
-            <DataTable
-              data={users?.content || []}
-              columns={createUserTableColumns({
-                data: users,
-                handlers: {
-                  handleEditUser,
-                  handleResetPassword,
-                  handleViewUserDetail,
-                  handleDeleteUser,
-                },
-              })}
-              loading={isLoading}
-              emptyMessage="No user found"
-              getRowKey={(user) => user.id}
-            />
-
-            <CustomPagination
-              currentPage={currentPage}
-              totalPages={users?.totalPages || 1}
-              onPageChange={handlePageChange}
-              size="md"
-            />
+        <div className="flex-1 flex flex-col min-h-0">
+          {/* Table container with proper overflow handling */}
+          <div className="flex-1 rounded-md border overflow-hidden flex flex-col">
+            <div className="flex-1 overflow-x-auto">
+              <DataTable
+                data={users?.content || []}
+                columns={createUserTableColumns({
+                  data: users,
+                  handlers: {
+                    handleEditUser,
+                    handleResetPassword,
+                    handleViewUserDetail,
+                    handleDeleteUser,
+                  },
+                })}
+                loading={isLoading}
+                emptyMessage="No user found"
+                getRowKey={(user) => user.id}
+              />
+              {/* Pagination positioned to the right and outside the scrollable area */}
+              <div className="border-t bg-background p-2 flex justify-end">
+                <CustomPagination
+                  currentPage={currentPage}
+                  totalPages={users?.totalPages || 1}
+                  onPageChange={handlePageChange}
+                  size="md"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -411,13 +412,7 @@ function UserPageContent() {
 
 export default function UserPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center p-8">
-          Loading users...
-        </div>
-      }
-    >
+    <Suspense fallback={<Loading />}>
       <UserPageContent />
     </Suspense>
   );
