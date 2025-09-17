@@ -6,7 +6,7 @@
 
 # Project Information
 PROJECT_DISPLAY_NAME="Internal Dev frontend App"
-APP_NAME="internal_dev_frontend"
+APP_NAME="internal-dev-frontend"
 PROJECT_DESCRIPTION="Internal Dev Frontend Application"
 
 # Port Configuration
