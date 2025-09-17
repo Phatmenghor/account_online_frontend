@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { DeleteConfirmationDialog } from "@/components/shared/dialog/dialog-delete";
 import { CustomPagination } from "@/components/shared/pagination/custom-pagination";
 import { DataTable } from "@/components/shared/table/data-table";
@@ -17,7 +18,6 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import StatusFilter from "@/constants/AppResource/display-list/status/status-filter";
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
 import {
   ExcelColumn,
@@ -43,7 +43,7 @@ import {
 import ModalProject from "@/components/shared/modal/project-modal";
 import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 
-export default function ProjectPage() {
+function ProjectPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [projects, setProjects] = useState<AllProjectModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -444,5 +444,19 @@ export default function ProjectPage() {
         />
       </CardContent>
     </Card>
+  );
+}
+
+export default function ProjectPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center p-8">
+          Loading projects...
+        </div>
+      }
+    >
+      <ProjectPageContent />
+    </Suspense>
   );
 }

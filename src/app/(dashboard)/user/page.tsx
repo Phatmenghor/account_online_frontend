@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import ConfirmDialog from "@/components/shared/dialog/dialog-confirm";
 import { DeleteConfirmationDialog } from "@/components/shared/dialog/dialog-delete";
 import ResetPasswordModal from "@/components/shared/dialog/dialog-reset-password";
@@ -23,17 +24,16 @@ import {
 } from "@/services/dashboard/user/user.service";
 import { useDebounce } from "@/utils/debounce/debounce";
 
-import { Download, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import StatusFilter from "@/constants/AppResource/display-list/status/status-filter";
 import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import ModalUser from "@/components/shared/modal/user-modal";
 import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
 
-export default function UserPage() {
+function UserPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState<AllUserModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -406,5 +406,19 @@ export default function UserPage() {
         />
       </CardContent>
     </Card>
+  );
+}
+
+export default function UserPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center p-8">
+          Loading users...
+        </div>
+      }
+    >
+      <UserPageContent />
+    </Suspense>
   );
 }
