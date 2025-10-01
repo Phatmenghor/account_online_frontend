@@ -42,7 +42,11 @@ import {
   AllAttendanceModel,
   AttendanceModel,
 } from "@/models/attendance/attendances.response";
-import { getAttendanceService } from "@/services/dashboard/attendance/attendance.service";
+import {
+  deleteAttendanceService,
+  getAttendanceService,
+} from "@/services/dashboard/attendance/attendance.service";
+import { createAttendanceTableColumns } from "@/components/shared/table/attendance-content";
 
 function AttendancePageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,13 +56,12 @@ function AttendancePageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExportingToExcel, setIsExportingToExcel] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<ProjectModel | null>(
-    null
-  );
+  const [selectedAttendance, setSelectedAttendance] =
+    useState<AttendanceModel | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isProjectDetailOpen, setIsProjectDetailOpen] = useState(false);
+  const [isAttendanceDetailOpen, setIsAttendanceDetailOpen] = useState(false);
 
   const t = useTranslations();
 
@@ -189,7 +192,7 @@ function AttendancePageContent() {
         });
       }
       setIsModalOpen(false);
-      setSelectedProject(null);
+      setSelectedAttendance(null);
       loadAttendances();
     } catch (err: any) {
       toast.error(err?.errorMessage || "Failed to save project");
@@ -203,11 +206,11 @@ function AttendancePageContent() {
   };
 
   const confirmDeleteProject = async () => {
-    if (!selectedProject) return;
+    if (!selectedAttendance) return;
     setIsSubmitting(true);
 
     try {
-      const response = await deleteProjectService(selectedProject.id);
+      const response = await deleteAttendanceService(selectedAttendance.id);
 
       if (response) {
         setAttendances((prev) =>
@@ -215,7 +218,7 @@ function AttendancePageContent() {
             ? {
                 ...prev,
                 content: prev.content.filter(
-                  (proj) => proj.id !== selectedProject.id
+                  (proj) => proj.id !== selectedAttendance.id
                 ),
                 totalElements: prev.totalElements - 1,
               }
@@ -229,7 +232,7 @@ function AttendancePageContent() {
       }
 
       setIsDeleteDialogOpen(false);
-      setSelectedProject(null);
+      setSelectedAttendance(null);
     } catch (err: any) {
       AppToast({
         type: "error",
@@ -312,25 +315,25 @@ function AttendancePageContent() {
     }
   };
 
-  const handleEditProject = (proj: ProjectModel) => {
-    setSelectedProject(proj);
+  const handleEditAttendance = (proj: AttendanceModel) => {
+    setSelectedAttendance(proj);
     setMode(ModalMode.UPDATE_MODE);
     setIsModalOpen(true);
   };
 
   const handleAddProject = () => {
-    setSelectedProject(null);
+    setSelectedAttendance(null);
     setMode(ModalMode.CREATE_MODE);
     setIsModalOpen(true);
   };
 
-  const handleViewProjectDetail = (proj: ProjectModel) => {
-    setSelectedProject(proj);
-    setIsProjectDetailOpen(true);
+  const handleViewAttendanceDetail = (proj: AttendanceModel) => {
+    setSelectedAttendance(proj);
+    setIsAttendanceDetailOpen(true);
   };
 
-  const handleDeleteProject = (proj: ProjectModel) => {
-    setSelectedProject(proj);
+  const handleDeleteAttendance = (proj: AttendanceModel) => {
+    setSelectedAttendance(proj);
     setIsDeleteDialogOpen(true);
   };
 
@@ -389,12 +392,12 @@ function AttendancePageContent() {
             <div className="flex-1 overflow-x-auto">
               <DataTable
                 data={attendances?.content || []}
-                columns={createProjectTableColumns({
+                columns={createAttendanceTableColumns({
                   data: attendances,
                   handlers: {
-                    handleEditProject,
-                    handleViewProjectDetail,
-                    handleDeleteProject,
+                    handleEditAttendance,
+                    handleViewAttendanceDetail,
+                    handleDeleteAttendance,
                   },
                 })}
                 loading={isLoading}
@@ -406,7 +409,7 @@ function AttendancePageContent() {
               <div className="border-t bg-background p-2 flex justify-end">
                 <CustomPagination
                   currentPage={currentPage}
-                  totalPages={projects?.totalPages || 1}
+                  totalPages={attendances?.totalPages || 1}
                   onPageChange={handlePageChange}
                   size="md"
                 />
@@ -419,33 +422,33 @@ function AttendancePageContent() {
           isOpen={isDeleteDialogOpen}
           onClose={() => {
             setIsDeleteDialogOpen(false);
-            setSelectedProject(null);
+            setSelectedAttendance(null);
           }}
           onDelete={confirmDeleteProject}
           title="Delete Project"
           description={`Are you sure you want to delete the project`}
-          itemName={selectedProject?.projectName || "N/A"}
+          itemName={selectedAttendance?.userFullName || "N/A"}
           isSubmitting={isSubmitting}
         />
 
         <ProjectViewModal
-          isOpen={isProjectDetailOpen}
+          isOpen={isAttendanceDetailOpen}
           onClose={() => {
-            setIsProjectDetailOpen(false);
-            setSelectedProject(null);
+            setIsAttendanceDetailOpen(false);
+            setSelectedAttendance(null);
           }}
-          projectId={selectedProject?.id ?? 0}
+          projectId={selectedAttendance?.id ?? 0}
         />
 
         <ModalProject
           isOpen={isModalOpen}
           mode={mode}
           onClose={() => {
-            setSelectedProject(null);
+            setSelectedAttendance(null);
             setIsModalOpen(false);
           }}
           onSave={handleSaveProject}
-          projectId={selectedProject?.id ?? 0}
+          projectId={selectedAttendance?.id ?? 0}
           isSubmitting={isSubmitting}
         />
       </CardContent>
