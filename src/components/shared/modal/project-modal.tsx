@@ -22,6 +22,7 @@ import {
 import { getProjectByIdService } from "@/services/dashboard/project/project.service";
 import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Props = {
   mode: ModalMode;
@@ -65,6 +66,9 @@ export default function ModalProject({
       dbType: "",
       dbServer: "",
       remark: "",
+      projectStatus: "",
+      gitUrl: "",
+      gitBranch: "",
     } as any,
   });
 
@@ -98,6 +102,9 @@ export default function ModalProject({
               dbType: "",
               dbServer: "",
               remark: "",
+              projectStatus: "",
+              gitUrl: "",
+              gitBranch: "",
             }
           : projectDetail ?? {}
       );
@@ -149,7 +156,7 @@ export default function ModalProject({
           </div>
 
           {/* Type */}
-          <div className="space-y-1">
+          {/*  <div className="space-y-1">
             <Label htmlFor="type">Type</Label>
             <Controller
               control={control}
@@ -161,6 +168,38 @@ export default function ModalProject({
                   disabled={isSubmitting}
                   className={errors.type ? "border-red-500" : ""}
                 />
+              )}
+            />
+            {errors.type && (
+              <p className="text-sm text-destructive">
+                {errors.type.message as string}
+              </p>
+            )}
+          </div> */}
+
+          <div className="space-y-1">
+            <Label htmlFor="type">Type</Label>
+            <Controller
+              control={control}
+              name="type"
+              render={({ field }) => (
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger
+                    id="type"
+                    className={errors.type ? "border-red-500" : ""}
+                  >
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Frontend">Frontend</SelectItem>
+                    <SelectItem value="Backend">Backend</SelectItem>
+                    <SelectItem value="Full Stack">Full Stack</SelectItem>
+                  </SelectContent>
+                </Select>
               )}
             />
             {errors.type && (
@@ -212,6 +251,81 @@ export default function ModalProject({
             {errors.hostPort && (
               <p className="text-sm text-destructive">
                 {errors.hostPort.message as string}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="projectStatus">Project Status</Label>
+            <Controller
+              control={control}
+              name="projectStatus"
+              render={({ field }) => (
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger
+                    id="projectStatus"
+                    className={errors.projectStatus ? "border-red-500" : ""}
+                  >
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="UAT">UAT</SelectItem>
+                    <SelectItem value="PRODUCTION">PRODUCTION</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.projectStatus && (
+              <p className="text-sm text-destructive">
+                {errors.projectStatus.message as string}
+              </p>
+            )}
+          </div>
+
+          {/* Git url */}
+          <div className="space-y-1">
+            <Label htmlFor="gitUrl">Git URL</Label>
+            <Controller
+              control={control}
+              name="gitUrl"
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="gitUrl"
+                  disabled={isSubmitting}
+                  className={errors.gitUrl ? "border-red-500" : ""}
+                />
+              )}
+            />
+            {errors.gitUrl && (
+              <p className="text-sm text-destructive">
+                {errors.gitUrl.message as string}
+              </p>
+            )}
+          </div>
+
+          {/* Git branch */}
+          <div className="space-y-1">
+            <Label htmlFor="gitBranch">Git Branch</Label>
+            <Controller
+              control={control}
+              name="gitBranch"
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="gitBranch"
+                  disabled={isSubmitting}
+                  className={errors.gitBranch ? "border-red-500" : ""}
+                />
+              )}
+            />
+            {errors.gitBranch && (
+              <p className="text-sm text-destructive">
+                {errors.gitBranch.message as string}
               </p>
             )}
           </div>

@@ -14,6 +14,7 @@ import {
   ProjectModel,
 } from "@/models/project/project.response";
 import { useTranslations } from "next-intl";
+import { formatStatus } from "@/utils/format/ProjectStatus";
 
 interface ProjectTableHandlers {
   handleEditProject: (project: ProjectModel) => void;
@@ -59,6 +60,15 @@ export const createProjectTableColumns = ({
       label: tProject("type"),
       render: (project) => (
         <span className="font-medium">{project.type || "---"}</span>
+      ),
+    },
+    {
+      key: "projectStatus",
+      label: tProject("projectStatus"),
+      render: (project) => (
+        <span className="font-medium">
+          {formatStatus(project.projectStatus)|| "---"}
+        </span>
       ),
     },
     {

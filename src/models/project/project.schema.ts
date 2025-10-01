@@ -11,6 +11,9 @@ export const CreateProjectSchema = z.object({
   dbType: z.string().optional(),
   dbServer: z.string().optional(),
   remark: z.string().optional(),
+  projectStatus: z.string().optional(),
+  gitUrl: z.string().optional(),
+  gitBranch: z.string().optional(),
 });
 
 // Schema for updating a project
@@ -25,6 +28,9 @@ export const UpdateProjectSchema = z.object({
   dbServer: z.string().optional(),
   memberInvolved: z.string().optional(),
   remark: z.string().optional(),
+  projectStatus: z.string().optional(),
+  gitUrl: z.string().optional(),
+  gitBranch: z.string().optional(),
 });
 
 // Types inferred from schema

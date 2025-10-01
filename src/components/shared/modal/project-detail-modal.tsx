@@ -17,6 +17,8 @@ import {
   Calendar,
   Users,
   StickyNote,
+  GitBranch,
+  Github,
 } from "lucide-react";
 import { ProjectModel } from "@/models/project/project.response";
 import { getProjectByIdService } from "@/services/dashboard/project/project.service";
@@ -98,6 +100,21 @@ export default function ProjectViewModal({
                       icon: <Briefcase />,
                       label: "Type",
                       value: project?.type,
+                    },
+                    {
+                      icon: <Briefcase />,
+                      label: "Project Status",
+                      value: project?.projectStatus,
+                    },
+                    {
+                      icon: <GitBranch />,
+                      label: "Git Branch",
+                      value: project?.gitBranch,
+                    },
+                    {
+                      icon: <Github />,
+                      label: "Git URL",
+                      value: project?.gitUrl,
                     },
                     {
                       icon: <Calendar />,
