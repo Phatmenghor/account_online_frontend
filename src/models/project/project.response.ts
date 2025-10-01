@@ -18,6 +18,9 @@ export interface ProjectModel {
   dbType: string;
   dbServer: string;
   remark: string;
+  projectStatus?: string;
+  gitUrl?: string;
+  gitBranch?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -65,6 +65,7 @@
       "dbServer": "Database Server",
       "memberInvolved": "Members Involved",
       "remark": "Remark",
+      "projectStatus": "Project Status",
       "createdAt": "Created At",
       "updatedAt": "Updated At",
       "actions": "Actions"

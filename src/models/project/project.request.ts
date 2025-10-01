@@ -8,6 +8,9 @@ export interface CreateProjectReq {
   dbType?: string;
   dbServer?: string;
   remark?: string;
+  projectStatus?: string;
+  gitUrl?: string;
+  gitBranch?: string;
 }
 
 export interface UpdateProjectReq {
@@ -20,10 +23,14 @@ export interface UpdateProjectReq {
   dbServer?: string;
   memberInvolved?: string;
   remark?: string;
+  projectStatus?: string;
+  gitUrl?: string;
+  gitBranch?: string;
 }
 
 export interface AllProjectReq {
   search: string;
   pageNo: number;
   pageSize: number;
+  projectStatus?: string;
 }
