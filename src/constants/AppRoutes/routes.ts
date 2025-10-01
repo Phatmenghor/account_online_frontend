@@ -1,4 +1,4 @@
-import { Code, User2 } from "lucide-react";
+import { Calendar, Code, User2 } from "lucide-react";
 
 export const ROUTES = {
   AUTH: {
@@ -8,6 +8,7 @@ export const ROUTES = {
     INDEX: "/user",
     PROFILE: "/profile",
     PROJECT: "/project",
+    ATTENDANCE: "/attendance",
   },
 };
 
@@ -21,5 +22,10 @@ export const navItems = [
     title: "Project",
     href: ROUTES.DASHBOARD.PROJECT,
     icon: Code,
+  },
+  {
+    title: "Attendance",
+    href: ROUTES.DASHBOARD.ATTENDANCE,
+    icon: Calendar,
   },
 ];

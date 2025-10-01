@@ -4,10 +4,7 @@ import {
   Mail,
   Calendar,
   Shield,
-  Hash,
   Briefcase,
-  CheckCircle,
-  XCircle,
   Award,
   Crown,
 } from "lucide-react";

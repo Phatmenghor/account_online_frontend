@@ -1,7 +1,14 @@
 "use client";
 
 import { ROUTES } from "@/constants/AppRoutes/routes";
-import { Code, Folder, Layers, Server, User2 } from "lucide-react";
+import {
+  Calendar1Icon,
+  Code,
+  Folder,
+  Layers,
+  Server,
+  User2,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function useNavItems() {
@@ -17,6 +24,11 @@ export function useNavItems() {
       title: t("project"),
       href: ROUTES.DASHBOARD.PROJECT,
       icon: Folder,
+    },
+    {
+      title: t("attendance"),
+      href: ROUTES.DASHBOARD.ATTENDANCE,
+      icon: Calendar1Icon,
     },
   ];
 }
