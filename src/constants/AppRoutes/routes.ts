@@ -8,7 +8,10 @@ export const ROUTES = {
     INDEX: "/user",
     PROFILE: "/profile",
     PROJECT: "/project",
-    ATTENDANCE: "/attendance",
+    ATTENDANCE: {
+      REQUEST: "/attendance-request",
+      HISTORY: "/attendance-history",
+    },
   },
 };
 

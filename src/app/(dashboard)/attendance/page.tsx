@@ -23,8 +23,6 @@ import {
   ExcelExporter,
   ExcelSheet,
 } from "@/utils/export-file/excel";
-import { createProjectTableColumns } from "@/components/shared/table/project-content";
-import { ProjectModel } from "@/models/project/project.response";
 import ProjectViewModal from "@/components/shared/modal/project-detail-modal";
 import {
   CreateProjectForm,
@@ -32,7 +30,6 @@ import {
 } from "@/models/project/project.schema";
 import {
   createProjectService,
-  deleteProjectService,
   updateProjectService,
 } from "@/services/dashboard/project/project.service";
 import ModalProject from "@/components/shared/modal/project-modal";
@@ -43,10 +40,17 @@ import {
   AttendanceModel,
 } from "@/models/attendance/attendances.response";
 import {
+  createAttendanceService,
   deleteAttendanceService,
   getAttendanceService,
+  updateAttendanceService,
 } from "@/services/dashboard/attendance/attendance.service";
 import { createAttendanceTableColumns } from "@/components/shared/table/attendance-content";
+import {
+  AttendanceCreateForm,
+  AttendanceUpdateForm,
+} from "@/models/attendance/attendance.schema";
+import ModalAttendance from "@/components/shared/modal/attendance-modal";
 
 function AttendancePageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,7 +75,7 @@ function AttendancePageContent() {
   const debouncedSearchQuery = useDebounce(searchQuery, 400);
 
   const { currentPage, updateUrlWithPage, handlePageChange } = usePagination({
-    baseRoute: ROUTES.DASHBOARD.PROJECT,
+    baseRoute: ROUTES.DASHBOARD.ATTENDANCE,
     defaultPageSize: 10,
   });
 
@@ -92,7 +96,7 @@ function AttendancePageContent() {
       });
       setAttendances(response);
     } catch (error: any) {
-      console.log("Failed to fetch projects: ", error);
+      console.log("Failed to fetch attendance: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -108,23 +112,13 @@ function AttendancePageContent() {
   };
 
   const handleSaveProject = async (
-    formData: CreateProjectForm | UpdateProjectForm
+    formData: AttendanceCreateForm | AttendanceUpdateForm
   ) => {
     setIsSubmitting(true);
     try {
       if (mode === ModalMode.CREATE_MODE) {
-        const createData = formData as CreateProjectForm;
-        const response = await createProjectService({
-          hostPort: Number(createData.hostPort),
-          hostServer: createData.hostServer,
-          memberInvolved: createData.memberInvolved,
-          projectName: createData.projectName,
-          remark: createData.remark || "",
-          type: createData.type,
-          dbType: createData.dbType,
-          dbServer: createData.dbServer,
-          dbName: createData.dbName,
-        });
+        const createData = formData as AttendanceCreateForm;
+        const response = await createAttendanceService(createData);
 
         // Optimistic update
         setAttendances((prev: any) =>
@@ -150,26 +144,21 @@ function AttendancePageContent() {
         startTransition(() => {
           AppToast({
             type: "success",
-            message: "Project created successfully",
-            description: "New Project",
+            message: "Attendance created successfully",
+            description: "New Attendance",
           });
         });
       } else if (mode === ModalMode.UPDATE_MODE) {
-        const updateProjectForm = formData as UpdateProjectForm;
+        const updateProjectForm = formData as AttendanceUpdateForm;
         if (!updateProjectForm.id) {
-          console.error("Missing projects id in update form");
+          console.error("Missing attendances id in update form");
           return;
         }
-        const response = await updateProjectService(updateProjectForm.id, {
-          hostPort: updateProjectForm.hostPort,
-          hostServer: updateProjectForm.hostServer,
-          projectName: updateProjectForm.projectName,
-          remark: updateProjectForm.remark || "",
+        const response = await updateAttendanceService(updateProjectForm.id, {
+          endDate: updateProjectForm.endDate,
+          reason: updateProjectForm.reason,
+          startDate: updateProjectForm.startDate,
           type: updateProjectForm.type,
-          memberInvolved: updateProjectForm?.memberInvolved || "",
-          dbType: updateProjectForm.dbType,
-          dbServer: updateProjectForm.dbServer,
-          dbName: updateProjectForm.dbName,
         });
 
         setAttendances((prev) =>
@@ -243,77 +232,77 @@ function AttendancePageContent() {
     }
   };
 
-  const handleExportToExcel = async (data: AttendanceModel[] | null) => {
-    setIsExportingToExcel(true);
-    try {
-      // Define columns based on ProjectModel
-      const columns: ExcelColumn[] = [
-        { header: "ID", key: "id", width: 8, type: "number" },
-        { header: "Project Name", key: "projectName", width: 25, type: "text" },
-        { header: "Type", key: "type", width: 15, type: "text" },
-        { header: "Host Server", key: "hostServer", width: 20, type: "text" },
-        { header: "Host Port", key: "hostPort", width: 10, type: "number" },
-        { header: "Database Name", key: "dbName", width: 20, type: "text" },
-        { header: "Database Type", key: "dbType", width: 15, type: "text" },
-        { header: "Database Server", key: "dbServer", width: 20, type: "text" },
-        {
-          header: "Members Involved",
-          key: "memberInvolved",
-          width: 25,
-          type: "text",
-        },
-        { header: "Remark", key: "remark", width: 30, type: "text" },
-        {
-          header: "Created Date",
-          key: "createdAt",
-          width: 18,
-          type: "date",
-          format: "mm/dd/yyyy",
-        },
-        {
-          header: "Updated Date",
-          key: "updatedAt",
-          width: 18,
-          type: "date",
-          format: "mm/dd/yyyy",
-        },
-      ];
+  // const handleExportToExcel = async (data: AttendanceModel[] | null) => {
+  //   setIsExportingToExcel(true);
+  //   try {
+  //     // Define columns based on ProjectModel
+  //     const columns: ExcelColumn[] = [
+  //       { header: "ID", key: "id", width: 8, type: "number" },
+  //       { header: "Project Name", key: "projectName", width: 25, type: "text" },
+  //       { header: "Type", key: "type", width: 15, type: "text" },
+  //       { header: "Host Server", key: "hostServer", width: 20, type: "text" },
+  //       { header: "Host Port", key: "hostPort", width: 10, type: "number" },
+  //       { header: "Database Name", key: "dbName", width: 20, type: "text" },
+  //       { header: "Database Type", key: "dbType", width: 15, type: "text" },
+  //       { header: "Database Server", key: "dbServer", width: 20, type: "text" },
+  //       {
+  //         header: "Members Involved",
+  //         key: "memberInvolved",
+  //         width: 25,
+  //         type: "text",
+  //       },
+  //       { header: "Remark", key: "remark", width: 30, type: "text" },
+  //       {
+  //         header: "Created Date",
+  //         key: "createdAt",
+  //         width: 18,
+  //         type: "date",
+  //         format: "mm/dd/yyyy",
+  //       },
+  //       {
+  //         header: "Updated Date",
+  //         key: "updatedAt",
+  //         width: 18,
+  //         type: "date",
+  //         format: "mm/dd/yyyy",
+  //       },
+  //     ];
 
-      // Create Excel exporter
-      const exporter = new ExcelExporter({
-        filename: "projects.xlsx",
-        title: "Project Management Report",
-        author: "IT Department",
-        useAlternateRows: true,
-        protection: {
-          password: "88889999",
-          deleteRows: false,
-          selectLockedCells: true,
-          selectUnlockedCells: true,
-        },
-      });
+  //     // Create Excel exporter
+  //     const exporter = new ExcelExporter({
+  //       filename: "projects.xlsx",
+  //       title: "Project Management Report",
+  //       author: "IT Department",
+  //       useAlternateRows: true,
+  //       protection: {
+  //         password: "88889999",
+  //         deleteRows: false,
+  //         selectLockedCells: true,
+  //         selectUnlockedCells: true,
+  //       },
+  //     });
 
-      // Configure sheet
-      const sheetConfig: ExcelSheet = {
-        name: "Projects",
-        data: data ?? [],
-        columns,
-        autoFilter: true,
-        freezeRows: 1,
-        sortBy: [{ key: "id", order: "asc" }],
-      };
+  //     // Configure sheet
+  //     const sheetConfig: ExcelSheet = {
+  //       name: "Projects",
+  //       data: data ?? [],
+  //       columns,
+  //       autoFilter: true,
+  //       freezeRows: 1,
+  //       sortBy: [{ key: "id", order: "asc" }],
+  //     };
 
-      exporter.addSheet(sheetConfig);
-      await exporter.export();
+  //     exporter.addSheet(sheetConfig);
+  //     await exporter.export();
 
-      AppToast({ type: "success", message: "Successfully exported to Excel" });
-    } catch (error: any) {
-      AppToast({ type: "error", message: "Failed to export to Excel" });
-      console.error("Error exporting to Excel:", error);
-    } finally {
-      setIsExportingToExcel(false);
-    }
-  };
+  //     AppToast({ type: "success", message: "Successfully exported to Excel" });
+  //   } catch (error: any) {
+  //     AppToast({ type: "error", message: "Failed to export to Excel" });
+  //     console.error("Error exporting to Excel:", error);
+  //   } finally {
+  //     setIsExportingToExcel(false);
+  //   }
+  // };
 
   const handleEditAttendance = (proj: AttendanceModel) => {
     setSelectedAttendance(proj);
@@ -361,7 +350,7 @@ function AttendancePageContent() {
             <div>
               {/* FIXED BUTTON WITH PROPER LOADING STATE AND TEXT */}
               <Button
-                onClick={() => handleExportToExcel(attendances?.content ?? [])}
+                onClick={() => {}}
                 size="lg"
                 variant="outline"
                 className="gap-2 text-sm sm:text-base h-10 hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6"
@@ -440,7 +429,7 @@ function AttendancePageContent() {
           projectId={selectedAttendance?.id ?? 0}
         />
 
-        <ModalProject
+        <ModalAttendance
           isOpen={isModalOpen}
           mode={mode}
           onClose={() => {
@@ -448,7 +437,7 @@ function AttendancePageContent() {
             setIsModalOpen(false);
           }}
           onSave={handleSaveProject}
-          projectId={selectedAttendance?.id ?? 0}
+          attendanceId={selectedAttendance?.id ?? 0}
           isSubmitting={isSubmitting}
         />
       </CardContent>

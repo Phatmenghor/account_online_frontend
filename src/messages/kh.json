@@ -71,6 +71,31 @@
       "updatedAt": "បានកែប្រែ",
       "actions": "សកម្មភាព"
     },
+    "attendance": {
+      "title": "ការចូលរួម",
+      "search-attendance": "ស្វែងរកការចូលរួម...",
+      "table-header-attendance": {
+        "id": "លេខសម្គាល់",
+        "userId": "លេខសម្គាល់អ្នកប្រើប្រាស់",
+        "userIdCard": "អត្តសញ្ញាណប័ណ្ណ",
+        "userFullName": "ឈ្មោះពេញ",
+        "userEmail": "អ៊ីមែល",
+        "userPosition": "មុខតំណែង",
+        "type": "ប្រភេទ",
+        "status": "ស្ថានភាព",
+        "startDate": "ថ្ងៃចាប់ផ្តើម",
+        "endDate": "ថ្ងៃបញ្ចប់",
+        "totalDays": "ចំនួនថ្ងៃសរុប",
+        "reason": "ហេតុផល",
+        "approvedByIdCard": "អនុម័តដោយ (អត្តសញ្ញាណប័ណ្ណ)",
+        "approvedByFullName": "អនុម័តដោយ (ឈ្មោះពេញ)",
+        "approvedAt": "បានអនុម័តនៅ",
+        "approvalNotes": "កំណត់សម្គាល់អនុម័ត",
+        "createdAt": "បានបង្កើតនៅ",
+        "updatedAt": "បានធ្វើបច្ចុប្បន្នភាពនៅ",
+        "actions": "សកម្មភាព"
+      }
+    },
 
     "roles": {
       "admin": "អ្នកគ្រប់គ្រង",

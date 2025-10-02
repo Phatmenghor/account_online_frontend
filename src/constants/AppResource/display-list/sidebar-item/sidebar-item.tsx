@@ -23,12 +23,22 @@ export function useNavItems() {
     {
       title: t("project"),
       href: ROUTES.DASHBOARD.PROJECT,
-      icon: Folder,
+      icon: Code,
     },
     {
       title: t("attendance"),
-      href: ROUTES.DASHBOARD.ATTENDANCE,
+      href: "#", // main parent, not clickable
       icon: Calendar1Icon,
+      subItems: [
+        {
+          title: t("attendanceRequest"),
+          href: ROUTES.DASHBOARD.ATTENDANCE.REQUEST,
+        },
+        {
+          title: t("attendanceHistory"),
+          href: ROUTES.DASHBOARD.ATTENDANCE.HISTORY,
+        },
+      ],
     },
   ];
 }

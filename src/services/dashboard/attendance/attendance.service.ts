@@ -85,7 +85,7 @@ export async function createAttendanceService(newProj: AttendanceReq) {
 
 export async function updateAttendanceService(
   id: number,
-  updates: AttendanceReq
+  updates: Partial<AttendanceReq>
 ) {
   try {
     const response = await axiosClientWithAuth.put(

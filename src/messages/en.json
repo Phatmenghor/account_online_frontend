@@ -71,6 +71,31 @@
       "updatedAt": "Updated At",
       "actions": "Actions"
     },
+    "attendance": {
+      "title": "Attendance",
+      "search-attendance": "Search attendance...",
+      "table-header-attendance": {
+        "id": "ID",
+        "userId": "User ID",
+        "userIdCard": "ID Card",
+        "userFullName": "Full Name",
+        "userEmail": "Email",
+        "userPosition": "Position",
+        "type": "Type",
+        "status": "Status",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "totalDays": "Total Days",
+        "reason": "Reason",
+        "approvedByIdCard": "Approved By (ID Card)",
+        "approvedByFullName": "Approved By (Full Name)",
+        "approvedAt": "Approved At",
+        "approvalNotes": "Approval Notes",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "actions": "Actions"
+      }
+    },
 
     "roles": {
       "admin": "Admin",
