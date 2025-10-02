@@ -1,5 +1,6 @@
 {
   "common": {
+    "dashbaord": "Dashboard",
     "language": "Language",
     "selectLanguage": "Select Language",
     "loading": "Loading...",

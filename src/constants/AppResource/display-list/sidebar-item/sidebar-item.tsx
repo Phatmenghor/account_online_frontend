@@ -16,8 +16,13 @@ export function useNavItems() {
 
   return [
     {
-      title: t("users"),
+      title: t("dashbaord"),
       href: ROUTES.DASHBOARD.INDEX,
+      icon: User2,
+    },
+    {
+      title: t("users"),
+      href: ROUTES.DASHBOARD.USER,
       icon: User2,
     },
     {
