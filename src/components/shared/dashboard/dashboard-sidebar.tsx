@@ -80,7 +80,6 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
               isOpen ? "gap-2" : "justify-center w-full"
             )}
           >
-            {/* Always show logo */}
             <img
               src={AppIcons.APP.APP_LOGO}
               alt="Internal Dev Logo"
@@ -89,7 +88,6 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
                 isOpen ? "mr-0" : "mx-auto h-8 w-7"
               )}
             />
-            {/* Show app name only when sidebar is open */}
             {isOpen && (
               <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
                 Internal Dev
@@ -97,7 +95,6 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
             )}
           </Link>
 
-          {/* Toggle button */}
           <Button
             variant="ghost"
             size="icon"
@@ -121,56 +118,80 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
           <nav className="grid gap-1 px-2">
             {navItems.map((item) => (
               <div key={item.title} className="flex flex-col">
-                <button
-                  type="button"
-                  onClick={() => item.subItems && toggleSubmenu(item.title)}
-                  className={cn(
-                    "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
-                    pathname === item.href &&
-                      "bg-accent text-accent-foreground",
-                    !isOpen && "justify-center px-0"
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span
-                    className={cn(
-                      "whitespace-nowrap transition-all duration-300 ease-in-out",
-                      isOpen
-                        ? "opacity-100 translate-x-0 max-w-xs"
-                        : "opacity-0 -translate-x-4 max-w-0"
-                    )}
-                  >
-                    {item.title}
-                  </span>
-
-                  {/* Arrow indicator for sub-items */}
-                  {item.subItems && isOpen && (
-                    <ChevronRight
+                {/* If item has subItems, use button to toggle submenu */}
+                {item.subItems ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => toggleSubmenu(item.title)}
                       className={cn(
-                        "ml-auto h-4 w-4 transition-transform duration-200",
-                        openSubmenus[item.title] && "rotate-90"
+                        "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
+                        openSubmenus[item.title] &&
+                          "bg-accent text-accent-foreground",
+                        !isOpen && "justify-center px-0"
                       )}
-                    />
-                  )}
-                </button>
-
-                {/* Render sub-items if submenu is open */}
-                {item.subItems && openSubmenus[item.title] && isOpen && (
-                  <div className="ml-6 flex flex-col gap-1 mt-1">
-                    {item.subItems.map((sub) => (
-                      <Link
-                        key={sub.href}
-                        href={sub.href}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span
                         className={cn(
-                          "flex h-8 items-center rounded-md px-2 text-sm font-normal hover:bg-accent hover:text-accent-foreground transition-colors",
-                          pathname === sub.href &&
-                            "bg-accent text-accent-foreground"
+                          "whitespace-nowrap transition-all duration-300 ease-in-out",
+                          isOpen
+                            ? "opacity-100 translate-x-0 max-w-xs"
+                            : "opacity-0 -translate-x-4 max-w-0"
                         )}
                       >
-                        {sub.title}
-                      </Link>
-                    ))}
-                  </div>
+                        {item.title}
+                      </span>
+                      <ChevronRight
+                        className={cn(
+                          "ml-auto h-4 w-4 transition-transform duration-200",
+                          openSubmenus[item.title] && "rotate-90"
+                        )}
+                      />
+                    </button>
+
+                    {/* Render submenu links */}
+                    {openSubmenus[item.title] && isOpen && (
+                      <div className="ml-6 flex flex-col gap-1 mt-1">
+                        {item.subItems.map((sub) => (
+                          <Link
+                            key={sub.href}
+                            href={sub.href}
+                            className={cn(
+                              "flex h-8 items-center rounded-md px-2 text-sm font-normal hover:bg-accent hover:text-accent-foreground transition-colors",
+                              pathname === sub.href &&
+                                "bg-accent text-accent-foreground"
+                            )}
+                          >
+                            {sub.title}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // Regular route link
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
+                      pathname === item.href &&
+                        "bg-accent text-accent-foreground",
+                      !isOpen && "justify-center px-0"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span
+                      className={cn(
+                        "whitespace-nowrap transition-all duration-300 ease-in-out",
+                        isOpen
+                          ? "opacity-100 translate-x-0 max-w-xs"
+                          : "opacity-0 -translate-x-4 max-w-0"
+                      )}
+                    >
+                      {item.title}
+                    </span>
+                  </Link>
                 )}
               </div>
             ))}
