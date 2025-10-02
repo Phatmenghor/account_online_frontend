@@ -1,4 +1,5 @@
-import { Status } from "../../filter/filter";
+import { Value } from "@radix-ui/react-select";
+import { ProjectStatus, Status } from "../../filter/filter";
 
 export const STATUS_FILTER = [
   { value: "ALL", label: "All Status" },
@@ -15,3 +16,9 @@ export enum ModalMode {
   CREATE_MODE = "create",
   UPDATE_MODE = "update",
 }
+
+
+export const STATUS_PROJECT = [
+  {value: ProjectStatus.UAT, label: "UAT"},
+  {value: ProjectStatus.PRODUCTION, label: "Production"}
+]

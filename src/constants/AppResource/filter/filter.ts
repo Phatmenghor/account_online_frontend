@@ -7,3 +7,8 @@ export enum Role {
   ADMIN = "ADMIN",
   SUPER = "SUPER",
 }
+
+export enum ProjectStatus {
+  UAT = "UAT",
+  PRODUCTION = "PRODUCTION"
+}

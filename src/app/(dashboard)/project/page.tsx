@@ -40,11 +40,19 @@ import {
   updateProjectService,
 } from "@/services/dashboard/project/project.service";
 import ModalProject from "@/components/shared/modal/project-modal";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
+import { ModalMode, STATUS_PROJECT } from "@/constants/AppResource/display-list/status/status";
 import Loading from "@/components/shared/common/loading";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function ProjectPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [projectStatus, setProjectStatus] = useState<string>("all");
   const [projects, setProjects] = useState<AllProjectModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,6 +91,7 @@ function ProjectPageContent() {
         search: debouncedSearchQuery,
         pageNo: currentPage,
         pageSize: 10,
+        projectStatus: projectStatus !== "all" ? projectStatus : undefined,
       });
       setProjects(response);
     } catch (error: any) {
@@ -90,15 +99,21 @@ function ProjectPageContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [debouncedSearchQuery, currentPage]);
+  }, [debouncedSearchQuery, currentPage, projectStatus]);
 
   useEffect(() => {
     loadProjects();
-  }, [loadProjects, debouncedSearchQuery]);
+  }, [loadProjects, debouncedSearchQuery, projectStatus]);
 
   // Simplified search change handler - just updates the state, debouncing handles the rest
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setProjectStatus(value);
+    // Reset to first page when filter changes
+    updateUrlWithPage(1, true);
   };
 
   const handleSaveProject = async (
@@ -363,11 +378,25 @@ function ProjectPageContent() {
                 disabled={isSubmitting}
               />
             </div>
+            
+            {/* Status Filter Dropdown */}
+            <Select value={projectStatus} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-[180px] h-9">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                {STATUS_PROJECT.map((status) => (
+                  <SelectItem key={status.value} value={status.value}>
+                    {status.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex gap-4">
             <div>
-              {/* FIXED BUTTON WITH PROPER LOADING STATE AND TEXT */}
               <Button
                 onClick={() => handleExportToExcel(projects?.content ?? [])}
                 size="lg"
@@ -408,7 +437,7 @@ function ProjectPageContent() {
                     handleDeleteProject,
                   },
                 })}
-                loading={isLoading}
+                // loading={isLoading}
                 emptyMessage="No project found"
                 getRowKey={(project) => project.id}
               />
