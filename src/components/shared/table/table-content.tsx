@@ -1,4 +1,3 @@
-import { TableColumn } from "@/components/shared/table/table";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
@@ -13,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
+import { TableColumn } from "./data-table";
 
 interface userTableHandlers {
   handleEditUser: (user: UserModel) => void;

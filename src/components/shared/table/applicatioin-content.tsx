@@ -1,5 +1,7 @@
-import { AllAppModel, ApplicationModel } from "@/models/application/app.response";
-import { TableColumn } from "@/components/shared/table/table";
+import {
+  AllAppModel,
+  ApplicationModel,
+} from "@/models/application/app.response";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
@@ -12,6 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
 import { formatStatusApp } from "@/utils/format/ProjectStatus";
+import { TableColumn } from "./data-table";
 
 interface ApplicationTableHandlers {
   handleEditApplication: (application: ApplicationModel) => void;
@@ -28,7 +31,11 @@ export const createApplicationTableColumns = ({
   data,
   handlers,
 }: ApplicationTableOptions): TableColumn<ApplicationModel>[] => {
-  const { handleEditApplication, handleViewApplicationDetail, handleDeleteApplication } = handlers;
+  const {
+    handleEditApplication,
+    handleViewApplicationDetail,
+    handleDeleteApplication,
+  } = handlers;
 
   const tApplication = useTranslations("application");
   const tCommon = useTranslations("common");
@@ -85,7 +92,9 @@ export const createApplicationTableColumns = ({
       key: "memberInvolved",
       label: tApplication("memberInvolved"),
       render: (application) => (
-        <span className="font-medium">{application.memberInvolved || "---"}</span>
+        <span className="font-medium">
+          {application.memberInvolved || "---"}
+        </span>
       ),
     },
     {

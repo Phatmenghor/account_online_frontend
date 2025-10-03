@@ -1,5 +1,7 @@
-import { AllTraineeModel, TraineeModel } from "@/models/trainee/trainee.response";
-import { TableColumn } from "@/components/shared/table/table";
+import {
+  AllTraineeModel,
+  TraineeModel,
+} from "@/models/trainee/trainee.response";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
@@ -11,6 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
+import { TableColumn } from "./data-table";
 
 interface TraineeTableHandlers {
   handleEditTrainee: (trainee: TraineeModel) => void;
@@ -27,7 +30,8 @@ export const createTraineeTableColumns = ({
   data,
   handlers,
 }: TraineeTableOptions): TableColumn<TraineeModel>[] => {
-  const { handleEditTrainee, handleViewTraineeDetail, handleDeleteTrainee } = handlers;
+  const { handleEditTrainee, handleViewTraineeDetail, handleDeleteTrainee } =
+    handlers;
 
   const tTrainee = useTranslations("trainee");
   const tCommon = useTranslations("common");
@@ -36,7 +40,8 @@ export const createTraineeTableColumns = ({
     {
       key: "index",
       label: "#",
-      className: "w-[60px]",
+      maxWidth: "60px",
+      minWidth: "60px",
       render: (_, index) => (
         <span className="font-medium">
           {indexDisplay(data?.pageNo || 1, data?.pageSize || 10, index)}
@@ -46,6 +51,9 @@ export const createTraineeTableColumns = ({
     {
       key: "reportRemark",
       label: tTrainee("reportRemark"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (trainee) => (
         <span className="font-medium">{trainee.reportRemark || "---"}</span>
       ),
@@ -53,6 +61,9 @@ export const createTraineeTableColumns = ({
     {
       key: "challenge",
       label: tTrainee("challenge"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (trainee) => (
         <span className="font-medium">{trainee.challenge || "---"}</span>
       ),
@@ -60,13 +71,19 @@ export const createTraineeTableColumns = ({
     {
       key: "recommend",
       label: tTrainee("recommend"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (trainee) => (
         <span className="font-medium">{trainee.recommend || "---"}</span>
       ),
     },
     {
       key: "createdAt",
+      truncate: true,
       label: tTrainee("createdAt"),
+      maxWidth: "380px",
+      minWidth: "150px",
       render: (trainee) => (
         <span className="text-muted-foreground">
           {DateTimeFormat(trainee.createdAt)}
@@ -76,7 +93,8 @@ export const createTraineeTableColumns = ({
     {
       key: "actions",
       label: tTrainee("actions"),
-      className: "w-[160px]",
+      maxWidth: "180px",
+      minWidth: "160px",
       render: (trainee) => (
         <div className="flex items-center gap-2">
           <TooltipProvider>
