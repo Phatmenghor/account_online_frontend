@@ -159,7 +159,9 @@ export default function ModalAttendance({
 
           {/* Type */}
           <div className="space-y-1">
-            <Label htmlFor="type">Type *</Label>
+            <Label htmlFor="type">
+              Type {isCreate ? <span className="text-red-700">*</span> : ""}
+            </Label>
             <Controller
               control={control}
               name="type"
@@ -189,7 +191,10 @@ export default function ModalAttendance({
 
           {/* Leave request */}
           <div className="space-y-1">
-            <Label htmlFor="leaveRequest">Leave Request *</Label>
+            <Label htmlFor="leaveRequest">
+              Leave Request{" "}
+              {isCreate ? <span className="text-red-700">*</span> : ""}
+            </Label>
             <Controller
               control={control}
               name="leaveRequest"
