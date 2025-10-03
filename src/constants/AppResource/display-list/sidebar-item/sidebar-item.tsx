@@ -1,9 +1,6 @@
 "use client";
 
 import { ROUTES } from "@/constants/AppRoutes/routes";
-<<<<<<< HEAD
-import { Calendar1Icon, Code, User2 } from "lucide-react";
-=======
 import {
   Calendar1Icon,
   Code,
@@ -14,7 +11,6 @@ import {
   Server,
   User2,
 } from "lucide-react";
->>>>>>> 5980abe55623a4e1006db8198d76b956ce566b38
 import { useTranslations } from "next-intl";
 
 export function useNavItems() {
