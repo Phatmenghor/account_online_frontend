@@ -1,4 +1,3 @@
-import { TableColumn } from "@/components/shared/table/table";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
@@ -15,6 +14,7 @@ import {
   AttendanceModel,
 } from "@/models/attendance/attendances.response";
 import { Badge } from "@/components/ui/badge";
+import { TableColumn } from "./data-table";
 
 interface AttendanceTableHandlers {
   handleEditAttendance: (attendance: AttendanceModel) => void;

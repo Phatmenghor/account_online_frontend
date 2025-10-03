@@ -1,4 +1,3 @@
-import { TableColumn } from "@/components/shared/table/table";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
@@ -15,6 +14,7 @@ import {
 } from "@/models/project/project.response";
 import { useTranslations } from "next-intl";
 import { formatStatus } from "@/utils/format/ProjectStatus";
+import { TableColumn } from "./data-table";
 
 interface ProjectTableHandlers {
   handleEditProject: (project: ProjectModel) => void;
@@ -67,7 +67,7 @@ export const createProjectTableColumns = ({
       label: tProject("projectStatus"),
       render: (project) => (
         <span className="font-medium">
-          {formatStatus(project.projectStatus)|| "---"}
+          {formatStatus(project.projectStatus) || "---"}
         </span>
       ),
     },

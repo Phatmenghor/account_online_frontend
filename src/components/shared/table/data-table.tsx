@@ -6,6 +6,9 @@ export interface TableColumn<T = any> {
   className?: string;
   render?: (item: T, index: number) => ReactNode;
   sortable?: boolean;
+  truncate?: boolean;
+  maxWidth?: string; // Max width for the column (flexible)
+  minWidth?: string; // Min width for the column (optional)
 }
 
 interface DataTableProps<T = any> {
@@ -39,6 +42,10 @@ export function DataTable<T = any>({
                   className={`px-4 py-3 text-left font-semibold text-xs text-muted-foreground border-b border-border ${
                     column.className || ""
                   }`}
+                  style={{
+                    ...(column.maxWidth && { maxWidth: column.maxWidth }),
+                    ...(column.minWidth && { minWidth: column.minWidth }),
+                  }}
                 >
                   {column.label}
                 </th>
@@ -65,9 +72,7 @@ export function DataTable<T = any>({
   }
 
   return (
-    <div
-      className={`rounded-md border overflow-x-auto whitespace-nowrap ${className}`}
-    >
+    <div className={`rounded-md border overflow-x-auto ${className}`}>
       <table className="w-full text-sm">
         <thead className="bg-muted/50">
           <tr>
@@ -77,12 +82,12 @@ export function DataTable<T = any>({
                 className={`px-4 py-3 text-left font-semibold text-xs text-muted-foreground border-b border-border ${
                   column.className || ""
                 }`}
+                style={{
+                  ...(column.maxWidth && { maxWidth: column.maxWidth }),
+                  ...(column.minWidth && { minWidth: column.minWidth }),
+                }}
               >
-                <div
-                  className={`flex items-center gap-1 ${
-                    column.className || ""
-                  }`}
-                >
+                <div className="flex items-center gap-1">
                   <span>{column.label}</span>
                 </div>
               </th>
@@ -108,18 +113,37 @@ export function DataTable<T = any>({
                 }`}
                 onClick={() => onRowClick?.(item)}
               >
-                {columns.map((column) => (
-                  <td
-                    key={column.key}
-                    className={`px-4 py-3 border-b border-border/50 ${
-                      column.className || ""
-                    }`}
-                  >
-                    {column.render
-                      ? column.render(item, index)
-                      : String(item[column.key as keyof T] || "---")}
-                  </td>
-                ))}
+                {columns.map((column) => {
+                  const cellContent = column.render
+                    ? column.render(item, index)
+                    : String(item[column.key as keyof T] || "---");
+
+                  return (
+                    <td
+                      key={column.key}
+                      className={`px-4 py-3 border-b border-border/50 ${
+                        column.className || ""
+                      }`}
+                      style={{
+                        ...(column.maxWidth && { maxWidth: column.maxWidth }),
+                        ...(column.minWidth && { minWidth: column.minWidth }),
+                      }}
+                    >
+                      {column.truncate ? (
+                        <div
+                          className="overflow-hidden text-ellipsis whitespace-nowrap"
+                          title={
+                            typeof cellContent === "string" ? cellContent : ""
+                          }
+                        >
+                          {cellContent}
+                        </div>
+                      ) : (
+                        cellContent
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             ))
           )}
