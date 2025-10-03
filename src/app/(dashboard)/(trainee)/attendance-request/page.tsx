@@ -45,6 +45,8 @@ import {
 import { createAttendanceApprovalTableColumns } from "@/components/shared/table/attendance-approval-content";
 import ModalAttendanceApprovalOrCancel from "@/components/shared/modal/attendance-approval-modal";
 import { AttendanceApprovalViewModal } from "@/components/shared/modal/attendance-approval-detail-modal";
+import ModalAttendance from "@/components/shared/modal/attendance-modal";
+import { toast } from "sonner";
 
 function AttendanceRequestPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,12 +62,11 @@ function AttendanceRequestPageContent() {
     useState<AttendanceType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isExportingToExcel, setIsExportingToExcel] = useState(false);
   const [selectedAttendance, setSelectedAttendance] =
     useState<AttendanceModel | null>(null);
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [mode, setMode] = useState<ModalMode>(ModalMode.UPDATE_MODE);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAttendanceDetailOpen, setIsAttendanceDetailOpen] = useState(false);
 
@@ -223,6 +224,54 @@ function AttendanceRequestPageContent() {
     }
   };
 
+  const handleSaveProject = async (formData: AttendanceUpdateForm) => {
+    setIsSubmitting(true);
+    try {
+      const updateProjectForm = formData as AttendanceUpdateForm;
+      if (!updateProjectForm.id) {
+        console.error("Missing attendances id in update form");
+        return;
+      }
+      const response = await updateAttendanceService(updateProjectForm.id, {
+        endDate: updateProjectForm.endDate,
+        reason: updateProjectForm.reason,
+        startDate: updateProjectForm.startDate,
+        type: updateProjectForm.type,
+      });
+
+      setAttendances((prev) =>
+        prev
+          ? {
+              ...prev,
+              content: prev.content.map((proj) =>
+                proj.id === updateProjectForm.id ? response : proj
+              ),
+            }
+          : prev
+      );
+
+      startTransition(() => {
+        AppToast({
+          type: "success",
+          message: "Project updated successfully",
+          description: "Updated Project",
+        });
+      });
+
+      setIsModalOpen(false);
+      setSelectedAttendance(null);
+      loadAttendances();
+    } catch (err: any) {
+      toast.error(err?.errorMessage || "Failed to save project");
+      AppToast({
+        type: "error",
+        message: "Failed to save project",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const confirmDeleteAttendance = async () => {
     if (!selectedAttendance) return;
     setIsSubmitting(true);
@@ -261,131 +310,14 @@ function AttendanceRequestPageContent() {
     }
   };
 
-  const handleExportToExcel = async () => {
-    setIsExportingToExcel(true);
-    try {
-      // Define columns based on AttendanceModel
-      const columns: ExcelColumn[] = [
-        { header: "ID", key: "id", width: 8, type: "number" },
-        { header: "User ID Card", key: "userIdCard", width: 15, type: "text" },
-        { header: "Full Name", key: "userFullName", width: 25, type: "text" },
-        { header: "Email", key: "userEmail", width: 30, type: "text" },
-        { header: "Position", key: "userPosition", width: 20, type: "text" },
-        { header: "Type", key: "type", width: 15, type: "text" },
-        { header: "Status", key: "status", width: 12, type: "text" },
-        {
-          header: "Start Date",
-          key: "startDate",
-          width: 15,
-          type: "date",
-          format: "mm/dd/yyyy",
-        },
-        {
-          header: "End Date",
-          key: "endDate",
-          width: 15,
-          type: "date",
-          format: "mm/dd/yyyy",
-        },
-        { header: "Total Days", key: "totalDays", width: 12, type: "number" },
-        { header: "Reason", key: "reason", width: 35, type: "text" },
-        {
-          header: "Approved By ID",
-          key: "approvedByIdCard",
-          width: 15,
-          type: "text",
-        },
-        {
-          header: "Approved By",
-          key: "approvedByFullName",
-          width: 25,
-          type: "text",
-        },
-        {
-          header: "Approved At",
-          key: "approvedAt",
-          width: 18,
-          type: "date",
-          format: "mm/dd/yyyy hh:mm",
-        },
-        {
-          header: "Approval Notes",
-          key: "approvalNotes",
-          width: 30,
-          type: "text",
-        },
-        {
-          header: "Created Date",
-          key: "createdAt",
-          width: 18,
-          type: "date",
-          format: "mm/dd/yyyy hh:mm",
-        },
-        {
-          header: "Updated Date",
-          key: "updatedAt",
-          width: 18,
-          type: "date",
-          format: "mm/dd/yyyy hh:mm",
-        },
-      ];
-
-      // Create Excel exporter
-      const exporter = new ExcelExporter({
-        filename: "attendance_requests.xlsx",
-        title: "Attendance Request Report",
-        author: "HR Department",
-        useAlternateRows: true,
-        protection: {
-          password: "88889999",
-          deleteRows: false,
-          selectLockedCells: true,
-          selectUnlockedCells: true,
-        },
-      });
-
-      // Configure sheet
-      const sheetConfig: ExcelSheet = {
-        name: "Attendance Requests",
-        data: attendances?.content ?? [],
-        columns,
-        autoFilter: true,
-        freezeRows: 1,
-        sortBy: [{ key: "id", order: "desc" }],
-      };
-
-      exporter.addSheet(sheetConfig);
-      await exporter.export();
-
-      AppToast({ type: "success", message: "Successfully exported to Excel" });
-    } catch (error: any) {
-      AppToast({ type: "error", message: "Failed to export to Excel" });
-      console.error("Error exporting to Excel:", error);
-    } finally {
-      setIsExportingToExcel(false);
-    }
-  };
-
-  const handleEditAttendance = (attendance: AttendanceModel) => {
-    setSelectedAttendance(attendance);
-    setMode(ModalMode.UPDATE_MODE);
-    setIsModalOpen(true);
-  };
-
-  const handleAddAttendance = () => {
-    setSelectedAttendance(null);
-    setMode(ModalMode.CREATE_MODE);
-    setIsModalOpen(true);
-  };
-
   const handleViewAttendanceDetail = (attendance: AttendanceModel) => {
     setSelectedAttendance(attendance);
     setIsAttendanceDetailOpen(true);
   };
 
-  const handleDeleteAttendance = (attendance: AttendanceModel) => {
+  const handleEditAttendance = (attendance: AttendanceModel) => {
     setSelectedAttendance(attendance);
-    setIsDeleteDialogOpen(true);
+    setIsEditDialogOpen(true);
   };
 
   return (
@@ -410,28 +342,6 @@ function AttendanceRequestPageContent() {
               />
             </div>
           </div>
-
-          <div className="flex gap-4">
-            <div>
-              <Button
-                onClick={handleExportToExcel}
-                size="lg"
-                variant="outline"
-                className="gap-2 text-sm sm:text-base h-10 hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6"
-                disabled={isExportingToExcel || !attendances?.content?.length}
-              >
-                <img
-                  src={AppIcons.FILE.Excel}
-                  alt="Excel Icon"
-                  className="h-4 w-4 lg:h-5 lg:w-5 text-muted-foreground flex-shrink-0"
-                />
-                <span className="text-sm gap-2">
-                  {isExportingToExcel ? <Loading /> : "Export"}
-                </span>
-                <Download className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
-              </Button>
-            </div>
-          </div>
         </div>
 
         <div className="w-full">
@@ -447,7 +357,7 @@ function AttendanceRequestPageContent() {
                   handlers: {
                     handleOpenApprovalModal,
                     handleViewAttendanceDetail,
-                    handleDeleteAttendance,
+                    handleEditAttendance,
                   },
                 })}
                 loading={isLoading}
@@ -468,16 +378,15 @@ function AttendanceRequestPageContent() {
           </div>
         </div>
 
-        <DeleteConfirmationDialog
-          isOpen={isDeleteDialogOpen}
+        <ModalAttendance
+          isOpen={isEditDialogOpen}
+          mode={mode}
           onClose={() => {
-            setIsDeleteDialogOpen(false);
             setSelectedAttendance(null);
+            setIsEditDialogOpen(false);
           }}
-          onDelete={confirmDeleteAttendance}
-          title="Delete Attendance Request"
-          description={`Are you sure you want to delete the attendance request for`}
-          itemName={selectedAttendance?.userFullName || "N/A"}
+          onSave={handleSaveProject}
+          attendanceId={selectedAttendance?.id ?? 0}
           isSubmitting={isSubmitting}
         />
 

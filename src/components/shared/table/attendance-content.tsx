@@ -45,6 +45,9 @@ export const createAttendanceTableColumns = ({
       key: "index",
       label: "#",
       className: "w-[60px]",
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (_, index) => (
         <span className="font-medium">
           {indexDisplay(data?.pageNo || 1, data?.pageSize || 10, index)}
@@ -52,13 +55,13 @@ export const createAttendanceTableColumns = ({
       ),
     },
     {
-      key: "userFullName",
-      label: t("userFullName"),
+      key: "idCard",
+      label: t("userIdCard"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <div className="flex flex-col">
-          <span className="font-medium">
-            {attendance.userFullName || "---"}
-          </span>
           <span className="text-xs text-muted-foreground">
             {attendance.userIdCard || attendance.userEmail || ""}
           </span>
@@ -66,8 +69,25 @@ export const createAttendanceTableColumns = ({
       ),
     },
     {
+      key: "userFullName",
+      label: t("userFullName"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
+      render: (attendance) => (
+        <div className="flex flex-col">
+          <span className="font-medium">
+            {attendance.userFullName || "---"}
+          </span>
+        </div>
+      ),
+    },
+    {
       key: "userPosition",
       label: t("position"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <span className="font-medium">{attendance.userPosition || "---"}</span>
       ),
@@ -75,6 +95,9 @@ export const createAttendanceTableColumns = ({
     {
       key: "type",
       label: t("type"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <Badge variant="outline" className="capitalize">
           {attendance.type || "---"}
@@ -84,6 +107,9 @@ export const createAttendanceTableColumns = ({
     {
       key: "leaveRequest",
       label: t("leaveRequest"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <Badge variant="outline" className="capitalize">
           {attendance.leaveRequest || "---"}
@@ -93,6 +119,9 @@ export const createAttendanceTableColumns = ({
     {
       key: "status",
       label: t("status"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => {
         const status = attendance.status?.toLowerCase();
         const statusConfig: Record<string, string> = {
@@ -114,6 +143,9 @@ export const createAttendanceTableColumns = ({
     {
       key: "period",
       label: t("period"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <span className="font-medium">
           {DateTimeFormat(attendance.startDate)} →{" "}
@@ -124,6 +156,9 @@ export const createAttendanceTableColumns = ({
     {
       key: "totalDays",
       label: t("totalDays"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <span className="font-medium">{attendance.totalDays || 0}</span>
       ),
@@ -131,6 +166,9 @@ export const createAttendanceTableColumns = ({
     {
       key: "approvedBy",
       label: t("approvedBy"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <span className="font-medium">
           {attendance.approvedByFullName || "---"}
@@ -140,6 +178,9 @@ export const createAttendanceTableColumns = ({
     {
       key: "createdAt",
       label: t("createdAt"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <span className="text-muted-foreground">
           {DateTimeFormat(attendance.createdAt)}
@@ -149,6 +190,9 @@ export const createAttendanceTableColumns = ({
     {
       key: "actions",
       label: t("actions"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       className: "w-[160px]",
       render: (attendance) => (
         <div className="flex items-center gap-2">

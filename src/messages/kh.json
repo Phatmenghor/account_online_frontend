@@ -95,8 +95,9 @@
       "history": "ប្រវត្តិវត្តមាន"
     },
     "modal": {
-      "cancel": "បោះបង់",
-      "approval": "យល់ព្រម",
+      "cancel": "បោះបង់សំណើ",
+      "discard": "ចាកចេញ",
+      "approval": "យល់ព្រមសំណើ",
       "approvalOrCancelTitle": "យល់ព្រម ឬ បោះបង់ការចូលរួម",
       "approvalOrCancelDesc": "អ្នកអាចយល់ព្រម ឬបោះបង់សំណើវត្តមាននេះខាងក្រោម។",
       "viewTitle": "សំណើវត្តមាន",
@@ -114,7 +115,7 @@
     "table-header-attendance": {
       "id": "លេខសម្គាល់",
       "userId": "លេខសម្គាល់អ្នកប្រើប្រាស់",
-      "userIdCard": "អត្តសញ្ញាណប័ណ្ណ",
+      "userIdCard": "លេខសម្គាល់បុគ្គលិក",
       "userFullName": "ឈ្មោះពេញ",
       "userEmail": "អ៊ីមែល",
       "position": "មុខតំណែង",

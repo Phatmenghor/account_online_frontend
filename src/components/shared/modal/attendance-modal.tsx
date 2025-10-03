@@ -33,6 +33,7 @@ import { getAttendancesByIdService } from "@/services/dashboard/attendance/atten
 import { AttendanceReq } from "@/models/attendance/attendances.request";
 import {
   ATTENDANCE_TYPE_OPTIONS,
+  AttendanceStatus,
   LEAVE_REQUEST_OPTIONS,
   LeaveRequest,
 } from "@/constants/AppResource/filter/attendance";
@@ -102,6 +103,11 @@ export default function ModalAttendance({
     }
   }, [attendanceId, isCreate, reset]);
 
+  const isPending = attendanceDetail?.status === AttendanceStatus.PENDING;
+
+  // check if we are creating or pending update
+  const canEdit = isCreate || isPending;
+
   useEffect(() => {
     if (isOpen && !isCreate) loadAttendanceById();
     if (isOpen && isCreate) {
@@ -119,6 +125,7 @@ export default function ModalAttendance({
     if (isCreate) {
       const payload: AttendanceReq = data as AttendanceCreateForm;
       onSave(payload);
+      onClose();
     } else {
       const updateData = data as AttendanceUpdateForm;
       if (!updateData.id) return console.error("Missing ID for update");
@@ -131,6 +138,7 @@ export default function ModalAttendance({
         reason: updateData.reason,
       };
       onSave({ id: updateData.id, updates: payload });
+      onClose();
     }
   };
 
@@ -169,7 +177,7 @@ export default function ModalAttendance({
                 <Select
                   value={field.value}
                   onValueChange={field.onChange}
-                  disabled={isSubmitting}
+                  disabled={!canEdit || isSubmitting}
                 >
                   <SelectTrigger id="status">
                     <SelectValue placeholder="Select status" />
@@ -202,7 +210,7 @@ export default function ModalAttendance({
                 <Select
                   value={field.value}
                   onValueChange={field.onChange}
-                  disabled={isSubmitting}
+                  disabled={!canEdit || isSubmitting}
                 >
                   <SelectTrigger id="status">
                     <SelectValue placeholder="Select request" />
@@ -224,7 +232,10 @@ export default function ModalAttendance({
 
           {/* Start Date */}
           <div className="space-y-1">
-            <Label htmlFor="startDate">Start Date *</Label>
+            <Label htmlFor="startDate">
+              Start Date{" "}
+              {isCreate ? <span className="text-red-700">*</span> : ""}
+            </Label>
             <Controller
               control={control}
               name="startDate"
@@ -233,7 +244,7 @@ export default function ModalAttendance({
                   type="date"
                   {...field}
                   id="startDate"
-                  disabled={isSubmitting}
+                  disabled={!canEdit || isSubmitting}
                   className={errors.startDate ? "border-red-500" : ""}
                 />
               )}
@@ -247,7 +258,9 @@ export default function ModalAttendance({
 
           {/* End Date */}
           <div className="space-y-1">
-            <Label htmlFor="endDate">End Date *</Label>
+            <Label htmlFor="endDate">
+              End Date {isCreate ? <span className="text-red-700">*</span> : ""}
+            </Label>
             <Controller
               control={control}
               name="endDate"
@@ -256,7 +269,7 @@ export default function ModalAttendance({
                   type="date"
                   {...field}
                   id="endDate"
-                  disabled={isSubmitting}
+                  disabled={!canEdit || isSubmitting}
                   className={errors.endDate ? "border-red-500" : ""}
                 />
               )}
@@ -270,7 +283,9 @@ export default function ModalAttendance({
 
           {/* Reason */}
           <div className="space-y-1">
-            <Label htmlFor="reason">Reason *</Label>
+            <Label htmlFor="reason">
+              Reason {isCreate ? <span className="text-red-700">*</span> : ""}
+            </Label>
             <Controller
               control={control}
               name="reason"
@@ -278,7 +293,7 @@ export default function ModalAttendance({
                 <Textarea
                   {...field}
                   id="reason"
-                  disabled={isSubmitting}
+                  disabled={!canEdit || isSubmitting}
                   className={errors.reason ? "border-red-500" : ""}
                 />
               )}

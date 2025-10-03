@@ -180,6 +180,18 @@ export default function ModalAttendanceApprovalOrCancel({
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4">
             <Button
+              variant="outline"
+              type="button"
+              onClick={() => onClose()}
+              disabled={
+                isSubmitting ||
+                !attendance ||
+                attendance.status === AttendanceStatus.CANCELLED
+              }
+            >
+              {t("discard")}
+            </Button>
+            <Button
               variant="destructive"
               type="button"
               onClick={handleCancelAttendance}

@@ -1,8 +1,7 @@
-import { TableColumn } from "@/components/shared/table/table";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
-import { Eye, Trash } from "lucide-react";
+import { Eye, Pencil } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -15,11 +14,12 @@ import {
   AllAttendanceModel,
   AttendanceModel,
 } from "@/models/attendance/attendances.response";
+import { TableColumn } from "./data-table";
 
 interface AttendanceTableHandlers {
   handleOpenApprovalModal: (attendance: AttendanceModel) => void;
   handleViewAttendanceDetail: (attendance: AttendanceModel) => void;
-  handleDeleteAttendance: (attendance: AttendanceModel) => void;
+  handleEditAttendance: (attendance: AttendanceModel) => void;
 }
 
 interface AttendanceApprovalTableOptions {
@@ -36,7 +36,7 @@ export const createAttendanceApprovalTableColumns = ({
   const {
     handleOpenApprovalModal,
     handleViewAttendanceDetail,
-    handleDeleteAttendance,
+    handleEditAttendance,
   } = handlers;
 
   const t = useTranslations("attendance.table-header-attendance");
@@ -46,6 +46,9 @@ export const createAttendanceApprovalTableColumns = ({
     {
       key: "index",
       label: "#",
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       className: "w-[60px]",
       render: (_, index) => (
         <span className="font-medium">
@@ -54,13 +57,13 @@ export const createAttendanceApprovalTableColumns = ({
       ),
     },
     {
-      key: "userFullName",
-      label: t("userFullName"),
+      key: "idCard",
+      label: t("userIdCard"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <div className="flex flex-col">
-          <span className="font-medium">
-            {attendance.userFullName || "---"}
-          </span>
           <span className="text-xs text-muted-foreground">
             {attendance.userIdCard || attendance.userEmail || ""}
           </span>
@@ -68,8 +71,25 @@ export const createAttendanceApprovalTableColumns = ({
       ),
     },
     {
+      key: "userFullName",
+      label: t("userFullName"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
+      render: (attendance) => (
+        <div className="flex flex-col">
+          <span className="font-medium">
+            {attendance.userFullName || "---"}
+          </span>
+        </div>
+      ),
+    },
+    {
       key: "status",
       label: t("status"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => {
         const status = attendance.status?.toLowerCase();
         const statusConfig: Record<string, string> = {
@@ -92,6 +112,9 @@ export const createAttendanceApprovalTableColumns = ({
     {
       key: "period",
       label: t("period"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       render: (attendance) => (
         <span className="font-medium">
           {DateTimeFormat(attendance.startDate)} →{" "}
@@ -102,6 +125,9 @@ export const createAttendanceApprovalTableColumns = ({
     {
       key: "actions",
       label: t("actions"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
       className: "w-[180px]",
       render: (attendance) => (
         <div className="flex items-center gap-2">
@@ -122,6 +148,19 @@ export const createAttendanceApprovalTableColumns = ({
                   ? "Approve or Cancel this request"
                   : "View details"}
               </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEditAttendance(attendance)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{tCommon("edit")}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
