@@ -4,7 +4,9 @@ import { ROUTES } from "@/constants/AppRoutes/routes";
 import {
   Calendar1Icon,
   Code,
+  Dock,
   Folder,
+  FolderClosed,
   Layers,
   Server,
   User2,
@@ -44,6 +46,16 @@ export function useNavItems() {
           href: ROUTES.DASHBOARD.ATTENDANCE.HISTORY,
         },
       ],
+    },
+    {
+      title: t("application"),
+      href: ROUTES.DASHBOARD.APPLICATION,
+      icon: Dock,
+    },
+    {
+      title: t("trainee"),
+      href: ROUTES.DASHBOARD.TRAINEE,
+      icon: FolderClosed,
     },
   ];
 }

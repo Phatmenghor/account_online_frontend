@@ -156,27 +156,6 @@ export default function ModalProject({
           </div>
 
           {/* Type */}
-          {/*  <div className="space-y-1">
-            <Label htmlFor="type">Type</Label>
-            <Controller
-              control={control}
-              name="type"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id="type"
-                  disabled={isSubmitting}
-                  className={errors.type ? "border-red-500" : ""}
-                />
-              )}
-            />
-            {errors.type && (
-              <p className="text-sm text-destructive">
-                {errors.type.message as string}
-              </p>
-            )}
-          </div> */}
-
           <div className="space-y-1">
             <Label htmlFor="type">Type</Label>
             <Controller

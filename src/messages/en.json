@@ -21,6 +21,8 @@
     "users": "Users",
     "project": "Projects",
     "attendance": "Attendance",
+    "application": "Application",
+    "trainee": "Report Trainee",
     "new": "New",
     "allStatus": "All Status",
     "status": {
@@ -133,5 +135,19 @@
       "login-success": "Successfully logged in!",
       "login-error": "Login failed. Please check your credentials."
     }
+  },
+  "application": {
+    "projectName": "Project Name",
+    "department": "Department",
+    "year": "Year",
+    "applicationStatus": "Application Status",
+    "urlLink": "Url Link",
+    "memberInvolved": "Members Involved",
+    "remark": "Remark",
+    "createdAt": "Created At",
+    "actions": "Actions"
+  },
+  "trainee": {
+
   }
 }

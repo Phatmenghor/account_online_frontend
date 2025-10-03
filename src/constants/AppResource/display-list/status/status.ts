@@ -22,3 +22,11 @@ export const STATUS_PROJECT = [
   {value: ProjectStatus.UAT, label: "UAT"},
   {value: ProjectStatus.PRODUCTION, label: "Production"}
 ]
+
+export const STATUS_APPLICATION = [
+  { value: "UAT", label: "UAT" },
+  { value: "PRODUCTION", label: "Production" },
+  { value: "ACTIVE", label: "Active" },
+  { value: "INACTIVE", label: "Inactive" },
+  { value: "DEVELOPMENT", label: "Development" }
+];

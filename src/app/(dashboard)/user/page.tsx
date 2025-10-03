@@ -60,7 +60,7 @@ function UserPageContent() {
   const debouncedSearchQuery = useDebounce(searchQuery, 400);
 
   const { currentPage, updateUrlWithPage, handlePageChange } = usePagination({
-    baseRoute: ROUTES.DASHBOARD.INDEX,
+    baseRoute: ROUTES.DASHBOARD.USER,
   });
 
   useEffect(() => {
