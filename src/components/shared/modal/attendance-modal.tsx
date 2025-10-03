@@ -31,7 +31,11 @@ import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import { AttendanceModel } from "@/models/attendance/attendances.response";
 import { getAttendancesByIdService } from "@/services/dashboard/attendance/attendance.service";
 import { AttendanceReq } from "@/models/attendance/attendances.request";
-import { ATTENDANCE_TYPE_OPTIONS } from "@/constants/AppResource/filter/attendance";
+import {
+  ATTENDANCE_TYPE_OPTIONS,
+  LEAVE_REQUEST_OPTIONS,
+  LeaveRequest,
+} from "@/constants/AppResource/filter/attendance";
 
 type ModalAttendanceProps = {
   isOpen: boolean;
@@ -62,7 +66,13 @@ export default function ModalAttendance({
       isCreate ? AttendanceReqCreateSchema : AttendanceReqUpdateSchema
     ),
     defaultValues: isCreate
-      ? { type: "", startDate: "", endDate: "", reason: "" }
+      ? {
+          type: "",
+          startDate: "",
+          endDate: "",
+          reason: "",
+          leaveRequest: LeaveRequest.FULL_DAY,
+        }
       : undefined,
   });
 
@@ -82,6 +92,7 @@ export default function ModalAttendance({
       reset({
         id: data.id,
         type: data.type,
+        leaveRequest: data.leaveRequest || LeaveRequest.FULL_DAY,
         startDate: data.startDate,
         endDate: data.endDate,
         reason: data.reason,
@@ -94,7 +105,13 @@ export default function ModalAttendance({
   useEffect(() => {
     if (isOpen && !isCreate) loadAttendanceById();
     if (isOpen && isCreate) {
-      reset({ type: "", startDate: "", endDate: "", reason: "" });
+      reset({
+        type: "",
+        startDate: "",
+        leaveRequest: LeaveRequest.FULL_DAY,
+        endDate: "",
+        reason: "",
+      });
     }
   }, [isOpen, isCreate, loadAttendanceById, reset]);
 
@@ -108,6 +125,7 @@ export default function ModalAttendance({
 
       const payload: Partial<AttendanceReq> = {
         type: updateData.type,
+        leaveRequest: updateData.leaveRequest,
         startDate: updateData.startDate,
         endDate: updateData.endDate,
         reason: updateData.reason,
@@ -156,6 +174,36 @@ export default function ModalAttendance({
                   </SelectTrigger>
                   <SelectContent>
                     {ATTENDANCE_TYPE_OPTIONS.map((s) => (
+                      <SelectItem key={s.value} value={s.value}>
+                        {s.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.type && (
+              <p className="text-destructive text-sm">{errors.type.message}</p>
+            )}
+          </div>
+
+          {/* Leave request */}
+          <div className="space-y-1">
+            <Label htmlFor="leaveRequest">Leave Request *</Label>
+            <Controller
+              control={control}
+              name="leaveRequest"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger id="status">
+                    <SelectValue placeholder="Select request" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LEAVE_REQUEST_OPTIONS.map((s) => (
                       <SelectItem key={s.value} value={s.value}>
                         {s.label}
                       </SelectItem>

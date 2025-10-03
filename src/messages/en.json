@@ -72,31 +72,6 @@
       "updatedAt": "Updated At",
       "actions": "Actions"
     },
-    "attendance": {
-      "title": "Attendance",
-      "search-attendance": "Search attendance...",
-      "table-header-attendance": {
-        "id": "ID",
-        "userId": "User ID",
-        "userIdCard": "ID Card",
-        "userFullName": "Full Name",
-        "userEmail": "Email",
-        "userPosition": "Position",
-        "type": "Type",
-        "status": "Status",
-        "startDate": "Start Date",
-        "endDate": "End Date",
-        "totalDays": "Total Days",
-        "reason": "Reason",
-        "approvedByIdCard": "Approved By (ID Card)",
-        "approvedByFullName": "Approved By (Full Name)",
-        "approvedAt": "Approved At",
-        "approvalNotes": "Approval Notes",
-        "createdAt": "Created At",
-        "updatedAt": "Updated At",
-        "actions": "Actions"
-      }
-    },
 
     "roles": {
       "admin": "Admin",
@@ -109,6 +84,55 @@
     }
   },
 
+  "attendance": {
+    "title": "Attendance",
+    "search-attendance": "Search attendance...",
+    "trainee": {
+      "index": "Trainee",
+      "request": "Attendance Request",
+      "history": "Attendance History"
+    },
+    "modal": {
+      "cancel": "Cancel",
+      "approval": "Approve",
+      "approvalOrCancelTitle": "Approve or Cancel Attendance",
+      "approvalOrCancelDesc": "You can approve or cancel this attendance request below.",
+      "viewTitle": "Attendance Request",
+      "viewDesc": "Attendance request details for",
+      "personalInfo": "User Information",
+      "attendanceInfo": "Attendance Information",
+      "approvalInfo": "Approval Information",
+      "close": "Close",
+      "noUserData": "No attendance data available",
+      "status": "Status",
+      "approvalNotes": "Approval Notes",
+      "approvalNotesPlaceholder": "Enter approval notes here...",
+      "selectStatus": "Select status"
+    },
+    "table-header-attendance": {
+      "id": "ID",
+      "userId": "User ID",
+      "userIdCard": "ID Card",
+      "userFullName": "Full Name",
+      "userEmail": "Email",
+      "position": "Position",
+      "type": "Type",
+      "period": "Period",
+      "status": "Status",
+      "leaveRequest": "leave sessions",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "totalDays": "Total Days",
+      "reason": "Reason",
+      "approvedByIdCard": "Approved By (ID Card)",
+      "approvedBy": "Approved By (Full Name)",
+      "approvedAt": "Approved At",
+      "approvalNotes": "Approval Notes",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "actions": "Actions"
+    }
+  },
   "auth": {
     "login": "Login",
     "logout": "Logout",

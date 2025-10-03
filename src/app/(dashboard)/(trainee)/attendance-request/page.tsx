@@ -16,23 +16,12 @@ import { Download, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
 import {
   ExcelColumn,
   ExcelExporter,
   ExcelSheet,
 } from "@/utils/export-file/excel";
-import ProjectViewModal from "@/components/shared/modal/project-detail-modal";
-import {
-  CreateProjectForm,
-  UpdateProjectForm,
-} from "@/models/project/project.schema";
-import {
-  createProjectService,
-  updateProjectService,
-} from "@/services/dashboard/project/project.service";
-import ModalProject from "@/components/shared/modal/project-modal";
 import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import Loading from "@/components/shared/common/loading";
 import {
@@ -45,23 +34,36 @@ import {
   getAttendanceService,
   updateAttendanceService,
 } from "@/services/dashboard/attendance/attendance.service";
-import { createAttendanceTableColumns } from "@/components/shared/table/attendance-content";
 import {
   AttendanceCreateForm,
   AttendanceUpdateForm,
 } from "@/models/attendance/attendance.schema";
-import ModalAttendance from "@/components/shared/modal/attendance-modal";
+import {
+  AttendanceStatus,
+  AttendanceType,
+} from "@/constants/AppResource/filter/attendance";
+import { createAttendanceApprovalTableColumns } from "@/components/shared/table/attendance-approval-content";
+import ModalAttendanceApprovalOrCancel from "@/components/shared/modal/attendance-approval-modal";
+import { AttendanceApprovalViewModal } from "@/components/shared/modal/attendance-approval-detail-modal";
 
-function AttendancePageContent() {
+function AttendanceRequestPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [attendances, setAttendances] = useState<AllAttendanceModel | null>(
     null
   );
+
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
+
+  const [attendancesStatusFilter, setAttendancesStatusFilter] =
+    useState<AttendanceStatus | null>(AttendanceStatus.PENDING);
+  const [attendancesTypeFilter, setAttendancesTypeFilter] =
+    useState<AttendanceType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExportingToExcel, setIsExportingToExcel] = useState(false);
   const [selectedAttendance, setSelectedAttendance] =
     useState<AttendanceModel | null>(null);
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,7 +77,7 @@ function AttendancePageContent() {
   const debouncedSearchQuery = useDebounce(searchQuery, 400);
 
   const { currentPage, updateUrlWithPage, handlePageChange } = usePagination({
-    baseRoute: ROUTES.DASHBOARD.ATTENDANCE,
+    baseRoute: ROUTES.DASHBOARD.ATTENDANCE.REQUEST,
     defaultPageSize: 10,
   });
 
@@ -93,10 +95,17 @@ function AttendancePageContent() {
         search: debouncedSearchQuery,
         pageNo: currentPage,
         pageSize: 10,
+        status: attendancesStatusFilter || AttendanceStatus.PENDING,
+        type:
+          attendancesTypeFilter !== null ? attendancesTypeFilter : undefined,
       });
       setAttendances(response);
     } catch (error: any) {
       console.log("Failed to fetch attendance: ", error);
+      AppToast({
+        type: "error",
+        message: error?.errorMessage || "Failed to fetch attendance requests",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -111,7 +120,22 @@ function AttendancePageContent() {
     setSearchQuery(e.target.value);
   };
 
-  const handleSaveProject = async (
+  const handleOpenApprovalModal = (attendance: AttendanceModel) => {
+    setSelectedAttendance(attendance);
+    setIsApprovalModalOpen(true);
+  };
+
+  const handleApprovalSuccess = () => {
+    setSelectedAttendance(null);
+    setIsApprovalModalOpen(false);
+    loadAttendances();
+    AppToast({
+      type: "success",
+      message: "Attendance updated successfully",
+    });
+  };
+
+  const handleSaveAttendance = async (
     formData: AttendanceCreateForm | AttendanceUpdateForm
   ) => {
     setIsSubmitting(true);
@@ -144,29 +168,35 @@ function AttendancePageContent() {
         startTransition(() => {
           AppToast({
             type: "success",
-            message: "Attendance created successfully",
-            description: "New Attendance",
+            message: "Attendance request created successfully",
+            description: "New Attendance Request",
           });
         });
       } else if (mode === ModalMode.UPDATE_MODE) {
-        const updateProjectForm = formData as AttendanceUpdateForm;
-        if (!updateProjectForm.id) {
-          console.error("Missing attendances id in update form");
+        const updateAttendanceForm = formData as AttendanceUpdateForm;
+        if (!updateAttendanceForm.id) {
+          console.error("Missing attendance id in update form");
           return;
         }
-        const response = await updateAttendanceService(updateProjectForm.id, {
-          endDate: updateProjectForm.endDate,
-          reason: updateProjectForm.reason,
-          startDate: updateProjectForm.startDate,
-          type: updateProjectForm.type,
-        });
+        const response = await updateAttendanceService(
+          updateAttendanceForm.id,
+          {
+            endDate: updateAttendanceForm.endDate,
+            reason: updateAttendanceForm.reason,
+            startDate: updateAttendanceForm.startDate,
+            type: updateAttendanceForm.type,
+            leaveRequest: updateAttendanceForm.leaveRequest,
+          }
+        );
 
         setAttendances((prev) =>
           prev
             ? {
                 ...prev,
-                content: prev.content.map((proj) =>
-                  proj.id === updateProjectForm.id ? response : proj
+                content: prev.content.map((attendance) =>
+                  attendance.id === updateAttendanceForm.id
+                    ? response
+                    : attendance
                 ),
               }
             : prev
@@ -175,8 +205,8 @@ function AttendancePageContent() {
         startTransition(() => {
           AppToast({
             type: "success",
-            message: "Project updated successfully",
-            description: "Updated Project",
+            message: "Attendance request updated successfully",
+            description: "Updated Attendance Request",
           });
         });
       }
@@ -184,17 +214,16 @@ function AttendancePageContent() {
       setSelectedAttendance(null);
       loadAttendances();
     } catch (err: any) {
-      toast.error(err?.errorMessage || "Failed to save project");
       AppToast({
         type: "error",
-        message: "Failed to save project",
+        message: err?.errorMessage || "Failed to save attendance request",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const confirmDeleteProject = async () => {
+  const confirmDeleteAttendance = async () => {
     if (!selectedAttendance) return;
     setIsSubmitting(true);
 
@@ -207,7 +236,7 @@ function AttendancePageContent() {
             ? {
                 ...prev,
                 content: prev.content.filter(
-                  (proj) => proj.id !== selectedAttendance.id
+                  (attendance) => attendance.id !== selectedAttendance.id
                 ),
                 totalElements: prev.totalElements - 1,
               }
@@ -216,7 +245,7 @@ function AttendancePageContent() {
 
         AppToast({
           type: "success",
-          message: "Project deleted successfully",
+          message: "Attendance request deleted successfully",
         });
       }
 
@@ -225,104 +254,137 @@ function AttendancePageContent() {
     } catch (err: any) {
       AppToast({
         type: "error",
-        message: "Failed to delete project",
+        message: err?.errorMessage || "Failed to delete attendance request",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // const handleExportToExcel = async (data: AttendanceModel[] | null) => {
-  //   setIsExportingToExcel(true);
-  //   try {
-  //     // Define columns based on ProjectModel
-  //     const columns: ExcelColumn[] = [
-  //       { header: "ID", key: "id", width: 8, type: "number" },
-  //       { header: "Project Name", key: "projectName", width: 25, type: "text" },
-  //       { header: "Type", key: "type", width: 15, type: "text" },
-  //       { header: "Host Server", key: "hostServer", width: 20, type: "text" },
-  //       { header: "Host Port", key: "hostPort", width: 10, type: "number" },
-  //       { header: "Database Name", key: "dbName", width: 20, type: "text" },
-  //       { header: "Database Type", key: "dbType", width: 15, type: "text" },
-  //       { header: "Database Server", key: "dbServer", width: 20, type: "text" },
-  //       {
-  //         header: "Members Involved",
-  //         key: "memberInvolved",
-  //         width: 25,
-  //         type: "text",
-  //       },
-  //       { header: "Remark", key: "remark", width: 30, type: "text" },
-  //       {
-  //         header: "Created Date",
-  //         key: "createdAt",
-  //         width: 18,
-  //         type: "date",
-  //         format: "mm/dd/yyyy",
-  //       },
-  //       {
-  //         header: "Updated Date",
-  //         key: "updatedAt",
-  //         width: 18,
-  //         type: "date",
-  //         format: "mm/dd/yyyy",
-  //       },
-  //     ];
+  const handleExportToExcel = async () => {
+    setIsExportingToExcel(true);
+    try {
+      // Define columns based on AttendanceModel
+      const columns: ExcelColumn[] = [
+        { header: "ID", key: "id", width: 8, type: "number" },
+        { header: "User ID Card", key: "userIdCard", width: 15, type: "text" },
+        { header: "Full Name", key: "userFullName", width: 25, type: "text" },
+        { header: "Email", key: "userEmail", width: 30, type: "text" },
+        { header: "Position", key: "userPosition", width: 20, type: "text" },
+        { header: "Type", key: "type", width: 15, type: "text" },
+        { header: "Status", key: "status", width: 12, type: "text" },
+        {
+          header: "Start Date",
+          key: "startDate",
+          width: 15,
+          type: "date",
+          format: "mm/dd/yyyy",
+        },
+        {
+          header: "End Date",
+          key: "endDate",
+          width: 15,
+          type: "date",
+          format: "mm/dd/yyyy",
+        },
+        { header: "Total Days", key: "totalDays", width: 12, type: "number" },
+        { header: "Reason", key: "reason", width: 35, type: "text" },
+        {
+          header: "Approved By ID",
+          key: "approvedByIdCard",
+          width: 15,
+          type: "text",
+        },
+        {
+          header: "Approved By",
+          key: "approvedByFullName",
+          width: 25,
+          type: "text",
+        },
+        {
+          header: "Approved At",
+          key: "approvedAt",
+          width: 18,
+          type: "date",
+          format: "mm/dd/yyyy hh:mm",
+        },
+        {
+          header: "Approval Notes",
+          key: "approvalNotes",
+          width: 30,
+          type: "text",
+        },
+        {
+          header: "Created Date",
+          key: "createdAt",
+          width: 18,
+          type: "date",
+          format: "mm/dd/yyyy hh:mm",
+        },
+        {
+          header: "Updated Date",
+          key: "updatedAt",
+          width: 18,
+          type: "date",
+          format: "mm/dd/yyyy hh:mm",
+        },
+      ];
 
-  //     // Create Excel exporter
-  //     const exporter = new ExcelExporter({
-  //       filename: "projects.xlsx",
-  //       title: "Project Management Report",
-  //       author: "IT Department",
-  //       useAlternateRows: true,
-  //       protection: {
-  //         password: "88889999",
-  //         deleteRows: false,
-  //         selectLockedCells: true,
-  //         selectUnlockedCells: true,
-  //       },
-  //     });
+      // Create Excel exporter
+      const exporter = new ExcelExporter({
+        filename: "attendance_requests.xlsx",
+        title: "Attendance Request Report",
+        author: "HR Department",
+        useAlternateRows: true,
+        protection: {
+          password: "88889999",
+          deleteRows: false,
+          selectLockedCells: true,
+          selectUnlockedCells: true,
+        },
+      });
 
-  //     // Configure sheet
-  //     const sheetConfig: ExcelSheet = {
-  //       name: "Projects",
-  //       data: data ?? [],
-  //       columns,
-  //       autoFilter: true,
-  //       freezeRows: 1,
-  //       sortBy: [{ key: "id", order: "asc" }],
-  //     };
+      // Configure sheet
+      const sheetConfig: ExcelSheet = {
+        name: "Attendance Requests",
+        data: attendances?.content ?? [],
+        columns,
+        autoFilter: true,
+        freezeRows: 1,
+        sortBy: [{ key: "id", order: "desc" }],
+      };
 
-  //     exporter.addSheet(sheetConfig);
-  //     await exporter.export();
+      exporter.addSheet(sheetConfig);
+      await exporter.export();
 
-  //     AppToast({ type: "success", message: "Successfully exported to Excel" });
-  //   } catch (error: any) {
-  //     AppToast({ type: "error", message: "Failed to export to Excel" });
-  //     console.error("Error exporting to Excel:", error);
-  //   } finally {
-  //     setIsExportingToExcel(false);
-  //   }
-  // };
+      AppToast({ type: "success", message: "Successfully exported to Excel" });
+    } catch (error: any) {
+      AppToast({ type: "error", message: "Failed to export to Excel" });
+      console.error("Error exporting to Excel:", error);
+    } finally {
+      setIsExportingToExcel(false);
+    }
+  };
 
-  const handleEditAttendance = (proj: AttendanceModel) => {
-    setSelectedAttendance(proj);
+  const handleEditAttendance = (attendance: AttendanceModel) => {
+    setSelectedAttendance(attendance);
     setMode(ModalMode.UPDATE_MODE);
     setIsModalOpen(true);
   };
 
-  const handleAddProject = () => {
+  const handleAddAttendance = () => {
     setSelectedAttendance(null);
     setMode(ModalMode.CREATE_MODE);
     setIsModalOpen(true);
   };
 
-  const handleViewAttendanceDetail = (proj: AttendanceModel) => {
-    setSelectedAttendance(proj);
+  const handleViewAttendanceDetail = (attendance: AttendanceModel) => {
+    setSelectedAttendance(attendance);
     setIsAttendanceDetailOpen(true);
   };
 
-  const handleDeleteAttendance = (proj: AttendanceModel) => {
-    setSelectedAttendance(proj);
+  const handleDeleteAttendance = (attendance: AttendanceModel) => {
+    setSelectedAttendance(attendance);
     setIsDeleteDialogOpen(true);
   };
 
@@ -334,10 +396,13 @@ function AttendancePageContent() {
             <div className="relative w-full md:w-[350px]">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                aria-label="search-project"
-                autoComplete="search-project"
+                aria-label="search-attendance"
+                autoComplete="search-attendance"
                 type="search"
-                placeholder={t("project.search-project")}
+                placeholder={
+                  t("attendance.search-attendance") ||
+                  "Search attendance requests..."
+                }
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"
@@ -348,13 +413,12 @@ function AttendancePageContent() {
 
           <div className="flex gap-4">
             <div>
-              {/* FIXED BUTTON WITH PROPER LOADING STATE AND TEXT */}
               <Button
-                onClick={() => {}}
+                onClick={handleExportToExcel}
                 size="lg"
                 variant="outline"
                 className="gap-2 text-sm sm:text-base h-10 hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6"
-                disabled={isExportingToExcel}
+                disabled={isExportingToExcel || !attendances?.content?.length}
               >
                 <img
                   src={AppIcons.FILE.Excel}
@@ -367,9 +431,6 @@ function AttendancePageContent() {
                 <Download className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
               </Button>
             </div>
-            <Button className="h-10" onClick={handleAddProject}>
-              {t("common.new")}
-            </Button>
           </div>
         </div>
 
@@ -381,17 +442,17 @@ function AttendancePageContent() {
             <div className="flex-1 overflow-x-auto">
               <DataTable
                 data={attendances?.content || []}
-                columns={createAttendanceTableColumns({
+                columns={createAttendanceApprovalTableColumns({
                   data: attendances,
                   handlers: {
-                    handleEditAttendance,
+                    handleOpenApprovalModal,
                     handleViewAttendanceDetail,
                     handleDeleteAttendance,
                   },
                 })}
                 loading={isLoading}
-                emptyMessage="No project found"
-                getRowKey={(project) => project.id}
+                emptyMessage="No attendance requests found"
+                getRowKey={(attendance) => attendance.id}
               />
 
               {/* Pagination positioned to the right and outside the scrollable area */}
@@ -413,42 +474,42 @@ function AttendancePageContent() {
             setIsDeleteDialogOpen(false);
             setSelectedAttendance(null);
           }}
-          onDelete={confirmDeleteProject}
-          title="Delete Project"
-          description={`Are you sure you want to delete the project`}
+          onDelete={confirmDeleteAttendance}
+          title="Delete Attendance Request"
+          description={`Are you sure you want to delete the attendance request for`}
           itemName={selectedAttendance?.userFullName || "N/A"}
           isSubmitting={isSubmitting}
         />
 
-        <ProjectViewModal
+        <AttendanceApprovalViewModal
+          attendance={selectedAttendance}
           isOpen={isAttendanceDetailOpen}
           onClose={() => {
             setIsAttendanceDetailOpen(false);
             setSelectedAttendance(null);
           }}
-          projectId={selectedAttendance?.id ?? 0}
         />
-
-        <ModalAttendance
-          isOpen={isModalOpen}
-          mode={mode}
-          onClose={() => {
-            setSelectedAttendance(null);
-            setIsModalOpen(false);
-          }}
-          onSave={handleSaveProject}
-          attendanceId={selectedAttendance?.id ?? 0}
-          isSubmitting={isSubmitting}
-        />
+        {/* New Approval / Cancel Modal */}
+        {selectedAttendance && (
+          <ModalAttendanceApprovalOrCancel
+            isOpen={isApprovalModalOpen}
+            attendanceId={selectedAttendance.id}
+            onClose={() => {
+              setSelectedAttendance(null);
+              setIsApprovalModalOpen(false);
+            }}
+            onSuccess={handleApprovalSuccess}
+          />
+        )}
       </CardContent>
     </Card>
   );
 }
 
-export default function AttendancePageContentPage() {
+export default function AttendanceRequestPage() {
   return (
     <Suspense fallback={<Loading />}>
-      <AttendancePageContent />
+      <AttendanceRequestPageContent />
     </Suspense>
   );
 }

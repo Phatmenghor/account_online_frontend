@@ -1,18 +1,12 @@
 "use client";
 
 import { ROUTES } from "@/constants/AppRoutes/routes";
-import {
-  Calendar1Icon,
-  Code,
-  Folder,
-  Layers,
-  Server,
-  User2,
-} from "lucide-react";
+import { Calendar1Icon, Code, User2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function useNavItems() {
   const t = useTranslations("common");
+  const tT = useTranslations("attendance");
 
   return [
     {
@@ -31,16 +25,16 @@ export function useNavItems() {
       icon: Code,
     },
     {
-      title: t("attendance"),
+      title: tT("trainee.index"),
       href: "#", // main parent, not clickable
       icon: Calendar1Icon,
       subItems: [
         {
-          title: t("attendanceRequest"),
+          title: tT("trainee.request"),
           href: ROUTES.DASHBOARD.ATTENDANCE.REQUEST,
         },
         {
-          title: t("attendanceHistory"),
+          title: tT("trainee.history"),
           href: ROUTES.DASHBOARD.ATTENDANCE.HISTORY,
         },
       ],

@@ -10,5 +10,5 @@ export enum Role {
 
 export enum ProjectStatus {
   UAT = "UAT",
-  PRODUCTION = "PRODUCTION"
+  PRODUCTION = "PRODUCTION",
 }

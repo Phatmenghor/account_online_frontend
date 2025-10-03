@@ -72,31 +72,6 @@
       "updatedAt": "បានកែប្រែ",
       "actions": "សកម្មភាព"
     },
-    "attendance": {
-      "title": "ការចូលរួម",
-      "search-attendance": "ស្វែងរកការចូលរួម...",
-      "table-header-attendance": {
-        "id": "លេខសម្គាល់",
-        "userId": "លេខសម្គាល់អ្នកប្រើប្រាស់",
-        "userIdCard": "អត្តសញ្ញាណប័ណ្ណ",
-        "userFullName": "ឈ្មោះពេញ",
-        "userEmail": "អ៊ីមែល",
-        "userPosition": "មុខតំណែង",
-        "type": "ប្រភេទ",
-        "status": "ស្ថានភាព",
-        "startDate": "ថ្ងៃចាប់ផ្តើម",
-        "endDate": "ថ្ងៃបញ្ចប់",
-        "totalDays": "ចំនួនថ្ងៃសរុប",
-        "reason": "ហេតុផល",
-        "approvedByIdCard": "អនុម័តដោយ (អត្តសញ្ញាណប័ណ្ណ)",
-        "approvedByFullName": "អនុម័តដោយ (ឈ្មោះពេញ)",
-        "approvedAt": "បានអនុម័តនៅ",
-        "approvalNotes": "កំណត់សម្គាល់អនុម័ត",
-        "createdAt": "បានបង្កើតនៅ",
-        "updatedAt": "បានធ្វើបច្ចុប្បន្នភាពនៅ",
-        "actions": "សកម្មភាព"
-      }
-    },
 
     "roles": {
       "admin": "អ្នកគ្រប់គ្រង",
@@ -109,6 +84,55 @@
     }
   },
 
+  "attendance": {
+    "title": "ការចូលរួម",
+    "search-attendance": "ស្វែងរកការចូលរួម...",
+    "trainee": {
+      "index": "បុគ្គលិកហ្វឹកហាត់",
+      "request": "សំណើវត្តមាន",
+      "history": "ប្រវត្តិវត្តមាន"
+    },
+    "modal": {
+      "cancel": "បោះបង់",
+      "approval": "យល់ព្រម",
+      "approvalOrCancelTitle": "យល់ព្រម ឬ បោះបង់ការចូលរួម",
+      "approvalOrCancelDesc": "អ្នកអាចយល់ព្រម ឬបោះបង់សំណើវត្តមាននេះខាងក្រោម។",
+      "viewTitle": "សំណើវត្តមាន",
+      "viewDesc": "ព័ត៌មានសំណើវត្តមានសម្រាប់",
+      "personalInfo": "ព័ត៌មានអ្នកប្រើប្រាស់",
+      "attendanceInfo": "ព័ត៌មានវត្តមាន",
+      "approvalInfo": "ព័ត៌មានអនុម័ត",
+      "close": "បិទ",
+      "noUserData": "គ្មានទិន្នន័យវត្តមាន",
+      "status": "ស្ថានភាព",
+      "approvalNotes": "កំណត់សម្គាល់អនុម័ត",
+      "approvalNotesPlaceholder": "បញ្ចូលកំណត់សម្គាល់អនុម័តនៅទីនេះ...",
+      "selectStatus": "ជ្រើសរើសស្ថានភាព"
+    },
+    "table-header-attendance": {
+      "id": "លេខសម្គាល់",
+      "userId": "លេខសម្គាល់អ្នកប្រើប្រាស់",
+      "userIdCard": "អត្តសញ្ញាណប័ណ្ណ",
+      "userFullName": "ឈ្មោះពេញ",
+      "userEmail": "អ៊ីមែល",
+      "position": "មុខតំណែង",
+      "type": "ប្រភេទ",
+      "period": "រយៈពេល",
+      "status": "ស្ថានភាព",
+      "leaveRequest": "ចាកចេញវេន",
+      "startDate": "ថ្ងៃចាប់ផ្តើម",
+      "endDate": "ថ្ងៃបញ្ចប់",
+      "totalDays": "ចំនួនថ្ងៃសរុប",
+      "reason": "ហេតុផល",
+      "approvedByIdCard": "អនុម័តដោយ (អត្តសញ្ញាណប័ណ្ណ)",
+      "approvedBy": "អនុម័តដោយ (ឈ្មោះពេញ)",
+      "approvedAt": "បានអនុម័តនៅ",
+      "approvalNotes": "កំណត់សម្គាល់អនុម័ត",
+      "createdAt": "បានបង្កើតនៅ",
+      "updatedAt": "បានធ្វើបច្ចុប្បន្នភាពនៅ",
+      "actions": "សកម្មភាព"
+    }
+  },
   "auth": {
     "login": "ចូល",
     "logout": "ចាកចេញ",

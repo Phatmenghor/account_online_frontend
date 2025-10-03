@@ -5,6 +5,7 @@ export interface AttendanceApproveReq {
 
 export interface AttendanceReq {
   type: string;
+  leaveRequest: string;
   startDate: string;
   endDate: string;
   reason: string;

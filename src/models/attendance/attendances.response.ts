@@ -18,6 +18,7 @@ export interface AttendanceModel {
   status: string;
   startDate: string;
   endDate: string;
+  leaveRequest: string;
   totalDays: number;
   reason: string;
   approvedByIdCard: string;

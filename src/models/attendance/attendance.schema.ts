@@ -31,6 +31,7 @@ export type AttendanceApproveReqUpdate = z.infer<
 // Create mode
 export const AttendanceReqCreateSchema = z.object({
   type: z.string().nonempty("Type is required"),
+  leaveRequest: z.string().nonempty("Leave request is required"),
   startDate: z.string().nonempty("Start date is required"),
   endDate: z.string().nonempty("End date is required"),
   reason: z.string().nonempty("Reason is required"),
@@ -40,6 +41,7 @@ export const AttendanceReqCreateSchema = z.object({
 export const AttendanceReqUpdateSchema = z.object({
   id: z.number().optional(),
   type: z.string().optional(),
+  leaveRequest: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   reason: z.string().optional(),

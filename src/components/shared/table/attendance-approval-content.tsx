@@ -2,7 +2,7 @@ import { TableColumn } from "@/components/shared/table/table";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
-import { Edit, Eye, Trash } from "lucide-react";
+import { Eye, Trash } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -10,29 +10,31 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
+import { Badge } from "@/components/ui/badge";
 import {
   AllAttendanceModel,
   AttendanceModel,
 } from "@/models/attendance/attendances.response";
-import { Badge } from "@/components/ui/badge";
 
 interface AttendanceTableHandlers {
-  handleEditAttendance: (attendance: AttendanceModel) => void;
+  handleOpenApprovalModal: (attendance: AttendanceModel) => void;
   handleViewAttendanceDetail: (attendance: AttendanceModel) => void;
   handleDeleteAttendance: (attendance: AttendanceModel) => void;
 }
 
-interface AttendanceTableOptions {
+interface AttendanceApprovalTableOptions {
   data: AllAttendanceModel | null;
   handlers: AttendanceTableHandlers;
+  visibleColumns?: string[];
 }
 
-export const createAttendanceTableColumns = ({
+export const createAttendanceApprovalTableColumns = ({
   data,
   handlers,
-}: AttendanceTableOptions): TableColumn<AttendanceModel>[] => {
+  visibleColumns,
+}: AttendanceApprovalTableOptions): TableColumn<AttendanceModel>[] => {
   const {
-    handleEditAttendance,
+    handleOpenApprovalModal,
     handleViewAttendanceDetail,
     handleDeleteAttendance,
   } = handlers;
@@ -40,7 +42,7 @@ export const createAttendanceTableColumns = ({
   const t = useTranslations("attendance.table-header-attendance");
   const tCommon = useTranslations("common");
 
-  return [
+  const allColumns: TableColumn<AttendanceModel>[] = [
     {
       key: "index",
       label: "#",
@@ -66,31 +68,6 @@ export const createAttendanceTableColumns = ({
       ),
     },
     {
-      key: "userPosition",
-      label: t("position"),
-      render: (attendance) => (
-        <span className="font-medium">{attendance.userPosition || "---"}</span>
-      ),
-    },
-    {
-      key: "type",
-      label: t("type"),
-      render: (attendance) => (
-        <Badge variant="outline" className="capitalize">
-          {attendance.type || "---"}
-        </Badge>
-      ),
-    },
-    {
-      key: "leaveRequest",
-      label: t("leaveRequest"),
-      render: (attendance) => (
-        <Badge variant="outline" className="capitalize">
-          {attendance.leaveRequest || "---"}
-        </Badge>
-      ),
-    },
-    {
       key: "status",
       label: t("status"),
       render: (attendance) => {
@@ -99,6 +76,7 @@ export const createAttendanceTableColumns = ({
           approved: "bg-green-100 text-green-700 border-green-200",
           pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
           rejected: "bg-red-100 text-red-700 border-red-200",
+          cancelled: "bg-gray-100 text-gray-700 border-gray-200",
         };
         return (
           <Badge
@@ -122,34 +100,9 @@ export const createAttendanceTableColumns = ({
       ),
     },
     {
-      key: "totalDays",
-      label: t("totalDays"),
-      render: (attendance) => (
-        <span className="font-medium">{attendance.totalDays || 0}</span>
-      ),
-    },
-    {
-      key: "approvedBy",
-      label: t("approvedBy"),
-      render: (attendance) => (
-        <span className="font-medium">
-          {attendance.approvedByFullName || "---"}
-        </span>
-      ),
-    },
-    {
-      key: "createdAt",
-      label: t("createdAt"),
-      render: (attendance) => (
-        <span className="text-muted-foreground">
-          {DateTimeFormat(attendance.createdAt)}
-        </span>
-      ),
-    },
-    {
       key: "actions",
       label: t("actions"),
-      className: "w-[160px]",
+      className: "w-[180px]",
       render: (attendance) => (
         <div className="flex items-center gap-2">
           <TooltipProvider>
@@ -158,12 +111,17 @@ export const createAttendanceTableColumns = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleEditAttendance(attendance)}
+                  disabled={attendance.status !== "PENDING"} // Only pending can be approved/cancelled
+                  onClick={() => handleOpenApprovalModal(attendance)}
                 >
-                  <Edit className="h-4 w-4" />
+                  {attendance.status === "PENDING" ? "Approve/Cancel" : "View"}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("edit")}</TooltipContent>
+              <TooltipContent>
+                {attendance.status === "PENDING"
+                  ? "Approve or Cancel this request"
+                  : "View details"}
+              </TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -178,22 +136,14 @@ export const createAttendanceTableColumns = ({
               </TooltipTrigger>
               <TooltipContent>{tCommon("view")}</TooltipContent>
             </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDeleteAttendance(attendance)}
-                >
-                  <Trash className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{tCommon("delete")}</TooltipContent>
-            </Tooltip>
           </TooltipProvider>
         </div>
       ),
     },
   ];
+
+  // Filter visible columns if provided
+  return visibleColumns && visibleColumns.length > 0
+    ? allColumns.filter((col) => visibleColumns.includes(col.key))
+    : allColumns;
 };
