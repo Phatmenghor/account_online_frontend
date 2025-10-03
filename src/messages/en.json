@@ -148,6 +148,11 @@
     "actions": "Actions"
   },
   "trainee": {
-
+    "reportRemark": "Report Remark",
+    "challenge": "Challenge",
+    "recommend": "Recommend",
+    "createdAt": "Created At",
+    "actions": "Actions",
+    "search-trainee": "Search create by user..."
   }
 }
