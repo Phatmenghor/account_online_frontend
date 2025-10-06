@@ -34,6 +34,36 @@ export async function getAttendanceService(request: AllAttendancesReq) {
   }
 }
 
+export async function getAllListingAttendanceService(
+  request: AllAttendancesReq
+) {
+  try {
+    // Simulate API delay
+    const response = await axiosClientWithAuth.post(
+      "/api/v1/attendance/all-list",
+      request
+    );
+
+    return response.data.data;
+  } catch (error) {
+    // Axios error handling (optional for mock)
+    if (axios.isAxiosError(error)) {
+      const raw = error.response?.data;
+      const message = raw?.message || "Failed to fetch attendances.";
+      console.error("Axios error:", message);
+
+      throw { errorMessage: message, rawError: raw };
+    } else {
+      console.error("Unexpected error:", error);
+      throw {
+        errorMessage:
+          "An unexpected error occurred while fetching attendances.",
+        rawError: error,
+      };
+    }
+  }
+}
+
 export async function getAttendancesByIdService(id: number) {
   try {
     const response = await axiosClientWithAuth.get(`/api/v1/attendance/${id}`);
@@ -163,10 +193,7 @@ export async function cancelAttendanceService(id: number) {
   }
 }
 
-export async function getMyAttendanceService(
-  id: number,
-  updates: AttendanceReq
-) {
+export async function getMyAttendanceService(updates: AllAttendancesReq) {
   try {
     const response = await axiosClientWithAuth.post(
       `/api/v1/attendance/my`,

@@ -136,136 +136,52 @@ function AttendanceRequestPageContent() {
     });
   };
 
-  const handleSaveAttendance = async (
-    formData: AttendanceCreateForm | AttendanceUpdateForm
-  ) => {
+  const handleSaveAttendance = async (formData: AttendanceUpdateForm) => {
     setIsSubmitting(true);
     try {
-      if (mode === ModalMode.CREATE_MODE) {
-        const createData = formData as AttendanceCreateForm;
-        const response = await createAttendanceService(createData);
+      const attendanceFormData = formData as AttendanceUpdateForm;
+      if (!attendanceFormData.id) {
+        console.error("Missing attendances id in update form");
+        return;
+      }
 
-        // Optimistic update
-        setAttendances((prev: any) =>
-          prev
-            ? {
-                ...prev,
-                content: [response, ...prev.content],
-                totalElements: prev.totalElements + 1,
-              }
-            : {
-                content: [response],
-                pageNo: 1,
-                pageSize: 10,
-                totalElements: 1,
-                totalPages: 1,
-                hasNext: false,
-                hasPrevious: false,
-                first: true,
-                last: true,
-              }
-        );
+      console.log("Attendance form data: ", formData);
 
-        startTransition(() => {
-          AppToast({
-            type: "success",
-            message: "Attendance request created successfully",
-            description: "New Attendance Request",
-          });
-        });
-      } else if (mode === ModalMode.UPDATE_MODE) {
-        const updateAttendanceForm = formData as AttendanceUpdateForm;
-        if (!updateAttendanceForm.id) {
-          console.error("Missing attendance id in update form");
-          return;
-        }
-        const response = await updateAttendanceService(
-          updateAttendanceForm.id,
-          {
-            endDate: updateAttendanceForm.endDate,
-            reason: updateAttendanceForm.reason,
-            startDate: updateAttendanceForm.startDate,
-            type: updateAttendanceForm.type,
-            leaveRequest: updateAttendanceForm.leaveRequest,
-          }
-        );
+      const response = await updateAttendanceService(
+        attendanceFormData.id,
+        formData
+      );
 
+      console.log("Attendance response: ", response);
+
+      if (response) {
         setAttendances((prev) =>
           prev
             ? {
                 ...prev,
-                content: prev.content.map((attendance) =>
-                  attendance.id === updateAttendanceForm.id
-                    ? response
-                    : attendance
+                content: prev.content.map((proj) =>
+                  proj.id === attendanceFormData.id ? response : proj
                 ),
               }
             : prev
         );
 
+        setIsModalOpen(false);
+        setSelectedAttendance(null);
+
         startTransition(() => {
           AppToast({
             type: "success",
-            message: "Attendance request updated successfully",
-            description: "Updated Attendance Request",
+            message: "Attendance updated successfully",
+            description: "Updated Attendance",
           });
         });
       }
-      setIsModalOpen(false);
-      setSelectedAttendance(null);
-      loadAttendances();
     } catch (err: any) {
+      toast.error(err?.errorMessage || "Failed to save attendance");
       AppToast({
         type: "error",
-        message: err?.errorMessage || "Failed to save attendance request",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleSaveProject = async (formData: AttendanceUpdateForm) => {
-    setIsSubmitting(true);
-    try {
-      const updateProjectForm = formData as AttendanceUpdateForm;
-      if (!updateProjectForm.id) {
-        console.error("Missing attendances id in update form");
-        return;
-      }
-      const response = await updateAttendanceService(updateProjectForm.id, {
-        endDate: updateProjectForm.endDate,
-        reason: updateProjectForm.reason,
-        startDate: updateProjectForm.startDate,
-        type: updateProjectForm.type,
-      });
-
-      setAttendances((prev) =>
-        prev
-          ? {
-              ...prev,
-              content: prev.content.map((proj) =>
-                proj.id === updateProjectForm.id ? response : proj
-              ),
-            }
-          : prev
-      );
-
-      startTransition(() => {
-        AppToast({
-          type: "success",
-          message: "Project updated successfully",
-          description: "Updated Project",
-        });
-      });
-
-      setIsModalOpen(false);
-      setSelectedAttendance(null);
-      loadAttendances();
-    } catch (err: any) {
-      toast.error(err?.errorMessage || "Failed to save project");
-      AppToast({
-        type: "error",
-        message: "Failed to save project",
+        message: "Failed to save attendance",
       });
     } finally {
       setIsSubmitting(false);
@@ -380,12 +296,12 @@ function AttendanceRequestPageContent() {
 
         <ModalAttendance
           isOpen={isEditDialogOpen}
-          mode={mode}
+          mode={ModalMode.UPDATE_MODE}
           onClose={() => {
             setSelectedAttendance(null);
             setIsEditDialogOpen(false);
           }}
-          onSave={handleSaveProject}
+          onSave={handleSaveAttendance}
           attendanceId={selectedAttendance?.id ?? 0}
           isSubmitting={isSubmitting}
         />

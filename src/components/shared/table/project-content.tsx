@@ -51,6 +51,9 @@ export const createProjectTableColumns = ({
     {
       key: "projectName",
       label: tProject("projectName"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (project) => (
         <span className="font-medium">{project.projectName || "---"}</span>
       ),
@@ -58,6 +61,9 @@ export const createProjectTableColumns = ({
     {
       key: "type",
       label: tProject("type"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (project) => (
         <span className="font-medium">{project.type || "---"}</span>
       ),
@@ -65,6 +71,9 @@ export const createProjectTableColumns = ({
     {
       key: "projectStatus",
       label: tProject("projectStatus"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (project) => (
         <span className="font-medium">
           {formatStatus(project.projectStatus) || "---"}
@@ -74,6 +83,9 @@ export const createProjectTableColumns = ({
     {
       key: "hostServer",
       label: tProject("hostServer"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (project) => (
         <span className="font-medium">{project.hostServer || "---"}</span>
       ),
@@ -81,6 +93,9 @@ export const createProjectTableColumns = ({
     {
       key: "dbName",
       label: tProject("dbName"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (project) => (
         <span className="font-medium">{project.dbName || "---"}</span>
       ),
@@ -88,6 +103,9 @@ export const createProjectTableColumns = ({
     {
       key: "hostPort",
       label: tProject("hostPort"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (project) => (
         <span className="font-medium">{project.hostPort || "---"}</span>
       ),
@@ -95,6 +113,9 @@ export const createProjectTableColumns = ({
     {
       key: "memberInvolved",
       label: tProject("memberInvolved"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (project) => (
         <span className="font-medium">{project.memberInvolved || "---"}</span>
       ),
@@ -102,6 +123,9 @@ export const createProjectTableColumns = ({
     {
       key: "createdAt",
       label: tProject("createdAt"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (project) => (
         <span className="text-muted-foreground">
           {DateTimeFormat(project.createdAt)}

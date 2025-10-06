@@ -30,13 +30,13 @@ import {
 import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import { AttendanceModel } from "@/models/attendance/attendances.response";
 import { getAttendancesByIdService } from "@/services/dashboard/attendance/attendance.service";
-import { AttendanceReq } from "@/models/attendance/attendances.request";
 import {
   ATTENDANCE_TYPE_OPTIONS,
   AttendanceStatus,
   LEAVE_REQUEST_OPTIONS,
   LeaveRequest,
 } from "@/constants/AppResource/filter/attendance";
+import { AttendanceReq } from "@/models/attendance/attendances.request";
 
 type ModalAttendanceProps = {
   isOpen: boolean;
@@ -66,15 +66,14 @@ export default function ModalAttendance({
     resolver: zodResolver(
       isCreate ? AttendanceReqCreateSchema : AttendanceReqUpdateSchema
     ),
-    defaultValues: isCreate
-      ? {
-          type: "",
-          startDate: "",
-          endDate: "",
-          reason: "",
-          leaveRequest: LeaveRequest.FULL_DAY,
-        }
-      : undefined,
+    defaultValues: {
+      type: "",
+      startDate: "",
+      endDate: "",
+      reason: "",
+      leaveRequest: LeaveRequest.FULL_DAY,
+      ...(isCreate ? {} : { id: 0 }), // Only include id for update mode
+    },
   });
 
   const {
@@ -90,13 +89,14 @@ export default function ModalAttendance({
     try {
       const data = await getAttendancesByIdService(attendanceId);
       setAttendanceDetail(data);
+
       reset({
         id: data.id,
-        type: data.type,
+        type: data.type || "",
         leaveRequest: data.leaveRequest || LeaveRequest.FULL_DAY,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        reason: data.reason,
+        startDate: data.startDate || "",
+        endDate: data.endDate || "",
+        reason: data.reason || "",
       });
     } catch (err) {
       console.error("Failed to fetch attendance:", err);
@@ -109,7 +109,9 @@ export default function ModalAttendance({
   const canEdit = isCreate || isPending;
 
   useEffect(() => {
-    if (isOpen && !isCreate) loadAttendanceById();
+    if (isOpen && !isCreate) {
+      loadAttendanceById();
+    }
     if (isOpen && isCreate) {
       reset({
         type: "",
@@ -122,22 +124,40 @@ export default function ModalAttendance({
   }, [isOpen, isCreate, loadAttendanceById, reset]);
 
   const onSubmit = (data: AttendanceCreateForm | AttendanceUpdateForm) => {
+    console.log("Form submitted with data:", data);
+
     if (isCreate) {
-      const payload: AttendanceReq = data as AttendanceCreateForm;
+      const formData = data as AttendanceCreateForm;
+      const payload: AttendanceReq = {
+        type: formData.type,
+        leaveRequest: formData.leaveRequest ?? LeaveRequest.FULL_DAY,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        reason: formData.reason,
+      };
+      console.log("Create payload:", payload);
       onSave(payload);
       onClose();
     } else {
       const updateData = data as AttendanceUpdateForm;
-      if (!updateData.id) return console.error("Missing ID for update");
 
-      const payload: Partial<AttendanceReq> = {
-        type: updateData.type,
-        leaveRequest: updateData.leaveRequest,
-        startDate: updateData.startDate,
-        endDate: updateData.endDate,
-        reason: updateData.reason,
+      // Validate that we have an ID
+      if (!updateData.id) {
+        console.error("Missing ID for update. Full data:", updateData);
+        return;
+      }
+
+      // Build the update payload with proper typing
+      const updatePayload: Partial<AttendanceReq> = {
+        type: data.type ?? attendanceDetail?.type,
+        leaveRequest: data.leaveRequest ?? attendanceDetail?.leaveRequest,
+        startDate: data.startDate ?? attendanceDetail?.startDate,
+        endDate: data.endDate ?? attendanceDetail?.endDate,
+        reason: data.reason ?? attendanceDetail?.reason,
       };
-      onSave({ id: updateData.id, updates: payload });
+
+      console.log("Update payload:", updatePayload);
+      onSave({ id: updateData.id, updates: updatePayload });
       onClose();
     }
   };
@@ -157,30 +177,37 @@ export default function ModalAttendance({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
+          {/* Hidden ID field for update mode */}
           {!isCreate && (
             <Controller
               control={control}
               name="id"
-              render={({ field }) => <input type="hidden" {...field} />}
+              render={({ field }) => (
+                <input
+                  type="hidden"
+                  {...field}
+                  value={field.value || attendanceId || 0}
+                />
+              )}
             />
           )}
 
           {/* Type */}
           <div className="space-y-1">
             <Label htmlFor="type">
-              Type {isCreate ? <span className="text-red-700">*</span> : ""}
+              Type {isCreate && <span className="text-red-700">*</span>}
             </Label>
             <Controller
               control={control}
               name="type"
               render={({ field }) => (
                 <Select
-                  value={field.value}
+                  value={field.value || ""}
                   onValueChange={field.onChange}
                   disabled={!canEdit || isSubmitting}
                 >
-                  <SelectTrigger id="status">
-                    <SelectValue placeholder="Select status" />
+                  <SelectTrigger id="type">
+                    <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
                     {ATTENDANCE_TYPE_OPTIONS.map((s) => (
@@ -201,18 +228,18 @@ export default function ModalAttendance({
           <div className="space-y-1">
             <Label htmlFor="leaveRequest">
               Leave Request{" "}
-              {isCreate ? <span className="text-red-700">*</span> : ""}
+              {isCreate && <span className="text-red-700">*</span>}
             </Label>
             <Controller
               control={control}
               name="leaveRequest"
               render={({ field }) => (
                 <Select
-                  value={field.value}
+                  value={field.value || LeaveRequest.FULL_DAY}
                   onValueChange={field.onChange}
                   disabled={!canEdit || isSubmitting}
                 >
-                  <SelectTrigger id="status">
+                  <SelectTrigger id="leaveRequest">
                     <SelectValue placeholder="Select request" />
                   </SelectTrigger>
                   <SelectContent>
@@ -225,16 +252,17 @@ export default function ModalAttendance({
                 </Select>
               )}
             />
-            {errors.type && (
-              <p className="text-destructive text-sm">{errors.type.message}</p>
+            {errors.leaveRequest && (
+              <p className="text-destructive text-sm">
+                {errors.leaveRequest.message}
+              </p>
             )}
           </div>
 
           {/* Start Date */}
           <div className="space-y-1">
             <Label htmlFor="startDate">
-              Start Date{" "}
-              {isCreate ? <span className="text-red-700">*</span> : ""}
+              Start Date {isCreate && <span className="text-red-700">*</span>}
             </Label>
             <Controller
               control={control}
@@ -243,6 +271,7 @@ export default function ModalAttendance({
                 <Input
                   type="date"
                   {...field}
+                  value={field.value || ""}
                   id="startDate"
                   disabled={!canEdit || isSubmitting}
                   className={errors.startDate ? "border-red-500" : ""}
@@ -259,7 +288,7 @@ export default function ModalAttendance({
           {/* End Date */}
           <div className="space-y-1">
             <Label htmlFor="endDate">
-              End Date {isCreate ? <span className="text-red-700">*</span> : ""}
+              End Date {isCreate && <span className="text-red-700">*</span>}
             </Label>
             <Controller
               control={control}
@@ -268,6 +297,7 @@ export default function ModalAttendance({
                 <Input
                   type="date"
                   {...field}
+                  value={field.value || ""}
                   id="endDate"
                   disabled={!canEdit || isSubmitting}
                   className={errors.endDate ? "border-red-500" : ""}
@@ -284,7 +314,7 @@ export default function ModalAttendance({
           {/* Reason */}
           <div className="space-y-1">
             <Label htmlFor="reason">
-              Reason {isCreate ? <span className="text-red-700">*</span> : ""}
+              Reason {isCreate && <span className="text-red-700">*</span>}
             </Label>
             <Controller
               control={control}
@@ -292,6 +322,7 @@ export default function ModalAttendance({
               render={({ field }) => (
                 <Textarea
                   {...field}
+                  value={field.value || ""}
                   id="reason"
                   disabled={!canEdit || isSubmitting}
                   className={errors.reason ? "border-red-500" : ""}

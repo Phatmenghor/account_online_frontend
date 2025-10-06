@@ -54,6 +54,9 @@ export const createApplicationTableColumns = ({
     {
       key: "projectName",
       label: tApplication("projectName"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (application) => (
         <span className="font-medium">{application.projectName || "---"}</span>
       ),
@@ -61,6 +64,9 @@ export const createApplicationTableColumns = ({
     {
       key: "department",
       label: tApplication("department"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (application) => (
         <span className="font-medium">{application.department || "---"}</span>
       ),
@@ -68,6 +74,9 @@ export const createApplicationTableColumns = ({
     {
       key: "year",
       label: tApplication("year"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (application) => (
         <span className="font-medium">{application.year || "---"}</span>
       ),
@@ -75,6 +84,9 @@ export const createApplicationTableColumns = ({
     {
       key: "applicationStatus",
       label: tApplication("applicationStatus"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (application) => (
         <span className="font-medium">
           {formatStatusApp(application.applicationStatus) || "---"}
@@ -84,6 +96,9 @@ export const createApplicationTableColumns = ({
     {
       key: "urlLink",
       label: tApplication("urlLink"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (application) => (
         <span className="font-medium">{application.urlLink || "---"}</span>
       ),
@@ -91,6 +106,9 @@ export const createApplicationTableColumns = ({
     {
       key: "memberInvolved",
       label: tApplication("memberInvolved"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (application) => (
         <span className="font-medium">
           {application.memberInvolved || "---"}
@@ -100,6 +118,9 @@ export const createApplicationTableColumns = ({
     {
       key: "remark",
       label: tApplication("remark"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (application) => (
         <span className="font-medium">{application.remark || "---"}</span>
       ),
@@ -107,6 +128,9 @@ export const createApplicationTableColumns = ({
     {
       key: "createdAt",
       label: tApplication("createdAt"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (application) => (
         <span className="text-muted-foreground">
           {DateTimeFormat(application.createdAt)}
@@ -116,7 +140,9 @@ export const createApplicationTableColumns = ({
     {
       key: "actions",
       label: tApplication("actions"),
-      className: "w-[160px]",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (application) => (
         <div className="flex items-center gap-2">
           <TooltipProvider>

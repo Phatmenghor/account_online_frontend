@@ -54,6 +54,9 @@ export const createUserTableColumns = ({
     {
       key: "avatar",
       label: tUser("profile"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       className: "w-[80px]",
       render: (user) => (
         <CustomAvatar
@@ -66,6 +69,9 @@ export const createUserTableColumns = ({
     {
       key: "idCard",
       label: tUser("idCard"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (user) => (
         <span className="font-medium">{user.idCard || "---"}</span>
       ),
@@ -73,6 +79,9 @@ export const createUserTableColumns = ({
     {
       key: "fullName",
       label: tUser("fullName"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (user) => (
         <span className="font-medium">{user.fullName || "---"}</span>
       ),
@@ -80,6 +89,9 @@ export const createUserTableColumns = ({
     {
       key: "email",
       label: tUser("email"),
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (user) => (
         <span className="font-medium">{user.email || "---"}</span>
       ),
@@ -87,11 +99,17 @@ export const createUserTableColumns = ({
 
     {
       key: "userRole",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       label: tUser("userRole"),
       render: (user) => <RoleBadge role={user.userRole} />,
     },
     {
       key: "createdAt",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       label: tUser("createdAt"),
       render: (user) => (
         <span className="text-muted-foreground">
@@ -102,7 +120,9 @@ export const createUserTableColumns = ({
     {
       key: "actions",
       label: tUser("actions"),
-      className: "w-[160px]",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
       render: (user) => (
         <div className="flex items-center gap-2">
           <TooltipProvider>

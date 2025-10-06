@@ -5,10 +5,8 @@ import {
   Calendar1Icon,
   Code,
   Dock,
-  Folder,
   FolderClosed,
-  Layers,
-  Server,
+  User,
   User2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -26,7 +24,7 @@ export function useNavItems() {
     {
       title: t("users"),
       href: ROUTES.DASHBOARD.USER,
-      icon: User2,
+      icon: User,
     },
     {
       title: t("project"),

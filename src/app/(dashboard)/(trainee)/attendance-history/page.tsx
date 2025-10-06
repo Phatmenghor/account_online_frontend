@@ -28,6 +28,7 @@ import {
 import {
   createAttendanceService,
   deleteAttendanceService,
+  getAllListingAttendanceService,
   getAttendanceService,
   updateAttendanceService,
 } from "@/services/dashboard/attendance/attendance.service";
@@ -38,6 +39,12 @@ import {
 } from "@/models/attendance/attendance.schema";
 import ModalAttendance from "@/components/shared/modal/attendance-modal";
 import { AttendanceDetailModal } from "@/components/shared/modal/attendance-detail-modal";
+import {
+  ExcelColumn,
+  ExcelExporter,
+  ExcelSheet,
+} from "@/utils/export-file/excel";
+import LoadingSpinner from "@/components/shared/common/excel-loading";
 
 function AttendancePageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -98,7 +105,7 @@ function AttendancePageContent() {
     setSearchQuery(e.target.value);
   };
 
-  const handleSaveProject = async (
+  const handleSaveAttendance = async (
     formData: AttendanceCreateForm | AttendanceUpdateForm
   ) => {
     setIsSubmitting(true);
@@ -136,16 +143,17 @@ function AttendancePageContent() {
           });
         });
       } else if (mode === ModalMode.UPDATE_MODE) {
-        const updateProjectForm = formData as AttendanceUpdateForm;
-        if (!updateProjectForm.id) {
+        const attendanceFormData = formData as AttendanceUpdateForm;
+        if (!attendanceFormData.id) {
           console.error("Missing attendances id in update form");
           return;
         }
-        const response = await updateAttendanceService(updateProjectForm.id, {
-          endDate: updateProjectForm.endDate,
-          reason: updateProjectForm.reason,
-          startDate: updateProjectForm.startDate,
-          type: updateProjectForm.type,
+        const response = await updateAttendanceService(attendanceFormData.id, {
+          leaveRequest: attendanceFormData.leaveRequest,
+          endDate: attendanceFormData.endDate,
+          reason: attendanceFormData.reason,
+          startDate: attendanceFormData.startDate,
+          type: attendanceFormData.type,
         });
 
         setAttendances((prev) =>
@@ -153,7 +161,7 @@ function AttendancePageContent() {
             ? {
                 ...prev,
                 content: prev.content.map((proj) =>
-                  proj.id === updateProjectForm.id ? response : proj
+                  proj.id === attendanceFormData.id ? response : proj
                 ),
               }
             : prev
@@ -162,7 +170,7 @@ function AttendancePageContent() {
         startTransition(() => {
           AppToast({
             type: "success",
-            message: "Project updated successfully",
+            message: "Attendance updated successfully",
             description: "Updated Project",
           });
         });
@@ -171,17 +179,17 @@ function AttendancePageContent() {
       setSelectedAttendance(null);
       loadAttendances();
     } catch (err: any) {
-      toast.error(err?.errorMessage || "Failed to save project");
+      toast.error(err?.errorMessage || "Failed to save attendance");
       AppToast({
         type: "error",
-        message: "Failed to save project",
+        message: "Failed to save attendance",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const confirmDeleteProject = async () => {
+  const confirmDeleteAttendance = async () => {
     if (!selectedAttendance) return;
     setIsSubmitting(true);
 
@@ -219,77 +227,122 @@ function AttendancePageContent() {
     }
   };
 
-  // const handleExportToExcel = async (data: AttendanceModel[] | null) => {
-  //   setIsExportingToExcel(true);
-  //   try {
-  //     // Define columns based on ProjectModel
-  //     const columns: ExcelColumn[] = [
-  //       { header: "ID", key: "id", width: 8, type: "number" },
-  //       { header: "Project Name", key: "projectName", width: 25, type: "text" },
-  //       { header: "Type", key: "type", width: 15, type: "text" },
-  //       { header: "Host Server", key: "hostServer", width: 20, type: "text" },
-  //       { header: "Host Port", key: "hostPort", width: 10, type: "number" },
-  //       { header: "Database Name", key: "dbName", width: 20, type: "text" },
-  //       { header: "Database Type", key: "dbType", width: 15, type: "text" },
-  //       { header: "Database Server", key: "dbServer", width: 20, type: "text" },
-  //       {
-  //         header: "Members Involved",
-  //         key: "memberInvolved",
-  //         width: 25,
-  //         type: "text",
-  //       },
-  //       { header: "Remark", key: "remark", width: 30, type: "text" },
-  //       {
-  //         header: "Created Date",
-  //         key: "createdAt",
-  //         width: 18,
-  //         type: "date",
-  //         format: "mm/dd/yyyy",
-  //       },
-  //       {
-  //         header: "Updated Date",
-  //         key: "updatedAt",
-  //         width: 18,
-  //         type: "date",
-  //         format: "mm/dd/yyyy",
-  //       },
-  //     ];
+  const handleExportToExcel = async () => {
+    setIsExportingToExcel(true);
+    try {
+      // Define columns based on AttendanceModel
+      const columns: ExcelColumn[] = [
+        { header: "ID", key: "id", width: 8, type: "number" },
+        { header: "User ID", key: "userId", width: 10, type: "number" },
+        { header: "ID Card", key: "userIdCard", width: 15, type: "text" },
+        { header: "Full Name", key: "userFullName", width: 25, type: "text" },
+        { header: "Email", key: "userEmail", width: 30, type: "text" },
+        { header: "Position", key: "userPosition", width: 20, type: "text" },
+        { header: "Type", key: "type", width: 15, type: "text" },
+        { header: "Status", key: "status", width: 12, type: "text" },
+        {
+          header: "Start Date",
+          key: "startDate",
+          width: 18,
+          type: "date",
+          format: "mm/dd/yyyy",
+        },
+        {
+          header: "End Date",
+          key: "endDate",
+          width: 18,
+          type: "date",
+          format: "mm/dd/yyyy",
+        },
+        {
+          header: "Leave Request",
+          key: "leaveRequest",
+          width: 20,
+          type: "text",
+        },
+        { header: "Total Days", key: "totalDays", width: 12, type: "number" },
+        { header: "Reason", key: "reason", width: 30, type: "text" },
+        {
+          header: "Approved By (ID Card)",
+          key: "approvedByIdCard",
+          width: 20,
+          type: "text",
+        },
+        {
+          header: "Approved By (Name)",
+          key: "approvedByFullName",
+          width: 25,
+          type: "text",
+        },
+        {
+          header: "Approved At",
+          key: "approvedAt",
+          width: 18,
+          type: "date",
+          format: "mm/dd/yyyy",
+        },
+        {
+          header: "Approval Notes",
+          key: "approvalNotes",
+          width: 30,
+          type: "text",
+        },
+        {
+          header: "Created Date",
+          key: "createdAt",
+          width: 18,
+          type: "date",
+          format: "mm/dd/yyyy",
+        },
+        {
+          header: "Updated Date",
+          key: "updatedAt",
+          width: 18,
+          type: "date",
+          format: "mm/dd/yyyy",
+        },
+      ];
 
-  //     // Create Excel exporter
-  //     const exporter = new ExcelExporter({
-  //       filename: "projects.xlsx",
-  //       title: "Project Management Report",
-  //       author: "IT Department",
-  //       useAlternateRows: true,
-  //       protection: {
-  //         password: "88889999",
-  //         deleteRows: false,
-  //         selectLockedCells: true,
-  //         selectUnlockedCells: true,
-  //       },
-  //     });
+      // Create Excel exporter
+      const exporter = new ExcelExporter({
+        filename: "attendance.xlsx",
+        title: "Attendance Report",
+        author: "HR Department",
+        useAlternateRows: true,
+        protection: {
+          password: "88889999",
+          deleteRows: false,
+          selectLockedCells: true,
+          selectUnlockedCells: true,
+        },
+      });
 
-  //     // Configure sheet
-  //     const sheetConfig: ExcelSheet = {
-  //       name: "Projects",
-  //       data: data ?? [],
-  //       columns,
-  //       autoFilter: true,
-  //       freezeRows: 1,
-  //       sortBy: [{ key: "id", order: "asc" }],
-  //     };
+      const response = await getAllListingAttendanceService({});
 
-  //     exporter.addSheet(sheetConfig);
-  //     await exporter.export();
+      // Configure sheet
+      const sheetConfig: ExcelSheet = {
+        name: "Attendance",
+        data: response ?? [],
+        columns,
+        autoFilter: true,
+        freezeRows: 1,
+        sortBy: [{ key: "id", order: "asc" }],
+      };
 
-  //     AppToast({ type: "success", message: "Successfully exported to Excel" });
-  //   } catch (error: any) {
-  //     AppToast({ type: "error", message: "Failed to export to Excel" });
-  //     console.error("Error exporting to Excel:", error);
-  //   } finally {
-  //     setIsExportingToExcel(false);
-  //   }
-  // };
+      exporter.addSheet(sheetConfig);
+      await exporter.export();
+
+      AppToast({
+        type: "success",
+        message: "Successfully exported attendance to Excel",
+      });
+    } catch (error: any) {
+      AppToast({ type: "error", message: "Failed to export attendance" });
+      console.error("Error exporting attendance to Excel:", error);
+    } finally {
+      setIsExportingToExcel(false);
+    }
+  };
 
   const handleEditAttendance = (proj: AttendanceModel) => {
     setSelectedAttendance(proj);
@@ -297,7 +350,7 @@ function AttendancePageContent() {
     setIsModalOpen(true);
   };
 
-  const handleAddProject = () => {
+  const handleAddAttendance = () => {
     setSelectedAttendance(null);
     setMode(ModalMode.CREATE_MODE);
     setIsModalOpen(true);
@@ -335,26 +388,33 @@ function AttendancePageContent() {
 
           <div className="flex gap-4">
             <div>
-              {/* FIXED BUTTON WITH PROPER LOADING STATE AND TEXT */}
               <Button
-                onClick={() => {}}
+                onClick={() => handleExportToExcel()}
                 size="lg"
                 variant="outline"
                 className="gap-2 text-sm sm:text-base h-10 hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6"
                 disabled={isExportingToExcel}
               >
-                <img
-                  src={AppIcons.FILE.Excel}
-                  alt="Excel Icon"
-                  className="h-4 w-4 lg:h-5 lg:w-5 text-muted-foreground flex-shrink-0"
-                />
-                <span className="text-sm gap-2">
-                  {isExportingToExcel ? <Loading /> : "Export"}
-                </span>
-                <Download className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
+                {isExportingToExcel ? (
+                  <>
+                    <LoadingSpinner size={20} />
+                    <span className="text-sm lg:text-base">Exporting…</span>
+                  </>
+                ) : (
+                  <>
+                    <img
+                      src={AppIcons.FILE.Excel}
+                      alt="Excel Icon"
+                      className="h-4 w-4 lg:h-5 lg:w-5 text-muted-foreground flex-shrink-0"
+                    />
+                    <span className="text-sm lg:text-base">Export</span>
+                    <Download className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
+                  </>
+                )}
               </Button>
             </div>
-            <Button className="h-10" onClick={handleAddProject}>
+
+            <Button className="h-10" onClick={handleAddAttendance}>
               {t("common.new")}
             </Button>
           </div>
@@ -378,7 +438,7 @@ function AttendancePageContent() {
                 })}
                 loading={isLoading}
                 emptyMessage="No attendance found"
-                getRowKey={(project) => project.id}
+                getRowKey={(attendance) => attendance.id}
               />
 
               {/* Pagination positioned to the right and outside the scrollable area */}
@@ -400,9 +460,9 @@ function AttendancePageContent() {
             setIsDeleteDialogOpen(false);
             setSelectedAttendance(null);
           }}
-          onDelete={confirmDeleteProject}
+          onDelete={confirmDeleteAttendance}
           title="Delete Project"
-          description={`Are you sure you want to delete the project`}
+          description={`Are you sure you want to delete the attendance`}
           itemName={selectedAttendance?.userFullName || "N/A"}
           isSubmitting={isSubmitting}
         />
@@ -423,7 +483,7 @@ function AttendancePageContent() {
             setSelectedAttendance(null);
             setIsModalOpen(false);
           }}
-          onSave={handleSaveProject}
+          onSave={handleSaveAttendance}
           attendanceId={selectedAttendance?.id ?? 0}
           isSubmitting={isSubmitting}
         />

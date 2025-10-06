@@ -228,7 +228,12 @@ function TraineePageContent() {
       // Define columns based on TraineeModel
       const columns: ExcelColumn[] = [
         { header: "ID", key: "id", width: 8, type: "number" },
-        { header: "Report Remark", key: "reportRemark", width: 40, type: "text" },
+        {
+          header: "Report Remark",
+          key: "reportRemark",
+          width: 40,
+          type: "text",
+        },
         { header: "Challenge", key: "challenge", width: 40, type: "text" },
         { header: "Recommend", key: "recommend", width: 40, type: "text" },
         {
