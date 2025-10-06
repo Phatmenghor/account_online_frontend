@@ -30,7 +30,7 @@ export interface UpdateProjectReq {
 
 export interface AllProjectReq {
   search: string;
-  pageNo: number;
-  pageSize: number;
+  pageNo?: number;
+  pageSize?: number;
   projectStatus?: string;
 }

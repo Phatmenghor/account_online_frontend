@@ -33,6 +33,32 @@ export async function getProjectService(request: AllProjectReq) {
   }
 }
 
+export async function getAllExcelProjectService(request: AllProjectReq) {
+  try {
+    // Simulate API delay
+    const response = await axiosClientWithAuth.post(
+      "/api/projects/all-list",
+      request
+    );
+    return response.data;
+  } catch (error) {
+    // Axios error handling (optional for mock)
+    if (axios.isAxiosError(error)) {
+      const raw = error.response?.data;
+      const message = raw?.message || "Failed to fetch projects.";
+      console.error("Axios error:", message);
+
+      throw { errorMessage: message, rawError: raw };
+    } else {
+      console.error("Unexpected error:", error);
+      throw {
+        errorMessage: "An unexpected error occurred while fetching projects.",
+        rawError: error,
+      };
+    }
+  }
+}
+
 export async function getProjectByIdService(id: number) {
   try {
     const response = await axiosClientWithAuth.get(`/api/projects/${id}`);
