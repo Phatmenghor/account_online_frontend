@@ -169,7 +169,8 @@
     "memberInvolved": "Members Involved",
     "remark": "Remark",
     "createdAt": "Created At",
-    "actions": "Actions"
+    "actions": "Actions",
+    "search-application": "Search application..."
   },
   "trainee": {
     "reportRemark": "Report Remark",
@@ -177,6 +178,6 @@
     "recommend": "Recommend",
     "createdAt": "Created At",
     "actions": "Actions",
-    "search-trainee": "Search create by user..."
+    "search-trainee": "Search report trainee..."
   }
 }
