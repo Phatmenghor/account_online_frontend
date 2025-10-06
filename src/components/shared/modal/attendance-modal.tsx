@@ -27,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import { AttendanceModel } from "@/models/attendance/attendances.response";
 import { getAttendancesByIdService } from "@/services/dashboard/attendance/attendance.service";
 import {
@@ -45,6 +44,8 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
+import { CustomDatePicker } from "../common/custom-date-picker";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 type ModalAttendanceProps = {
   isOpen: boolean;
@@ -91,6 +92,7 @@ export default function ModalAttendance({
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isDirty },
   } = form;
 
@@ -351,15 +353,18 @@ export default function ModalAttendance({
                       control={control}
                       name="startDate"
                       render={({ field }) => (
-                        <Input
-                          type="date"
-                          {...field}
-                          value={field.value || ""}
-                          id="startDate"
-                          disabled={!canEdit || isSubmitting}
-                          className={`transition-colors focus:border-green-500 ${
-                            errors.startDate ? "border-red-500" : ""
-                          }`}
+                        <CustomDatePicker
+                          value={field.value}
+                          onChange={(date) => {
+                            field.onChange(date);
+                            setValue("startDate", date, {
+                              shouldDirty: true,
+                              shouldTouch: true,
+                            });
+                          }}
+                          disabled={isSubmitting}
+                          placeholder="Select start date"
+                          error={!!errors.startDate}
                         />
                       )}
                     />
@@ -379,15 +384,18 @@ export default function ModalAttendance({
                       control={control}
                       name="endDate"
                       render={({ field }) => (
-                        <Input
-                          type="date"
-                          {...field}
-                          value={field.value || ""}
-                          id="endDate"
-                          disabled={!canEdit || isSubmitting}
-                          className={`transition-colors focus:border-green-500 ${
-                            errors.endDate ? "border-red-500" : ""
-                          }`}
+                        <CustomDatePicker
+                          value={field.value}
+                          onChange={(date) => {
+                            field.onChange(date);
+                            setValue("endDate", date, {
+                              shouldDirty: true,
+                              shouldTouch: true,
+                            });
+                          }}
+                          disabled={isSubmitting}
+                          placeholder="Select end date"
+                          error={!!errors.endDate}
                         />
                       )}
                     />

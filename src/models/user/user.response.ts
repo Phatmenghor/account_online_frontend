@@ -14,6 +14,7 @@ export interface UserModel {
   userRole: string;
   userStatus: string;
   fullName: string;
+  userPermission: string;
   position: string;
   profileUrl: string;
   createdAt: string;

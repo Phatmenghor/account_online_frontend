@@ -16,28 +16,17 @@ import { Download, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
-import ProjectViewModal from "@/components/shared/modal/project-detail-modal";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import Loading from "@/components/shared/common/loading";
 import {
   AllAttendanceModel,
   AttendanceModel,
 } from "@/models/attendance/attendances.response";
 import {
-  createAttendanceService,
-  deleteAttendanceService,
   getAllListingAttendanceService,
   getAttendanceService,
-  updateAttendanceService,
 } from "@/services/dashboard/attendance/attendance.service";
 import { createAttendanceTableColumns } from "@/components/shared/table/attendance-content";
-import {
-  AttendanceCreateForm,
-  AttendanceUpdateForm,
-} from "@/models/attendance/attendance.schema";
-import ModalAttendance from "@/components/shared/modal/attendance-modal";
 import { AttendanceDetailModal } from "@/components/shared/modal/attendance-detail-modal";
 import {
   ExcelColumn,

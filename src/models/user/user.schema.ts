@@ -10,6 +10,7 @@ export const UpdateUserSchema = z.object({
   username: z.string().optional(),
   email: z.string().email("Invalid email format").optional(),
   fullName: z.string().optional(),
+  userPermission: z.string().optional(),
   status: z.string().optional(),
   profileUrl: z.string().optional(),
   position: z.string().optional(),
@@ -26,6 +27,7 @@ export const CreateUserSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   fullName: z.string().optional(),
+  userPermission: z.string().optional(),
   role: z.string().min(1, "Role is required"), // make role required for clarity
   position: z.string().optional(),
   profileUrl: z.string().optional(),

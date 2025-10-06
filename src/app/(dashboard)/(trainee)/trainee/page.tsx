@@ -40,12 +40,12 @@ import {
   getTraineeService,
   updateTraineeService,
 } from "@/services/dashboard/trainee/trainee.service";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import Loading from "@/components/shared/common/loading";
 import { createTraineeTableColumns } from "@/components/shared/table/trainee-content";
 import TraineeViewModal from "@/components/shared/modal/trainee-detail-modal";
 import ModalTrainee from "@/components/shared/modal/trainee-modal";
 import { format } from "date-fns";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 function TraineePageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -122,18 +122,18 @@ function TraineePageContent() {
         setTrainees((prev: any) =>
           prev
             ? {
-              ...prev,
-              content: [response, ...prev.content],
-              totalElements: prev.totalElements + 1,
-            }
+                ...prev,
+                content: [response, ...prev.content],
+                totalElements: prev.totalElements + 1,
+              }
             : {
-              content: [response],
-              pageNo: 1,
-              pageSize: 10,
-              totalElements: 1,
-              totalPages: 1,
-              last: true,
-            }
+                content: [response],
+                pageNo: 1,
+                pageSize: 10,
+                totalElements: 1,
+                totalPages: 1,
+                last: true,
+              }
         );
 
         startTransition(() => {
@@ -158,11 +158,11 @@ function TraineePageContent() {
         setTrainees((prev) =>
           prev
             ? {
-              ...prev,
-              content: prev.content.map((trainee) =>
-                trainee.id === updateTraineeForm.id ? response : trainee
-              ),
-            }
+                ...prev,
+                content: prev.content.map((trainee) =>
+                  trainee.id === updateTraineeForm.id ? response : trainee
+                ),
+              }
             : prev
         );
 
@@ -199,12 +199,12 @@ function TraineePageContent() {
         setTrainees((prev) =>
           prev
             ? {
-              ...prev,
-              content: prev.content.filter(
-                (trainee) => trainee.id !== selectedTrainee.id
-              ),
-              totalElements: prev.totalElements - 1,
-            }
+                ...prev,
+                content: prev.content.filter(
+                  (trainee) => trainee.id !== selectedTrainee.id
+                ),
+                totalElements: prev.totalElements - 1,
+              }
             : prev
         );
 
@@ -226,125 +226,95 @@ function TraineePageContent() {
     }
   };
 
-const handleExportToExcel = async () => {
-  setIsSubmitting(true);
+  const handleExportToExcel = async () => {
+    setIsSubmitting(true);
 
-  try {
-    setIsExportingToExcel(true);
+    try {
+      setIsExportingToExcel(true);
 
-    // Create filter object for API call
-    const exportFilter = {
-      search: debouncedSearchQuery,
-    };
+      // Create filter object for API call
+      const exportFilter = {
+        search: debouncedSearchQuery,
+      };
 
-    // Fetch all data for export using the Excel service
-    const allDataResponse = await getAllExcelTraineeService(exportFilter);
+      // Fetch all data for export using the Excel service
+      const allDataResponse = await getAllExcelTraineeService(exportFilter);
 
-    // The API returns data in response.data array
-    const traineeData = allDataResponse?.data || [];
-    const totalCount = traineeData.length;
+      // The API returns data in response.data array
+      const traineeData = allDataResponse?.data || [];
+      const totalCount = traineeData.length;
 
-    if (totalCount === 0) {
-      toast.warning("No data available to export.");
-      setIsSubmitting(false);
-      return;
-    }
+      if (totalCount === 0) {
+        toast.warning("No data available to export.");
+        setIsSubmitting(false);
+        return;
+      }
 
-    // Check Excel limit
-    const EXCEL_LIMIT = 10000; // Adjust based on your Constants
-    if (totalCount > EXCEL_LIMIT) {
-      toast.info(
-        `Only ${EXCEL_LIMIT} items can be exported. Too many records. Please filter the data.`
-      );
-      setIsSubmitting(false);
-      return;
-    }
+      // Check Excel limit
+      const EXCEL_LIMIT = 10000; // Adjust based on your Constants
+      if (totalCount > EXCEL_LIMIT) {
+        toast.info(
+          `Only ${EXCEL_LIMIT} items can be exported. Too many records. Please filter the data.`
+        );
+        setIsSubmitting(false);
+        return;
+      }
 
-    if (!Array.isArray(traineeData) || traineeData.length === 0) {
-      toast.warning("No data available to export.");
-      setIsSubmitting(false);
-      return;
-    }
+      if (!Array.isArray(traineeData) || traineeData.length === 0) {
+        toast.warning("No data available to export.");
+        setIsSubmitting(false);
+        return;
+      }
 
-    // Create workbook
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Trainee Reports");
+      // Create workbook
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Trainee Reports");
 
-    // Define columns
-    const columns: string[] = [
-      "No",
-      "Report Remark",
-      "Challenge",
-      "Recommend",
-      "Created Date",
-      "Updated Date",
-    ];
+      // Define columns
+      const columns: string[] = [
+        "No",
+        "Report Remark",
+        "Challenge",
+        "Recommend",
+        "Created Date",
+        "Updated Date",
+      ];
 
-    // Add title row at Row 1
-    worksheet.mergeCells(1, 1, 1, columns.length);
-    const titleCell = worksheet.getCell("A1");
-    titleCell.value = "Trainee Report Management";
-    titleCell.font = { size: 16, bold: true, color: { argb: "FFFFFFFF" } };
-    titleCell.alignment = { vertical: "middle", horizontal: "center" };
-    titleCell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FF1F4E78" },
-    };
-
-    // Add total count row at Row 2
-    worksheet.mergeCells(2, 1, 2, columns.length);
-    const totalCell = worksheet.getCell("A2");
-    totalCell.value = `Total Trainee Reports: ${totalCount}`;
-    totalCell.font = { size: 12, bold: true, color: { argb: "FF000000" } };
-    totalCell.alignment = { vertical: "middle", horizontal: "center" };
-    totalCell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FFDDDDDD" },
-    };
-
-    // Add header row at Row 4
-    const headerRow = worksheet.getRow(4);
-    columns.forEach((text: string, idx: number) => {
-      const cell = headerRow.getCell(idx + 1);
-      cell.value = text;
-      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.alignment = { vertical: "middle", horizontal: "center" };
-      cell.fill = {
+      // Add title row at Row 1
+      worksheet.mergeCells(1, 1, 1, columns.length);
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "Trainee Report Management";
+      titleCell.font = { size: 16, bold: true, color: { argb: "FFFFFFFF" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "center" };
+      titleCell.fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "FF007ACC" },
-      };
-      cell.border = {
-        top: { style: "thin" },
-        bottom: { style: "thin" },
-        left: { style: "thin" },
-        right: { style: "thin" },
+        fgColor: { argb: "FF1F4E78" },
       };
 
-      // Adjust column widths
-      const columnWidths = [5, 40, 40, 40, 18, 18];
-      worksheet.getColumn(idx + 1).width = columnWidths[idx];
-    });
+      // Add total count row at Row 2
+      worksheet.mergeCells(2, 1, 2, columns.length);
+      const totalCell = worksheet.getCell("A2");
+      totalCell.value = `Total Trainee Reports: ${totalCount}`;
+      totalCell.font = { size: 12, bold: true, color: { argb: "FF000000" } };
+      totalCell.alignment = { vertical: "middle", horizontal: "center" };
+      totalCell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFDDDDDD" },
+      };
 
-    // Add data rows starting at row 5
-    traineeData.forEach((item: TraineeModel, i: number) => {
-      const row = worksheet.addRow([
-        i + 1,
-        item.reportRemark || "---",
-        item.challenge || "---",
-        item.recommend || "---",
-        item.createdAt || "---",
-        item.updatedAt || "---",
-      ]);
-
-      // Zebra striping
-      row.eachCell((cell) => {
+      // Add header row at Row 4
+      const headerRow = worksheet.getRow(4);
+      columns.forEach((text: string, idx: number) => {
+        const cell = headerRow.getCell(idx + 1);
+        cell.value = text;
+        cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+        cell.alignment = { vertical: "middle", horizontal: "center" };
         cell.fill = {
           type: "pattern",
           pattern: "solid",
-          fgColor: { argb: i % 2 === 0 ? "FFF3F3F3" : "FFFFFFFF" },
+          fgColor: { argb: "FF007ACC" },
         };
         cell.border = {
           top: { style: "thin" },
@@ -352,51 +322,84 @@ const handleExportToExcel = async () => {
           left: { style: "thin" },
           right: { style: "thin" },
         };
-        cell.alignment = { vertical: "middle", horizontal: "left" };
+
+        // Adjust column widths
+        const columnWidths = [5, 40, 40, 40, 18, 18];
+        worksheet.getColumn(idx + 1).width = columnWidths[idx];
       });
 
-      // Center align the No column (1st column)
-      row.getCell(1).alignment = { vertical: "middle", horizontal: "center" };
-    });
+      // Add data rows starting at row 5
+      traineeData.forEach((item: TraineeModel, i: number) => {
+        const row = worksheet.addRow([
+          i + 1,
+          item.reportRemark || "---",
+          item.challenge || "---",
+          item.recommend || "---",
+          item.createdAt || "---",
+          item.updatedAt || "---",
+        ]);
 
-    // Format date columns (5th and 6th columns)
-    [5, 6].forEach((colIndex) => {
-      worksheet.getColumn(colIndex).eachCell((cell, rowNumber: number) => {
-        if (rowNumber > 4 && cell.value) {
-          try {
-            const dateValue = new Date(cell.value as string);
-            if (!isNaN(dateValue.getTime())) {
-              cell.value = dateValue;
-              cell.numFmt = "dd-mm-yyyy";
+        // Zebra striping
+        row.eachCell((cell) => {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: i % 2 === 0 ? "FFF3F3F3" : "FFFFFFFF" },
+          };
+          cell.border = {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          };
+          cell.alignment = { vertical: "middle", horizontal: "left" };
+        });
+
+        // Center align the No column (1st column)
+        row.getCell(1).alignment = { vertical: "middle", horizontal: "center" };
+      });
+
+      // Format date columns (5th and 6th columns)
+      [5, 6].forEach((colIndex) => {
+        worksheet.getColumn(colIndex).eachCell((cell, rowNumber: number) => {
+          if (rowNumber > 4 && cell.value) {
+            try {
+              const dateValue = new Date(cell.value as string);
+              if (!isNaN(dateValue.getTime())) {
+                cell.value = dateValue;
+                cell.numFmt = "dd-mm-yyyy";
+              }
+            } catch (error) {
+              console.warn("Date parsing failed for:", cell.value);
             }
-          } catch (error) {
-            console.warn("Date parsing failed for:", cell.value);
           }
-        }
+        });
       });
-    });
 
-    // Generate and save file
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
+      // Generate and save file
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
 
-    const fileName = `trainee_reports_${format(new Date(), "dd-MM-yyyy")}.xlsx`;
-    saveAs(blob, fileName);
+      const fileName = `trainee_reports_${format(
+        new Date(),
+        "dd-MM-yyyy"
+      )}.xlsx`;
+      saveAs(blob, fileName);
 
-    const exportedCount = traineeData.length;
-    toast.success(
-      `Excel file exported successfully! Total records: ${exportedCount}`
-    );
-  } catch (error: unknown) {
-    console.error("Error exporting to Excel:", error);
-    toast.error("Error exporting to Excel. Please try again.");
-  } finally {
-    setIsSubmitting(false);
-    setIsExportingToExcel(false);
-  }
-};
+      const exportedCount = traineeData.length;
+      toast.success(
+        `Excel file exported successfully! Total records: ${exportedCount}`
+      );
+    } catch (error: unknown) {
+      console.error("Error exporting to Excel:", error);
+      toast.error("Error exporting to Excel. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+      setIsExportingToExcel(false);
+    }
+  };
 
   const handleEditTrainee = (trainee: TraineeModel) => {
     setSelectedTrainee(trainee);

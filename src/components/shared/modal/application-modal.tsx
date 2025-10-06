@@ -20,7 +20,6 @@ import {
   UpdateAppForm,
 } from "@/models/application/app.schema";
 import { getAppByIdService } from "@/services/dashboard/application/app.service";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -32,6 +31,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AppWindow, PenSquare, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 type Props = {
   mode: ModalMode;

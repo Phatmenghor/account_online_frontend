@@ -20,7 +20,7 @@ import {
   UpdateProjectForm,
 } from "@/models/project/project.schema";
 import { getProjectByIdService } from "@/services/dashboard/project/project.service";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
+import {} from "@/constants/AppResource/display-list/enum/status";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -32,6 +32,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FolderPlus, FolderEdit, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 type Props = {
   mode: ModalMode;

@@ -29,7 +29,7 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/status";
 import ModalUser from "@/components/shared/modal/user-modal";
 import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
 

@@ -10,6 +10,7 @@ export interface UpdateUserReq {
   email?: string;
   fullName?: string;
   status?: string;
+  userPermission?: string;
   profileUrl?: string;
   position?: string;
 }
@@ -19,6 +20,7 @@ export interface CreateUserReq {
   email: string;
   password: string;
   fullName?: string;
+  userPermission?: string;
   role?: string;
   position?: string;
 }

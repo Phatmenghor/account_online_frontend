@@ -35,7 +35,7 @@ import { UseFormReturn } from "react-hook-form";
 import { UserModel } from "@/models/user/user.response";
 import { UpdateUserProfileForm } from "@/models/auth/profile.schema";
 import { Image } from "@/app/(dashboard)/profile/page";
-import { Status } from "@/constants/AppResource/filter/filter";
+import { Status } from "@/constants/AppResource/filter/status";
 
 interface Props {
   tabValue: string;

@@ -12,11 +12,10 @@ import { Separator } from "@/components/ui/separator";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { usePagination } from "@/hooks/use-pagination";
 import { useDebounce } from "@/utils/debounce/debounce";
-import { Download, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import Loading from "@/components/shared/common/loading";
 import {
   AllAttendanceModel,
@@ -41,6 +40,7 @@ import ModalAttendanceApprovalOrCancel from "@/components/shared/modal/attendanc
 import { AttendanceApprovalViewModal } from "@/components/shared/modal/attendance-approval-detail-modal";
 import ModalAttendance from "@/components/shared/modal/attendance-modal";
 import { toast } from "sonner";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 function AttendanceRequestPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -269,6 +269,11 @@ function AttendanceRequestPageContent() {
     setIsModalOpen(true);
   };
 
+  const handleDeleteAttendance = (attendance: AttendanceModel) => {
+    setSelectedAttendance(attendance);
+    setIsDeleteDialogOpen(true);
+  };
+
   const handleViewAttendanceDetail = (attendance: AttendanceModel) => {
     setSelectedAttendance(attendance);
     setIsAttendanceDetailOpen(true);
@@ -315,6 +320,7 @@ function AttendanceRequestPageContent() {
                     handleOpenApprovalModal,
                     handleViewAttendanceDetail,
                     handleEditAttendance,
+                    handleDeleteAttendance,
                   },
                 })}
                 loading={isLoading}

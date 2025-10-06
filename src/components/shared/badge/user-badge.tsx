@@ -1,4 +1,4 @@
-import { Status } from "@/constants/AppResource/display-list/status/status";
+import { Status } from "@/constants/AppResource/display-list/enum/status";
 
 interface StatusBadgeProps {
   status: string;

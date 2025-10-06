@@ -12,7 +12,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { SidebarUserProfile } from "@/components/app/profile/sidebar-profile";
 import { UserModel } from "@/models/user/user.response";
-import { useNavItems } from "@/constants/AppResource/display-list/sidebar-item/sidebar-item";
+import { useNavItems } from "@/constants/AppResource/display-list/ui-helper/sidebar-item";
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
 import { getUserProfileService } from "@/services/dashboard/user/user.service";
 

@@ -16,44 +16,16 @@ import { Download, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
-import { AppIcons } from "@/constants/AppResource/icons/app-icons";
-import {
-  ExcelColumn,
-  ExcelExporter,
-  ExcelSheet,
-} from "@/utils/export-file/excel";
 import { createProjectTableColumns } from "@/components/shared/table/project-content";
 import {
   AllProjectModel,
   ProjectModel,
 } from "@/models/project/project.response";
 import ProjectViewModal from "@/components/shared/modal/project-detail-modal";
-import {
-  CreateProjectForm,
-  UpdateProjectForm,
-} from "@/models/project/project.schema";
-import {
-  createProjectService,
-  deleteProjectService,
-  getProjectService,
-  updateProjectService,
-} from "@/services/dashboard/project/project.service";
-import ModalProject from "@/components/shared/modal/project-modal";
-import {
-  ModalMode,
-  STATUS_PROJECT,
-} from "@/constants/AppResource/display-list/status/status";
 import Loading from "@/components/shared/common/loading";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getMyAttendanceService } from "@/services/dashboard/attendance/attendance.service";
 import { AllAttendanceModel } from "@/models/attendance/attendances.response";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 function HomePageContent() {
   const [searchQuery, setSearchQuery] = useState("");

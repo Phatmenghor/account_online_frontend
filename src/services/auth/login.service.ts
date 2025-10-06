@@ -1,6 +1,7 @@
 import { LoginCredentials } from "@/models/auth/auth.request";
 import { UpdateUserReq } from "@/models/user/user.request";
 import { axiosClient } from "@/utils/axios";
+import { storePermission } from "@/utils/local-storage/permission";
 import { storeRole } from "@/utils/local-storage/roles";
 import { getToken, storeToken } from "@/utils/local-storage/token";
 import { storeUserInfo } from "@/utils/local-storage/userInfo";
@@ -14,6 +15,7 @@ export async function loginService(credentials: LoginCredentials) {
     storeToken(response.data.data.accessToken);
     storeRole(response.data.data.userRole.userRole);
     storeUserInfo(response.data.userRole);
+    storePermission(response?.data?.userRole?.userPermission);
 
     return response.data.data;
   } catch (error) {

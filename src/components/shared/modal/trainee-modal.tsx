@@ -19,7 +19,7 @@ import {
   UpdateTraineeForm,
 } from "@/models/trainee/trainee.schema";
 import { getTraineeByIdService } from "@/services/dashboard/trainee/trainee.service";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/status";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, FilePenLine, Loader2 } from "lucide-react";

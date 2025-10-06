@@ -28,11 +28,11 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ModalMode } from "@/constants/AppResource/display-list/status/status";
 import ModalUser from "@/components/shared/modal/user-modal";
 import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
 import Loading from "@/components/shared/common/loading";
 import { UserViewModal } from "@/components/shared/modal/user-detail-modal";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 function UserPageContent() {
   const [searchQuery, setSearchQuery] = useState("");

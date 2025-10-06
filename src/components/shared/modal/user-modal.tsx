@@ -24,20 +24,21 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, EyeOff, UserPlus, UserCog, Loader2 } from "lucide-react";
 import { getUserByIdService } from "@/services/dashboard/user/user.service";
 import { UserModel } from "@/models/user/user.response";
-import { ROLE_FILTER } from "@/constants/AppResource/display-list/role/role";
 import {
   CreateUserSchema,
   UpdateUserSchema,
   CreateUserForm,
   UpdateUserForm,
 } from "@/models/user/user.schema";
-import {
-  ModalMode,
-  STATUS_USER_OPTIONS,
-} from "@/constants/AppResource/display-list/status/status";
+
 import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
-import { Status } from "@/constants/AppResource/filter/filter";
 import Loading from "@/components/shared/common/loading";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
+import { ROLE_FILTER } from "@/constants/AppResource/filter/role";
+import { STATUS_USER_OPTIONS } from "@/constants/AppResource/filter/status";
+import { Status } from "@/constants/AppResource/display-list/enum/status";
+import { UserPermission } from "@/constants/AppResource/display-list/enum/user";
+import { USER_PERMISSION_OPTIONS } from "@/constants/AppResource/filter/permission";
 
 type ModalUserProps = {
   isOpen: boolean;
@@ -74,6 +75,7 @@ export default function ModalUser({
           email: "",
           password: "",
           fullName: "",
+          userPermission: UserPermission.NORMAL,
           role: ROLE_FILTER[0]?.value || "",
           position: "",
           profileUrl: "",
@@ -102,6 +104,7 @@ export default function ModalUser({
         email: user.email || "",
         fullName: user.fullName || "",
         status: user.userStatus || STATUS_USER_OPTIONS[0]?.value,
+        userPermission: user.userPermission || UserPermission.NORMAL,
         position: user.position || "",
         profileUrl: user.profileUrl || "",
       });
@@ -121,6 +124,7 @@ export default function ModalUser({
         username: "",
         email: "",
         password: "",
+        userPermission: UserPermission.NORMAL,
         fullName: "",
         role: ROLE_FILTER[0]?.value || "",
         position: "",
@@ -144,6 +148,7 @@ export default function ModalUser({
         email: updateData.email?.trim(),
         fullName: updateData.fullName?.trim(),
         status: updateData.status,
+        userPermission: updateData.userPermission || UserPermission.NORMAL,
         position: updateData.position?.trim(),
         profileUrl: updateData.profileUrl?.trim(),
       };
@@ -274,6 +279,49 @@ export default function ModalUser({
                     {errors.email && (
                       <p className="text-sm text-red-600">
                         {errors.email.message as string}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Username & Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="userPermission"
+                      className="text-sm font-medium"
+                    >
+                      User Permission{" "}
+                      {isCreate && <span className="text-red-500">*</span>}
+                    </Label>
+                    <Controller
+                      control={control}
+                      name="userPermission"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={isSubmitting}
+                        >
+                          <SelectTrigger
+                            id="userPermission"
+                            className="transition-colors focus:border-green-500"
+                          >
+                            <SelectValue placeholder="Select user permission" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {USER_PERMISSION_OPTIONS.map((r) => (
+                              <SelectItem key={r.value} value={r.value}>
+                                {r.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.userPermission && (
+                      <p className="text-sm text-red-600">
+                        {errors.userPermission.message as string}
                       </p>
                     )}
                   </div>

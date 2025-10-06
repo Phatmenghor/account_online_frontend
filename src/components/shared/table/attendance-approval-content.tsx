@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
-import { Eye, Pencil } from "lucide-react";
+import { Eye, Pencil, Trash } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -15,11 +15,19 @@ import {
   AttendanceModel,
 } from "@/models/attendance/attendances.response";
 import { TableColumn } from "./data-table";
+import { getPermission } from "@/utils/local-storage/permission";
+import { canPerformPrivilegedAction } from "@/utils/authorization/permission";
+import { getRoles } from "@/utils/local-storage/roles";
+import {
+  Role,
+  UserPermission,
+} from "@/constants/AppResource/display-list/enum/user";
 
 interface AttendanceTableHandlers {
   handleOpenApprovalModal: (attendance: AttendanceModel) => void;
   handleViewAttendanceDetail: (attendance: AttendanceModel) => void;
   handleEditAttendance: (attendance: AttendanceModel) => void;
+  handleDeleteAttendance: (attendance: AttendanceModel) => void;
 }
 
 interface AttendanceApprovalTableOptions {
@@ -37,10 +45,16 @@ export const createAttendanceApprovalTableColumns = ({
     handleOpenApprovalModal,
     handleViewAttendanceDetail,
     handleEditAttendance,
+    handleDeleteAttendance,
   } = handlers;
 
   const t = useTranslations("attendance.table-header-attendance");
   const tCommon = useTranslations("common");
+  const currentPermission = getPermission();
+  const currentRole = getRoles();
+
+  const canApprove =
+    currentRole === Role.SUPER && currentPermission === UserPermission.APPROVED;
 
   const allColumns: TableColumn<AttendanceModel>[] = [
     {
@@ -149,7 +163,7 @@ export const createAttendanceApprovalTableColumns = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={attendance.status !== "PENDING"} // Only pending can be approved/cancelled
+                  disabled={attendance.status !== "PENDING" && canApprove} // Only pending can be approved/cancelled
                   onClick={() => handleOpenApprovalModal(attendance)}
                 >
                   {attendance.status === "PENDING" ? "Approve/Reject" : "View"}
@@ -186,6 +200,19 @@ export const createAttendanceApprovalTableColumns = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{tCommon("view")}</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDeleteAttendance(attendance)}
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{tCommon("delete")}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
