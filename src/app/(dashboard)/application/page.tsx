@@ -86,7 +86,7 @@ function ApplicationPageContent() {
       const response = await getAllAppService({
         search: debouncedSearchQuery,
         pageNo: currentPage,
-        pageSize: 10,
+        pageSize: 15,
         applicationStatus:
           applicationStatus !== "all" ? applicationStatus : undefined,
       });

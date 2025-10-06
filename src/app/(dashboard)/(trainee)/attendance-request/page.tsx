@@ -89,7 +89,7 @@ function AttendanceRequestPageContent() {
       const response = await getAttendanceService({
         search: debouncedSearchQuery,
         pageNo: currentPage,
-        pageSize: 10,
+        pageSize: 15,
         status: attendancesStatusFilter || AttendanceStatus.PENDING,
         type:
           attendancesTypeFilter !== null ? attendancesTypeFilter : undefined,

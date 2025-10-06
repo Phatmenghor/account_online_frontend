@@ -29,9 +29,9 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ModalMode } from "@/constants/AppResource/display-list/enum/status";
 import ModalUser from "@/components/shared/modal/user-modal";
 import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 function UserPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,7 +76,7 @@ function UserPageContent() {
       const response = await getUsersService({
         search: debouncedSearchQuery,
         pageNo: currentPage,
-        pageSize: 5,
+        pageSize: 15,
         status: statusFilter,
       });
       setUsers(response);

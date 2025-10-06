@@ -73,7 +73,7 @@ function AttendancePageContent() {
       const response = await getAttendanceService({
         search: debouncedSearchQuery,
         pageNo: currentPage,
-        pageSize: 10,
+        pageSize: 15,
       });
       setAttendances(response);
     } catch (error: any) {

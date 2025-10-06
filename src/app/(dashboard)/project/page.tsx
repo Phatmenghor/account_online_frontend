@@ -95,7 +95,7 @@ function ProjectPageContent() {
       const response = await getProjectService({
         search: debouncedSearchQuery,
         pageNo: currentPage,
-        pageSize: 10,
+        pageSize: 15,
         projectStatus: projectStatus !== "all" ? projectStatus : undefined,
       });
       setProjects(response);

@@ -76,7 +76,7 @@ function UserPageContent() {
       const response = await getUsersService({
         search: debouncedSearchQuery,
         pageNo: currentPage,
-        pageSize: 10,
+        pageSize: 15,
         status: statusFilter,
       });
       setUsers(response);
