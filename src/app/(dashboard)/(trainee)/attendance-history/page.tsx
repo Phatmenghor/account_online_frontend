@@ -57,8 +57,6 @@ function AttendancePageContent() {
   const [selectedAttendance, setSelectedAttendance] =
     useState<AttendanceModel | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAttendanceDetailOpen, setIsAttendanceDetailOpen] = useState(false);
 
   const t = useTranslations();
@@ -103,128 +101,6 @@ function AttendancePageContent() {
   // Simplified search change handler - just updates the state, debouncing handles the rest
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-  };
-
-  const handleSaveAttendance = async (
-    formData: AttendanceCreateForm | AttendanceUpdateForm
-  ) => {
-    setIsSubmitting(true);
-    try {
-      if (mode === ModalMode.CREATE_MODE) {
-        const createData = formData as AttendanceCreateForm;
-        const response = await createAttendanceService(createData);
-
-        // Optimistic update
-        setAttendances((prev: any) =>
-          prev
-            ? {
-                ...prev,
-                content: [response, ...prev.content],
-                totalElements: prev.totalElements + 1,
-              }
-            : {
-                content: [response],
-                pageNo: 1,
-                pageSize: 10,
-                totalElements: 1,
-                totalPages: 1,
-                hasNext: false,
-                hasPrevious: false,
-                first: true,
-                last: true,
-              }
-        );
-
-        startTransition(() => {
-          AppToast({
-            type: "success",
-            message: "Attendance created successfully",
-            description: "New Attendance",
-          });
-        });
-      } else if (mode === ModalMode.UPDATE_MODE) {
-        const attendanceFormData = formData as AttendanceUpdateForm;
-        if (!attendanceFormData.id) {
-          console.error("Missing attendances id in update form");
-          return;
-        }
-        const response = await updateAttendanceService(attendanceFormData.id, {
-          leaveRequest: attendanceFormData.leaveRequest,
-          endDate: attendanceFormData.endDate,
-          reason: attendanceFormData.reason,
-          startDate: attendanceFormData.startDate,
-          type: attendanceFormData.type,
-        });
-
-        setAttendances((prev) =>
-          prev
-            ? {
-                ...prev,
-                content: prev.content.map((proj) =>
-                  proj.id === attendanceFormData.id ? response : proj
-                ),
-              }
-            : prev
-        );
-
-        startTransition(() => {
-          AppToast({
-            type: "success",
-            message: "Attendance updated successfully",
-            description: "Updated Project",
-          });
-        });
-      }
-      setIsModalOpen(false);
-      setSelectedAttendance(null);
-      loadAttendances();
-    } catch (err: any) {
-      toast.error(err?.errorMessage || "Failed to save attendance");
-      AppToast({
-        type: "error",
-        message: "Failed to save attendance",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const confirmDeleteAttendance = async () => {
-    if (!selectedAttendance) return;
-    setIsSubmitting(true);
-
-    try {
-      const response = await deleteAttendanceService(selectedAttendance.id);
-
-      if (response) {
-        setAttendances((prev) =>
-          prev
-            ? {
-                ...prev,
-                content: prev.content.filter(
-                  (proj) => proj.id !== selectedAttendance.id
-                ),
-                totalElements: prev.totalElements - 1,
-              }
-            : prev
-        );
-
-        AppToast({
-          type: "success",
-          message: "Project deleted successfully",
-        });
-      }
-
-      setIsDeleteDialogOpen(false);
-      setSelectedAttendance(null);
-    } catch (err: any) {
-      AppToast({
-        type: "error",
-        message: "Failed to delete project",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const handleExportToExcel = async () => {
@@ -344,26 +220,9 @@ function AttendancePageContent() {
     }
   };
 
-  const handleEditAttendance = (proj: AttendanceModel) => {
-    setSelectedAttendance(proj);
-    setMode(ModalMode.UPDATE_MODE);
-    setIsModalOpen(true);
-  };
-
-  const handleAddAttendance = () => {
-    setSelectedAttendance(null);
-    setMode(ModalMode.CREATE_MODE);
-    setIsModalOpen(true);
-  };
-
   const handleViewAttendanceDetail = (proj: AttendanceModel) => {
     setSelectedAttendance(proj);
     setIsAttendanceDetailOpen(true);
-  };
-
-  const handleDeleteAttendance = (proj: AttendanceModel) => {
-    setSelectedAttendance(proj);
-    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -413,10 +272,6 @@ function AttendancePageContent() {
                 )}
               </Button>
             </div>
-
-            <Button className="h-10" onClick={handleAddAttendance}>
-              {t("common.new")}
-            </Button>
           </div>
         </div>
 
@@ -431,9 +286,7 @@ function AttendancePageContent() {
                 columns={createAttendanceTableColumns({
                   data: attendances,
                   handlers: {
-                    handleEditAttendance,
                     handleViewAttendanceDetail,
-                    handleDeleteAttendance,
                   },
                 })}
                 loading={isLoading}
@@ -454,19 +307,6 @@ function AttendancePageContent() {
           </div>
         </div>
 
-        <DeleteConfirmationDialog
-          isOpen={isDeleteDialogOpen}
-          onClose={() => {
-            setIsDeleteDialogOpen(false);
-            setSelectedAttendance(null);
-          }}
-          onDelete={confirmDeleteAttendance}
-          title="Delete Project"
-          description={`Are you sure you want to delete the attendance`}
-          itemName={selectedAttendance?.userFullName || "N/A"}
-          isSubmitting={isSubmitting}
-        />
-
         <AttendanceDetailModal
           isOpen={isAttendanceDetailOpen}
           onClose={() => {
@@ -474,18 +314,6 @@ function AttendancePageContent() {
             setSelectedAttendance(null);
           }}
           attendance={selectedAttendance}
-        />
-
-        <ModalAttendance
-          isOpen={isModalOpen}
-          mode={mode}
-          onClose={() => {
-            setSelectedAttendance(null);
-            setIsModalOpen(false);
-          }}
-          onSave={handleSaveAttendance}
-          attendanceId={selectedAttendance?.id ?? 0}
-          isSubmitting={isSubmitting}
         />
       </CardContent>
     </Card>

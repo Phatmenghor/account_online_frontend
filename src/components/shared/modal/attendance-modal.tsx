@@ -91,7 +91,6 @@ export default function ModalAttendance({
       setAttendanceDetail(data);
 
       reset({
-        id: data.id,
         type: data.type || "",
         leaveRequest: data.leaveRequest || LeaveRequest.FULL_DAY,
         startDate: data.startDate || "",
@@ -142,7 +141,7 @@ export default function ModalAttendance({
       const updateData = data as AttendanceUpdateForm;
 
       // Validate that we have an ID
-      if (!updateData.id) {
+      if (!attendanceDetail?.id) {
         console.error("Missing ID for update. Full data:", updateData);
         return;
       }
@@ -157,7 +156,7 @@ export default function ModalAttendance({
       };
 
       console.log("Update payload:", updatePayload);
-      onSave({ id: updateData.id, updates: updatePayload });
+      onSave({ id: attendanceDetail.id, updates: updatePayload });
       onClose();
     }
   };

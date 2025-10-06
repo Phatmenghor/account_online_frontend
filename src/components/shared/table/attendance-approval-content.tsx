@@ -71,6 +71,18 @@ export const createAttendanceApprovalTableColumns = ({
       ),
     },
     {
+      key: "reason",
+      label: t("reason"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
+      render: (attendance) => (
+        <div className="flex flex-col">
+          <span className="font-medium">{attendance.reason || "---"}</span>
+        </div>
+      ),
+    },
+    {
       key: "userFullName",
       label: t("userFullName"),
       truncate: true,

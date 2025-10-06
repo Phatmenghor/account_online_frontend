@@ -39,7 +39,6 @@ export const AttendanceReqCreateSchema = z.object({
 
 // Update mode
 export const AttendanceReqUpdateSchema = z.object({
-  id: z.number().optional(),
   type: z.string().optional(),
   leaveRequest: z.string().optional(),
   startDate: z.string().optional(),

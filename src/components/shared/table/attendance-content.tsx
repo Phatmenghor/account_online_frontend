@@ -17,9 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { TableColumn } from "./data-table";
 
 interface AttendanceTableHandlers {
-  handleEditAttendance: (attendance: AttendanceModel) => void;
   handleViewAttendanceDetail: (attendance: AttendanceModel) => void;
-  handleDeleteAttendance: (attendance: AttendanceModel) => void;
 }
 
 interface AttendanceTableOptions {
@@ -31,11 +29,7 @@ export const createAttendanceTableColumns = ({
   data,
   handlers,
 }: AttendanceTableOptions): TableColumn<AttendanceModel>[] => {
-  const {
-    handleEditAttendance,
-    handleViewAttendanceDetail,
-    handleDeleteAttendance,
-  } = handlers;
+  const { handleViewAttendanceDetail } = handlers;
 
   const t = useTranslations("attendance.table-header-attendance");
   const tCommon = useTranslations("common");
@@ -65,6 +59,18 @@ export const createAttendanceTableColumns = ({
           <span className="text-xs text-muted-foreground">
             {attendance.userIdCard || attendance.userEmail || ""}
           </span>
+        </div>
+      ),
+    },
+    {
+      key: "reason",
+      label: t("reason"),
+      truncate: true,
+      maxWidth: "400px",
+      minWidth: "200px",
+      render: (attendance) => (
+        <div className="flex flex-col">
+          <span className="font-medium">{attendance.reason || "---"}</span>
         </div>
       ),
     },
@@ -202,38 +208,12 @@ export const createAttendanceTableColumns = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleEditAttendance(attendance)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{tCommon("edit")}</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
                   onClick={() => handleViewAttendanceDetail(attendance)}
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{tCommon("view")}</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDeleteAttendance(attendance)}
-                >
-                  <Trash className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{tCommon("delete")}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
