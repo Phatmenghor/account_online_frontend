@@ -12,12 +12,12 @@ import ChangePasswordTab from "@/components/app/profile/change-password-tab";
 import { getUserProfileService } from "@/services/dashboard/user/user.service";
 import { updateUserProfileService } from "@/services/auth/login.service";
 import { uploadImageService } from "@/services/dashboard/image/image.service";
-import { Status } from "@/constants/AppResource/filter/status";
 import { UserModel } from "@/models/user/user.response";
 import {
   UpdateUserProfileForm,
   UpdateUserProfileSchema,
 } from "@/models/auth/profile.schema";
+import { Status } from "@/constants/AppResource/display-list/enum/status";
 
 export interface Image {
   type: string;
