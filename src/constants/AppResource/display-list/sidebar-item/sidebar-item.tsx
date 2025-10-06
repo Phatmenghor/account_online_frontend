@@ -44,17 +44,17 @@ export function useNavItems() {
           title: tT("trainee.history"),
           href: ROUTES.DASHBOARD.ATTENDANCE.HISTORY,
         },
+        {
+          title: t("trainee"),
+          href: ROUTES.DASHBOARD.TRAINEE,
+          icon: FolderClosed,
+        },
       ],
     },
     {
       title: t("application"),
       href: ROUTES.DASHBOARD.APPLICATION,
       icon: Dock,
-    },
-    {
-      title: t("trainee"),
-      href: ROUTES.DASHBOARD.TRAINEE,
-      icon: FolderClosed,
     },
   ];
 }
