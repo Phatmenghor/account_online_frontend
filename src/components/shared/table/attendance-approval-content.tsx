@@ -158,23 +158,27 @@ export const createAttendanceApprovalTableColumns = ({
       render: (attendance) => (
         <div className="flex items-center gap-2">
           <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={attendance.status !== "PENDING" && canApprove} // Only pending can be approved/cancelled
-                  onClick={() => handleOpenApprovalModal(attendance)}
-                >
-                  {attendance.status === "PENDING" ? "Approve/Reject" : "View"}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {attendance.status === "PENDING"
-                  ? "Approve or Cancel this request"
-                  : "View details"}
-              </TooltipContent>
-            </Tooltip>
+            {canApprove && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={attendance.status !== "PENDING"}
+                    onClick={() => handleOpenApprovalModal(attendance)}
+                  >
+                    {attendance.status === "PENDING"
+                      ? "Approve/Reject"
+                      : "View"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {attendance.status === "PENDING"
+                    ? "Approve or Cancel this request"
+                    : "View details"}
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             <Tooltip>
               <TooltipTrigger asChild>

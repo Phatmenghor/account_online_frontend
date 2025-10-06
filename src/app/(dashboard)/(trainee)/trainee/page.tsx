@@ -81,7 +81,7 @@ function TraineePageContent() {
       const response = await getTraineeService({
         search: debouncedSearchQuery,
         pageNo: currentPage,
-        pageSize: 100,
+        pageSize: 10,
       });
       setTrainees(response);
     } catch (error: any) {

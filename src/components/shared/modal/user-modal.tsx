@@ -148,7 +148,7 @@ export default function ModalUser({
         email: updateData.email?.trim(),
         fullName: updateData.fullName?.trim(),
         status: updateData.status,
-        userPermission: updateData.userPermission || UserPermission.NORMAL,
+        userPermission: updateData.userPermission ?? UserPermission.NORMAL,
         position: updateData.position?.trim(),
         profileUrl: updateData.profileUrl?.trim(),
       };

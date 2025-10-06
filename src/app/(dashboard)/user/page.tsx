@@ -142,6 +142,7 @@ function UserPageContent() {
         const response = await createUserService({
           email: createData.email,
           fullName: createData.fullName,
+          userPermission: createData.userPermission,
           password: createData.password,
           role: createData.role,
           username: createData.username,
