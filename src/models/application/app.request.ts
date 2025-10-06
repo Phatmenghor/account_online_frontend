@@ -20,7 +20,7 @@ export interface UpdateAppReq {
 
 export interface AllAppReq {
   search: string;
-  pageNo: number;
-  pageSize: number;
+  pageNo?: number;
+  pageSize?: number;
   applicationStatus?: string;
 }

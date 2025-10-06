@@ -2,13 +2,38 @@ import { AllAppReq, CreateAppReq, UpdateAppReq } from "@/models/application/app.
 import { axiosClientWithAuth } from "@/utils/axios";
 import axios from "axios";
 
-export async function getAppService(request: AllAppReq) {
+export async function getAllAppService(request: AllAppReq) {
   try {
     const response = await axiosClientWithAuth.post(
       "/api/application/all",
       request
     );
     return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const raw = error.response?.data;
+      const message = raw?.message || "Failed to fetch applications.";
+      console.error("Axios error:", message);
+
+      throw { errorMessage: message, rawError: raw };
+    } else {
+      console.error("Unexpected error:", error);
+      throw {
+        errorMessage:
+          "An unexpected error occurred while fetching applications.",
+        rawError: error,
+      };
+    }
+  }
+}
+
+export async function getAllAppExcelService(request: AllAppReq){
+  try {
+    const response = await axiosClientWithAuth.post(
+      "/api/application/all-list",
+      request
+    );
+    return response.data;   // we don't have "response.data.data", cuz backend doesn't have content: {} (check swagger) or allDataResponse?.data
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;

@@ -1,5 +1,7 @@
 "use client";
 
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 import { Suspense } from "react";
 import { DeleteConfirmationDialog } from "@/components/shared/dialog/dialog-delete";
 import { CustomPagination } from "@/components/shared/pagination/custom-pagination";
@@ -34,7 +36,8 @@ import {
 import {
   createAppService,
   deleteAppService,
-  getAppService,
+  getAllAppExcelService,
+  getAllAppService,
   updateAppService,
 } from "@/services/dashboard/application/app.service";
 import ModalApplication from "@/components/shared/modal/application-modal";
@@ -49,6 +52,7 @@ import {
 } from "@/components/ui/select";
 import { createApplicationTableColumns } from "@/components/shared/table/applicatioin-content";
 import ApplicationViewModal from "@/components/shared/modal/application-detail-modal";
+import { format } from "date-fns";
 
 function ApplicationPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -87,7 +91,7 @@ function ApplicationPageContent() {
   const loadApplications = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await getAppService({
+      const response = await getAllAppService({
         search: debouncedSearchQuery,
         pageNo: currentPage,
         pageSize: 100,
@@ -245,80 +249,195 @@ function ApplicationPageContent() {
     }
   };
 
-  const handleExportToExcel = async (data: ApplicationModel[] | null) => {
+const handleExportToExcel = async () => {
+  setIsSubmitting(true);
+
+  try {
     setIsExportingToExcel(true);
-    try {
-      // Define columns based on ApplicationModel
-      const columns: ExcelColumn[] = [
-        { header: "ID", key: "id", width: 8, type: "number" },
-        { header: "Project Name", key: "projectName", width: 25, type: "text" },
-        { header: "Department", key: "department", width: 15, type: "text" },
-        { header: "Year", key: "year", width: 10, type: "text" },
-        {
-          header: "Application Status",
-          key: "applicationStatus",
-          width: 20,
-          type: "text",
-        },
-        { header: "URL Link", key: "urlLink", width: 30, type: "text" },
-        {
-          header: "Members Involved",
-          key: "memberInvolved",
-          width: 25,
-          type: "text",
-        },
-        { header: "Remark", key: "remark", width: 30, type: "text" },
-        {
-          header: "Created Date",
-          key: "createdAt",
-          width: 18,
-          type: "date",
-          format: "mm/dd/yyyy",
-        },
-        {
-          header: "Updated Date",
-          key: "updatedAt",
-          width: 18,
-          type: "date",
-          format: "mm/dd/yyyy",
-        },
-      ];
 
-      // Create Excel exporter
-      const exporter = new ExcelExporter({
-        filename: "applications.xlsx",
-        title: "Application Management Report",
-        author: "IT Department",
-        useAlternateRows: true,
-        protection: {
-          password: "88889999",
-          deleteRows: false,
-          selectLockedCells: true,
-          selectUnlockedCells: true,
-        },
-      });
+    // Create filter object for API call
+    const exportFilter = {
+      search: debouncedSearchQuery,// Large number to get all records
+      applicationStatus: applicationStatus !== "all" ? applicationStatus : undefined,
+    };
 
-      // Configure sheet
-      const sheetConfig: ExcelSheet = {
-        name: "Applications",
-        data: data ?? [],
-        columns,
-        autoFilter: true,
-        freezeRows: 1,
-        sortBy: [{ key: "id", order: "asc" }],
+    // Fetch all data for export using the Excel service
+    const allDataResponse = await getAllAppExcelService(exportFilter);
+
+    console.log("Export response:", allDataResponse);
+
+    // The API returns data in response.data array
+    const applicationData = allDataResponse?.data || [];
+    const totalCount = applicationData.length;
+
+    if (totalCount === 0) {
+      toast.warning("No data available to export.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Check Excel limit
+    const EXCEL_LIMIT = 10000; // Adjust based on your Constants
+    if (totalCount > EXCEL_LIMIT) {
+      toast.info(
+        `Only ${EXCEL_LIMIT} items can be exported. Too many records. Please filter the data.`
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!Array.isArray(applicationData) || applicationData.length === 0) {
+      toast.warning("No data available to export.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Create workbook
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Applications");
+
+    // Define columns
+    const columns: string[] = [
+      "No",
+      "Project Name",
+      "Department",
+      "Year",
+      "Application Status",
+      "URL Link",
+      "Members Involved",
+      "Remark",
+      "Created Date",
+      "Updated Date",
+    ];
+
+    // Add title row at Row 1
+    worksheet.mergeCells(1, 1, 1, columns.length);
+    const titleCell = worksheet.getCell("A1");
+    titleCell.value = "Application Management Report";
+    titleCell.font = { size: 16, bold: true, color: { argb: "FFFFFFFF" } };
+    titleCell.alignment = { vertical: "middle", horizontal: "center" };
+    titleCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF1F4E78" },
+    };
+
+    // Add total count row at Row 2
+    worksheet.mergeCells(2, 1, 2, columns.length);
+    const totalCell = worksheet.getCell("A2");
+    totalCell.value = `Total Applications: ${totalCount}`;
+    totalCell.font = { size: 12, bold: true, color: { argb: "FF000000" } };
+    totalCell.alignment = { vertical: "middle", horizontal: "center" };
+    totalCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFDDDDDD" },
+    };
+
+    // Add header row at Row 4
+    const headerRow = worksheet.getRow(4);
+    columns.forEach((text: string, idx: number) => {
+      const cell = headerRow.getCell(idx + 1);
+      cell.value = text;
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF007ACC" },
+      };
+      cell.border = {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" },
       };
 
-      exporter.addSheet(sheetConfig);
-      await exporter.export();
+      // Adjust column widths
+      const columnWidths = [5, 25, 15, 10, 20, 30, 25, 30, 18, 18];
+      worksheet.getColumn(idx + 1).width = columnWidths[idx];
+    });
 
-      AppToast({ type: "success", message: "Successfully exported to Excel" });
-    } catch (error: any) {
-      AppToast({ type: "error", message: "Failed to export to Excel" });
-      console.error("Error exporting to Excel:", error);
-    } finally {
-      setIsExportingToExcel(false);
-    }
-  };
+    // Add data rows starting at row 5
+    applicationData.forEach((item: ApplicationModel, i: number) => {
+      const row = worksheet.addRow([
+        i + 1,
+        item.projectName || "---",
+        item.department || "---",
+        item.year || "---",
+        item.applicationStatus || "---",
+        item.urlLink || "---",
+        item.memberInvolved || "---",
+        item.remark || "---",
+        item.createdAt || "---",
+        item.updatedAt || "---",
+      ]);
+
+      // Zebra striping
+      row.eachCell((cell) => {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: i % 2 === 0 ? "FFF3F3F3" : "FFFFFFFF" },
+        };
+        cell.border = {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        };
+        cell.alignment = { vertical: "middle", horizontal: "center" };
+      });
+
+      // Color the "Application Status" column (5th column)
+      const statusCell = row.getCell(5);
+      const statusValue = item.applicationStatus?.toLowerCase();
+
+      if (statusValue === "inactive" || statusValue === "suspended") {
+        statusCell.font = { color: { argb: "FFFF0000" }, bold: true };
+      } else if (statusValue === "active") {
+        statusCell.font = { color: { argb: "FF00AA00" }, bold: true };
+      }
+    });
+
+    // Format date columns (9th and 10th columns)
+    [9, 10].forEach((colIndex) => {
+      worksheet.getColumn(colIndex).eachCell((cell, rowNumber: number) => {
+        if (rowNumber > 4 && cell.value) {
+          try {
+            const dateValue = new Date(cell.value as string);
+            if (!isNaN(dateValue.getTime())) {
+              cell.value = dateValue;
+              cell.numFmt = "dd-mm-yyyy";
+            }
+          } catch (error) {
+            console.warn("Date parsing failed for:", cell.value);
+          }
+        }
+      });
+    });
+
+    // Generate and save file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const fileName = `applications_${format(new Date(), "dd-MM-yyyy")}.xlsx`;
+    saveAs(blob, fileName);
+
+    const exportedCount = applicationData.length;
+    toast.success(
+      `Excel file exported successfully! Total records: ${exportedCount}`
+    );
+  } catch (error: unknown) {
+    console.error("Error exporting to Excel:", error);
+    toast.error("Error exporting to Excel. Please try again.");
+  } finally {
+    setIsSubmitting(false);
+    setIsExportingToExcel(false);
+  }
+};
 
   const handleEditApplication = (app: ApplicationModel) => {
     setSelectedApplication(app);
@@ -353,7 +472,7 @@ function ApplicationPageContent() {
                 aria-label="search-application"
                 autoComplete="search-application"
                 type="search"
-                placeholder={t("project.search-project")}
+                placeholder={t("application.search-application")}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"
@@ -380,7 +499,8 @@ function ApplicationPageContent() {
           <div className="flex gap-4">
             <div>
               <Button
-                onClick={() => handleExportToExcel(applications?.content ?? [])}
+                // onClick={() => handleExportToExcel(applications?.content ?? [])}
+                onClick={handleExportToExcel}
                 size="lg"
                 variant="outline"
                 className="gap-2 text-sm sm:text-base h-10 hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6"

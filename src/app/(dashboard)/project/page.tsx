@@ -1,5 +1,7 @@
 "use client";
 
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 import { Suspense } from "react";
 import { DeleteConfirmationDialog } from "@/components/shared/dialog/dialog-delete";
 import { CustomPagination } from "@/components/shared/pagination/custom-pagination";
@@ -36,6 +38,7 @@ import {
 import {
   createProjectService,
   deleteProjectService,
+  getAllExcelProjectService,
   getProjectService,
   updateProjectService,
 } from "@/services/dashboard/project/project.service";
@@ -49,6 +52,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { format } from "date-fns";
 
 function ProjectPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -258,85 +262,211 @@ function ProjectPageContent() {
     }
   };
 
-  const handleExportToExcel = async (data: ProjectModel[] | null) => {
+const handleExportToExcel = async () => {
+  setIsSubmitting(true);
+
+  try {
     setIsExportingToExcel(true);
-    try {
-      // Define columns based on ProjectModel
-      const columns: ExcelColumn[] = [
-        { header: "ID", key: "id", width: 8, type: "number" },
-        { header: "Project Name", key: "projectName", width: 25, type: "text" },
-        { header: "Type", key: "type", width: 15, type: "text" },
-        { header: "Host Server", key: "hostServer", width: 20, type: "text" },
-        { header: "Host Port", key: "hostPort", width: 10, type: "number" },
-        { header: "Database Name", key: "dbName", width: 20, type: "text" },
-        { header: "Database Type", key: "dbType", width: 15, type: "text" },
-        { header: "Database Server", key: "dbServer", width: 20, type: "text" },
-        {
-          header: "Project Status",
-          key: "projectStatus",
-          width: 20,
-          type: "text",
-        },
-        { header: "Git Url", key: "gitUrl", width: 20, type: "text" },
-        { header: "Git Branch", key: "gitBranch", width: 20, type: "text" },
-        {
-          header: "Members Involved",
-          key: "memberInvolved",
-          width: 25,
-          type: "text",
-        },
-        { header: "Remark", key: "remark", width: 30, type: "text" },
-        {
-          header: "Created Date",
-          key: "createdAt",
-          width: 18,
-          type: "date",
-          format: "mm/dd/yyyy",
-        },
-        {
-          header: "Updated Date",
-          key: "updatedAt",
-          width: 18,
-          type: "date",
-          format: "mm/dd/yyyy",
-        },
-      ];
 
-      // Create Excel exporter
-      const exporter = new ExcelExporter({
-        filename: "projects.xlsx",
-        title: "Project Management Report",
-        author: "IT Department",
-        useAlternateRows: true,
-        protection: {
-          password: "88889999",
-          deleteRows: false,
-          selectLockedCells: true,
-          selectUnlockedCells: true,
-        },
-      });
+    // Create filter object for API call
+    const exportFilter = {
+      search: debouncedSearchQuery,
+      pageNo: 0,
+      pageSize: 100000, // Large number to get all records
+      projectStatus: projectStatus !== "all" ? projectStatus : undefined,
+    };
 
-      // Configure sheet
-      const sheetConfig: ExcelSheet = {
-        name: "Projects",
-        data: data ?? [],
-        columns,
-        autoFilter: true,
-        freezeRows: 1,
-        sortBy: [{ key: "id", order: "asc" }],
+    // Fetch all data for export using the Excel service
+    const allDataResponse = await getAllExcelProjectService(exportFilter);
+
+    console.log("Export response:", allDataResponse);
+    console.log("Data array:", allDataResponse?.data);
+    console.log("Data count:", allDataResponse?.data?.length);
+
+    // The API returns data in response.data array
+    const projectData = allDataResponse?.data || [];
+    const totalCount = projectData.length;
+
+    if (totalCount === 0) {
+      toast.warning("No data available to export.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Check Excel limit
+    const EXCEL_LIMIT = 10000; // Adjust based on your Constants
+    if (totalCount > EXCEL_LIMIT) {
+      toast.info(
+        `Only ${EXCEL_LIMIT} items can be exported. Too many records. Please filter the data.`
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!Array.isArray(projectData) || projectData.length === 0) {
+      toast.warning("No data available to export.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Create workbook
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Projects");
+
+    // Define columns
+    const columns: string[] = [
+      "No",
+      "Project Name",
+      "Type",
+      "Host Server",
+      "Host Port",
+      "Database Name",
+      "Database Type",
+      "Database Server",
+      "Project Status",
+      "Git Url",
+      "Git Branch",
+      "Members Involved",
+      "Remark",
+      "Created Date",
+      "Updated Date",
+    ];
+
+    // Add title row at Row 1
+    worksheet.mergeCells(1, 1, 1, columns.length);
+    const titleCell = worksheet.getCell("A1");
+    titleCell.value = "Project Management Report";
+    titleCell.font = { size: 16, bold: true, color: { argb: "FFFFFFFF" } };
+    titleCell.alignment = { vertical: "middle", horizontal: "center" };
+    titleCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF1F4E78" },
+    };
+
+    // Add total count row at Row 2
+    worksheet.mergeCells(2, 1, 2, columns.length);
+    const totalCell = worksheet.getCell("A2");
+    totalCell.value = `Total Projects: ${totalCount}`;
+    totalCell.font = { size: 12, bold: true, color: { argb: "FF000000" } };
+    totalCell.alignment = { vertical: "middle", horizontal: "center" };
+    totalCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFDDDDDD" },
+    };
+
+    // Add header row at Row 4
+    const headerRow = worksheet.getRow(4);
+    columns.forEach((text: string, idx: number) => {
+      const cell = headerRow.getCell(idx + 1);
+      cell.value = text;
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF007ACC" },
+      };
+      cell.border = {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" },
       };
 
-      exporter.addSheet(sheetConfig);
-      await exporter.export();
+      // Adjust column widths
+      const columnWidths = [5, 25, 15, 20, 10, 20, 15, 20, 20, 20, 20, 25, 30, 18, 18];
+      worksheet.getColumn(idx + 1).width = columnWidths[idx];
+    });
 
-      AppToast({ type: "success", message: "Successfully exported to Excel" });
-    } catch (error: any) {
-      AppToast({ type: "error", message: "Failed to export to Excel" });
-      console.error("Error exporting to Excel:", error);
-    } finally {
-      setIsExportingToExcel(false);
-    }
-  };
+    // Add data rows starting at row 5
+    projectData.forEach((item: ProjectModel, i: number) => {
+      const row = worksheet.addRow([
+        i + 1,
+        item.projectName || "---",
+        item.type || "---",
+        item.hostServer || "---",
+        item.hostPort || "---",
+        item.dbName || "---",
+        item.dbType || "---",
+        item.dbServer || "---",
+        item.projectStatus || "---",
+        item.gitUrl || "---",
+        item.gitBranch || "---",
+        item.memberInvolved || "---",
+        item.remark || "---",
+        item.createdAt || "---",
+        item.updatedAt || "---",
+      ]);
+
+      // Zebra striping
+      row.eachCell((cell) => {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: i % 2 === 0 ? "FFF3F3F3" : "FFFFFFFF" },
+        };
+        cell.border = {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        };
+        cell.alignment = { vertical: "middle", horizontal: "center" };
+      });
+
+      // Color the "Project Status" column (9th column)
+      const statusCell = row.getCell(9);
+      const statusValue = item.projectStatus?.toLowerCase();
+
+      if (statusValue === "inactive" || statusValue === "suspended" || statusValue === "cancelled") {
+        statusCell.font = { color: { argb: "FFFF0000" }, bold: true };
+      } else if (statusValue === "active" || statusValue === "completed") {
+        statusCell.font = { color: { argb: "FF00AA00" }, bold: true };
+      } else if (statusValue === "pending" || statusValue === "in progress") {
+        statusCell.font = { color: { argb: "FFFF8C00" }, bold: true };
+      }
+    });
+
+    // Format date columns (14th and 15th columns)
+    [14, 15].forEach((colIndex) => {
+      worksheet.getColumn(colIndex).eachCell((cell, rowNumber: number) => {
+        if (rowNumber > 4 && cell.value) {
+          try {
+            const dateValue = new Date(cell.value as string);
+            if (!isNaN(dateValue.getTime())) {
+              cell.value = dateValue;
+              cell.numFmt = "dd-mm-yyyy";
+            }
+          } catch (error) {
+            console.warn("Date parsing failed for:", cell.value);
+          }
+        }
+      });
+    });
+
+    // Generate and save file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const fileName = `projects_${format(new Date(), "dd-MM-yyyy")}.xlsx`;
+    saveAs(blob, fileName);
+
+    const exportedCount = projectData.length;
+    toast.success(
+      `Excel file exported successfully! Total records: ${exportedCount}`
+    );
+  } catch (error: unknown) {
+    console.error("Error exporting to Excel:", error);
+    toast.error("Error exporting to Excel. Please try again.");
+  } finally {
+    setIsSubmitting(false);
+    setIsExportingToExcel(false);
+  }
+};
 
   const handleEditProject = (proj: ProjectModel) => {
     setSelectedProject(proj);
@@ -398,7 +528,7 @@ function ProjectPageContent() {
           <div className="flex gap-4">
             <div>
               <Button
-                onClick={() => handleExportToExcel(projects?.content ?? [])}
+                onClick={handleExportToExcel}
                 size="lg"
                 variant="outline"
                 className="gap-2 text-sm sm:text-base h-10 hover:bg-gray-200 duration-400 lg:text-lg px-3 sm:px-4 lg:px-6"
