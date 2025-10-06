@@ -95,8 +95,8 @@
       "history": "Attendance History"
     },
     "modal": {
-      "cancel": "Cancel Request",
-      "approval": "Approve Request",
+      "reject": "Reject",
+      "approval": "Approve",
       "approvalOrCancelTitle": "Approve or Cancel Attendance",
       "approvalOrCancelDesc": "You can approve or cancel this attendance request below.",
       "viewTitle": "Attendance Request",

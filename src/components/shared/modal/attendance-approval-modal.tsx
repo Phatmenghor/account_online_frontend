@@ -201,7 +201,7 @@ export default function ModalAttendanceApprovalOrCancel({
                 attendance.status === AttendanceStatus.CANCELLED
               }
             >
-              {t("cancel")}
+              {t("reject")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {t("approval")}

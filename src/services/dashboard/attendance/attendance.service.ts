@@ -118,10 +118,13 @@ export async function updateAttendanceService(
   updates: Partial<AttendanceReq>
 ) {
   try {
+    console.log("### updates", updates);
     const response = await axiosClientWithAuth.put(
       `/api/v1/attendance/${id}`,
       updates
     );
+
+    console.log("## ===res", response);
 
     return response.data.data;
   } catch (error) {

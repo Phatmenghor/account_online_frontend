@@ -140,7 +140,7 @@ export const createAttendanceApprovalTableColumns = ({
                   disabled={attendance.status !== "PENDING"} // Only pending can be approved/cancelled
                   onClick={() => handleOpenApprovalModal(attendance)}
                 >
-                  {attendance.status === "PENDING" ? "Approve/Cancel" : "View"}
+                  {attendance.status === "PENDING" ? "Approve/Reject" : "View"}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
