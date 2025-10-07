@@ -44,8 +44,8 @@ import {
 import { createApplicationTableColumns } from "@/components/shared/table/applicatioin-content";
 import ApplicationViewModal from "@/components/shared/modal/application-detail-modal";
 import { format } from "date-fns";
-import { STATUS_APPLICATION } from "@/constants/AppResource/filter/project";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
+import { STATUS_APPLICATION } from "@/constants/AppResource/filter/application";
 
 function ApplicationPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -334,7 +334,7 @@ function ApplicationPageContent() {
         const cell = headerRow.getCell(idx + 1);
         cell.value = text;
         cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-        cell.alignment = { vertical: "middle", horizontal: "center" };
+        cell.alignment = { vertical: "middle", horizontal: "left" };
         cell.fill = {
           type: "pattern",
           pattern: "solid",
@@ -380,7 +380,7 @@ function ApplicationPageContent() {
             left: { style: "thin" },
             right: { style: "thin" },
           };
-          cell.alignment = { vertical: "middle", horizontal: "center" };
+          cell.alignment = { vertical: "middle", horizontal: "left" };
         });
 
         // Color the "Application Status" column (5th column)

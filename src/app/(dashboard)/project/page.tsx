@@ -52,7 +52,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
-import { STATUS_APPLICATION } from "@/constants/AppResource/filter/project";
+import { STATUS_PROJECT } from "@/constants/AppResource/filter/project";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 function ProjectPageContent() {
@@ -363,7 +363,7 @@ function ProjectPageContent() {
         const cell = headerRow.getCell(idx + 1);
         cell.value = text;
         cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-        cell.alignment = { vertical: "middle", horizontal: "center" };
+        cell.alignment = { vertical: "middle", horizontal: "left" };
         cell.fill = {
           type: "pattern",
           pattern: "solid",
@@ -416,7 +416,7 @@ function ProjectPageContent() {
             left: { style: "thin" },
             right: { style: "thin" },
           };
-          cell.alignment = { vertical: "middle", horizontal: "center" };
+          cell.alignment = { vertical: "middle", horizontal: "left" };
         });
 
         // Color the "Project Status" column (9th column)
@@ -523,7 +523,7 @@ function ProjectPageContent() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                {STATUS_APPLICATION.map((status) => (
+                {STATUS_PROJECT.map((status) => (
                   <SelectItem key={status.value} value={status.value}>
                     {status.label}
                   </SelectItem>

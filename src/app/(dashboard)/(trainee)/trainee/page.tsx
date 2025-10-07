@@ -305,7 +305,7 @@ function TraineePageContent() {
         const cell = headerRow.getCell(idx + 1);
         cell.value = text;
         cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-        cell.alignment = { vertical: "middle", horizontal: "center" };
+        cell.alignment = { vertical: "middle", horizontal: "left" };
         cell.fill = {
           type: "pattern",
           pattern: "solid",
