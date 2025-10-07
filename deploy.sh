@@ -22,11 +22,11 @@ print_error() {
 # Exit on any error
 set -e
 
-print_status "Starting deployment process for Internal Dev frontend on port 2333..."
+print_status "Starting deployment process for Internal Dev frontend on port 4050..."
 
-# Pull latest code from development branch
-print_status "Pulling latest code from development branch..."
-git pull origin development
+# Pull latest code from test branch
+print_status "Pulling latest code from test branch..."
+git pull origin test
 
 # Install dependencies with force flag
 print_status "Installing dependencies..."
@@ -48,8 +48,8 @@ pm2 stop ksit 2>/dev/null || true
 print_status "Deleting existing PM2 process..."
 pm2 delete ksit 2>/dev/null || true
 
-# Create PM2 configuration file with port 8443
-print_status "Creating PM2 configuration for port 8443..."
+# Create PM2 configuration file with port 4050
+print_status "Creating PM2 configuration for port 4050..."
 cat > pm2.config.js << 'EOF'
 module.exports = {
   apps: [
@@ -84,14 +84,14 @@ module.exports = {
 EOF
 
 # Start PM2 process
-print_status "Starting PM2 process on port 2333..."
+print_status "Starting PM2 process on port 4040..."
 pm2 start pm2.config.js
 
 # Save PM2 configuration
 print_status "Saving PM2 configuration..."
 pm2 save
 
-print_status "🎉 Deployment completed! App running on http://192.168.103.106:2333"
+print_status "🎉 Deployment completed! App running on http://192.168.103.106:4050"
 
 # Show PM2 status
 print_status "Current PM2 status:"
