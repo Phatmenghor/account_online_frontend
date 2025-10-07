@@ -54,7 +54,7 @@ cat > pm2.config.js << 'EOF'
 module.exports = {
   apps: [
     {
-      name: 'internal_dev_frontend',
+      name: 'internal_dev_frontend-testing',
       script: 'npm',
       args: 'start',
       instances: 1,
@@ -62,8 +62,8 @@ module.exports = {
       watch: false,
       env: {
         NODE_ENV: 'production',
-        PORT: '3015',
-        EXTERNAL_PORT: '9999'
+        PORT: '4040',
+        EXTERNAL_PORT: '4050'
       },
       env_file: '.env.production',
       log_file: './logs/app.log',

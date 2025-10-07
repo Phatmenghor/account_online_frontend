@@ -5,16 +5,16 @@
 #=============================================================================
 
 # Project Information
-PROJECT_DISPLAY_NAME="Internal Dev frontend App"
-APP_NAME="internal-dev-frontend"
+PROJECT_DISPLAY_NAME="Internal Dev frontend App Testing"
+APP_NAME="internal-dev-frontend-testing"
 PROJECT_DESCRIPTION="Internal Dev Frontend Application"
 
 # Port Configuration
-EXTERNAL_PORT=9999
-INTERNAL_PORT=3015
+EXTERNAL_PORT=4050
+INTERNAL_PORT=4040
 
 # API Configuration
-FRONTEND_API_URL="http://192.168.103.106:9999"
+FRONTEND_API_URL="http://192.168.103.106:4050"
 BACKEND_API_URL="http://192.168.103.106:8888"
 SERVER_IP="192.168.103.106"
 
