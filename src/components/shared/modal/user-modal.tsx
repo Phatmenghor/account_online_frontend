@@ -228,7 +228,11 @@ export default function ModalUser({
 
                 {/* Username & Email */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                  <div
+                    className={`space-y-2 transition-all duration-300 ${
+                      isCreate ? "block" : "hidden"
+                    }`}
+                  >
                     <Label htmlFor="username" className="text-sm font-medium">
                       Username{" "}
                       {isCreate && <span className="text-red-500">*</span>}
@@ -255,6 +259,7 @@ export default function ModalUser({
                     )}
                   </div>
 
+                  {/* Email Field */}
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-medium">
                       Email{" "}
