@@ -1,7 +1,0 @@
-export enum ApplicationStatus {
-  UAT = "UAT",
-  PRODUCTION = "PRODUCTION",
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  DEVELOPMENT = "DEVELOPMENT",
-}

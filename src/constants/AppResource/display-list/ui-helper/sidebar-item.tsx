@@ -26,35 +26,5 @@ export function useNavItems() {
       href: ROUTES.DASHBOARD.USER,
       icon: User,
     },
-    {
-      title: t("project"),
-      href: ROUTES.DASHBOARD.PROJECT,
-      icon: Code,
-    },
-    {
-      title: tT("trainee.index"),
-      href: "#", // main parent, not clickable
-      icon: Calendar1Icon,
-      subItems: [
-        {
-          title: tT("trainee.request"),
-          href: ROUTES.DASHBOARD.ATTENDANCE.REQUEST,
-        },
-        {
-          title: tT("trainee.history"),
-          href: ROUTES.DASHBOARD.ATTENDANCE.HISTORY,
-        },
-        {
-          title: t("trainee"),
-          href: ROUTES.DASHBOARD.TRAINEE,
-          icon: FolderClosed,
-        },
-      ],
-    },
-    {
-      title: t("application"),
-      href: ROUTES.DASHBOARD.APPLICATION,
-      icon: Dock,
-    },
   ];
 }
