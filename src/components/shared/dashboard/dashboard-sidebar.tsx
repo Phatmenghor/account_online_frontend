@@ -90,7 +90,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
             />
             {isOpen && (
               <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                Internal Dev
+                Account Online
               </span>
             )}
           </Link>

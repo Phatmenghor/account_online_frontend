@@ -207,7 +207,7 @@ export default function ModalUser({
                 <p className="text-muted-foreground">No user data available</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {/* Error Display */}
                 {error && (
                   <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
@@ -226,284 +226,328 @@ export default function ModalUser({
                   />
                 )}
 
-                {/* Username & Email */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div
-                    className={`space-y-2 transition-all duration-300 ${
-                      isCreate ? "block" : "hidden"
-                    }`}
-                  >
-                    <Label htmlFor="username" className="text-sm font-medium">
-                      Username{" "}
-                      {isCreate && <span className="text-red-500">*</span>}
-                    </Label>
-                    <Controller
-                      control={control}
-                      name="username"
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id="username"
-                          placeholder="johndoe"
-                          disabled={isSubmitting}
-                          className={`transition-colors focus:border-green-500 ${
-                            errors.username ? "border-red-500" : ""
-                          }`}
-                        />
-                      )}
-                    />
-                    {errors.username && (
-                      <p className="text-sm text-red-600">
-                        {errors.username.message as string}
-                      </p>
-                    )}
-                  </div>
+                {/* Account Credentials Section */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Account Credentials
+                  </h3>
 
-                  {/* Email Field */}
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium">
-                      Email{" "}
-                      {isCreate && <span className="text-red-500">*</span>}
-                    </Label>
-                    <Controller
-                      control={control}
-                      name="email"
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id="email"
-                          type="email"
-                          placeholder="john@example.com"
-                          disabled={isSubmitting}
-                          className={`transition-colors focus:border-green-500 ${
-                            errors.email ? "border-red-500" : ""
-                          }`}
-                        />
-                      )}
-                    />
-                    {errors.email && (
-                      <p className="text-sm text-red-600">
-                        {errors.email.message as string}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Username & Email */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="userPermission"
-                      className="text-sm font-medium"
-                    >
-                      User Permission{" "}
-                      {isCreate && <span className="text-red-500">*</span>}
-                    </Label>
-                    <Controller
-                      control={control}
-                      name="userPermission"
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          disabled={isSubmitting}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Username - Create Mode Only */}
+                    {isCreate && (
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="username"
+                          className="text-sm font-medium"
                         >
-                          <SelectTrigger
-                            id="userPermission"
-                            className="transition-colors focus:border-green-500"
-                          >
-                            <SelectValue placeholder="Select user permission" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {USER_PERMISSION_OPTIONS.map((r) => (
-                              <SelectItem key={r.value} value={r.value}>
-                                {r.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.userPermission && (
-                      <p className="text-sm text-red-600">
-                        {errors.userPermission.message as string}
-                      </p>
+                          Username <span className="text-red-500">*</span>
+                        </Label>
+                        <Controller
+                          control={control}
+                          name="username"
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              id="username"
+                              placeholder="johndoe"
+                              disabled={isSubmitting}
+                              className={`transition-colors ${
+                                errors.username ? "border-red-500" : ""
+                              }`}
+                            />
+                          )}
+                        />
+                        {errors.username && (
+                          <p className="text-sm text-red-600">
+                            {errors.username.message as string}
+                          </p>
+                        )}
+                      </div>
                     )}
-                  </div>
-                </div>
 
-                {/* Password (create only) */}
-                {isCreate && (
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm font-medium">
-                      Password <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="relative">
+                    {/* Username - Edit Mode (Read Only) */}
+                    {!isCreate && userDetail && (
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="username-readonly"
+                          className="text-sm font-medium"
+                        >
+                          Username (ID Card)
+                        </Label>
+                        <Input
+                          id="username-readonly"
+                          value={userDetail.idCard || "Not provided"}
+                          disabled
+                          className="bg-muted/50 cursor-not-allowed"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Username cannot be modified
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Email Field */}
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm font-medium">
+                        Email{" "}
+                        {isCreate && <span className="text-red-500">*</span>}
+                      </Label>
                       <Controller
                         control={control}
-                        name="password"
+                        name="email"
                         render={({ field }) => (
                           <Input
                             {...field}
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Enter secure password"
+                            id="email"
+                            type="email"
+                            placeholder="john@example.com"
                             disabled={isSubmitting}
-                            className={`transition-colors focus:border-green-500 pr-10 ${
-                              (errors as any).password ? "border-red-500" : ""
+                            className={`transition-colors ${
+                              errors.email ? "border-red-500" : ""
                             }`}
                           />
                         )}
                       />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        onClick={() => setShowPassword((p) => !p)}
-                        tabIndex={-1}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
+                      {errors.email && (
+                        <p className="text-sm text-red-600">
+                          {errors.email.message as string}
+                        </p>
+                      )}
                     </div>
-                    {(errors as any).password && (
-                      <p className="text-sm text-red-600">
-                        {(errors as any).password.message as string}
-                      </p>
-                    )}
                   </div>
-                )}
 
-                {/* Full Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-sm font-medium">
-                    Full Name
-                  </Label>
-                  <Controller
-                    control={control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        id="fullName"
-                        placeholder="John Doe"
-                        disabled={isSubmitting}
-                        className="transition-colors focus:border-green-500"
-                      />
-                    )}
-                  />
+                  {/* Password - Create Mode Only */}
+                  {isCreate && (
+                    <div className="space-y-2">
+                      <Label htmlFor="password" className="text-sm font-medium">
+                        Password <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="relative">
+                        <Controller
+                          control={control}
+                          name="password"
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              id="password"
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Enter secure password"
+                              disabled={isSubmitting}
+                              className={`transition-colors pr-10 ${
+                                (errors as any).password ? "border-red-500" : ""
+                              }`}
+                            />
+                          )}
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                          onClick={() => setShowPassword((p) => !p)}
+                          tabIndex={-1}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                      {(errors as any).password && (
+                        <p className="text-sm text-red-600">
+                          {(errors as any).password.message as string}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {/* Position */}
-                <div className="space-y-2">
-                  <Label htmlFor="position" className="text-sm font-medium">
-                    Position
-                  </Label>
-                  <Controller
-                    control={control}
-                    name="position"
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        id="position"
-                        placeholder="Software Engineer"
-                        disabled={isSubmitting}
-                        className="transition-colors focus:border-green-500"
+                {/* Personal Information Section */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Personal Information
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Full Name */}
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName" className="text-sm font-medium">
+                        Full Name
+                      </Label>
+                      <Controller
+                        control={control}
+                        name="fullName"
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            id="fullName"
+                            placeholder="John Doe"
+                            disabled={isSubmitting}
+                            className="transition-colors"
+                          />
+                        )}
                       />
-                    )}
-                  />
+                    </div>
+
+                    {/* Position */}
+                    <div className="space-y-2">
+                      <Label htmlFor="position" className="text-sm font-medium">
+                        Position
+                      </Label>
+                      <Controller
+                        control={control}
+                        name="position"
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            id="position"
+                            placeholder="Software Engineer"
+                            disabled={isSubmitting}
+                            className="transition-colors"
+                          />
+                        )}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Role (create only) */}
-                {isCreate && (
-                  <div className="space-y-2">
-                    <Label htmlFor="role" className="text-sm font-medium">
-                      Role
-                    </Label>
-                    <Controller
-                      control={control}
-                      name="role"
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          disabled={isSubmitting}
-                        >
-                          <SelectTrigger
-                            id="role"
-                            className="transition-colors focus:border-green-500"
-                          >
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {ROLE_FILTER.map((r) => (
-                              <SelectItem key={r.value} value={r.value}>
-                                {r.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-                )}
+                {/* Permissions & Access Section */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Permissions & Access
+                  </h3>
 
-                {/* Status (update only) */}
-                {!isCreate && (
-                  <div className="space-y-2">
-                    <Label htmlFor="status" className="text-sm font-medium">
-                      Status <span className="text-red-500">*</span>
-                    </Label>
-                    <Controller
-                      control={control}
-                      name="status"
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          disabled={isSubmitting}
-                        >
-                          <SelectTrigger
-                            id="status"
-                            className="transition-colors focus:border-green-500"
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* User Permission */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="userPermission"
+                        className="text-sm font-medium"
+                      >
+                        User Permission{" "}
+                        {isCreate && <span className="text-red-500">*</span>}
+                      </Label>
+                      <Controller
+                        control={control}
+                        name="userPermission"
+                        render={({ field }) => (
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={isSubmitting}
                           >
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {STATUS_USER_OPTIONS.map((s) => (
-                              <SelectItem key={s.value} value={s.value}>
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className={`w-2 h-2 rounded-full ${
-                                      s.value === Status.ACTIVE
-                                        ? "bg-green-500"
-                                        : "bg-gray-400"
-                                    }`}
-                                  ></div>
-                                  {s.label}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                            <SelectTrigger
+                              id="userPermission"
+                              className="transition-colors"
+                            >
+                              <SelectValue placeholder="Select user permission" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {USER_PERMISSION_OPTIONS.map((r) => (
+                                <SelectItem key={r.value} value={r.value}>
+                                  {r.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.userPermission && (
+                        <p className="text-sm text-red-600">
+                          {errors.userPermission.message as string}
+                        </p>
                       )}
-                    />
-                    {errors.status && (
-                      <p className="text-sm text-red-600">
-                        {errors.status.message as string}
-                      </p>
+                    </div>
+
+                    {/* Role - Create Mode Only */}
+                    {isCreate && (
+                      <div className="space-y-2">
+                        <Label htmlFor="role" className="text-sm font-medium">
+                          Role
+                        </Label>
+                        <Controller
+                          control={control}
+                          name="role"
+                          render={({ field }) => (
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              disabled={isSubmitting}
+                            >
+                              <SelectTrigger
+                                id="role"
+                                className="transition-colors"
+                              >
+                                <SelectValue placeholder="Select role" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {ROLE_FILTER.map((r) => (
+                                  <SelectItem key={r.value} value={r.value}>
+                                    {r.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {/* Status - Edit Mode Only */}
+                    {!isCreate && (
+                      <div className="space-y-2">
+                        <Label htmlFor="status" className="text-sm font-medium">
+                          Status <span className="text-red-500">*</span>
+                        </Label>
+                        <Controller
+                          control={control}
+                          name="status"
+                          render={({ field }) => (
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              disabled={isSubmitting}
+                            >
+                              <SelectTrigger
+                                id="status"
+                                className="transition-colors"
+                              >
+                                <SelectValue placeholder="Select status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {STATUS_USER_OPTIONS.map((s) => (
+                                  <SelectItem key={s.value} value={s.value}>
+                                    <div className="flex items-center gap-2">
+                                      <div
+                                        className={`w-2 h-2 rounded-full ${
+                                          s.value === Status.ACTIVE
+                                            ? "bg-green-500"
+                                            : "bg-gray-400"
+                                        }`}
+                                      ></div>
+                                      {s.label}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.status && (
+                          <p className="text-sm text-red-600">
+                            {errors.status.message as string}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
-                )}
+                </div>
 
                 {/* User Info Card - Read Only (edit mode only) */}
                 {!isCreate && userDetail && (
-                  <div className="mt-6 p-4 bg-muted/30 rounded-lg border border-border">
+                  <div className="mt-2 p-4 bg-muted/30 rounded-lg border border-border">
                     <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                       <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      User Information (Read Only)
+                      System Information (Read Only)
                     </h4>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
@@ -511,25 +555,11 @@ export default function ModalUser({
                         <p className="font-medium">{userDetail.id}</p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">ID Card:</span>
-                        <p className="font-medium">
-                          {userDetail.idCard || "Not provided"}
-                        </p>
-                      </div>
-                      <div>
                         <span className="text-muted-foreground">
                           Current Status:
                         </span>
                         <p className="font-medium">
                           {userDetail.userStatus || "Unknown"}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">
-                          Profile URL:
-                        </span>
-                        <p className="font-medium truncate">
-                          {userDetail.profileUrl || "Not provided"}
                         </p>
                       </div>
                     </div>
