@@ -1,0 +1,19 @@
+export interface CreateOccupationReq {
+  nameEn: string
+  nameKh: string
+  status: string
+}
+
+export interface UpdateOccupationReq {
+  nameEn?: string
+  nameKh?: string
+  status?: string
+}
+
+export interface AllOccupationReq {
+  pageNo?: number;
+  pageSize?: number;
+  language?: string;
+  search?: string;
+  status?: string;
+}

@@ -41,7 +41,7 @@ export function useNavItems() {
         },
         {
           title: t("reference"),
-          href: ROUTES.DASHBOARD.STATIC.REFERECE,
+          href: ROUTES.DASHBOARD.STATIC.REFERENCE,
           icon: FolderClosed,
         },
       ],

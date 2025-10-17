@@ -1,7 +1,7 @@
 import {
-  AllMaritalModel,
-  MaritalModel,
-} from "@/models/static/marital/marital.response";
+  AllReferenceModel,
+  ReferenceModel,
+} from "@/models/static/reference/reference.response";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { Edit, Eye, Trash } from "lucide-react";
@@ -15,22 +15,22 @@ import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 import { Badge } from "@/components/ui/badge";
 
-interface MaritalTableHandlers {
-  handleEditMarital: (marital: MaritalModel) => void;
-  handleViewMaritalDetail: (marital: MaritalModel) => void;
-  handleDeleteMarital: (marital: MaritalModel) => void;
+interface ReferenceTableHandlers {
+  handleEditReference: (reference: ReferenceModel) => void;
+  handleViewReferenceDetail: (reference: ReferenceModel) => void;
+  handleDeleteReference: (reference: ReferenceModel) => void;
 }
 
-interface MaritalTableOptions {
-  data: AllMaritalModel | null;
-  handlers: MaritalTableHandlers;
+interface ReferenceTableOptions {
+  data: AllReferenceModel | null;
+  handlers: ReferenceTableHandlers;
 }
 
-export const createMaritalTableColumns = ({
+export const createReferenceTableColumns = ({
   data,
   handlers,
-}: MaritalTableOptions): TableColumn<MaritalModel>[] => {
-  const { handleEditMarital, handleViewMaritalDetail, handleDeleteMarital } =
+}: ReferenceTableOptions): TableColumn<ReferenceModel>[] => {
+  const { handleEditReference, handleViewReferenceDetail, handleDeleteReference } =
     handlers;
 
   const getStatusColor = (status: string) => {
@@ -65,8 +65,8 @@ export const createMaritalTableColumns = ({
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
-      render: (marital) => (
-        <span className="font-medium">{marital.nameEn || "---"}</span>
+      render: (reference) => (
+        <span className="font-medium">{reference.nameEn || "---"}</span>
       ),
     },
     {
@@ -75,8 +75,8 @@ export const createMaritalTableColumns = ({
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
-      render: (marital) => (
-        <span className="font-medium">{marital.nameKh || "---"}</span>
+      render: (reference) => (
+        <span className="font-medium">{reference.nameKh || "---"}</span>
       ),
     },
     {
@@ -85,10 +85,9 @@ export const createMaritalTableColumns = ({
       truncate: true,
       maxWidth: "150px",
       minWidth: "100px",
-      render: (marital) => (
-        // <span className="font-medium">{marital.status || "---"}</span>
-        <Badge className={getStatusColor(marital?.status ?? "")}>
-            <span className="ml-1">{marital?.status || "ACTIVE"}</span>
+      render: (reference) => (
+        <Badge className={getStatusColor(reference?.status ?? "")}>
+          <span className="ml-1">{reference?.status || "ACTIVE"}</span>
         </Badge>
       ),
     },
@@ -97,7 +96,7 @@ export const createMaritalTableColumns = ({
       label: tMaster("actions"),
       maxWidth: "180px",
       minWidth: "160px",
-      render: (marital) => (
+      render: (reference) => (
         <div className="flex items-center gap-2">
           <TooltipProvider>
             <Tooltip>
@@ -105,7 +104,7 @@ export const createMaritalTableColumns = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleEditMarital(marital)}
+                  onClick={() => handleEditReference(reference)}
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -118,7 +117,7 @@ export const createMaritalTableColumns = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleViewMaritalDetail(marital)}
+                  onClick={() => handleViewReferenceDetail(reference)}
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
@@ -131,7 +130,7 @@ export const createMaritalTableColumns = ({
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => handleDeleteMarital(marital)}
+                  onClick={() => handleDeleteReference(reference)}
                 >
                   <Trash className="h-3 w-3" />
                 </Button>

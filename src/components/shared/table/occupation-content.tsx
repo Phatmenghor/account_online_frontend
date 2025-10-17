@@ -1,7 +1,7 @@
 import {
-  AllMaritalModel,
-  MaritalModel,
-} from "@/models/static/marital/marital.response";
+  AllOccupationModel,
+  OccupationModel,
+} from "@/models/static/occupation/occupation.response";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { Edit, Eye, Trash } from "lucide-react";
@@ -15,22 +15,22 @@ import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 import { Badge } from "@/components/ui/badge";
 
-interface MaritalTableHandlers {
-  handleEditMarital: (marital: MaritalModel) => void;
-  handleViewMaritalDetail: (marital: MaritalModel) => void;
-  handleDeleteMarital: (marital: MaritalModel) => void;
+interface OccupationTableHandlers {
+  handleEditOccupation: (occupation: OccupationModel) => void;
+  handleViewOccupationDetail: (occupation: OccupationModel) => void;
+  handleDeleteOccupation: (occupation: OccupationModel) => void;
 }
 
-interface MaritalTableOptions {
-  data: AllMaritalModel | null;
-  handlers: MaritalTableHandlers;
+interface OccupationTableOptions {
+  data: AllOccupationModel | null;
+  handlers: OccupationTableHandlers;
 }
 
-export const createMaritalTableColumns = ({
+export const createOccupationTableColumns = ({
   data,
   handlers,
-}: MaritalTableOptions): TableColumn<MaritalModel>[] => {
-  const { handleEditMarital, handleViewMaritalDetail, handleDeleteMarital } =
+}: OccupationTableOptions): TableColumn<OccupationModel>[] => {
+  const { handleEditOccupation, handleViewOccupationDetail, handleDeleteOccupation } =
     handlers;
 
   const getStatusColor = (status: string) => {
@@ -65,8 +65,8 @@ export const createMaritalTableColumns = ({
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
-      render: (marital) => (
-        <span className="font-medium">{marital.nameEn || "---"}</span>
+      render: (occupation) => (
+        <span className="font-medium">{occupation.nameEn || "---"}</span>
       ),
     },
     {
@@ -75,8 +75,8 @@ export const createMaritalTableColumns = ({
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
-      render: (marital) => (
-        <span className="font-medium">{marital.nameKh || "---"}</span>
+      render: (occupation) => (
+        <span className="font-medium">{occupation.nameKh || "---"}</span>
       ),
     },
     {
@@ -85,19 +85,18 @@ export const createMaritalTableColumns = ({
       truncate: true,
       maxWidth: "150px",
       minWidth: "100px",
-      render: (marital) => (
-        // <span className="font-medium">{marital.status || "---"}</span>
-        <Badge className={getStatusColor(marital?.status ?? "")}>
-            <span className="ml-1">{marital?.status || "ACTIVE"}</span>
+      render: (occupation) => (
+        <Badge className={getStatusColor(occupation?.status ?? "")}>
+          <span className="ml-1">{occupation?.status || "ACTIVE"}</span>
         </Badge>
       ),
     },
     {
       key: "actions",
-      label: tMaster("actions"),
+      label: "Actions",
       maxWidth: "180px",
       minWidth: "160px",
-      render: (marital) => (
+      render: (occupation) => (
         <div className="flex items-center gap-2">
           <TooltipProvider>
             <Tooltip>
@@ -105,7 +104,7 @@ export const createMaritalTableColumns = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleEditMarital(marital)}
+                  onClick={() => handleEditOccupation(occupation)}
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -118,7 +117,7 @@ export const createMaritalTableColumns = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleViewMaritalDetail(marital)}
+                  onClick={() => handleViewOccupationDetail(occupation)}
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
@@ -131,7 +130,7 @@ export const createMaritalTableColumns = ({
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => handleDeleteMarital(marital)}
+                  onClick={() => handleDeleteOccupation(occupation)}
                 >
                   <Trash className="h-3 w-3" />
                 </Button>

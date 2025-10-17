@@ -22,7 +22,7 @@
     "marital": "Marital",
     "occupation": "Occupation",
     "reference": "Reference",
-    "index": "Data Static",
+    "index": "Master Data",
     "new": "New",
     "allStatus": "All Status",
     "status": {
@@ -80,5 +80,15 @@
       "login-success": "Successfully logged in!",
       "login-error": "Login failed. Please check your credentials."
     }
+  },
+
+  "master": {
+    "search-marital": "Search maritals...",
+    "search-reference": "Search references...",
+    "search-occupation": "Search occupations...",
+    "nameEn": "Name (English)",
+    "nameKh": "Name (Khmer)",
+    "actions": "Actions",
+    "status": "Status"
   }
 }

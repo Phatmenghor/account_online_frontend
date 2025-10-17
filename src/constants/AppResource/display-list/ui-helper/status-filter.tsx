@@ -3,7 +3,7 @@
 import { CustomSelect } from "@/components/shared/select/custom-select";
 import { useTranslations } from "next-intl";
 import { Dispatch, SetStateAction } from "react";
-import { Status } from "../enum/mode";
+import { Status } from "../enum/status";
 
 interface filterProps {
   statusFilter: string;

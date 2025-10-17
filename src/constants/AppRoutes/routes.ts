@@ -11,7 +11,7 @@ export const ROUTES = {
     STATIC: {
       MARITAL: "/marital",
       OCCUPATION: "/occupation",
-      REFERECE: "/reference"
+      REFERENCE: "/reference"
     }
 
   },

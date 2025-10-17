@@ -238,7 +238,7 @@ function MaritalPageContent() {
                 aria-label="search-marital"
                 autoComplete="search-marital"
                 type="search"
-                placeholder="Search marital status..."
+                placeholder={t("master.search-marital")}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"

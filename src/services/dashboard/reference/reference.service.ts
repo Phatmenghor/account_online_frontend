@@ -1,11 +1,11 @@
-import { AllMaritalReq, CreateMaritalReq, UpdateMaritalReq } from "@/models/static/marital/marital.request";
+import { AllReferenceReq, CreateReferenceReq, UpdateReferenceReq } from "@/models/static/reference/reference.request";
 import { axiosClientWithAuth } from "@/utils/axios";
 import axios from "axios";
 
-export async function getAllMaritalService(request: AllMaritalReq) {
+export async function getAllReferenceService(request: AllReferenceReq) {
     try {
         const response = await axiosClientWithAuth.post(
-            "/api/v1/marital-status/all",
+            "/api/v1/reference/banks/all",
             request
         );
         return response.data.data;
@@ -13,7 +13,7 @@ export async function getAllMaritalService(request: AllMaritalReq) {
     catch (error) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
-      const message = raw?.message || "Failed to fetch maritals.";
+      const message = raw?.message || "Failed to fetch references.";
       console.error("Axios error:", message);
 
       throw { errorMessage: message, rawError: raw };
@@ -21,21 +21,21 @@ export async function getAllMaritalService(request: AllMaritalReq) {
       console.error("Unexpected error:", error);
       throw {
         errorMessage:
-          "An unexpected error occurred while fetching maritals.",
+          "An unexpected error occurred while fetching references.",
         rawError: error,
       };
     }
   }
 }
 
-export async function getMaritalByIdService(id: number) {
+export async function getReferenceByIdService(id: number) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/marital-status/get-by-id/${id}`);
+    const response = await axiosClientWithAuth.post(`/api/v1/reference/banks/get-by-id/${id}`);
     return response.data.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
-      const message = raw?.message || "Failed to fetch marital by id.";
+      const message = raw?.message || "Failed to fetch reference by id.";
       console.error("Axios error:", message);
 
       throw { errorMessage: message, rawError: raw };
@@ -43,73 +43,73 @@ export async function getMaritalByIdService(id: number) {
       console.error("Unexpected error:", error);
       throw {
         errorMessage:
-          "An unexpected error occurred while fetching marital by id.",
+          "An unexpected error occurred while fetching reference by id.",
         rawError: error,
       };
     }
   }
 }
 
-export async function createMaritalService(request: CreateMaritalReq) {
+export async function createReferenceService(request: CreateReferenceReq) {
   try {
-    const response = await axiosClientWithAuth.post("/api/v1/marital-status/create", request);
+    const response = await axiosClientWithAuth.post("/api/v1/reference/banks/create", request);
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
-      const message = raw?.message || "Failed to create marital.";
+      const message = raw?.message || "Failed to create reference.";
       console.error("Axios error:", message);
 
       throw { errorMessage: message, rawError: raw };
     } else {
       console.error("Unexpected error:", error);
       throw {
-        errorMessage: "An unexpected error occurred while creating marital.",
+        errorMessage: "An unexpected error occurred while creating reference.",
         rawError: error,
       };
     }
   }
 }
 
-export async function updateMaritalService(
+export async function updateReferenceService(
   id: number,
-  update: UpdateMaritalReq
+  update: UpdateReferenceReq
 ) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/marital-status/update/${id}`, update);
+    const response = await axiosClientWithAuth.post(`/api/v1/reference/banks/update/${id}`, update);
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
-      const message = raw?.message || "Failed to update marital.";
+      const message = raw?.message || "Failed to update reference.";
       console.error("Axios error:", message);
 
       throw { errorMessage: message, rawError: raw };
     } else {
       console.error("Unexpected error:", error);
       throw {
-        errorMessage: "An unexpected error occurred while updating marital.",
+        errorMessage: "An unexpected error occurred while updating reference.",
         rawError: error,
       };
     }
   }
 }
 
-export async function deleteMaritalService(id: number) {
+export async function deleteReferenceService(id: number) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/marital-status/delete/${id}`);
+    const response = await axiosClientWithAuth.post(`/api/v1/reference/banks/delete/{id}${id}`);
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
-      const message = raw?.message || "Failed to delete marital.";
+      const message = raw?.message || "Failed to delete reference.";
       console.error("Axios error:", message);
 
       throw { errorMessage: message, rawError: raw };
     } else {
       console.error("Unexpected error:", error);
       throw {
-        errorMessage: "An unexpected error occurred while deleting marital.",
+        errorMessage: "An unexpected error occurred while deleting reference.",
         rawError: error,
       };
     }
