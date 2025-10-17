@@ -1,0 +1,220 @@
+"use client";
+
+import type React from "react";
+import {
+  FileText,
+  Globe,
+  Tag,
+  Shield,
+  BookType,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { MaritalModel } from "@/models/static/marital/marital.response";
+import { useEffect, useState } from "react";
+import { getMaritalByIdService } from "@/services/dashboard/marital/marital.service";
+
+interface MaritalViewModalProps {
+  marital?: MaritalModel;
+  maritalId?: number;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function MaritalViewModal({
+  marital: initialMarital,
+  maritalId,
+  isOpen,
+  onClose,
+}: MaritalViewModalProps) {
+  const [marital, setMarital] = useState<MaritalModel | undefined>(
+    initialMarital
+  );
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (initialMarital) {
+      setMarital(initialMarital);
+      return;
+    }
+
+    if (maritalId) {
+      const fetchMarital = async () => {
+        setLoading(true);
+        try {
+          const data = await getMaritalByIdService(maritalId);
+          setMarital(data);
+        } catch (error) {
+          console.error("Failed to fetch marital:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchMarital();
+    }
+  }, [maritalId, initialMarital, isOpen]);
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case "ACTIVE":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "DELETE":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const handleClose = () => {
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-2xl h-[90vh] p-0 gap-0 flex flex-col">
+        {/* Header */}
+        <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
+          <div className="flex items-center gap-4 pr-8">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+              <FileText className="w-6 h-6 text-foreground" />
+            </div>
+            <div className="flex-1">
+              <DialogTitle className="text-xl font-semibold">
+                Marital Status Details
+              </DialogTitle>
+              <DialogDescription className="text-base text-muted-foreground">
+                {marital?.nameEn
+                  ? `Details for "${marital.nameEn}"`
+                  : marital?.nameKh
+                  ? `Details for "${marital.nameKh}"`
+                  : "Marital status information"}
+              </DialogDescription>
+
+              {marital && (
+                <Badge className={getStatusColor(marital?.status ?? "")}>
+                  <Shield className="h-3 w-3" />
+                  <span className="ml-1">{marital?.status || "ACTIVE"}</span>
+                </Badge>
+              )}
+            </div>
+          </div>
+        </DialogHeader>
+
+        {/* Content */}
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="p-6">
+            {loading ? (
+              <div className="text-center text-muted-foreground">
+                Loading marital status...
+              </div>
+            ) : marital ? (
+              <div className="space-y-6">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                    <h3 className="text-lg font-semibold">
+                      Basic Information
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Name (English):
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        <BookType className="h-4 w-4" />
+                        {marital?.nameEn || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Name (Khmer):
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        <BookType className="h-4 w-4" />
+                        {marital?.nameKh || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+                    <h3 className="text-lg font-semibold">
+                      Status Information
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Status:
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4" />
+                        <span className="text-sm">
+                          {marital?.status || "ACTIVE"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* System Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
+                    <h3 className="text-lg font-semibold">
+                      System Information
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Marital ID:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        {marital?.id || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No marital data available</p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        {/* Footer */}
+        <DialogFooter className="px-6 py-4 border-t bg-muted/30 flex-shrink-0">
+          <Button variant="outline" onClick={handleClose}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

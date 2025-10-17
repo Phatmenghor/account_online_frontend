@@ -8,6 +8,12 @@ export const ROUTES = {
     INDEX: "/dashboard",
     USER: "/user",
     PROFILE: "/profile",
+    STATIC: {
+      MARITAL: "/marital",
+      OCCUPATION: "/occupation",
+      REFERECE: "/reference"
+    }
+
   },
 };
 

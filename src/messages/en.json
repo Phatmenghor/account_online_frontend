@@ -19,10 +19,10 @@
     "home": "Home",
     "dashboard": "Dashboard",
     "users": "Users",
-    "project": "Projects",
-    "attendance": "Attendance",
-    "application": "Application",
-    "trainee": "Report Trainee",
+    "marital": "Marital",
+    "occupation": "Occupation",
+    "reference": "Reference",
+    "index": "Data Static",
     "new": "New",
     "allStatus": "All Status",
     "status": {
@@ -55,87 +55,7 @@
       "actions": "Actions"
     }
   },
-  "project": {
-    "title": "Projects",
-    "search-project": "Search projects...",
-    "table-header-project": {
-      "id": "ID",
-      "projectName": "Project Name",
-      "type": "Type",
-      "hostServer": "Host Server",
-      "hostPort": "Host Port",
-      "dbName": "Database Name",
-      "dbType": "Database Type",
-      "dbServer": "Database Server",
-      "memberInvolved": "Members Involved",
-      "remark": "Remark",
-      "projectStatus": "Project Status",
-      "createdAt": "Created At",
-      "updatedAt": "Updated At",
-      "actions": "Actions"
-    },
 
-    "roles": {
-      "admin": "Admin",
-      "developer": "Developer",
-      "user": "User"
-    },
-    "status": {
-      "active": "Active",
-      "delete": "Delete"
-    }
-  },
-
-  "attendance": {
-    "title": "Attendance",
-    "search-attendance": "Search attendance...",
-    "trainee": {
-      "index": "Trainee",
-      "request": "Attendance Request",
-      "history": "Attendance History"
-    },
-    "modal": {
-      "reject": "Reject",
-      "approval": "Approve",
-      "approvalOrCancelTitle": "Approve or Cancel Attendance",
-      "approvalOrCancelDesc": "You can approve or cancel this attendance request below.",
-      "viewTitle": "Attendance Request",
-      "viewDesc": "Attendance request details for",
-      "personalInfo": "User Information",
-      "attendanceInfo": "Attendance Information",
-      "approvalInfo": "Approval Information",
-      "close": "Close",
-      "discard": "Discard",
-      "noUserData": "No attendance data available",
-      "status": "Status",
-      "approvalNotes": "Approval Notes",
-      "approvalNotesPlaceholder": "Enter approval notes here...",
-      "selectStatus": "Select status"
-    },
-    "table-header-attendance": {
-      "id": "ID",
-      "userId": "User ID",
-      "userIdCard": "ID Card",
-      "userFullName": "Full Name",
-      "userEmail": "Email",
-      "position": "Position",
-      "type": "Type",
-      "period": "Period",
-      "status": "Status",
-      "leaveRequest": "leave sessions",
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "totalDays": "Total Days",
-      "reason": "Reason",
-      "approvedByIdCard": "Approved By (ID Card)",
-      "approvedBy": "Approved By (Full Name)",
-      "approvedAt": "Approved At",
-      "approvalNotes": "Approval Notes",
-      "createdAt": "Created At",
-      "updatedAt": "Updated At",
-      "actions": "Actions"
-    }
-  },
   "auth": {
     "login": "Login",
     "logout": "Logout",
@@ -160,25 +80,5 @@
       "login-success": "Successfully logged in!",
       "login-error": "Login failed. Please check your credentials."
     }
-  },
-  "application": {
-    "projectName": "Project Name",
-    "department": "Department",
-    "year": "Year",
-    "applicationStatus": "Application Status",
-    "urlLink": "Url Link",
-    "memberInvolved": "Members Involved",
-    "remark": "Remark",
-    "createdAt": "Created At",
-    "actions": "Actions",
-    "search-application": "Search application..."
-  },
-  "trainee": {
-    "reportRemark": "Report Remark",
-    "challenge": "Challenge",
-    "recommend": "Recommend",
-    "createdAt": "Created At",
-    "actions": "Actions",
-    "search-trainee": "Search report trainee..."
   }
 }
