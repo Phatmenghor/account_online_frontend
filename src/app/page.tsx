@@ -1,515 +1,790 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { CheckCircle, CreditCard, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RequestIdImage, RequestValidModel } from "@/models/acc-online/nid.request.model";
+import { ResponseNID, ValidationResponse } from "@/models/acc-online/nid.response.model";
+import { extractNIDService, validateNIDService } from "@/services/acc-online/nid.service";
+import { formatDate } from "@/constants/AppResource/format-date/format-dd-mm-yyyy";
+import ValidationErrorModal from "@/components/acc-online/validateModal";
+import ErrorModal from "@/components/acc-online/errorModal";
+import SuccessModal from "@/components/acc-online/successModal";
+import LanguageSwitcher from "@/components/shared/common/language-switcher";
+import Footer from "@/components/shared/footer/footer";
 
-export default function DashboardBackground() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [fireworks, setFireworks] = useState<any[]>([]);
-  const [countdown, setCountdown] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
+export interface Image {
+  idImage: string;
+}
+
+export default function CheckNIDPage() {
+  const [imageData, setImageData] = useState<RequestIdImage | null>(null);
+  const [formData, setFormData] = useState<ResponseNID>({
+    idNumber: "",
+    lastNameKh: "",
+    firstNameKh: "",
+    dob: "",
+    gender: "",
+    lastNameEn: "",
+    firstNameEn: "",
+    expiredDate: "",
+    issuedDate: "",
+    address: "",
+    pob: ""
   });
-  const [birthdayStatus, setBirthdayStatus] = useState<
-    "before" | "within10days" | "today" | "after"
-  >("before");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<Image | null>(null);
 
-  useEffect(() => {
-    const handleMouseMove = (e: any) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 15,
-        y: (e.clientY / window.innerHeight - 0.5) * 15,
+  // Separate state for selfie
+  const [selfieImage, setSelfieImage] = useState<string | null>(null);
+  const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResponse | null>(null);
+
+  const [showValidationErrorModal, setShowValidationErrorModal] =
+    useState(false);
+  const [validationErrorData, setValidationErrorData] = useState({
+    title: "",
+    message: "",
+    description: "",
+  });
+
+  // change language
+  const translate = useTranslations("NIDPage");
+
+  // Helper function to convert date to YYYY-MM-DD
+  const formatDateForInput = (dateString: string): string => {
+    if (!dateString) return "";
+
+    // If already in YYYY-MM-DD format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+
+    // If in DD/MM/YYYY format
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+      const [day, month, year] = dateString.split('/');
+      return `${year}-${month}-${day}`;
+    }
+
+    // If in DD-MM-YYYY format
+    if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
+      const [day, month, year] = dateString.split('-');
+      return `${year}-${month}-${day}`;
+    }
+
+    return dateString;
+  };
+
+  // Helper function to normalize gender
+  const normalizeGender = (gender: string): string => {
+    if (!gender) return "";
+
+    const genderUpper = gender.toUpperCase().trim();
+
+    if (genderUpper === "M" || genderUpper === "MALE" || genderUpper === "ប្រុស") {
+      return "Male";
+    }
+
+    if (genderUpper === "F" || genderUpper === "FEMALE" || genderUpper === "ស្រី") {
+      return "Female";
+    }
+
+    return gender;
+  };
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        toast.error("File too large", {
+          description: "Image must be less than 5MB.",
+        });
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        // Convert to base64 with data URL prefix for preview
+        const base64WithPrefix = await convertToBase64(file);
+        // Get base64 without prefix for service
+        const base64ForService = base64WithPrefix.split(",")[1];
+
+        const imageRequestData: RequestIdImage = {
+          applicationName: "DEVELOPMENT",
+          idImage: base64ForService,
+        };
+
+        setImageData(imageRequestData);
+        setUploadedImage({
+          idImage: base64WithPrefix, // Use full data URL for preview
+        });
+        setImagePreview(base64WithPrefix);
+
+        // Auto-extract NID data when image is uploaded
+        await handleExtractNID(imageRequestData);
+      } catch (error) {
+        console.error("Error converting image to base64", error);
+        toast.error("Image processing error", {
+          description: "Failed to process the image. Please try again.",
+        });
+        setIsLoading(false);
+      }
+    }
+  };
+
+  // Separate handler for selfie upload
+  const handleSelfieUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        toast.error("File too large", {
+          description: "Image must be less than 5MB.",
+        });
+        return;
+      }
+
+      try {
+        const base64WithPrefix = await convertToBase64(file);
+        setSelfieImage(base64WithPrefix);
+        setSelfiePreview(base64WithPrefix);
+        toast.success("Selfie uploaded successfully!");
+      } catch (error) {
+        console.error("Error uploading selfie", error);
+        toast.error("Failed to upload selfie");
+      }
+    }
+  };
+
+  // Function to convert file to base64
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result); // Return full data URL
+        } else {
+          reject(new Error("Failed to convert file to base64"));
+        }
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleExtractNID = async (imageRequestData?: RequestIdImage) => {
+    const dataToProcess = imageRequestData || imageData;
+
+    if (!dataToProcess) {
+      toast.error("No image data", {
+        description: "Please upload an image first.",
       });
-    };
+      return;
+    }
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    setIsLoading(true);
+    try {
+      // response is already the extracted NID data object
+      const response = await extractNIDService(dataToProcess);
 
-  // Countdown timer and birthday status checker
-  useEffect(() => {
-    const calculateCountdown = () => {
-      const now = new Date();
-      const birthdayStart = new Date("2025-10-11T00:00:00");
-      const birthdayEnd = new Date("2025-10-11T23:59:59");
-      const tenDaysBefore = new Date("2025-10-01T00:00:00"); // 10 days before Oct 11
+      // Debug logging
+      console.log("=== RAW API RESPONSE ===");
+      console.log("Full response:", JSON.stringify(response, null, 2));
+      console.log("DOB from API:", response.dob);
+      console.log("Gender from API:", response.gender);
+      console.log("========================");
 
-      // Check if it's the birthday
-      if (now >= birthdayStart && now <= birthdayEnd) {
-        setBirthdayStatus("today");
-        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      // Normalize the data before setting state
+      const normalizedData = {
+        ...response,
+        dob: formatDateForInput(response.dob),
+        gender: normalizeGender(response.gender),
+      };
+
+      console.log("Normalized data:", normalizedData);
+      setFormData(normalizedData);
+      toast.success("NID extracted successfully!");
+
+    } catch (error: any) {
+      console.error("Failed to extract NID - Full error:", error);
+      console.error("Error message:", error.message);
+      console.error("Error response:", error.response?.data);
+
+      toast.error("Extraction error", {
+        description:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to extract NID information.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleValidateNID = async () => {
+    // Check if image is uploaded
+    if (!uploadedImage || !imageData) {
+      setValidationErrorData({
+        title: translate("required_image"),
+        message: "",
+        description: translate("req_image_des"),
+      });
+      setShowValidationErrorModal(true);
+      return;
+    }
+
+    // Check if required fields are filled
+    const requiredFields = [
+      { field: "idNumber", label: translate("id"), value: formData.idNumber },
+      {
+        field: "lastNameEn",
+        label: translate("lnameEn"),
+        value: formData.lastNameEn,
+      },
+      {
+        field: "firstNameEn",
+        label: translate("fnameEn"),
+        value: formData.firstNameEn,
+      },
+      { field: "dob", label: translate("dob"), value: formData.dob },
+    ];
+
+    const missingFields = requiredFields.filter(
+      (field) => !field.value?.toString().trim()
+    );
+
+    if (missingFields.length > 0) {
+      const missingFieldNames = missingFields
+        .map((field) => `${field.label}, `)
+        .join("\n");
+
+      const fieldWord =
+        missingFields.length === 1
+          ? translate("required")
+          : translate("requireds");
+
+      setValidationErrorData({
+        title: `${fieldWord}`,
+        message: "",
+        description: `${translate("req_des")} :\n${missingFieldNames}`,
+      });
+
+      setShowValidationErrorModal(true);
+      return;
+    }
+
+    setIsValidating(true);
+    try {
+      const validationData: RequestValidModel = {
+        applicationName: "INTRANET",
+        idNumber: formData.idNumber,
+        lastNameKh: formData.lastNameKh,
+        firstNameKh: formData.firstNameKh,
+        lastNameEn: formData.lastNameEn,
+        firstNameEn: formData.firstNameEn,
+        dob: formatDate(formData.dob),
+        gender: formData.gender,
+        expiredDate: formatDate(formData.expiredDate),
+        issuedDate: formatDate(formData.issuedDate),
+        address: formData.address,
+        pob: formData.pob,
+      };
+
+      const response = await validateNIDService(validationData);
+
+      setValidationResult(response);
+
+      // Check if there are incorrect fields that matter for error modal
+      const criticalFields = ["lastNameEn", "firstNameEn", "dob"];
+      const hasCriticalErrors = response.data.incorrectFields.some(
+        (field: string) => criticalFields.includes(field)
+      );
+
+      if (hasCriticalErrors) {
+        setShowErrorModal(true);
+      } else {
+        // Success even if there are other incorrect fields (like firstNameKh)
+        setShowSuccessModal(true);
       }
-      // Check if birthday has passed
-      else if (now > birthdayEnd) {
-        setBirthdayStatus("after");
-        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      }
-      // Check if within 10 days before birthday
-      else if (now >= tenDaysBefore && now < birthdayStart) {
-        setBirthdayStatus("within10days");
-        const difference = birthdayStart.getTime() - now.getTime();
+    } catch (error: any) {
+      setValidationErrorData({
+        title: translate("valid_fail"),
+        message: error.apiMessage || "Failed to validate NID information.",
+        description: error.uiMessage || "",
+      });
+      setShowValidationErrorModal(true);
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-        );
-        const minutes = Math.floor(
-          (difference % (1000 * 60 * 60)) / (1000 * 60)
-        );
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+  const handleInputChange = (field: keyof ResponseNID, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
-        setCountdown({ days, hours, minutes, seconds });
-      }
-      // More than 10 days before birthday
-      else {
-        setBirthdayStatus("before");
-        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      }
-    };
+  const clearInput: ResponseNID = {
+    idNumber: "",
+    lastNameKh: "",
+    firstNameKh: "",
+    dob: "",
+    gender: "",
+    lastNameEn: "",
+    firstNameEn: "",
+    expiredDate: "",
+    issuedDate: "",
+    address: "",
+    pob: ""
+  };
 
-    calculateCountdown();
-    const interval = setInterval(calculateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const handleClear = () => {
+    setFormData(clearInput);
+    setUploadedImage(null);
+    setImagePreview(null);
+    setImageData(null);
+    setSelfieImage(null);
+    setSelfiePreview(null);
+    setValidationResult(null);
 
-  // Fireworks generator
-  useEffect(() => {
-    const createFirework = () => {
-      const id = Math.random();
-      const x = Math.random() * 100;
-      const y = Math.random() * 60 + 10;
-      const color = ["#f97316", "#a855f7", "#ec4899", "#fbbf24", "#06b6d4"][
-        Math.floor(Math.random() * 5)
-      ];
+    // Reset file input
+    const fileInput = document.getElementById(
+      "image-upload"
+    ) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
+    }
 
-      setFireworks((prev) => [...prev, { id, x, y, color }]);
-
-      setTimeout(() => {
-        setFireworks((prev) => prev.filter((fw) => fw.id !== id));
-      }, 2000);
-    };
-
-    const interval = setInterval(createFirework, 800);
-    return () => clearInterval(interval);
-  }, []);
+    const selfieInput = document.getElementById(
+      "image-upload-user"
+    ) as HTMLInputElement;
+    if (selfieInput) {
+      selfieInput.value = "";
+    }
+  };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-orange-50 via-purple-50 to-pink-50">
-      {/* Outer decorative frame */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-4 rounded-3xl border-2 border-white/20 backdrop-blur-sm" />
-        <div className="absolute inset-8 rounded-2xl border border-white/10" />
+    <div className=" flex flex-col h-screen">
+      {/* Sticky Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b shadow-sm px-5">
+        <div className=" mx-auto px-10 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <img
+              src="/app/CP-bank-Logo.png"
+              alt="Bank Logo"
+              className="h-12"
+            />
+          </div>
+          <LanguageSwitcher variant="flag-only" />
+        </div>
       </div>
 
-      {/* Animated gradient overlay */}
-      <motion.div
-        className="absolute inset-0 opacity-20"
-        animate={{
-          background: [
-            "radial-gradient(circle at 20% 50%, rgba(251, 146, 60, 0.4) 0%, transparent 60%)",
-            "radial-gradient(circle at 80% 50%, rgba(192, 132, 252, 0.4) 0%, transparent 60%)",
-            "radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.4) 0%, transparent 60%)",
-            "radial-gradient(circle at 20% 50%, rgba(251, 146, 60, 0.4) 0%, transparent 60%)",
-          ],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-      />
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto pt-20 pb-0">
+        <div className="lg:px-16 px-4 py-8">
+          <Card className="p-8 mb-6 shadow-lg">
+            <div className="mx-auto">
+              <div className="mb-8">
+                <h1 className="text-2xl font-semibold text-gray-800 mb-2">
+                  Account Online Register
+                </h1>
+              </div>
 
-      {/* Main background image with parallax and zoom effect */}
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center"
-        style={{
-          x: mousePosition.x,
-          y: mousePosition.y,
-        }}
-        transition={{ type: "spring", stiffness: 60, damping: 25 }}
-      >
-        <motion.div
-          className="relative w-full h-full"
-          initial={{ scale: 1.15, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 2, ease: "easeOut" }}
-        >
-          <motion.div
-            className="absolute rounded-lg inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url('/app/dashboard.png')`,
-            }}
-            animate={{
-              filter: [
-                "brightness(1) contrast(1.05) saturate(1.1)",
-                "brightness(1.05) contrast(1.08) saturate(1.15)",
-                "brightness(1) contrast(1.05) saturate(1.1)",
-              ],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-
-          {/* Subtle vignette effect */}
-          <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/5" />
-        </motion.div>
-      </motion.div>
-
-      {/* Birthday Message Overlay */}
-      {birthdayStatus !== "before" && birthdayStatus !== "after" && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <div className="text-center px-8">
-            {/* Main Birthday Message */}
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: "easeOut" }}
-            >
-              <motion.h1
-                className="text-6xl md:text-8xl font-bold mb-8"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #f97316 0%, #a855f7 50%, #ec4899 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  filter: "drop-shadow(0 4px 20px rgba(251, 146, 60, 0.5))",
-                }}
-                animate={{
-                  scale: [1, 1.05, 1],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                Happy Birthday
-              </motion.h1>
-            </motion.div>
-
-            {/* Show "to you Phat Menghor" only on birthday */}
-            {birthdayStatus === "today" && (
-              <>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 1, delay: 0.3 }}
-                >
-                  <p
-                    className="text-3xl md:text-4xl font-light text-white mb-6"
-                    style={{
-                      textShadow:
-                        "0 2px 10px rgba(0, 0, 0, 0.3), 0 0 30px rgba(251, 146, 60, 0.5)",
-                    }}
-                  >
-                    to you
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 1, delay: 0.6 }}
-                >
-                  <motion.h2
-                    className="text-5xl md:text-7xl font-bold mb-8"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                      filter: "drop-shadow(0 4px 20px rgba(236, 72, 153, 0.6))",
-                    }}
-                    animate={{
-                      scale: [1, 1.03, 1],
-                    }}
-                    transition={{
-                      duration: 2.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 0.5,
-                    }}
-                  >
-                    Phat Menghor
-                  </motion.h2>
-                </motion.div>
-              </>
-            )}
-
-            {/* Date - only show on birthday */}
-            {birthdayStatus === "today" && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 1 }}
-                className="inline-block"
-              >
-                <motion.div
-                  className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border-2 border-white/30"
-                  animate={{
-                    boxShadow: [
-                      "0 0 20px rgba(251, 146, 60, 0.3)",
-                      "0 0 40px rgba(236, 72, 153, 0.5)",
-                      "0 0 20px rgba(251, 146, 60, 0.3)",
-                    ],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                >
-                  <p
-                    className="text-2xl md:text-3xl font-semibold text-white tracking-wider"
-                    style={{
-                      textShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
-                    }}
-                  >
-                    11 - October - 2025
-                  </p>
-                </motion.div>
-              </motion.div>
-            )}
-
-            {/* Countdown Timer - only show within 10 days before birthday */}
-            {birthdayStatus === "within10days" && (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 1.3 }}
-                className="mt-8"
-              >
-                <p
-                  className="text-xl md:text-2xl font-light text-white mb-4"
-                  style={{
-                    textShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-                  }}
-                >
-                  Countdown to Birthday:
-                </p>
-                <div className="flex gap-4 justify-center flex-wrap">
-                  {[
-                    { label: "Days", value: countdown.days },
-                    { label: "Hours", value: countdown.hours },
-                    { label: "Minutes", value: countdown.minutes },
-                    { label: "Seconds", value: countdown.seconds },
-                  ].map((item, index) => (
-                    <motion.div
-                      key={item.label}
-                      className="bg-white/25 backdrop-blur-lg px-6 py-4 rounded-xl border border-white/40"
-                      animate={{
-                        scale: item.label === "Seconds" ? [1, 1.05, 1] : 1,
-                      }}
-                      transition={{
-                        duration: 1,
-                        repeat: item.label === "Seconds" ? Infinity : 0,
-                      }}
-                    >
-                      <div
-                        className="text-3xl md:text-4xl font-bold"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #fbbf24 0%, #f97316 100%)",
-                          WebkitBackgroundClip: "text",
-                          WebkitTextFillColor: "transparent",
-                          backgroundClip: "text",
-                          textShadow: "0 0 20px rgba(251, 146, 60, 0.5)",
-                        }}
-                      >
-                        {String(item.value).padStart(2, "0")}
-                      </div>
-                      <div className="text-sm md:text-base text-white/80 mt-1 font-medium">
-                        {item.label}
-                      </div>
-                    </motion.div>
-                  ))}
+              {/* Loading indicator */}
+              {(isLoading || isValidating) && (
+                <div className="flex justify-center items-center space-x-2 mb-6">
+                  <Loader2 className="animate-spin h-6 w-6 text-blue-600" />
+                  <span className="text-sm text-gray-600">
+                    {isLoading ? translate("extracting") : translate("validating")}
+                  </span>
                 </div>
-              </motion.div>
-            )}
-          </div>
+              )}
+
+              {/* ID Card and Selfie Upload Section */}
+              <div className="flex md:flex-row flex-col justify-evenly items-center mb-8 py-2 gap-8">
+                <div>
+                  <p className="text-sm text-gray-600 mb-4 text-center">
+                    Please upload the front side of your ID card.
+                  </p>
+
+                  <div className="relative">
+                    <div className="absolute -top-2 -left-2 w-6 h-6 border-l-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 border-r-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute -bottom-2 -left-2 w-6 h-6 border-l-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute -bottom-2 -right-2 w-6 h-6 border-r-2 border-b-2 border-gray-400"></div>
+
+                    <div className="relative lg:w-96 md:w-80 w-96 h-64  bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        id="image-upload"
+                        disabled={isLoading || isValidating}
+                      />
+                      <img
+                        src={uploadedImage?.idImage || "/app/identity-card.png?height=192&width=320"}
+                        alt="ID Card"
+                        className="w-full h-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-4 text-center">
+                    Please upload a selfie image.
+                  </p>
+
+                  <div className="relative">
+                    <div className="absolute -top-2 -left-2 w-6 h-6 border-l-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 border-r-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute -bottom-2 -left-2 w-6 h-6 border-l-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute -bottom-2 -right-2 w-6 h-6 border-r-2 border-b-2 border-gray-400"></div>
+
+                    <div className="relative lg:w-96 md:w-80 w-96 h-64 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleSelfieUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        id="image-upload-user"
+                        disabled={isLoading || isValidating}
+                      />
+                      <img
+                        src={selfiePreview || "/app/image_selfie.jpg?height=192&width=320"}
+                        alt="Selfie"
+                        className="w-full h-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Form Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    First Name (KH)
+                  </label>
+                  <Input
+                    placeholder="First Name (KH)"
+                    value={formData.lastNameKh}
+                    onChange={(e) => handleInputChange("lastNameKh", e.target.value)}
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Last Name (KH)
+                  </label>
+                  <Input
+                    placeholder="Last Name (KH)"
+                    value={formData.firstNameKh}
+                    onChange={(e) => handleInputChange("firstNameKh", e.target.value)}
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Family Name
+                  </label>
+                  <Input
+                    placeholder="Family Name"
+                    value={formData.lastNameEn}
+                    onChange={(e) => handleInputChange("lastNameEn", e.target.value)}
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Given Name
+                  </label>
+                  <Input
+                    placeholder="Given Name"
+                    value={formData.firstNameEn}
+                    onChange={(e) => handleInputChange("firstNameEn", e.target.value)}
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Date Of Birth
+                  </label>
+                  <Input
+                    type="date"
+                    value={formData.dob}
+                    onChange={(e) => handleInputChange("dob", e.target.value)}
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+
+                {/* Gender */}
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Gender
+                  </label>
+                  <Select
+                    value={formData.gender || ""}
+                    onValueChange={(value) => handleInputChange("gender", value)}
+                    disabled={isLoading || isValidating}
+                  >
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="--- Choose one ---" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Male">Male</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Legal Type */}
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Legal Type
+                  </label>
+                  <Select disabled={isLoading || isValidating}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="--- Choose one ---" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="national-id">National ID Card</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Legal ID
+                  </label>
+                  <Input
+                    placeholder="Legal ID"
+                    value={formData.idNumber}
+                    onChange={(e) => handleInputChange("idNumber", e.target.value)}
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Address
+                  </label>
+                  <Input
+                    placeholder="Address"
+                    value={formData.address}
+                    onChange={(e) => handleInputChange("address", e.target.value)}
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Place Of Birth
+                  </label>
+                  <Input
+                    placeholder="Place Of Birth"
+                    value={formData.pob}
+                    onChange={(e) => handleInputChange("pob", e.target.value)}
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Marital Status
+                  </label>
+                  <Select disabled={isLoading || isValidating}>
+                    <SelectTrigger className="w-full h-10">
+                      <SelectValue placeholder="--- Choose one ---" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="single">Single</SelectItem>
+                      <SelectItem value="married">Married</SelectItem>
+                      <SelectItem value="divorced">Divorced</SelectItem>
+                      <SelectItem value="widowed">Widowed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Occupation
+                  </label>
+                  <Select disabled={isLoading || isValidating}>
+                    <SelectTrigger className="w-full h-10">
+                      <SelectValue placeholder="--- Choose one ---" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="student">Student</SelectItem>
+                      <SelectItem value="teacher">Teacher</SelectItem>
+                      <SelectItem value="developer">Developer</SelectItem>
+                      <SelectItem value="designer">Designer</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="freelancer">Freelancer</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Branch
+                  </label>
+                  <Select>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="--- Choose one ---" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="engineering">Engineering</SelectItem>
+                      <SelectItem value="design">Design</SelectItem>
+                      <SelectItem value="marketing">Marketing</SelectItem>
+                      <SelectItem value="sales">Sales</SelectItem>
+                      <SelectItem value="support">Customer Support</SelectItem>
+                      <SelectItem value="hr">Human Resources</SelectItem>
+                      <SelectItem value="finance">Finance</SelectItem>
+                      <SelectItem value="operations">Operations</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Referer (Optional)
+                  </label>
+                  <div className="flex">
+                    <Select>
+                      <SelectTrigger className="w-40 h-10 rounded-r-none">
+                        <SelectValue placeholder="CP Bank" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cpbank">CP Bank</SelectItem>
+                        <SelectItem value="funan">Funan</SelectItem>
+                        <SelectItem value="others">Others</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      placeholder="Staff Code"
+                      className="flex-1 h-10 !rounded-l-none"
+                      disabled={isLoading || isValidating}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    Contact Number
+                  </label>
+                  <Input
+                    placeholder="012345678"
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-1">
+                    OTP Code
+                    <a href="#" className="float-right text-blue-600 border-blue-600 border-b-2 text-sm">Resend OTP</a>
+                  </label>
+                  <Input
+                    placeholder="OTP Code"
+                    className="w-full h-10"
+                    disabled={isLoading || isValidating}
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-4 mt-8">
+                <Button
+                  className="px-8 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-md"
+                  onClick={handleValidateNID}
+                  disabled={isLoading || isValidating}
+                >
+                  {isValidating ? "Processing..." : "Verification"}
+                </Button>
+                <Button
+                  className="px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md"
+                  onClick={handleClear}
+                  disabled={isLoading || isValidating}
+                >
+                  Submit
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
-      )}
 
-      {/* Floating particles effect */}
-      {[...Array(30)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute"
-          style={{
-            width: Math.random() * 8 + 3,
-            height: Math.random() * 8 + 3,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            borderRadius: "16px",
-            background:
-              i % 3 === 0
-                ? "rgba(251, 146, 60, 0.3)"
-                : i % 3 === 1
-                ? "rgba(192, 132, 252, 0.3)"
-                : "rgba(236, 72, 153, 0.3)",
-            boxShadow: "0 0 20px rgba(255, 255, 255, 0.5)",
-          }}
-          animate={{
-            y: [0, -40 - Math.random() * 30, 0],
-            x: [0, Math.random() * 30 - 15, 0],
-            opacity: [0.2, 0.8, 0.2],
-            scale: [1, 1.3, 1],
-          }}
-          transition={{
-            duration: Math.random() * 6 + 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: Math.random() * 3,
-          }}
-        />
-      ))}
+        {/* Replace the footer section with: */}
+        <Footer />
 
-      {/* Light beam effects */}
-      <motion.div
-        className="absolute inset-0 opacity-30"
-        style={{
-          background:
-            "linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.4) 50%, transparent 60%)",
-          backgroundSize: "300% 300%",
-        }}
-        animate={{
-          backgroundPosition: ["0% 0%", "100% 100%"],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "linear",
-        }}
+      </div>
+
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        data={
+          validationResult?.data
+            ? {
+              score: validationResult.data.score,
+              incorrectFields: validationResult.data.incorrectFields,
+            }
+            : null
+        }
       />
 
-      {/* Pulsing corner glow effects */}
-      <motion.div
-        className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-400/30 via-orange-300/20 to-transparent rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.3, 0.6, 0.3],
-          rotate: [0, 90, 0],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        data={
+          validationResult?.data
+            ? {
+              score: validationResult.data.score,
+              incorrectFields: validationResult.data.incorrectFields,
+            }
+            : null
+        }
       />
 
-      <motion.div
-        className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-purple-400/30 via-purple-300/20 to-transparent rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.3, 0.6, 0.3],
-          rotate: [0, -90, 0],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 4,
-        }}
+      {/* Validation Error Modal */}
+      <ValidationErrorModal
+        isOpen={showValidationErrorModal}
+        onClose={() => setShowValidationErrorModal(false)}
+        title={validationErrorData.title}
+        message={validationErrorData.message}
+        description={validationErrorData.description}
       />
-
-      <motion.div
-        className="absolute top-1/2 left-1/2 w-96 h-96 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-pink-400/20 via-pink-300/10 to-transparent rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.5, 1],
-          opacity: [0.2, 0.5, 0.2],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 2,
-        }}
-      />
-
-      {/* Sparkle effects */}
-      {[...Array(10)].map((_, i) => (
-        <motion.div
-          key={`sparkle-${i}`}
-          className="absolute w-2 h-2 bg-white rounded-full"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            boxShadow: "0 0 10px 2px rgba(255, 255, 255, 0.8)",
-          }}
-          animate={{
-            opacity: [0, 1, 0],
-            scale: [0, 1.5, 0],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: Math.random() * 5,
-            repeatDelay: Math.random() * 3 + 2,
-          }}
-        />
-      ))}
-
-      {/* Fireworks */}
-      {fireworks.map((firework) => (
-        <div
-          key={firework.id}
-          className="absolute pointer-events-none"
-          style={{
-            left: `${firework.x}%`,
-            top: `${firework.y}%`,
-          }}
-        >
-          {[...Array(12)].map((_, i) => {
-            const angle = (i * 360) / 12;
-            const radius = 80;
-            return (
-              <motion.div
-                key={i}
-                className="absolute w-3 h-3 rounded-full"
-                style={{
-                  backgroundColor: firework.color,
-                  boxShadow: `0 0 15px ${firework.color}`,
-                }}
-                initial={{
-                  x: 0,
-                  y: 0,
-                  scale: 0,
-                  opacity: 1,
-                }}
-                animate={{
-                  x: Math.cos((angle * Math.PI) / 180) * radius,
-                  y: Math.sin((angle * Math.PI) / 180) * radius,
-                  scale: [0, 1, 0.5],
-                  opacity: [1, 1, 0],
-                }}
-                transition={{
-                  duration: 1.5,
-                  ease: "easeOut",
-                }}
-              />
-            );
-          })}
-          {/* Center burst */}
-          <motion.div
-            className="absolute w-6 h-6 rounded-full -translate-x-3 -translate-y-3"
-            style={{
-              backgroundColor: firework.color,
-              boxShadow: `0 0 30px ${firework.color}`,
-            }}
-            initial={{ scale: 0, opacity: 1 }}
-            animate={{ scale: [0, 1.5, 0], opacity: [1, 0.5, 0] }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          />
-        </div>
-      ))}
     </div>
   );
 }

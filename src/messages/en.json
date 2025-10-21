@@ -90,5 +90,42 @@
     "nameKh": "Name (Khmer)",
     "actions": "Actions",
     "status": "Status"
+  },
+
+  "NIDPage": {
+    "head_text": "CAMDX Validate Nid Card",
+    "process": "Processing...",
+    "check": "Check Now",
+    "clear": "Clear",
+    "extracting": "Extracting NID information...",
+    "validating": "Validating NID information...",
+
+    "info": "NID Extract Information",
+    "id": "Legal Id",
+    "lnameKH": "Lastname Kh",
+    "fnameKH": "Firstname Kh",
+    "dob": "Date of Birth",
+    "lnameEn": "Family Name",
+    "fnameEn": "Given Name",
+    "gender": "Gender",
+    "exp": "Legal ExpDate",
+    "issued": "Legal IssuedDate",
+
+    "valid_success": "Validation Successful",
+    "completed": "NID validation completed successfully with the following fields: Given Name, Family Name, and Date of Birth.",
+    "score": "Score",
+    "warning": "Warning Incorrect Fields:",
+    "close": "Close",
+
+    "valid_fail": "Validation Failed",
+    "not_match": "The following fields do not match the NID records:",
+    "incorrect": "Incorrect Fields:",
+
+    "required_image": "Image required",
+    "req_image_des": "Please upload identification card image before check validation.",
+
+    "requireds": "Required Fields",
+    "required": "Required Field",
+    "req_des": "Please fill in the following required"
   }
 }
