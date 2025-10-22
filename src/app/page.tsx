@@ -1,38 +1,31 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CheckCircle, CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  RequestIdImage,
-  RequestValidModel,
-} from "@/models/acc-online/nid.request.model";
-import {
-  ResponseNID,
-  ValidationResponse,
-} from "@/models/acc-online/nid.response.model";
-import {
-  extractNIDService,
-  validateNIDService,
-} from "@/services/acc-online/nid.service";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RequestIdImage, RequestValidModel } from "@/models/acc-online/nid.request.model";
+import { ResponseNID, ValidationResponse } from "@/models/acc-online/nid.response.model";
+import { extractNIDService, validateNIDService } from "@/services/acc-online/nid.service";
 import { formatDate } from "@/constants/AppResource/format-date/format-dd-mm-yyyy";
 import ValidationErrorModal from "@/components/acc-online/validateModal";
 import ErrorModal from "@/components/acc-online/errorModal";
 import SuccessModal from "@/components/acc-online/successModal";
 import LanguageSwitcher from "@/components/shared/common/language-switcher";
 import Footer from "@/components/shared/footer/footer";
-import { CustomDatePicker } from "@/components/shared/common/custom-date-picker";
+import { MaritalModel } from "@/models/static/marital/marital.response";
+import { getAllMaritalService } from "@/services/dashboard/marital/marital.service";
+import { useClientLocale } from "@/context/provider/local-provider";
+import { OccupationModel } from "@/models/static/occupation/occupation.response";
+import { ReferenceModel } from "@/models/static/reference/reference.response";
+import { getAllReferenceService } from "@/services/dashboard/reference/reference.service";
+import { getAllOccupationService } from "@/services/dashboard/occupation/occupation.service";
+import { FormInputField } from "@/components/acc-online/form-field/form-field";
 
 export interface Image {
   idImage: string;
@@ -51,7 +44,7 @@ export default function CheckNIDPage() {
     expiredDate: "",
     issuedDate: "",
     address: "",
-    pob: "",
+    pob: ""
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<Image | null>(null);
@@ -75,8 +68,104 @@ export default function CheckNIDPage() {
     description: "",
   });
 
+  // Marital status state
+  const [maritalStatuses, setMaritalStatuses] = useState<MaritalModel[]>([]);
+  const [selectedMaritalStatus, setSelectedMaritalStatus] = useState<string>("");
+  const [isLoadingMaritals, setIsLoadingMaritals] = useState(false);
+
+  // Occupation state
+  const [occupations, setOccupations] = useState<OccupationModel[]>([]);
+  const [selectedOccupation, setSelectedOccupation] = useState<string>("");
+  const [isLoadingOccupations, setIsLoadingOccupations] = useState(false);
+
+  // Reference bank state
+  const [referenceBanks, setReferenceBanks] = useState<ReferenceModel[]>([]);
+  const [selectedReferenceBank, setSelectedReferenceBank] = useState<string>("");
+  const [isLoadingReferenceBanks, setIsLoadingReferenceBanks] = useState(false);
+  const [staffCode, setStaffCode] = useState<string>("");
+
+  // Get current locale
+  const { locale: currentLocale } = useClientLocale();
+
   // change language
   const translate = useTranslations("NIDPage");
+
+  // Fetch marital statuses on component mount
+  useEffect(() => {
+    const fetchMaritalStatuses = async () => {
+      setIsLoadingMaritals(true);
+      try {
+        const response = await getAllMaritalService({
+          pageNo: 1,
+          pageSize: 100,
+          status: "ACTIVE"
+        });
+        setMaritalStatuses(response.content || []);
+      } catch (error: any) {
+        console.error("Failed to fetch:", error);
+        toast.error("Failed to load marital statuses");
+      } finally {
+        setIsLoadingMaritals(false);
+      }
+    };
+    fetchMaritalStatuses();
+  }, []);
+
+  // Fetch occupations on component mount
+  useEffect(() => {
+    const fetchOccupations = async () => {
+      setIsLoadingOccupations(true);
+      try {
+        const response = await getAllOccupationService({
+          pageNo: 1,
+          pageSize: 100,
+          status: "ACTIVE"
+        });
+        setOccupations(response.content || []);
+      } catch (error: any) {
+        console.error("Failed to fetch occupations:", error);
+        toast.error("Failed to load occupations");
+      } finally {
+        setIsLoadingOccupations(false);
+      }
+    };
+    fetchOccupations();
+  }, []);
+
+  // Fetch reference banks on component mount
+  useEffect(() => {
+    const fetchReferenceBanks = async () => {
+      setIsLoadingReferenceBanks(true);
+      try {
+        const response = await getAllReferenceService({
+          pageNo: 1,
+          pageSize: 100,
+          status: "ACTIVE"
+        });
+        setReferenceBanks(response.content || []);
+      } catch (error: any) {
+        console.error("Failed to fetch reference banks:", error);
+        toast.error("Failed to load reference banks");
+      } finally {
+        setIsLoadingReferenceBanks(false);
+      }
+    };
+    fetchReferenceBanks();
+  }, []);
+
+  // Helper function to get marital name based on locale
+  const getMaritalName = (marital: MaritalModel) => {
+    return currentLocale === "kh" ? marital.nameKh : marital.nameEn;
+  };
+  // Helper function to get occupation name based on locale
+  const getOccupationName = (occupation: OccupationModel) => {
+    return currentLocale === "kh" ? occupation.nameKh : occupation.nameEn;
+  };
+
+  // Helper function to get reference bank name based on locale
+  const getReferenceName = (reference: ReferenceModel) => {
+    return currentLocale === "kh" ? reference.nameKh : reference.nameEn;
+  };
 
   // Helper function to convert date to YYYY-MM-DD
   const formatDateForInput = (dateString: string): string => {
@@ -89,13 +178,13 @@ export default function CheckNIDPage() {
 
     // If in DD/MM/YYYY format
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split("/");
+      const [day, month, year] = dateString.split('/');
       return `${year}-${month}-${day}`;
     }
 
     // If in DD-MM-YYYY format
     if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split("-");
+      const [day, month, year] = dateString.split('-');
       return `${year}-${month}-${day}`;
     }
 
@@ -108,19 +197,11 @@ export default function CheckNIDPage() {
 
     const genderUpper = gender.toUpperCase().trim();
 
-    if (
-      genderUpper === "M" ||
-      genderUpper === "MALE" ||
-      genderUpper === "ប្រុស"
-    ) {
+    if (genderUpper === "M" || genderUpper === "MALE" || genderUpper === "ប្រុស") {
       return "Male";
     }
 
-    if (
-      genderUpper === "F" ||
-      genderUpper === "FEMALE" ||
-      genderUpper === "ស្រី"
-    ) {
+    if (genderUpper === "F" || genderUpper === "FEMALE" || genderUpper === "ស្រី") {
       return "Female";
     }
 
@@ -244,6 +325,7 @@ export default function CheckNIDPage() {
       console.log("Normalized data:", normalizedData);
       setFormData(normalizedData);
       toast.success("NID extracted successfully!");
+
     } catch (error: any) {
       console.error("Failed to extract NID - Full error:", error);
       console.error("Error message:", error.message);
@@ -375,7 +457,7 @@ export default function CheckNIDPage() {
     expiredDate: "",
     issuedDate: "",
     address: "",
-    pob: "",
+    pob: ""
   };
 
   const handleClear = () => {
@@ -386,6 +468,10 @@ export default function CheckNIDPage() {
     setSelfieImage(null);
     setSelfiePreview(null);
     setValidationResult(null);
+    setSelectedMaritalStatus("");
+    setSelectedOccupation("");
+    setSelectedReferenceBank("");
+    setStaffCode("");
 
     // Reset file input
     const fileInput = document.getElementById(
@@ -404,12 +490,16 @@ export default function CheckNIDPage() {
   };
 
   return (
-    <div className=" flex flex-col h-screen">
+    <div className="flex flex-col h-screen">
       {/* Sticky Header */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b shadow-sm px-5">
-        <div className=" mx-auto px-10 py-4 flex items-center justify-between">
+        <div className="mx-auto px-10 py-4 flex items-center justify-between">
           <div className="flex items-center">
-            <img src="/app/CP-bank-Logo.png" alt="Bank Logo" className="h-12" />
+            <img
+              src="/app/CP-bank-Logo.png"
+              alt="Bank Logo"
+              className="h-12"
+            />
           </div>
           <LanguageSwitcher variant="flag-only" />
         </div>
@@ -420,10 +510,11 @@ export default function CheckNIDPage() {
         <div className="lg:px-16 px-4 py-8">
           <Card className="p-8 mb-6 shadow-lg">
             <div className="mx-auto">
-              <div className="mb-8">
+              <div className="mb-8 flex justify-between">
                 <h1 className="text-2xl font-semibold text-gray-800 mb-2">
                   Account Online Register
                 </h1>
+                <Button onClick={handleClear}>Clear</Button>
               </div>
 
               {/* Loading indicator */}
@@ -431,9 +522,7 @@ export default function CheckNIDPage() {
                 <div className="flex justify-center items-center space-x-2 mb-6">
                   <Loader2 className="animate-spin h-6 w-6 text-blue-600" />
                   <span className="text-sm text-gray-600">
-                    {isLoading
-                      ? translate("extracting")
-                      : translate("validating")}
+                    {isLoading ? translate("extracting") : translate("validating")}
                   </span>
                 </div>
               )}
@@ -451,7 +540,7 @@ export default function CheckNIDPage() {
                     <div className="absolute -bottom-2 -left-2 w-6 h-6 border-l-2 border-b-2 border-gray-400"></div>
                     <div className="absolute -bottom-2 -right-2 w-6 h-6 border-r-2 border-b-2 border-gray-400"></div>
 
-                    <div className="relative lg:w-96 md:w-80 w-96 h-64  bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                    <div className="relative lg:w-96 md:w-80 w-96 h-64 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
                       <input
                         type="file"
                         accept="image/*"
@@ -461,10 +550,7 @@ export default function CheckNIDPage() {
                         disabled={isLoading || isValidating}
                       />
                       <img
-                        src={
-                          uploadedImage?.idImage ||
-                          "/app/identity-card.png?height=192&width=320"
-                        }
+                        src={uploadedImage?.idImage || "/app/identity-card.png?height=192&width=320"}
                         alt="ID Card"
                         className="w-full h-full"
                       />
@@ -492,10 +578,7 @@ export default function CheckNIDPage() {
                         disabled={isLoading || isValidating}
                       />
                       <img
-                        src={
-                          selfiePreview ||
-                          "/app/image_selfie.jpg?height=192&width=320"
-                        }
+                        src={selfiePreview || "/app/image_selfie.jpg?height=192&width=320"}
                         alt="Selfie"
                         className="w-full h-full"
                       />
@@ -506,21 +589,17 @@ export default function CheckNIDPage() {
 
               {/* Form Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
-                    First Name (KH)
-                  </label>
-                  <Input
-                    placeholder="First Name (KH)"
-                    value={formData.lastNameKh}
-                    onChange={(e) =>
-                      handleInputChange("lastNameKh", e.target.value)
-                    }
-                    className="w-full h-10"
-                    disabled={isLoading || isValidating}
-                  />
-                </div>
 
+                {/* First Name (KH) */}
+                <FormInputField
+                  label="First Name (KH)"
+                  placeholder="First Name (KH)"
+                  value={formData.lastNameKh}
+                  onChange={(value) => handleInputChange("lastNameKh", value)}
+                  disabled={isLoading || isValidating}
+                />
+
+                {/* Last Name (KH)*/}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Last Name (KH)
@@ -528,14 +607,13 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Last Name (KH)"
                     value={formData.firstNameKh}
-                    onChange={(e) =>
-                      handleInputChange("firstNameKh", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("firstNameKh", e.target.value)}
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
                 </div>
 
+                {/* Family Name */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Family Name
@@ -543,14 +621,13 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Family Name"
                     value={formData.lastNameEn}
-                    onChange={(e) =>
-                      handleInputChange("lastNameEn", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("lastNameEn", e.target.value)}
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
                 </div>
 
+                {/* Given Name */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Given Name
@@ -558,23 +635,23 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Given Name"
                     value={formData.firstNameEn}
-                    onChange={(e) =>
-                      handleInputChange("firstNameEn", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("firstNameEn", e.target.value)}
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
                 </div>
 
+                {/* Date Of Birth */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Date Of Birth
                   </label>
-                  <CustomDatePicker
+                  <Input
+                    type="date"
                     value={formData.dob}
-                    onChange={(value) => handleInputChange("dob", value)}
+                    onChange={(e) => handleInputChange("dob", e.target.value)}
+                    className="w-full h-10"
                     disabled={isLoading || isValidating}
-                    placeholder="Select start date"
                   />
                 </div>
 
@@ -585,9 +662,7 @@ export default function CheckNIDPage() {
                   </label>
                   <Select
                     value={formData.gender || ""}
-                    onValueChange={(value) =>
-                      handleInputChange("gender", value)
-                    }
+                    onValueChange={(value) => handleInputChange("gender", value)}
                     disabled={isLoading || isValidating}
                   >
                     <SelectTrigger className="h-10">
@@ -610,13 +685,12 @@ export default function CheckNIDPage() {
                       <SelectValue placeholder="--- Choose one ---" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="national-id">
-                        National ID Card
-                      </SelectItem>
+                      <SelectItem value="national-id">National ID Card</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
+                {/* Legal ID */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Legal ID
@@ -624,14 +698,13 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Legal ID"
                     value={formData.idNumber}
-                    onChange={(e) =>
-                      handleInputChange("idNumber", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("idNumber", e.target.value)}
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
                 </div>
 
+                {/* Address */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Address
@@ -639,14 +712,13 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Address"
                     value={formData.address}
-                    onChange={(e) =>
-                      handleInputChange("address", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("address", e.target.value)}
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
                 </div>
 
+                {/* Place Of Birth */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Place Of Birth
@@ -660,43 +732,53 @@ export default function CheckNIDPage() {
                   />
                 </div>
 
+                {/* Marital Status */}
                 <div className="md:col-span-2">
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Marital Status
                   </label>
-                  <Select disabled={isLoading || isValidating}>
+                  <Select
+                    value={selectedMaritalStatus}
+                    onValueChange={setSelectedMaritalStatus}
+                    disabled={isLoading || isValidating || isLoadingMaritals}
+                  >
                     <SelectTrigger className="w-full h-10">
-                      <SelectValue placeholder="--- Choose one ---" />
+                      <SelectValue placeholder={isLoadingMaritals ? "Loading..." : "--- Choose one ---"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="single">Single</SelectItem>
-                      <SelectItem value="married">Married</SelectItem>
-                      <SelectItem value="divorced">Divorced</SelectItem>
-                      <SelectItem value="widowed">Widowed</SelectItem>
+                      {maritalStatuses.map((marital) => (
+                        <SelectItem key={marital.id} value={marital.id.toString()}>
+                          {getMaritalName(marital)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
+                {/* Occupation */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Occupation
                   </label>
-                  <Select disabled={isLoading || isValidating}>
+                  <Select
+                    value={selectedOccupation}
+                    onValueChange={setSelectedOccupation}
+                    disabled={isLoading || isValidating || isLoadingOccupations}
+                  >
                     <SelectTrigger className="w-full h-10">
-                      <SelectValue placeholder="--- Choose one ---" />
+                      <SelectValue placeholder={isLoadingOccupations ? "Loading..." : "--- Choose one ---"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="student">Student</SelectItem>
-                      <SelectItem value="teacher">Teacher</SelectItem>
-                      <SelectItem value="developer">Developer</SelectItem>
-                      <SelectItem value="designer">Designer</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="freelancer">Freelancer</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      {occupations.map((occupation) => (
+                        <SelectItem key={occupation.id} value={occupation.id.toString()}>
+                          {getOccupationName(occupation)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
+                {/* Branch */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Branch
@@ -718,29 +800,39 @@ export default function CheckNIDPage() {
                   </Select>
                 </div>
 
+                {/* Reference */}
                 <div className="md:col-span-2">
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Referer (Optional)
                   </label>
                   <div className="flex">
-                    <Select>
+                    <Select
+                      value={selectedReferenceBank}
+                      onValueChange={setSelectedReferenceBank}
+                      disabled={isLoading || isValidating || isLoadingReferenceBanks}
+                    >
                       <SelectTrigger className="w-40 h-10 rounded-r-none">
-                        <SelectValue placeholder="CP Bank" />
+                        <SelectValue placeholder={isLoadingReferenceBanks ? "Loading..." : "CP Bank"} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="cpbank">CP Bank</SelectItem>
-                        <SelectItem value="funan">Funan</SelectItem>
-                        <SelectItem value="others">Others</SelectItem>
+                        {referenceBanks.map((reference) => (
+                          <SelectItem key={reference.id} value={reference.id.toString()}>
+                            {getReferenceName(reference)}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <Input
                       placeholder="Staff Code"
+                      value={staffCode}
+                      onChange={(e) => setStaffCode(e.target.value)}
                       className="flex-1 h-10 !rounded-l-none"
                       disabled={isLoading || isValidating}
                     />
                   </div>
                 </div>
 
+                {/* Contact Number */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Contact Number
@@ -752,15 +844,11 @@ export default function CheckNIDPage() {
                   />
                 </div>
 
+                {/* OTP Code */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     OTP Code
-                    <a
-                      href="#"
-                      className="float-right text-blue-600 border-blue-600 border-b-2 text-sm"
-                    >
-                      Resend OTP
-                    </a>
+                    <a href="#" className="float-right text-blue-600 border-blue-600 border-b-2 text-sm">Resend OTP</a>
                   </label>
                   <Input
                     placeholder="OTP Code"
@@ -791,7 +879,6 @@ export default function CheckNIDPage() {
           </Card>
         </div>
 
-        {/* Replace the footer section with: */}
         <Footer />
       </div>
 
@@ -802,9 +889,9 @@ export default function CheckNIDPage() {
         data={
           validationResult?.data
             ? {
-                score: validationResult.data.score,
-                incorrectFields: validationResult.data.incorrectFields,
-              }
+              score: validationResult.data.score,
+              incorrectFields: validationResult.data.incorrectFields,
+            }
             : null
         }
       />
@@ -816,9 +903,9 @@ export default function CheckNIDPage() {
         data={
           validationResult?.data
             ? {
-                score: validationResult.data.score,
-                incorrectFields: validationResult.data.incorrectFields,
-              }
+              score: validationResult.data.score,
+              incorrectFields: validationResult.data.incorrectFields,
+            }
             : null
         }
       />
