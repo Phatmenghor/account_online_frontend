@@ -7,16 +7,32 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CheckCircle, CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RequestIdImage, RequestValidModel } from "@/models/acc-online/nid.request.model";
-import { ResponseNID, ValidationResponse } from "@/models/acc-online/nid.response.model";
-import { extractNIDService, validateNIDService } from "@/services/acc-online/nid.service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  RequestIdImage,
+  RequestValidModel,
+} from "@/models/acc-online/nid.request.model";
+import {
+  ResponseNID,
+  ValidationResponse,
+} from "@/models/acc-online/nid.response.model";
+import {
+  extractNIDService,
+  validateNIDService,
+} from "@/services/acc-online/nid.service";
 import { formatDate } from "@/constants/AppResource/format-date/format-dd-mm-yyyy";
 import ValidationErrorModal from "@/components/acc-online/validateModal";
 import ErrorModal from "@/components/acc-online/errorModal";
 import SuccessModal from "@/components/acc-online/successModal";
 import LanguageSwitcher from "@/components/shared/common/language-switcher";
 import Footer from "@/components/shared/footer/footer";
+import { CustomDatePicker } from "@/components/shared/common/custom-date-picker";
 
 export interface Image {
   idImage: string;
@@ -35,7 +51,7 @@ export default function CheckNIDPage() {
     expiredDate: "",
     issuedDate: "",
     address: "",
-    pob: ""
+    pob: "",
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<Image | null>(null);
@@ -73,13 +89,13 @@ export default function CheckNIDPage() {
 
     // If in DD/MM/YYYY format
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split('/');
+      const [day, month, year] = dateString.split("/");
       return `${year}-${month}-${day}`;
     }
 
     // If in DD-MM-YYYY format
     if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split('-');
+      const [day, month, year] = dateString.split("-");
       return `${year}-${month}-${day}`;
     }
 
@@ -92,11 +108,19 @@ export default function CheckNIDPage() {
 
     const genderUpper = gender.toUpperCase().trim();
 
-    if (genderUpper === "M" || genderUpper === "MALE" || genderUpper === "ប្រុស") {
+    if (
+      genderUpper === "M" ||
+      genderUpper === "MALE" ||
+      genderUpper === "ប្រុស"
+    ) {
       return "Male";
     }
 
-    if (genderUpper === "F" || genderUpper === "FEMALE" || genderUpper === "ស្រី") {
+    if (
+      genderUpper === "F" ||
+      genderUpper === "FEMALE" ||
+      genderUpper === "ស្រី"
+    ) {
       return "Female";
     }
 
@@ -220,7 +244,6 @@ export default function CheckNIDPage() {
       console.log("Normalized data:", normalizedData);
       setFormData(normalizedData);
       toast.success("NID extracted successfully!");
-
     } catch (error: any) {
       console.error("Failed to extract NID - Full error:", error);
       console.error("Error message:", error.message);
@@ -352,7 +375,7 @@ export default function CheckNIDPage() {
     expiredDate: "",
     issuedDate: "",
     address: "",
-    pob: ""
+    pob: "",
   };
 
   const handleClear = () => {
@@ -386,11 +409,7 @@ export default function CheckNIDPage() {
       <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b shadow-sm px-5">
         <div className=" mx-auto px-10 py-4 flex items-center justify-between">
           <div className="flex items-center">
-            <img
-              src="/app/CP-bank-Logo.png"
-              alt="Bank Logo"
-              className="h-12"
-            />
+            <img src="/app/CP-bank-Logo.png" alt="Bank Logo" className="h-12" />
           </div>
           <LanguageSwitcher variant="flag-only" />
         </div>
@@ -412,7 +431,9 @@ export default function CheckNIDPage() {
                 <div className="flex justify-center items-center space-x-2 mb-6">
                   <Loader2 className="animate-spin h-6 w-6 text-blue-600" />
                   <span className="text-sm text-gray-600">
-                    {isLoading ? translate("extracting") : translate("validating")}
+                    {isLoading
+                      ? translate("extracting")
+                      : translate("validating")}
                   </span>
                 </div>
               )}
@@ -440,7 +461,10 @@ export default function CheckNIDPage() {
                         disabled={isLoading || isValidating}
                       />
                       <img
-                        src={uploadedImage?.idImage || "/app/identity-card.png?height=192&width=320"}
+                        src={
+                          uploadedImage?.idImage ||
+                          "/app/identity-card.png?height=192&width=320"
+                        }
                         alt="ID Card"
                         className="w-full h-full"
                       />
@@ -468,7 +492,10 @@ export default function CheckNIDPage() {
                         disabled={isLoading || isValidating}
                       />
                       <img
-                        src={selfiePreview || "/app/image_selfie.jpg?height=192&width=320"}
+                        src={
+                          selfiePreview ||
+                          "/app/image_selfie.jpg?height=192&width=320"
+                        }
                         alt="Selfie"
                         className="w-full h-full"
                       />
@@ -486,7 +513,9 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="First Name (KH)"
                     value={formData.lastNameKh}
-                    onChange={(e) => handleInputChange("lastNameKh", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("lastNameKh", e.target.value)
+                    }
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
@@ -499,7 +528,9 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Last Name (KH)"
                     value={formData.firstNameKh}
-                    onChange={(e) => handleInputChange("firstNameKh", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("firstNameKh", e.target.value)
+                    }
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
@@ -512,7 +543,9 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Family Name"
                     value={formData.lastNameEn}
-                    onChange={(e) => handleInputChange("lastNameEn", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("lastNameEn", e.target.value)
+                    }
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
@@ -525,7 +558,9 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Given Name"
                     value={formData.firstNameEn}
-                    onChange={(e) => handleInputChange("firstNameEn", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("firstNameEn", e.target.value)
+                    }
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
@@ -535,12 +570,11 @@ export default function CheckNIDPage() {
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Date Of Birth
                   </label>
-                  <Input
-                    type="date"
+                  <CustomDatePicker
                     value={formData.dob}
-                    onChange={(e) => handleInputChange("dob", e.target.value)}
-                    className="w-full h-10"
+                    onChange={(value) => handleInputChange("dob", value)}
                     disabled={isLoading || isValidating}
+                    placeholder="Select start date"
                   />
                 </div>
 
@@ -551,7 +585,9 @@ export default function CheckNIDPage() {
                   </label>
                   <Select
                     value={formData.gender || ""}
-                    onValueChange={(value) => handleInputChange("gender", value)}
+                    onValueChange={(value) =>
+                      handleInputChange("gender", value)
+                    }
                     disabled={isLoading || isValidating}
                   >
                     <SelectTrigger className="h-10">
@@ -574,7 +610,9 @@ export default function CheckNIDPage() {
                       <SelectValue placeholder="--- Choose one ---" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="national-id">National ID Card</SelectItem>
+                      <SelectItem value="national-id">
+                        National ID Card
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -586,7 +624,9 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Legal ID"
                     value={formData.idNumber}
-                    onChange={(e) => handleInputChange("idNumber", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("idNumber", e.target.value)
+                    }
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
@@ -599,7 +639,9 @@ export default function CheckNIDPage() {
                   <Input
                     placeholder="Address"
                     value={formData.address}
-                    onChange={(e) => handleInputChange("address", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("address", e.target.value)
+                    }
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
@@ -713,7 +755,12 @@ export default function CheckNIDPage() {
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     OTP Code
-                    <a href="#" className="float-right text-blue-600 border-blue-600 border-b-2 text-sm">Resend OTP</a>
+                    <a
+                      href="#"
+                      className="float-right text-blue-600 border-blue-600 border-b-2 text-sm"
+                    >
+                      Resend OTP
+                    </a>
                   </label>
                   <Input
                     placeholder="OTP Code"
@@ -746,7 +793,6 @@ export default function CheckNIDPage() {
 
         {/* Replace the footer section with: */}
         <Footer />
-
       </div>
 
       {/* Success Modal */}
@@ -756,9 +802,9 @@ export default function CheckNIDPage() {
         data={
           validationResult?.data
             ? {
-              score: validationResult.data.score,
-              incorrectFields: validationResult.data.incorrectFields,
-            }
+                score: validationResult.data.score,
+                incorrectFields: validationResult.data.incorrectFields,
+              }
             : null
         }
       />
@@ -770,9 +816,9 @@ export default function CheckNIDPage() {
         data={
           validationResult?.data
             ? {
-              score: validationResult.data.score,
-              incorrectFields: validationResult.data.incorrectFields,
-            }
+                score: validationResult.data.score,
+                incorrectFields: validationResult.data.incorrectFields,
+              }
             : null
         }
       />
