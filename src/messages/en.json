@@ -126,6 +126,10 @@
 
     "requireds": "Required Fields",
     "required": "Required Field",
-    "req_des": "Please fill in the following required"
+    "req_des": "Please fill in the following required",
+
+    "header_acc": "Account Online Register",
+    "img_card": "Please upload the front side of your ID card.",
+    "img_selfie": "Please upload a selfie image."
   }
 }

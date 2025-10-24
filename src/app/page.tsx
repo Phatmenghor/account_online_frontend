@@ -26,6 +26,7 @@ import { ReferenceModel } from "@/models/static/reference/reference.response";
 import { getAllReferenceService } from "@/services/dashboard/reference/reference.service";
 import { getAllOccupationService } from "@/services/dashboard/occupation/occupation.service";
 import { FormInputField } from "@/components/acc-online/form-field/form-field";
+import { CustomDatePicker } from "@/components/shared/common/custom-date-picker";
 
 export interface Image {
   idImage: string;
@@ -397,7 +398,7 @@ export default function CheckNIDPage() {
     setIsValidating(true);
     try {
       const validationData: RequestValidModel = {
-        applicationName: "INTRANET",
+        applicationName: "DEVELOPMENT",
         idNumber: formData.idNumber,
         lastNameKh: formData.lastNameKh,
         firstNameKh: formData.firstNameKh,
@@ -511,8 +512,8 @@ export default function CheckNIDPage() {
           <Card className="p-8 mb-6 shadow-lg">
             <div className="mx-auto">
               <div className="mb-8 flex justify-between">
-                <h1 className="text-2xl font-semibold text-gray-800 mb-2">
-                  Account Online Register
+                <h1 className="text-3xl text-gray-800 mb-2">
+                  {translate("header_acc")}
                 </h1>
                 <Button onClick={handleClear}>Clear</Button>
               </div>
@@ -528,19 +529,19 @@ export default function CheckNIDPage() {
               )}
 
               {/* ID Card and Selfie Upload Section */}
-              <div className="flex md:flex-row flex-col justify-evenly items-center mb-8 py-2 gap-8">
+              <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 gap-10">
                 <div>
-                  <p className="text-sm text-gray-600 mb-4 text-center">
-                    Please upload the front side of your ID card.
+                  <p className="text-base text-gray-600 mb-4 text-center">
+                    {translate("img_card")}
                   </p>
 
                   <div className="relative">
-                    <div className="absolute -top-2 -left-2 w-6 h-6 border-l-2 border-t-2 border-gray-400"></div>
-                    <div className="absolute -top-2 -right-2 w-6 h-6 border-r-2 border-t-2 border-gray-400"></div>
-                    <div className="absolute -bottom-2 -left-2 w-6 h-6 border-l-2 border-b-2 border-gray-400"></div>
-                    <div className="absolute -bottom-2 -right-2 w-6 h-6 border-r-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute -top-5 -left-6 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute -top-5 -right-6 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute -bottom-5 -left-6 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute -bottom-5 -right-6 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
 
-                    <div className="relative lg:w-96 md:w-80 w-96 h-64 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                    <div className="relative lg:w-96 md:w-80 w-96 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
                       <input
                         type="file"
                         accept="image/*"
@@ -558,17 +559,17 @@ export default function CheckNIDPage() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-4 text-center">
-                    Please upload a selfie image.
+                  <p className="text-base text-gray-600 mb-4 text-center">
+                    {translate("img_selfie")}
                   </p>
 
                   <div className="relative">
-                    <div className="absolute -top-2 -left-2 w-6 h-6 border-l-2 border-t-2 border-gray-400"></div>
-                    <div className="absolute -top-2 -right-2 w-6 h-6 border-r-2 border-t-2 border-gray-400"></div>
-                    <div className="absolute -bottom-2 -left-2 w-6 h-6 border-l-2 border-b-2 border-gray-400"></div>
-                    <div className="absolute -bottom-2 -right-2 w-6 h-6 border-r-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute -top-5 -left-6 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute -top-6 -right-6 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute -bottom-5 -left-6 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute -bottom-5 -right-6 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
 
-                    <div className="relative lg:w-96 md:w-80 w-96 h-64 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                    <div className="relative lg:w-96 md:w-80 w-96 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
                       <input
                         type="file"
                         accept="image/*"
@@ -646,12 +647,11 @@ export default function CheckNIDPage() {
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Date Of Birth
                   </label>
-                  <Input
-                    type="date"
+                  <CustomDatePicker
                     value={formData.dob}
-                    onChange={(e) => handleInputChange("dob", e.target.value)}
-                    className="w-full h-10"
+                    onChange={(value) => handleInputChange("dob", value)}
                     disabled={isLoading || isValidating}
+                    placeholder="Select start date"
                   />
                 </div>
 
@@ -838,7 +838,7 @@ export default function CheckNIDPage() {
                     Contact Number
                   </label>
                   <Input
-                    placeholder="012345678"
+                    placeholder="Contact Number"
                     className="w-full h-10"
                     disabled={isLoading || isValidating}
                   />
