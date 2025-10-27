@@ -1,0 +1,155 @@
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { getAllMaritalService } from "@/services/dashboard/marital/marital.service";
+import { getAllOccupationService } from "@/services/dashboard/occupation/occupation.service";
+import { getAllReferenceService } from "@/services/dashboard/reference/reference.service";
+import { getAllBranchService } from "@/services/branch/branch.service";
+import { MaritalModel } from "@/models/static/marital/marital.response";
+import { OccupationModel } from "@/models/static/occupation/occupation.response";
+import { ReferenceModel } from "@/models/static/reference/reference.response";
+import { BranchModel } from "@/models/branch/branch.response";
+
+/**
+ * Generic hook for fetching data with loading and error states
+ */
+interface UseFetchDataResult<T> {
+  data: T[];
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+}
+
+/**
+ * Hook to fetch marital statuses
+ */
+export const useMaritalStatuses = (): UseFetchDataResult<MaritalModel> => {
+  const [data, setData] = useState<MaritalModel[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await getAllMaritalService({
+        pageNo: 1,
+        pageSize: 100,
+        status: "ACTIVE"
+      });
+      setData(response.content || []);
+    } catch (err: any) {
+      console.error("Failed to fetch marital statuses:", err);
+      setError(err);
+      toast.error("Failed to load marital statuses");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return { data, isLoading, error, refetch: fetchData };
+};
+
+/**
+ * Hook to fetch occupations
+ */
+export const useOccupations = (): UseFetchDataResult<OccupationModel> => {
+  const [data, setData] = useState<OccupationModel[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await getAllOccupationService({
+        pageNo: 1,
+        pageSize: 100,
+        status: "ACTIVE"
+      });
+      setData(response.content || []);
+    } catch (err: any) {
+      console.error("Failed to fetch occupations:", err);
+      setError(err);
+      toast.error("Failed to load occupations");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return { data, isLoading, error, refetch: fetchData };
+};
+
+/**
+ * Hook to fetch reference banks
+ */
+export const useReferenceBanks = (): UseFetchDataResult<ReferenceModel> => {
+  const [data, setData] = useState<ReferenceModel[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await getAllReferenceService({
+        pageNo: 1,
+        pageSize: 100,
+        status: "ACTIVE"
+      });
+      setData(response.content || []);
+    } catch (err: any) {
+      console.error("Failed to fetch reference banks:", err);
+      setError(err);
+      toast.error("Failed to load reference banks");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return { data, isLoading, error, refetch: fetchData };
+};
+
+/**
+ * Hook to fetch branches
+ */
+export const useBranches = (): UseFetchDataResult<BranchModel> => {
+  const [data, setData] = useState<BranchModel[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await getAllBranchService({
+        pageNo: 1,
+        pageSize: 30,
+      });
+      setData(response.content || []);
+    } catch (err: any) {
+      console.error("Failed to fetch branches:", err);
+      setError(err);
+      toast.error("Failed to load branches");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return { data, isLoading, error, refetch: fetchData };
+};

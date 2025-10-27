@@ -72,11 +72,10 @@ interface CustomError {
 
 export async function validateNIDService(data: RequestValidModel) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/public/nid/validate`, {
-      applicationName: data.applicationName,
+    const response = await axiosClientWithAuth.post(`/api/v1/public/nid/validate`,
       data
-    });
-    return response.data.data.data;
+    );
+    return response.data.data;
   } catch (err) {
     const error = err as AxiosError<ErrorResponse>;
     const statusCode = error.response?.status ?? 500;

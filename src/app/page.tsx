@@ -12,21 +12,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RequestIdImage, RequestValidModel } from "@/models/acc-online/nid.request.model";
 import { ResponseNID, ValidationResponse } from "@/models/acc-online/nid.response.model";
 import { extractNIDService, validateNIDService } from "@/services/acc-online/nid.service";
-import { formatDate } from "@/constants/AppResource/format-date/format-dd-mm-yyyy";
+import { convertGenderForAPI, formatDate } from "@/constants/AppResource/format-date/format-dd-mm-yyyy";
 import ValidationErrorModal from "@/components/acc-online/validateModal";
 import ErrorModal from "@/components/acc-online/errorModal";
 import SuccessModal from "@/components/acc-online/successModal";
 import LanguageSwitcher from "@/components/shared/common/language-switcher";
 import Footer from "@/components/shared/footer/footer";
 import { MaritalModel } from "@/models/static/marital/marital.response";
-import { getAllMaritalService } from "@/services/dashboard/marital/marital.service";
 import { useClientLocale } from "@/context/provider/local-provider";
 import { OccupationModel } from "@/models/static/occupation/occupation.response";
 import { ReferenceModel } from "@/models/static/reference/reference.response";
-import { getAllReferenceService } from "@/services/dashboard/reference/reference.service";
-import { getAllOccupationService } from "@/services/dashboard/occupation/occupation.service";
 import { FormInputField } from "@/components/acc-online/form-field/form-field";
 import { CustomDatePicker } from "@/components/shared/common/custom-date-picker";
+import { formatDateForInput, normalizeGender } from "@/utils/format/BranchFormat";
+import { useBranches, useMaritalStatuses, useOccupations, useReferenceBanks } from "@/hooks/fetch-master";
+import { AppToast } from "@/components/shared/toast/app-toast";
+import { ComboboxSelectBranch } from "@/components/shared/combo-box/combobox-branch";
 
 export interface Image {
   idImage: string;
@@ -69,20 +70,19 @@ export default function CheckNIDPage() {
     description: "",
   });
 
-  // Marital status state
-  const [maritalStatuses, setMaritalStatuses] = useState<MaritalModel[]>([]);
+  // Use custom hooks for data fetching
+  const { data: maritalStatuses, isLoading: isLoadingMaritals } = useMaritalStatuses();
   const [selectedMaritalStatus, setSelectedMaritalStatus] = useState<string>("");
-  const [isLoadingMaritals, setIsLoadingMaritals] = useState(false);
 
-  // Occupation state
-  const [occupations, setOccupations] = useState<OccupationModel[]>([]);
+  const { data: occupations, isLoading: isLoadingOccupations } = useOccupations();
   const [selectedOccupation, setSelectedOccupation] = useState<string>("");
-  const [isLoadingOccupations, setIsLoadingOccupations] = useState(false);
 
-  // Reference bank state
-  const [referenceBanks, setReferenceBanks] = useState<ReferenceModel[]>([]);
+  const { data: referenceBanks, isLoading: isLoadingReferenceBanks } = useReferenceBanks();
   const [selectedReferenceBank, setSelectedReferenceBank] = useState<string>("");
-  const [isLoadingReferenceBanks, setIsLoadingReferenceBanks] = useState(false);
+
+  const { data: branches, isLoading: isLoadingBranches } = useBranches();
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
+
   const [staffCode, setStaffCode] = useState<string>("");
 
   // Get current locale
@@ -90,69 +90,6 @@ export default function CheckNIDPage() {
 
   // change language
   const translate = useTranslations("NIDPage");
-
-  // Fetch marital statuses on component mount
-  useEffect(() => {
-    const fetchMaritalStatuses = async () => {
-      setIsLoadingMaritals(true);
-      try {
-        const response = await getAllMaritalService({
-          pageNo: 1,
-          pageSize: 100,
-          status: "ACTIVE"
-        });
-        setMaritalStatuses(response.content || []);
-      } catch (error: any) {
-        console.error("Failed to fetch:", error);
-        toast.error("Failed to load marital statuses");
-      } finally {
-        setIsLoadingMaritals(false);
-      }
-    };
-    fetchMaritalStatuses();
-  }, []);
-
-  // Fetch occupations on component mount
-  useEffect(() => {
-    const fetchOccupations = async () => {
-      setIsLoadingOccupations(true);
-      try {
-        const response = await getAllOccupationService({
-          pageNo: 1,
-          pageSize: 100,
-          status: "ACTIVE"
-        });
-        setOccupations(response.content || []);
-      } catch (error: any) {
-        console.error("Failed to fetch occupations:", error);
-        toast.error("Failed to load occupations");
-      } finally {
-        setIsLoadingOccupations(false);
-      }
-    };
-    fetchOccupations();
-  }, []);
-
-  // Fetch reference banks on component mount
-  useEffect(() => {
-    const fetchReferenceBanks = async () => {
-      setIsLoadingReferenceBanks(true);
-      try {
-        const response = await getAllReferenceService({
-          pageNo: 1,
-          pageSize: 100,
-          status: "ACTIVE"
-        });
-        setReferenceBanks(response.content || []);
-      } catch (error: any) {
-        console.error("Failed to fetch reference banks:", error);
-        toast.error("Failed to load reference banks");
-      } finally {
-        setIsLoadingReferenceBanks(false);
-      }
-    };
-    fetchReferenceBanks();
-  }, []);
 
   // Helper function to get marital name based on locale
   const getMaritalName = (marital: MaritalModel) => {
@@ -166,47 +103,6 @@ export default function CheckNIDPage() {
   // Helper function to get reference bank name based on locale
   const getReferenceName = (reference: ReferenceModel) => {
     return currentLocale === "kh" ? reference.nameKh : reference.nameEn;
-  };
-
-  // Helper function to convert date to YYYY-MM-DD
-  const formatDateForInput = (dateString: string): string => {
-    if (!dateString) return "";
-
-    // If already in YYYY-MM-DD format
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-      return dateString;
-    }
-
-    // If in DD/MM/YYYY format
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split('/');
-      return `${year}-${month}-${day}`;
-    }
-
-    // If in DD-MM-YYYY format
-    if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split('-');
-      return `${year}-${month}-${day}`;
-    }
-
-    return dateString;
-  };
-
-  // Helper function to normalize gender
-  const normalizeGender = (gender: string): string => {
-    if (!gender) return "";
-
-    const genderUpper = gender.toUpperCase().trim();
-
-    if (genderUpper === "M" || genderUpper === "MALE" || genderUpper === "ប្រុស") {
-      return "Male";
-    }
-
-    if (genderUpper === "F" || genderUpper === "FEMALE" || genderUpper === "ស្រី") {
-      return "Female";
-    }
-
-    return gender;
   };
 
   const handleImageUpload = async (
@@ -325,7 +221,12 @@ export default function CheckNIDPage() {
 
       console.log("Normalized data:", normalizedData);
       setFormData(normalizedData);
-      toast.success("NID extracted successfully!");
+      // toast.success("NID extracted successfully!");
+      AppToast({
+        type: "success",
+        message: "NID extracted successfully!",
+        description: "Extract NID Card",
+      });
 
     } catch (error: any) {
       console.error("Failed to extract NID - Full error:", error);
@@ -405,7 +306,7 @@ export default function CheckNIDPage() {
         lastNameEn: formData.lastNameEn,
         firstNameEn: formData.firstNameEn,
         dob: formatDate(formData.dob),
-        gender: formData.gender,
+        gender: convertGenderForAPI(formData.gender),
         expiredDate: formatDate(formData.expiredDate),
         issuedDate: formatDate(formData.issuedDate),
         address: formData.address,
@@ -417,7 +318,7 @@ export default function CheckNIDPage() {
       setValidationResult(response);
 
       // Check if there are incorrect fields that matter for error modal
-      const criticalFields = ["lastNameEn", "firstNameEn", "dob"];
+      const criticalFields = ["lastNameEn", "firstNameEn", "dob", "gender"];
       const hasCriticalErrors = response.data.incorrectFields.some(
         (field: string) => criticalFields.includes(field)
       );
@@ -472,6 +373,7 @@ export default function CheckNIDPage() {
     setSelectedMaritalStatus("");
     setSelectedOccupation("");
     setSelectedReferenceBank("");
+    setSelectedBranch("");
     setStaffCode("");
 
     // Reset file input
@@ -529,19 +431,19 @@ export default function CheckNIDPage() {
               )}
 
               {/* ID Card and Selfie Upload Section */}
-              <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 gap-10">
+              <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 lg:gap-14 gap-8">
                 <div>
                   <p className="text-base text-gray-600 mb-4 text-center">
                     {translate("img_card")}
                   </p>
 
                   <div className="relative">
-                    <div className="absolute -top-5 -left-6 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
-                    <div className="absolute -top-5 -right-6 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
-                    <div className="absolute -bottom-5 -left-6 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
-                    <div className="absolute -bottom-5 -right-6 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute lg:-top-5 -top-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute lg:-top-5 -top-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
 
-                    <div className="relative lg:w-96 md:w-80 w-96 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                    <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
                       <input
                         type="file"
                         accept="image/*"
@@ -564,12 +466,12 @@ export default function CheckNIDPage() {
                   </p>
 
                   <div className="relative">
-                    <div className="absolute -top-5 -left-6 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
-                    <div className="absolute -top-6 -right-6 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
-                    <div className="absolute -bottom-5 -left-6 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
-                    <div className="absolute -bottom-5 -right-6 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute lg:-top-5 -top-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute lg:-top-5 -top-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
+                    <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
+                    <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
 
-                    <div className="relative lg:w-96 md:w-80 w-96 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                    <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
                       <input
                         type="file"
                         accept="image/*"
@@ -783,21 +685,13 @@ export default function CheckNIDPage() {
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     Branch
                   </label>
-                  <Select>
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="--- Choose one ---" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="engineering">Engineering</SelectItem>
-                      <SelectItem value="design">Design</SelectItem>
-                      <SelectItem value="marketing">Marketing</SelectItem>
-                      <SelectItem value="sales">Sales</SelectItem>
-                      <SelectItem value="support">Customer Support</SelectItem>
-                      <SelectItem value="hr">Human Resources</SelectItem>
-                      <SelectItem value="finance">Finance</SelectItem>
-                      <SelectItem value="operations">Operations</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <ComboboxSelectBranch
+                    dataSelect={branches.find(b => b.branchID === selectedBranch) || null}
+                    onChangeSelected={(branch) => setSelectedBranch(branch?.branchID || "")}
+                    disabled={isLoadingBranches}
+                    branches={branches}
+                    isLoading={isLoadingBranches}
+                  />
                 </div>
 
                 {/* Reference */}

@@ -112,7 +112,7 @@
     "issued": "Legal IssuedDate",
 
     "valid_success": "Validation Successful",
-    "completed": "NID validation completed successfully with the following fields: Given Name, Family Name, and Date of Birth.",
+    "completed": "NID validation completed successfully with the following fields: Given Name, Family Name, Gender and Date of Birth.",
     "score": "Score",
     "warning": "Warning Incorrect Fields:",
     "close": "Close",
