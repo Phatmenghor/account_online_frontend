@@ -205,13 +205,6 @@ export default function CheckNIDPage() {
       // response is already the extracted NID data object
       const response = await extractNIDService(dataToProcess);
 
-      // Debug logging
-      console.log("=== RAW API RESPONSE ===");
-      console.log("Full response:", JSON.stringify(response, null, 2));
-      console.log("DOB from API:", response.dob);
-      console.log("Gender from API:", response.gender);
-      console.log("========================");
-
       // Normalize the data before setting state
       const normalizedData = {
         ...response,
@@ -229,8 +222,6 @@ export default function CheckNIDPage() {
       });
 
     } catch (error: any) {
-      console.error("Failed to extract NID - Full error:", error);
-      console.error("Error message:", error.message);
       console.error("Error response:", error.response?.data);
 
       toast.error("Extraction error", {
@@ -252,46 +243,6 @@ export default function CheckNIDPage() {
         message: "",
         description: translate("req_image_des"),
       });
-      setShowValidationErrorModal(true);
-      return;
-    }
-
-    // Check if required fields are filled
-    const requiredFields = [
-      { field: "idNumber", label: translate("id"), value: formData.idNumber },
-      {
-        field: "lastNameEn",
-        label: translate("lnameEn"),
-        value: formData.lastNameEn,
-      },
-      {
-        field: "firstNameEn",
-        label: translate("fnameEn"),
-        value: formData.firstNameEn,
-      },
-      { field: "dob", label: translate("dob"), value: formData.dob },
-    ];
-
-    const missingFields = requiredFields.filter(
-      (field) => !field.value?.toString().trim()
-    );
-
-    if (missingFields.length > 0) {
-      const missingFieldNames = missingFields
-        .map((field) => `${field.label}, `)
-        .join("\n");
-
-      const fieldWord =
-        missingFields.length === 1
-          ? translate("required")
-          : translate("requireds");
-
-      setValidationErrorData({
-        title: `${fieldWord}`,
-        message: "",
-        description: `${translate("req_des")} :\n${missingFieldNames}`,
-      });
-
       setShowValidationErrorModal(true);
       return;
     }
