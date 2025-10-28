@@ -130,6 +130,33 @@
 
     "header_acc": "Account Online Register",
     "img_card": "Please upload the front side of your ID card.",
-    "img_selfie": "Please upload a selfie image."
+    "img_selfie": "Please upload a selfie image.",
+
+    "firstNameKh": "First Name (KH)",
+    "lastNameKH": "Last Name (KH)",
+    "familyNameEn": "Family Name",
+    "givenNameEn": "Given Name",
+    "dateOfBirth": "Date Of Birth",
+    "legalId": "Legal ID",
+    "legalType": "Legal Type",
+    "address": "Address",
+    "pob": "Place Of Birth",
+    "marital": "Marital Status",
+    "occupation": "Occupation",
+    "branch": "Branch",
+    "reference": "Referer (Optional)",
+    "staffCode": "Staff Code",
+    "contactNumber": "Contact Number",
+    "otpCode": "OTP Code",
+    "sendOtp": "Resend OTP",
+    "chooseOne": "--- Choose one ---",
+    "loading": "Loading...",
+
+    "processing": "Processing...",
+    "verification": "Verification",
+    "submit": "Submit",
+
+    "cfTitle": "Confirm Information",
+    "cfMessage": "Please confirm that you have reviewed your personal information."
   }
 }
