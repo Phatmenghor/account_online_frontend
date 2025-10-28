@@ -28,6 +28,7 @@ import { formatDateForInput, normalizeGender } from "@/utils/format/BranchFormat
 import { useBranches, useMaritalStatuses, useOccupations, useReferenceBanks } from "@/hooks/fetch-master";
 import { AppToast } from "@/components/shared/toast/app-toast";
 import { ComboboxSelectBranch } from "@/components/shared/combo-box/combobox-branch";
+import ConfirmationModal from "@/components/acc-online/confirmModal";
 
 export interface Image {
   idImage: string;
@@ -69,6 +70,8 @@ export default function CheckNIDPage() {
     message: "",
     description: "",
   });
+    // ✅ Add a new state to control the confirmation modal
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   // Use custom hooks for data fetching
   const { data: maritalStatuses, isLoading: isLoadingMaritals } = useMaritalStatuses();
@@ -237,15 +240,15 @@ export default function CheckNIDPage() {
 
   const handleValidateNID = async () => {
     // Check if image is uploaded
-    if (!uploadedImage || !imageData) {
-      setValidationErrorData({
-        title: translate("required_image"),
-        message: "",
-        description: translate("req_image_des"),
-      });
-      setShowValidationErrorModal(true);
-      return;
-    }
+    // if (!uploadedImage || !imageData) {
+    //   setValidationErrorData({
+    //     title: translate("required_image"),
+    //     message: "",
+    //     description: translate("req_image_des"),
+    //   });
+    //   setShowValidationErrorModal(true);
+    //   return;
+    // }
 
     setIsValidating(true);
     try {
@@ -290,6 +293,17 @@ export default function CheckNIDPage() {
     } finally {
       setIsValidating(false);
     }
+  };
+
+   // ✅ this function will open modal before validating
+  const handleOpenConfirmModal = () => {
+    setShowConfirmationModal(true);
+  };
+
+  // ✅ this runs validate when user clicks “Yes, I have reviewed”
+  const handleConfirmValidation = async () => {
+    setShowConfirmationModal(false);
+    await handleValidateNID();
   };
 
   const handleInputChange = (field: keyof ResponseNID, value: string) => {
@@ -347,7 +361,7 @@ export default function CheckNIDPage() {
     <div className="flex flex-col h-screen">
       {/* Sticky Header */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b shadow-sm px-5">
-        <div className="mx-auto px-10 py-4 flex items-center justify-between">
+        <div className="mx-auto lg:px-10 md:px-5 sm:px-0 py-4 flex items-center justify-between">
           <div className="flex items-center">
             <img
               src="/app/CP-bank-Logo.png"
@@ -707,7 +721,8 @@ export default function CheckNIDPage() {
               <div className="flex justify-end gap-4 mt-8">
                 <Button
                   className="px-8 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-md"
-                  onClick={handleValidateNID}
+                  // onClick={handleValidateNID}
+                  onClick={handleOpenConfirmModal}
                   disabled={isLoading || isValidating}
                 >
                   {isValidating ? "Processing..." : "Verification"}
@@ -726,6 +741,15 @@ export default function CheckNIDPage() {
 
         <Footer />
       </div>
+
+      {/* ✅ Add your Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmationModal}
+        onConfirm={handleConfirmValidation}
+        onCancel={() => setShowConfirmationModal(false)}
+        title="Confirm Information"
+        message="Please confirm that you have reviewed your personal information."
+      />
 
       {/* Success Modal */}
       <SuccessModal
