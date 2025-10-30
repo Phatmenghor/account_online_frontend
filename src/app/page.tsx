@@ -29,6 +29,7 @@ import { ComboboxSelectBranch } from "@/components/shared/combo-box/combobox-bra
 import ConfirmationModal from "@/components/acc-online/confirmModal";
 import LocationModal from "@/components/acc-online/addressModal";
 import { CommuneModel, DistrictModel, ProvinceModel, VillageModel } from "@/models/address/address.response";
+import OTPInput from "@/components/acc-online/form-field/form-otp";
 
 export interface Image {
   idImage: string;
@@ -90,7 +91,7 @@ export default function CheckNIDPage() {
     message: "",
     description: "",
   });
-  
+
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   // Location data state
@@ -116,6 +117,9 @@ export default function CheckNIDPage() {
 
   const [staffCode, setStaffCode] = useState<string>("");
 
+  // phone send otp
+  const [phoneNumber, setPhoneNumber] = useState("");
+
   // Get current locale
   const { locale: currentLocale } = useClientLocale();
 
@@ -126,7 +130,7 @@ export default function CheckNIDPage() {
   const getMaritalName = (marital: MaritalModel) => {
     return currentLocale === "kh" ? marital.nameKh : marital.nameEn;
   };
-  
+
   // Helper function to get occupation name based on locale
   const getOccupationName = (occupation: OccupationModel) => {
     return currentLocale === "kh" ? occupation.nameKh : occupation.nameEn;
@@ -245,7 +249,7 @@ export default function CheckNIDPage() {
 
       console.log("Normalized data:", normalizedData);
       setFormData(normalizedData);
-      
+
       AppToast({
         type: "success",
         message: "NID extracted successfully!",
@@ -320,52 +324,52 @@ export default function CheckNIDPage() {
     setShowConfirmationModal(false);
     await handleValidateNID();
   };
-  
-const handleLocationSubmit = (data: LocationSubmitData) => {
-  console.log("### Location data submitted:", data);
-  
-  // Build current address string from Khmer names
-  const addressParts = [
-    data.currentAddress.village?.villageKh,
-    data.currentAddress.commune?.communeKh,
-    data.currentAddress.district?.districtKh,
-    data.currentAddress.province?.provinceKh
-  ].filter(Boolean); // Remove null/undefined values
-  
-  const currentAddressString = addressParts.join(" ");
-  
-  // Build place of birth string from Khmer names
-  const pobParts = [
-    data.placeOfBirth.village?.villageKh,
-    data.placeOfBirth.commune?.communeKh,
-    data.placeOfBirth.district?.districtKh,
-    data.placeOfBirth.province?.provinceKh
-  ].filter(Boolean); // Remove null/undefined values
-  
-  const placeOfBirthString = pobParts.join(" ");
-  
-  // Update form data with both address and place of birth
-  setFormData(prev => ({
-    ...prev,
-    address: currentAddressString,
-    pob: placeOfBirthString
-  }));
-  
-  console.log("Updated Address:", currentAddressString);
-  console.log("Updated Place of Birth:", placeOfBirthString);
-  
-  AppToast({
-    type: "success",
-    message: currentLocale === "kh" 
-      ? "ព័ត៌មានទីតាំងត្រូវបានរក្សាទុកដោយជោគជ័យ!" 
-      : "Location information saved successfully!",
-    description: currentLocale === "kh"
-      ? "ទិន្នន័យទីតាំងត្រូវបានកត់ត្រា។"
-      : "Location data has been recorded.",
-  });
-  
-  setShowLocationModal(false);
-};
+
+  const handleLocationSubmit = (data: LocationSubmitData) => {
+    console.log("### Location data submitted:", data);
+
+    // Build current address string from Khmer names
+    const addressParts = [
+      data.currentAddress.village?.villageKh,
+      data.currentAddress.commune?.communeKh,
+      data.currentAddress.district?.districtKh,
+      data.currentAddress.province?.provinceKh
+    ].filter(Boolean); // Remove null/undefined values
+
+    const currentAddressString = addressParts.join(" ");
+
+    // Build place of birth string from Khmer names
+    const pobParts = [
+      data.placeOfBirth.village?.villageKh,
+      data.placeOfBirth.commune?.communeKh,
+      data.placeOfBirth.district?.districtKh,
+      data.placeOfBirth.province?.provinceKh
+    ].filter(Boolean); // Remove null/undefined values
+
+    const placeOfBirthString = pobParts.join(" ");
+
+    // Update form data with both address and place of birth
+    setFormData(prev => ({
+      ...prev,
+      address: currentAddressString,
+      pob: placeOfBirthString
+    }));
+
+    console.log("Updated Address:", currentAddressString);
+    console.log("Updated Place of Birth:", placeOfBirthString);
+
+    AppToast({
+      type: "success",
+      message: currentLocale === "kh"
+        ? "ព័ត៌មានទីតាំងត្រូវបានរក្សាទុកដោយជោគជ័យ!"
+        : "Location information saved successfully!",
+      description: currentLocale === "kh"
+        ? "ទិន្នន័យទីតាំងត្រូវបានកត់ត្រា។"
+        : "Location data has been recorded.",
+    });
+
+    setShowLocationModal(false);
+  };
 
   const handleInputChange = (field: keyof ResponseNID, value: string) => {
     setFormData((prev) => ({
@@ -585,7 +589,7 @@ const handleLocationSubmit = (data: LocationSubmitData) => {
                     value={formData.dob}
                     onChange={(value) => handleInputChange("dob", value)}
                     disabled={isLoading || isValidating}
-                    placeholder= {translate("dateOfBirth")}
+                    placeholder={translate("dateOfBirth")}
                   />
                 </div>
 
@@ -644,7 +648,7 @@ const handleLocationSubmit = (data: LocationSubmitData) => {
                     {translate("address")}
                   </label>
                   <Input
-                    placeholder= {translate("address")}
+                    placeholder={translate("address")}
                     value={formData.address}
                     onChange={(e) => handleInputChange("address", e.target.value)}
                     className="w-full h-10"
@@ -669,7 +673,7 @@ const handleLocationSubmit = (data: LocationSubmitData) => {
                 {/* Marital Status */}
                 <div className="md:col-span-2">
                   <label className="text-base font-medium text-gray-700 block mb-1">
-                   {translate("marital")}
+                    {translate("marital")}
                   </label>
                   <Select
                     value={selectedMaritalStatus}
@@ -758,30 +762,15 @@ const handleLocationSubmit = (data: LocationSubmitData) => {
                   </div>
                 </div>
 
-                {/* Contact Number */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
-                    {translate("contactNumber")}
-                  </label>
-                  <Input
-                    placeholder={translate("contactNumber")}
-                    className="w-full h-10"
-                    disabled={isLoading || isValidating}
-                  />
-                </div>
-
-                {/* OTP Code */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
-                    {translate("otpCode")}
-                    <a href="#" className="float-right text-blue-600 border-blue-600 border-b-2 text-sm">{translate("sendOtp")}</a>
-                  </label>
-                  <Input
-                    placeholder={translate("otpCode")}
-                    className="w-full h-10"
-                    disabled={isLoading || isValidating}
-                  />
-                </div>
+                {/* Contact Number & OTP Code*/}
+                <OTPInput
+                  phoneNumber={phoneNumber}
+                  onPhoneChange={(value) => setPhoneNumber(value)}
+                  onVerificationSuccess={() => {
+                    console.log("Phone verified:", phoneNumber);
+                  }}
+                  disabled={isLoading || isValidating}
+                />
               </div>
 
               {/* Action Buttons */}
@@ -818,22 +807,15 @@ const handleLocationSubmit = (data: LocationSubmitData) => {
       />
 
       {/* Location Modal - Shows on successful validation */}
-      {/* <LocationModal
+      <LocationModal
         isOpen={showLocationModal}
         onClose={() => setShowLocationModal(false)}
         onSubmit={handleLocationSubmit}
         formData={locationData}
         setFormData={setLocationData}
-      /> */}
-<LocationModal
-  isOpen={showLocationModal}
-  onClose={() => setShowLocationModal(false)}
-  onSubmit={handleLocationSubmit}
-  formData={locationData}
-  setFormData={setLocationData}
-  addressFromForm={formData.address} // Add this line to pass the address
-  placeOfBirthFromForm={formData.pob}
-/>
+        addressFromForm={formData.address} // Add this line to pass the address
+        placeOfBirthFromForm={formData.pob}
+      />
 
       {/* Error Modal */}
       <ErrorModal
