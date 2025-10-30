@@ -29,7 +29,10 @@
       "all": "All Status",
       "active": "Active",
       "delete": "Delete"
-    }
+    },
+    "chooseOne": "--- Choose one ---",
+    "yesIhave": "Yes, I have reviewed",
+    "noIneed": "No, I need to review"
   },
 
   "dashboard": {
@@ -158,5 +161,18 @@
 
     "cfTitle": "Confirm Information",
     "cfMessage": "Please confirm that you have reviewed your personal information."
+  },
+
+  "address": {
+    "locationInfo": "Location Information",
+    "loading": "Auto-filling information...",
+    "selectAddress": "Select Your Address:",
+    "selectPlaceOfBirth": "Select Place of Birth:",
+    "province": "Province/City",
+    "district": "District",
+    "commune": "Commune",
+    "village": "Village",
+    "close": "Close",
+    "submit": "Submit"
   }
 }

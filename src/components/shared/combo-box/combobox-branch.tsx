@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 
 interface Branch {
@@ -40,6 +41,9 @@ export function ComboboxSelectBranch({
 }: ComboboxSelectBranchProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // change language
+  const translate = useTranslations("common");
 
   // Filter branches based on search term
   const filteredBranches = useMemo(() => {
@@ -66,10 +70,10 @@ export function ComboboxSelectBranch({
           disabled={disabled}
         >
           {isLoading
-            ? "Loading..."
+            ? translate("loading")
             : dataSelect
             ? dataSelect.branchkh
-            : "--- Choose one ---"}
+            : translate("chooseOne")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

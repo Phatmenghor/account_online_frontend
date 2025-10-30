@@ -28,6 +28,7 @@ import { AppToast } from "@/components/shared/toast/app-toast";
 import { ComboboxSelectBranch } from "@/components/shared/combo-box/combobox-branch";
 import ConfirmationModal from "@/components/acc-online/confirmModal";
 import LocationModal from "@/components/acc-online/addressModal";
+import { CommuneModel, DistrictModel, ProvinceModel, VillageModel } from "@/models/address/address.response";
 
 export interface Image {
   idImage: string;
@@ -38,6 +39,21 @@ interface LocationData {
   district: string;
   commune: string;
   village: string;
+}
+
+interface LocationSubmitData {
+  currentAddress: {
+    province: ProvinceModel | null
+    district: DistrictModel | null
+    commune: CommuneModel | null
+    village: VillageModel | null
+  }
+  placeOfBirth: {
+    province: ProvinceModel | null
+    district: DistrictModel | null
+    commune: CommuneModel | null
+    village: VillageModel | null
+  }
 }
 
 export default function CheckNIDPage() {
@@ -304,21 +320,52 @@ export default function CheckNIDPage() {
     setShowConfirmationModal(false);
     await handleValidateNID();
   };
-
-  // Handle location modal submit
-  const handleLocationSubmit = (data: LocationData) => {
-    console.log("Location data submitted:", data);
-    // Here you can process the location data
-    // For example, send it to your API or update your state
-    
-    AppToast({
-      type: "success",
-      message: "Address information saved successfully!",
-      description: "Location data has been recorded.",
-    });
-    
-    setShowLocationModal(false);
-  };
+  
+const handleLocationSubmit = (data: LocationSubmitData) => {
+  console.log("### Location data submitted:", data);
+  
+  // Build current address string from Khmer names
+  const addressParts = [
+    data.currentAddress.village?.villageKh,
+    data.currentAddress.commune?.communeKh,
+    data.currentAddress.district?.districtKh,
+    data.currentAddress.province?.provinceKh
+  ].filter(Boolean); // Remove null/undefined values
+  
+  const currentAddressString = addressParts.join(" ");
+  
+  // Build place of birth string from Khmer names
+  const pobParts = [
+    data.placeOfBirth.village?.villageKh,
+    data.placeOfBirth.commune?.communeKh,
+    data.placeOfBirth.district?.districtKh,
+    data.placeOfBirth.province?.provinceKh
+  ].filter(Boolean); // Remove null/undefined values
+  
+  const placeOfBirthString = pobParts.join(" ");
+  
+  // Update form data with both address and place of birth
+  setFormData(prev => ({
+    ...prev,
+    address: currentAddressString,
+    pob: placeOfBirthString
+  }));
+  
+  console.log("Updated Address:", currentAddressString);
+  console.log("Updated Place of Birth:", placeOfBirthString);
+  
+  AppToast({
+    type: "success",
+    message: currentLocale === "kh" 
+      ? "ព័ត៌មានទីតាំងត្រូវបានរក្សាទុកដោយជោគជ័យ!" 
+      : "Location information saved successfully!",
+    description: currentLocale === "kh"
+      ? "ទិន្នន័យទីតាំងត្រូវបានកត់ត្រា។"
+      : "Location data has been recorded.",
+  });
+  
+  setShowLocationModal(false);
+};
 
   const handleInputChange = (field: keyof ResponseNID, value: string) => {
     setFormData((prev) => ({
@@ -771,13 +818,22 @@ export default function CheckNIDPage() {
       />
 
       {/* Location Modal - Shows on successful validation */}
-      <LocationModal
+      {/* <LocationModal
         isOpen={showLocationModal}
         onClose={() => setShowLocationModal(false)}
         onSubmit={handleLocationSubmit}
         formData={locationData}
         setFormData={setLocationData}
-      />
+      /> */}
+<LocationModal
+  isOpen={showLocationModal}
+  onClose={() => setShowLocationModal(false)}
+  onSubmit={handleLocationSubmit}
+  formData={locationData}
+  setFormData={setLocationData}
+  addressFromForm={formData.address} // Add this line to pass the address
+  placeOfBirthFromForm={formData.pob}
+/>
 
       {/* Error Modal */}
       <ErrorModal

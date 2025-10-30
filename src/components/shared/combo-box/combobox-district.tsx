@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { DistrictModel } from "@/models/address/address.response";
+import { useTranslations } from "next-intl";
 
 interface ComboboxSelectDistrictProps {
   dataSelect: DistrictModel | null;
@@ -38,6 +39,9 @@ export function ComboboxSelectDistrict({
 }: ComboboxSelectDistrictProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // change language
+  const translate = useTranslations("common");
 
   const getName = (district: DistrictModel) => {
     return locale === "kh" ? district.districtKh : district.districtEn;
@@ -67,10 +71,10 @@ export function ComboboxSelectDistrict({
           disabled={disabled}
         >
           {isLoading
-            ? "Loading..."
+            ? translate("loading")
             : dataSelect
             ? getName(dataSelect)
-            : "---Choose One---"}
+            : translate("chooseOne")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

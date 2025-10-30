@@ -1,5 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
 
 interface ConfirmationModalProps {
   isOpen: boolean
@@ -18,9 +19,12 @@ const ConfirmationModal = ({
 }: ConfirmationModalProps) => {
   if (!isOpen) return null
 
+  // change language
+  const translate = useTranslations("common");
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-xl">
+      <div className="bg-white rounded-lg p-10 max-w-lg w-full mx-4 shadow-xl">
         {/* Warning Icon */}
         <div className="flex justify-center mb-6">
           <div className="w-20 h-20 rounded-full border-4 border-orange-400 flex items-center justify-center">
@@ -40,13 +44,13 @@ const ConfirmationModal = ({
             onClick={onConfirm}
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-md transition-colors"
           >
-            Yes, I have reviewed
+            {translate("yesIhave")}
           </Button>
           <Button
             onClick={onCancel}
             className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-md transition-colors"
           >
-            No, I need to review
+           {translate("noIneed")}
           </Button>
         </div>
       </div>
