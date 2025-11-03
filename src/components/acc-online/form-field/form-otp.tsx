@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2, CheckCircle } from "lucide-react";
 import { AppToast } from "@/components/shared/toast/app-toast";
 import { SendOtpService, VerifyOtpService } from "@/services/otp/otp.service";
 import { SendOtpReq, VerifyOtpReq } from "@/models/otp/otp.request";
+import { useTranslations } from "next-intl";
 
 interface OTPInputProps {
   phoneNumber: string;
@@ -38,6 +39,8 @@ export default function OTPInput({
   const [otpExpiresAt, setOtpExpiresAt] = useState<string>("");
   const [countdown, setCountdown] = useState<number>(0);
 
+  const translate = useTranslations("NIDPage");
+
   // Countdown timer effect
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -54,18 +57,11 @@ export default function OTPInput({
     return () => clearInterval(interval);
   }, [countdown]);
 
-  // Auto-verify when OTP reaches 6 digits
-  useEffect(() => {
-    if (otpCode.length === 6 && /^\d{6}$/.test(otpCode) && !isOtpVerified) {
-      handleVerifyOtp();
-    }
-  }, [otpCode]);
-
   // Validate phone number format (9-15 digits)
-  const isValidPhoneNumber = (phone: string): boolean => {
+  const isValidPhoneNumber = useCallback((phone: string): boolean => {
     const phoneRegex = /^[0-9]{9,15}$/;
     return phoneRegex.test(phone.replace(/\s/g, ""));
-  };
+  }, []);
 
   // Handle phone number change
   const handlePhoneChange = (value: string) => {
@@ -83,21 +79,8 @@ export default function OTPInput({
     }
   };
 
-  // Auto-send OTP when user leaves phone input (blur)
-  const handlePhoneBlur = async () => {
-    if (!phoneNumber.trim()) return;
-    
-    if (isOtpVerified) return; // Don't send if already verified
-    
-    if (countdown > 0) return; // Don't send if countdown is active
-
-    if (isValidPhoneNumber(phoneNumber)) {
-      await handleSendOtp();
-    }
-  };
-
   // Send OTP
-  const handleSendOtp = async () => {
+  const handleSendOtp = useCallback(async () => {
     if (!phoneNumber.trim()) {
       AppToast({
         type: "error",
@@ -157,6 +140,19 @@ export default function OTPInput({
     } finally {
       setIsSendingOtp(false);
     }
+  }, [phoneNumber, isValidPhoneNumber, countdown]);
+
+  // Auto-send OTP when user leaves phone input (blur)
+  const handlePhoneBlur = async () => {
+    if (!phoneNumber.trim()) return;
+    
+    if (isOtpVerified) return; // Don't send if already verified
+    
+    if (countdown > 0) return; // Don't send if countdown is active
+
+    if (isValidPhoneNumber(phoneNumber)) {
+      await handleSendOtp();
+    }
   };
 
   // Handle OTP input change
@@ -167,7 +163,7 @@ export default function OTPInput({
   };
 
   // Verify OTP
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp = useCallback(async () => {
     if (!otpCode.trim()) {
       AppToast({
         type: "error",
@@ -240,28 +236,38 @@ export default function OTPInput({
     } finally {
       setIsVerifyingOtp(false);
     }
-  };
+  }, [otpCode, isOtpSent, phoneNumber, onVerificationSuccess]);
+
+  // Auto-verify when OTP reaches 6 digits
+  useEffect(() => {
+    if (otpCode.length === 6 && /^\d{6}$/.test(otpCode) && !isOtpVerified) {
+      handleVerifyOtp();
+    }
+  }, [otpCode, isOtpVerified, handleVerifyOtp]);
 
   // Reset function (can be called from parent)
-  const reset = () => {
+  const reset = useCallback(() => {
     setOtpCode("");
     setIsOtpSent(false);
     setIsOtpVerified(false);
     setOtpExpiresAt("");
     setCountdown(0);
-  };
+  }, []);
 
   // Expose reset method
   useEffect(() => {
     (window as any).otpInputReset = reset;
-  }, []);
+    return () => {
+      delete (window as any).otpInputReset;
+    };
+  }, [reset]);
 
   return (
     <>
       {/* Contact Number */}
       <div>
         <label className="text-base font-medium text-gray-700 block mb-1">
-          {phoneLabel}
+          {translate("contactNumber")}
           {isOtpVerified && (
             <span className="float-right text-green-600 text-sm flex items-center gap-1">
               <CheckCircle className="h-4 w-4" />
@@ -271,7 +277,7 @@ export default function OTPInput({
         </label>
         <div className="relative">
           <Input
-            placeholder={phonePlaceholder}
+            placeholder={translate("contactNumber")}
             value={phoneNumber}
             onChange={(e) => handlePhoneChange(e.target.value)}
             onBlur={handlePhoneBlur}
@@ -291,28 +297,28 @@ export default function OTPInput({
       {/* OTP Code */}
       <div>
         <label className="text-base font-medium text-gray-700 block mb-1">
-          {otpLabel}
+          {translate("otpCode")}
           <button
             type="button"
             onClick={handleSendOtp}
-            className={`float-right text-sm border-b-2 ${
+            className={`float-right text-sm border-b-2 transition-colors ${
               countdown > 0 || disabled || isSendingOtp || isOtpVerified || !phoneNumber
                 ? "text-gray-400 border-gray-400 cursor-not-allowed"
-                : "text-blue-600 border-blue-600 hover:text-blue-700 cursor-pointer"
+                : "text-blue-600 border-blue-600 hover:text-blue-700 hover:border-blue-700 cursor-pointer"
             }`}
-            disabled={countdown > 0 || disabled || isSendingOtp || !phoneNumber}
+            disabled={countdown > 0 || disabled || isSendingOtp || isOtpVerified || !phoneNumber}
           >
             {countdown > 0 
-              ? `${isOtpSent ? "Resend" : sendOtpText} (${countdown}s)` 
+              ? `${isOtpSent ? "Resend" : translate("sendOtp")} (${countdown}s)` 
               : isOtpSent 
-                ? "Resend OTP" 
-                : sendOtpText
+                ? translate("reSendOtp") 
+                : translate("sendOtp")
             }
           </button>
         </label>
         <div className="relative">
           <Input
-            placeholder={otpPlaceholder}
+            placeholder="Enter 6-digit OTP"
             value={otpCode}
             onChange={(e) => handleOtpChange(e.target.value)}
             maxLength={6}
@@ -326,11 +332,6 @@ export default function OTPInput({
             <CheckCircle className="absolute right-3 top-2.5 h-5 w-5 text-green-600" />
           )}
         </div>
-        {/* {isOtpSent && !isOtpVerified && otpExpiresAt && (
-          <p className="text-xs text-gray-500 mt-1">
-            OTP expires at: {new Date(otpExpiresAt).toLocaleTimeString()}
-          </p>
-        )} */}
       </div>
     </>
   );

@@ -100,6 +100,7 @@ function OccupationPageContent() {
         const response = await createOccupationService({
           nameEn: createData.nameEn,
           nameKh: createData.nameKh,
+          occupationCode: createData.occupationCode,
           status: createData.status,
         });
 
@@ -310,7 +311,7 @@ function OccupationPageContent() {
           onDelete={confirmDeleteOccupation}
           title="Delete Occupation"
           description={`Are you sure you want to delete this occupation`}
-          itemName={selectedOccupation?.nameEn || selectedOccupation?.nameKh}
+          itemName={selectedOccupation?.nameEn || selectedOccupation?.nameKh || selectedOccupation?.occupationCode}
           isSubmitting={isSubmitting}
         />
 

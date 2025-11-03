@@ -119,6 +119,7 @@ export default function CheckNIDPage() {
 
   // phone send otp
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
 
   // Get current locale
   const { locale: currentLocale } = useClientLocale();
@@ -299,12 +300,15 @@ export default function CheckNIDPage() {
       );
 
       if (hasCriticalErrors) {
+        setIsVerified(false);
         setShowErrorModal(true);
       } else {
+        setIsVerified(true); // Add this line - verification successful
         // Show location modal on success instead of success modal
         setShowLocationModal(true);
       }
     } catch (error: any) {
+      setIsVerified(false);
       setValidationErrorData({
         title: translate("valid_fail"),
         message: error.apiMessage || "Failed to validate NID information.",
@@ -400,6 +404,7 @@ export default function CheckNIDPage() {
     setSelfieImage(null);
     setSelfiePreview(null);
     setValidationResult(null);
+    setIsVerified(false); // Add this line
     setSelectedMaritalStatus("");
     setSelectedOccupation("");
     setSelectedReferenceBank("");
@@ -778,14 +783,14 @@ export default function CheckNIDPage() {
                 <Button
                   className="px-8 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-md"
                   onClick={handleOpenConfirmModal}
-                  disabled={isLoading || isValidating}
+                  disabled={isLoading || isValidating || isVerified}
                 >
                   {isValidating ? translate("processing") : translate("verification")}
                 </Button>
                 <Button
                   className="px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md"
                   onClick={handleClear}
-                  disabled={isLoading || isValidating}
+                  disabled={isLoading || isValidating || !isVerified} ///
                 >
                   {translate("submit")}
                 </Button>

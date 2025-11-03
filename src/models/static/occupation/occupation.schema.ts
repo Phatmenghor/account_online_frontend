@@ -4,6 +4,7 @@ import { z } from "zod";
 export const CreateOccupationSchema = z.object({
   nameEn: z.string().min(1, "English name is required"),
   nameKh: z.string().min(1, "Khmer name is required"),
+  occupationCode: z.string().min(1, "Occupation is required"),
   status: z.string().min(1, "Status is required"),
 });
 
@@ -12,6 +13,7 @@ export const UpdateOccupationSchema = z.object({
   id: z.number().optional(),
   nameEn: z.string().optional(),
   nameKh: z.string().optional(),
+  occupationCode: z.string().optional(),
   status: z.string().optional(),
 });
 

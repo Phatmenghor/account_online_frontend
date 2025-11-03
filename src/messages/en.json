@@ -91,6 +91,7 @@
     "search-occupation": "Search occupations...",
     "nameEn": "Name (English)",
     "nameKh": "Name (Khmer)",
+    "occupationCode": "Occupation Code",
     "actions": "Actions",
     "status": "Status"
   },
@@ -151,7 +152,8 @@
     "staffCode": "Staff Code",
     "contactNumber": "Contact Number",
     "otpCode": "OTP Code",
-    "sendOtp": "Resend OTP",
+    "reSendOtp": "Resend OTP",
+    "sendOtp": "Send OTP",
     "chooseOne": "--- Choose one ---",
     "loading": "Loading...",
 

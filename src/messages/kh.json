@@ -91,6 +91,7 @@
     "search-occupation": "ស្វែងរកមុខរបរ...",
     "nameEn": "ឈ្មោះ (អង់គ្លេស)",
     "nameKh": "ឈ្មោះ (ខ្មែរ)",
+    "occupationCode": "លេខកូដមុខរបរ",
     "actions": "សកម្មភាព",
     "status": "ស្ថានភាព"
   },
@@ -151,7 +152,8 @@
     "staffCode": "លេខកូដបុគ្គលិក",
     "contactNumber": "លេខទូរស័ព្ទរបស់អ្នក",
     "otpCode": "លេខ PIN សម្ងាត់",
-    "sendOtp": "ផ្ញើម្តងទៀត",
+    "reSendOtp": "ផ្ញើម្តងទៀត",
+    "sendOtp": "ផ្ញើ OTP",
     "chooseOne": "--- សូមជ្រើសរើស ---",
     "loading": "កំពុងផ្ទុក...",
     
