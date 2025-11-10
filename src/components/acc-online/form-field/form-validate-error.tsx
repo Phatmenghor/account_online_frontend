@@ -27,6 +27,7 @@ export const NIDFormSchema = z.object({
   maritalStatus: z.string().min(1, "Marital status is required"),
   occupation: z.string().min(1, "Occupation is required"),
   branch: z.string().min(1, "Branch is required"),
+  legalType: z.string().min(1, "Legal type is required"),
   referenceBank: z.string().optional(),
   staffCode: z.string().optional(),
   
@@ -43,6 +44,9 @@ export const NIDFormSchema = z.object({
   isVerified: z.boolean().refine((val) => val === true, {
     message: "NID must be verified before submission",
   }),
+
+  // OTP Code
+  // otpCode: z.string().min(1, "OTP code is required"),
 });
 
 export type NIDFormData = z.infer<typeof NIDFormSchema>;

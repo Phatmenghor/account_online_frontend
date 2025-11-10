@@ -302,11 +302,11 @@ export default function OTPInput({
             type="button"
             onClick={handleSendOtp}
             className={`float-right text-sm border-b-2 transition-colors ${
-              countdown > 0 || disabled || isSendingOtp || isOtpVerified || !phoneNumber
+              countdown > 0 
                 ? "text-gray-400 border-gray-400 cursor-not-allowed"
                 : "text-blue-600 border-blue-600 hover:text-blue-700 hover:border-blue-700 cursor-pointer"
             }`}
-            disabled={countdown > 0 || disabled || isSendingOtp || isOtpVerified || !phoneNumber}
+            disabled={countdown > 0}
           >
             {countdown > 0 
               ? `${isOtpSent ? "Resend" : translate("sendOtp")} (${countdown}s)` 
@@ -323,7 +323,6 @@ export default function OTPInput({
             onChange={(e) => handleOtpChange(e.target.value)}
             maxLength={6}
             className="w-full h-10"
-            disabled={disabled || !isOtpSent || isVerifyingOtp}
           />
           {isVerifyingOtp && (
             <Loader2 className="absolute right-3 top-2.5 h-5 w-5 animate-spin text-blue-600" />

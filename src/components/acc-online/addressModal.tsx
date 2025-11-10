@@ -1,11 +1,10 @@
 "use client"
 import { MapPin, X, Loader2 } from "lucide-react"
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 
 import { Button } from "@/components/ui/button"
 import { useClientLocale } from "@/context/provider/local-provider"
-import { useCommunes, useDistricts, useProvinces, useVillages } from "@/hooks/fetch-address"
 import type { CommuneModel, DistrictModel, ProvinceModel, VillageModel } from "@/models/address/address.response"
 import { ComboboxSelectProvince } from "../shared/combo-box/combobox-province"
 import { ComboboxSelectDistrict } from "../shared/combo-box/combobox-district"
@@ -81,17 +80,6 @@ const LocationModal = ({
   const [isLoadingAddress, setIsLoadingAddress] = useState(false)
   const [isLoadingPob, setIsLoadingPob] = useState(false)
 
-  // Fetch data for FIRST SECTION (Current Address)
-  const { data: provinces, isLoading: isLoadingProvinces } = useProvinces()
-  const { data: districts, isLoading: isLoadingDistricts } = useDistricts(formData.province)
-  const { data: communes, isLoading: isLoadingCommunes } = useCommunes(formData.district)
-  const { data: villages, isLoading: isLoadingVillages } = useVillages(formData.commune)
-
-  // Fetch data for SECOND SECTION (Place of Birth) - INDEPENDENT DATA
-  const { data: pobDistricts, isLoading: isLoadingPobDistricts } = useDistricts(pobProvince?.provinceCode || "")
-  const { data: pobCommunes, isLoading: isLoadingPobCommunes } = useCommunes(pobDistrict?.districtCode || "")
-  const { data: pobVillages, isLoading: isLoadingPobVillages } = useVillages(pobCommune?.communeCode || "")
-
   // Auto-fill current address when modal opens
   useEffect(() => {
     const fetchAddressData = async () => {
@@ -136,16 +124,9 @@ const LocationModal = ({
               village: addressData.village.villageCode
             }))
           }
-
-          // toast.success(currentLocale === "kh" 
-          //   ? "អាសយដ្ឋានត្រូវបានបំពេញដោយស្វ័យប្រវត្តិ" 
-          //   : "Address auto-filled successfully")
           
         } catch (error: any) {
           console.error("Error fetching address data:", error)
-          // toast.error(currentLocale === "kh"
-          //   ? "មិនអាចបំពេញអាសយដ្ឋានដោយស្វ័យប្រវត្តិបានទេ"
-          //   : "Failed to auto-fill address")
         } finally {
           setIsLoadingAddress(false)
         }
@@ -183,16 +164,9 @@ const LocationModal = ({
           if (pobData.village) {
             setPobVillage(pobData.village)
           }
-
-          // toast.success(currentLocale === "kh" 
-          //   ? "ទីកន្លែងកំណើតត្រូវបានបំពេញដោយស្វ័យប្រវត្តិ" 
-          //   : "Place of birth auto-filled successfully")
           
         } catch (error: any) {
           console.error("Error fetching place of birth data:", error)
-          // toast.error(currentLocale === "kh"
-          //   ? "មិនអាចបំពេញទីកន្លែងកំណើតដោយស្វ័យប្រវត្តិបានទេ"
-          //   : "Failed to auto-fill place of birth")
         } finally {
           setIsLoadingPob(false)
         }
@@ -203,7 +177,7 @@ const LocationModal = ({
   }, [isOpen, placeOfBirthFromForm])
 
   // Handlers for cascading dropdowns (FIRST SECTION: Current Address)
-  const handleProvinceChange = (province: ProvinceModel | null) => {
+  const handleProvinceChange = useCallback((province: ProvinceModel) => {
     setSelectedProvince(province)
     setSelectedDistrict(null)
     setSelectedCommune(null)
@@ -215,9 +189,9 @@ const LocationModal = ({
       commune: "",
       village: "",
     })
-  }
+  }, [setFormData])
 
-  const handleDistrictChange = (district: DistrictModel | null) => {
+  const handleDistrictChange = useCallback((district: DistrictModel) => {
     setSelectedDistrict(district)
     setSelectedCommune(null)
     setSelectedVillage(null)
@@ -228,9 +202,9 @@ const LocationModal = ({
       commune: "",
       village: "",
     }))
-  }
+  }, [setFormData])
 
-  const handleCommuneChange = (commune: CommuneModel | null) => {
+  const handleCommuneChange = useCallback((commune: CommuneModel) => {
     setSelectedCommune(commune)
     setSelectedVillage(null)
 
@@ -239,39 +213,39 @@ const LocationModal = ({
       commune: commune?.communeCode || "",
       village: "",
     }))
-  }
+  }, [setFormData])
 
-  const handleVillageChange = (village: VillageModel | null) => {
+  const handleVillageChange = useCallback((village: VillageModel) => {
     setSelectedVillage(village)
 
     setFormData((prev) => ({
       ...prev,
       village: village?.villageCode || "",
     }))
-  }
+  }, [setFormData])
 
   // Handlers for cascading dropdowns (SECOND SECTION: Place of Birth)
-  const handlePobProvinceChange = (province: ProvinceModel | null) => {
+  const handlePobProvinceChange = useCallback((province: ProvinceModel) => {
     setPobProvince(province)
     setPobDistrict(null)
     setPobCommune(null)
     setPobVillage(null)
-  }
+  }, [])
 
-  const handlePobDistrictChange = (district: DistrictModel | null) => {
+  const handlePobDistrictChange = useCallback((district: DistrictModel) => {
     setPobDistrict(district)
     setPobCommune(null)
     setPobVillage(null)
-  }
+  }, [])
 
-  const handlePobCommuneChange = (commune: CommuneModel | null) => {
+  const handlePobCommuneChange = useCallback((commune: CommuneModel) => {
     setPobCommune(commune)
     setPobVillage(null)
-  }
+  }, [])
 
-  const handlePobVillageChange = (village: VillageModel | null) => {
+  const handlePobVillageChange = useCallback((village: VillageModel) => {
     setPobVillage(village)
-  }
+  }, [])
 
   // Handle submit with all location data
   const handleSubmit = () => {
@@ -348,14 +322,11 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {translate("province")}
-                      {isLoadingProvinces && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
                     </label>
                     <ComboboxSelectProvince
                       dataSelect={selectedProvince}
                       onChangeSelected={handleProvinceChange}
-                      disabled={isLoadingProvinces || isLoadingAddress}
-                      provinces={provinces}
-                      isLoading={isLoadingProvinces}
+                      disabled={isLoadingAddress}
                       locale={currentLocale}
                     />
                   </div>
@@ -365,14 +336,12 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {currentLocale === "kh" ? "ស្រុក/ខណ្ឌ" : "District"}
-                      {isLoadingDistricts && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
                     </label>
                     <ComboboxSelectDistrict
                       dataSelect={selectedDistrict}
                       onChangeSelected={handleDistrictChange}
-                      disabled={isLoadingDistricts || !formData.province || isLoadingAddress}
-                      districts={districts}
-                      isLoading={isLoadingDistricts}
+                      disabled={isLoadingAddress}
+                      provinceCode={selectedProvince?.provinceCode}
                       locale={currentLocale}
                     />
                   </div>
@@ -382,14 +351,12 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {translate("commune")}
-                      {isLoadingCommunes && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
                     </label>
                     <ComboboxSelectCommune
                       dataSelect={selectedCommune}
                       onChangeSelected={handleCommuneChange}
-                      disabled={isLoadingCommunes || !formData.district || isLoadingAddress}
-                      communes={communes}
-                      isLoading={isLoadingCommunes}
+                      disabled={isLoadingAddress}
+                      districtCode={selectedDistrict?.districtCode}
                       locale={currentLocale}
                     />
                   </div>
@@ -399,14 +366,12 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {translate("village")}
-                      {isLoadingVillages && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
                     </label>
                     <ComboboxSelectVillage
                       dataSelect={selectedVillage}
                       onChangeSelected={handleVillageChange}
-                      disabled={isLoadingVillages || !formData.commune || isLoadingAddress}
-                      villages={villages}
-                      isLoading={isLoadingVillages}
+                      disabled={isLoadingAddress}
+                      communeCode={selectedCommune?.communeCode}
                       locale={currentLocale}
                     />
                   </div>
@@ -437,14 +402,11 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {translate("province")}
-                      {isLoadingProvinces && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
                     </label>
                     <ComboboxSelectProvince
                       dataSelect={pobProvince}
                       onChangeSelected={handlePobProvinceChange}
-                      disabled={isLoadingProvinces || isLoadingPob}
-                      provinces={provinces}
-                      isLoading={isLoadingProvinces}
+                      disabled={isLoadingPob}
                       locale={currentLocale}
                     />
                   </div>
@@ -454,14 +416,12 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {translate("district")}
-                      {isLoadingPobDistricts && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
                     </label>
                     <ComboboxSelectDistrict
                       dataSelect={pobDistrict}
                       onChangeSelected={handlePobDistrictChange}
-                      disabled={isLoadingPobDistricts || !pobProvince || isLoadingPob}
-                      districts={pobDistricts}
-                      isLoading={isLoadingPobDistricts}
+                      disabled={isLoadingPob}
+                      provinceCode={pobProvince?.provinceCode}
                       locale={currentLocale}
                     />
                   </div>
@@ -471,14 +431,12 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {translate("commune")}
-                      {isLoadingPobCommunes && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
                     </label>
                     <ComboboxSelectCommune
                       dataSelect={pobCommune}
                       onChangeSelected={handlePobCommuneChange}
-                      disabled={isLoadingPobCommunes || !pobDistrict || isLoadingPob}
-                      communes={pobCommunes}
-                      isLoading={isLoadingPobCommunes}
+                      disabled={isLoadingPob}
+                      districtCode={pobDistrict?.districtCode}
                       locale={currentLocale}
                     />
                   </div>
@@ -488,14 +446,12 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                        {translate("village")}
-                      {isLoadingPobVillages && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
                     </label>
                     <ComboboxSelectVillage
                       dataSelect={pobVillage}
                       onChangeSelected={handlePobVillageChange}
-                      disabled={isLoadingPobVillages || !pobCommune || isLoadingPob}
-                      villages={pobVillages}
-                      isLoading={isLoadingPobVillages}
+                      disabled={isLoadingPob}
+                      communeCode={pobCommune?.communeCode}
                       locale={currentLocale}
                     />
                   </div>
