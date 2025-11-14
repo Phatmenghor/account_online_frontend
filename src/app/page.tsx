@@ -1,11 +1,10 @@
-// It real code
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { CheckCircle, CreditCard, Loader2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -31,7 +30,9 @@ import LocationModal from "@/components/acc-online/addressModal";
 import { CommuneModel, DistrictModel, ProvinceModel, VillageModel } from "@/models/address/address.response";
 import OTPInput from "@/components/acc-online/form-field/form-otp";
 import { ComboboxSelectBranch } from "@/components/shared/combo-box/combobox-branch";
-import { AllBranchModel, BranchModel } from "@/models/branch/branch.response";
+import { BranchModel } from "@/models/branch/branch.response";
+import { CreateOpenAccountReq } from "@/models/open-account/openAccount.request";
+import { createOpenAccountService } from "@/services/open-account/openAccount.service";
 
 export interface Image {
   idImage: string;
@@ -72,7 +73,10 @@ export default function CheckNIDPage() {
     expiredDate: "",
     issuedDate: "",
     address: "",
-    pob: ""
+    pob: "",
+    MRZ1: "",
+    MRZ2: "",
+    MRZ3: ""
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<Image | null>(null);
@@ -83,7 +87,8 @@ export default function CheckNIDPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false); // Changed from showSuccessModal
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [validationResult, setValidationResult] = useState<ValidationResponse | null>(null);
 
@@ -95,12 +100,26 @@ export default function CheckNIDPage() {
   });
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-
   const [selectedBranch, setSelectedBranch] = useState<BranchModel | null>(null);
 
+  // Location data state - Store complete objects
+  const [locationData, setLocationData] = useState<LocationSubmitData>({
+    currentAddress: {
+      province: null,
+      district: null,
+      commune: null,
+      village: null,
+    },
+    placeOfBirth: {
+      province: null,
+      district: null,
+      commune: null,
+      village: null,
+    }
+  });
 
-  // Location data state
-  const [locationData, setLocationData] = useState<LocationData>({
+  // Separate state for LocationModal (it expects LocationData type)
+  const [locationFormData, setLocationFormData] = useState<LocationData>({
     province: "",
     district: "",
     commune: "",
@@ -112,7 +131,7 @@ export default function CheckNIDPage() {
   const [selectedMaritalStatus, setSelectedMaritalStatus] = useState<string>("");
 
   const { data: occupations, isLoading: isLoadingOccupations } = useOccupations();
-  const [selectedOccupation, setSelectedOccupation] = useState<string>("");
+  const [selectedOccupation, setSelectedOccupation] = useState<OccupationModel | null>(null);
 
   const { data: referenceBanks, isLoading: isLoadingReferenceBanks } = useReferenceBanks();
   const [selectedReferenceBank, setSelectedReferenceBank] = useState<string>("");
@@ -121,7 +140,10 @@ export default function CheckNIDPage() {
 
   // phone send otp
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [isVerified, setIsVerified] = useState(false);
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+
+  // Validation errors state
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Get current locale
   const { locale: currentLocale } = useClientLocale();
@@ -144,6 +166,38 @@ export default function CheckNIDPage() {
     return currentLocale === "kh" ? reference.nameKh : reference.nameEn;
   };
 
+  // Helper function to convert gender to API format
+  const convertGenderToAPI = (gender: string): string => {
+    if (gender.toLowerCase() === 'male' || gender.toLowerCase() === 'm') {
+      return 'MALE';
+    } else if (gender.toLowerCase() === 'female' || gender.toLowerCase() === 'f') {
+      return 'FEMALE';
+    }
+    return gender.toUpperCase();
+  };
+
+  // Helper function to get marital status string
+  const getMaritalStatusString = (maritalId: string): string => {
+    const marital = maritalStatuses.find(m => m.id.toString() === maritalId);
+    if (marital) {
+      return marital.nameEn.toUpperCase().replace(/\s+/g, '.');
+    }
+    return "SINGLE";
+  };
+
+  // Validation handler from OTP component
+  const handleValidationChange = useCallback((field: string, error: string | null) => {
+    setValidationErrors(prev => {
+      const newErrors = { ...prev };
+      if (error) {
+        newErrors[field] = error;
+      } else {
+        delete newErrors[field];
+      }
+      return newErrors;
+    });
+  }, []);
+
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -159,9 +213,7 @@ export default function CheckNIDPage() {
 
       setIsLoading(true);
       try {
-        // Convert to base64 with data URL prefix for preview
         const base64WithPrefix = await convertToBase64(file);
-        // Get base64 without prefix for service
         const base64ForService = base64WithPrefix.split(",")[1];
 
         const imageRequestData: RequestIdImage = {
@@ -175,7 +227,6 @@ export default function CheckNIDPage() {
         });
         setImagePreview(base64WithPrefix);
 
-        // Auto-extract NID data when image is uploaded
         await handleExtractNID(imageRequestData);
       } catch (error) {
         console.error("Error converting image to base64", error);
@@ -187,7 +238,6 @@ export default function CheckNIDPage() {
     }
   };
 
-  // Separate handler for selfie upload
   const handleSelfieUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -203,7 +253,8 @@ export default function CheckNIDPage() {
 
       try {
         const base64WithPrefix = await convertToBase64(file);
-        setSelfieImage(base64WithPrefix);
+        const base64ForService = base64WithPrefix.split(",")[1];
+        setSelfieImage(base64ForService);
         setSelfiePreview(base64WithPrefix);
         toast.success("Selfie uploaded successfully!");
       } catch (error) {
@@ -213,7 +264,6 @@ export default function CheckNIDPage() {
     }
   };
 
-  // Function to convert file to base64
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -243,7 +293,6 @@ export default function CheckNIDPage() {
     try {
       const response = await extractNIDService(dataToProcess);
 
-      // Normalize the data before setting state
       const normalizedData = {
         ...response,
         dob: formatDateForInput(response.dob),
@@ -289,28 +338,29 @@ export default function CheckNIDPage() {
         issuedDate: formatDate(formData.issuedDate),
         address: formData.address,
         pob: formData.pob,
+        MRZ1: formData.MRZ1,
+        MRZ2: formData.MRZ2,
+        MRZ3: formData.MRZ3
       };
 
       const response = await validateNIDService(validationData);
 
       setValidationResult(response);
 
-      // Check if there are incorrect fields that matter for error modal
       const criticalFields = ["lastNameEn", "firstNameEn", "dob", "gender"];
       const hasCriticalErrors = response.data.incorrectFields.some(
         (field: string) => criticalFields.includes(field)
       );
 
       if (hasCriticalErrors) {
-        setIsVerified(false);
+        setIsPhoneVerified(false);
         setShowErrorModal(true);
       } else {
-        setIsVerified(true); // Add this line - verification successful
-        // Show location modal on success instead of success modal
+        setIsPhoneVerified(true);
         setShowLocationModal(true);
       }
     } catch (error: any) {
-      setIsVerified(false);
+      setIsPhoneVerified(false);
       setValidationErrorData({
         title: translate("valid_fail"),
         message: error.apiMessage || "Failed to validate NID information.",
@@ -334,27 +384,26 @@ export default function CheckNIDPage() {
   const handleLocationSubmit = (data: LocationSubmitData) => {
     console.log("### Location data submitted:", data);
 
-    // Build current address string from Khmer names
+    setLocationData(data);
+
     const addressParts = [
       data.currentAddress.village?.villageKh,
       data.currentAddress.commune?.communeKh,
       data.currentAddress.district?.districtKh,
       data.currentAddress.province?.provinceKh
-    ].filter(Boolean); // Remove null/undefined values
+    ].filter(Boolean);
 
     const currentAddressString = addressParts.join(" ");
 
-    // Build place of birth string from Khmer names
     const pobParts = [
       data.placeOfBirth.village?.villageKh,
       data.placeOfBirth.commune?.communeKh,
       data.placeOfBirth.district?.districtKh,
       data.placeOfBirth.province?.provinceKh
-    ].filter(Boolean); // Remove null/undefined values
+    ].filter(Boolean);
 
     const placeOfBirthString = pobParts.join(" ");
 
-    // Update form data with both address and place of birth
     setFormData(prev => ({
       ...prev,
       address: currentAddressString,
@@ -377,6 +426,128 @@ export default function CheckNIDPage() {
     setShowLocationModal(false);
   };
 
+  // Handle Submit Account Opening
+  const handleSubmitAccount = async () => {
+    // Comprehensive validation
+    const errors: Record<string, string> = {};
+
+    if (!isPhoneVerified) {
+      errors.verification = "Please verify your NID first";
+    }
+
+    if (!uploadedImage?.idImage) {
+      errors.nidImage = "Please upload your NID card image";
+    }
+
+    if (!selfieImage) {
+      errors.selfieImage = "Please upload your selfie image";
+    }
+
+    if (!selectedBranch) {
+      errors.branch = "Please select a branch";
+    }
+
+    if (!selectedOccupation) {
+      errors.occupation = "Please select an occupation";
+    }
+
+    if (!selectedMaritalStatus) {
+      errors.maritalStatus = "Please select marital status";
+    }
+
+    if (!phoneNumber || validationErrors.phoneNumber) {
+      errors.phoneNumber = "Please provide a valid phone number";
+    }
+
+    if (!validationErrors.isPhoneVerified && !isPhoneVerified) {
+      errors.phoneVerification = "Please verify your phone number";
+    }
+
+    if (!locationData.currentAddress.province || !locationData.placeOfBirth.province) {
+      errors.location = "Please complete location information";
+    }
+
+    // Show all errors
+    if (Object.keys(errors).length > 0) {
+      const firstError = Object.values(errors)[0];
+      toast.error("Validation Error", {
+        description: firstError,
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const nidImageBase64 = uploadedImage!.idImage.split(",")[1] || uploadedImage!.idImage;
+
+      const accountData: CreateOpenAccountReq = {
+        familyName: formData.lastNameEn,
+        givenName: formData.firstNameEn,
+        firstNameKh: formData.firstNameKh,
+        lastNameKh: formData.lastNameKh,
+        dateOfBirth: formatDate(formData.dob),
+        gender: convertGenderToAPI(formData.gender),
+        placeOfBirth: formData.pob,
+        companyName: selectedReferenceBank ?
+          referenceBanks.find(r => r.id.toString() === selectedReferenceBank)?.nameEn || "CPBank"
+          : "CPBank",
+        referralId: staffCode || "",
+        branchCode: selectedBranch!.branchID,
+        occupation: selectedOccupation?.occupationCode || "",
+        maritalStatus: getMaritalStatusString(selectedMaritalStatus),
+        customerCurrentProvince: locationData.currentAddress.province?.provinceCode || "",
+        customerCurrentDistrict: locationData.currentAddress.district?.districtCode || "",
+        customerCurrentCommune: locationData.currentAddress.commune?.communeCode || "",
+        customerCurrentVillage: locationData.currentAddress.village?.villageCode || "",
+        customerPobProvince: locationData.placeOfBirth.province?.provinceCode || "",
+        customerPobDistrict: locationData.placeOfBirth.district?.districtCode || "",
+        customerPobCommune: locationData.placeOfBirth.commune?.communeCode || "",
+        customerPobVillage: locationData.placeOfBirth.village?.villageCode || "",
+        legalId: formData.idNumber,
+        legalIssueDate: formatDate(formData.issuedDate),
+        legalExpireDate: formatDate(formData.expiredDate),
+        legalAddress: formData.address,
+        legalDocType: "NATIONAL.ID",
+        legalMrz1: formData.MRZ1,
+        legalMrz2: formData.MRZ2,
+        legalMrz3: formData.MRZ3,
+        phoneNumber: phoneNumber,
+        // nidImage: nidImageBase64,
+        // selfieImage: selfieImage || ""
+        nidImage: nidImageBase64?.slice(0, 20) + "...",
+        selfieImage: selfieImage?.slice(0, 20) + "...",
+      };
+
+      console.log("=== ACCOUNT OPENING SUBMISSION DATA ===");
+      console.log(JSON.stringify(accountData, null, 2));
+      console.log("=======================================");
+
+      // TODO: Replace with your actual API call
+      const response = await createOpenAccountService(accountData);
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      AppToast({
+        type: "success",
+        message: "Account opened successfully!",
+        description: "Your account has been created.",
+      });
+
+      // Optional: Clear form after successful submission
+      // handleClear();
+
+    } catch (error: any) {
+      console.error("Account opening error:", error);
+      toast.error("Failed to open account", {
+        description: error.message || "Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleInputChange = (field: keyof ResponseNID, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -395,7 +566,10 @@ export default function CheckNIDPage() {
     expiredDate: "",
     issuedDate: "",
     address: "",
-    pob: ""
+    pob: "",
+    MRZ1: "",
+    MRZ2: "",
+    MRZ3: ""
   };
 
   const handleClear = () => {
@@ -406,20 +580,35 @@ export default function CheckNIDPage() {
     setSelfieImage(null);
     setSelfiePreview(null);
     setValidationResult(null);
-    setIsVerified(false); // Add this line
+    setIsPhoneVerified(false);
     setSelectedMaritalStatus("");
-    setSelectedOccupation("");
+    setSelectedOccupation(null);
     setSelectedReferenceBank("");
     setSelectedBranch(null);
     setStaffCode("");
+    setPhoneNumber("");
+    setValidationErrors({});
     setLocationData({
+      currentAddress: {
+        province: null,
+        district: null,
+        commune: null,
+        village: null,
+      },
+      placeOfBirth: {
+        province: null,
+        district: null,
+        commune: null,
+        village: null,
+      }
+    });
+    setLocationFormData({
       province: "",
       district: "",
       commune: "",
       village: "",
     });
 
-    // Reset file input
     const fileInput = document.getElementById(
       "image-upload"
     ) as HTMLInputElement;
@@ -435,12 +624,11 @@ export default function CheckNIDPage() {
     }
   };
 
-  // Get Branch
   const onBranchChange = useCallback(
     (branch: BranchModel) => {
       setSelectedBranch(branch);
     },
-    [selectedBranch]
+    []
   );
 
   return (
@@ -472,11 +660,13 @@ export default function CheckNIDPage() {
               </div>
 
               {/* Loading indicator */}
-              {(isLoading || isValidating) && (
+              {(isLoading || isValidating || isSubmitting) && (
                 <div className="flex justify-center items-center space-x-2 mb-6">
                   <Loader2 className="animate-spin h-6 w-6 text-blue-600" />
                   <span className="text-base text-gray-600">
-                    {isLoading ? translate("extracting") : translate("validating")}
+                    {isLoading && translate("extracting")}
+                    {isValidating && translate("validating")}
+                    {isSubmitting && "Submitting account..."}
                   </span>
                 </div>
               )}
@@ -501,7 +691,7 @@ export default function CheckNIDPage() {
                         onChange={handleImageUpload}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         id="image-upload"
-                        disabled={isLoading || isValidating}
+                        disabled={isLoading || isValidating || isSubmitting}
                       />
                       <img
                         src={uploadedImage?.idImage || "/app/identity-card.png?height=192&width=320"}
@@ -529,7 +719,7 @@ export default function CheckNIDPage() {
                         onChange={handleSelfieUpload}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         id="image-upload-user"
-                        disabled={isLoading || isValidating}
+                        disabled={isLoading || isValidating || isSubmitting}
                       />
                       <img
                         src={selfiePreview || "/app/image_selfie.jpg?height=192&width=320"}
@@ -550,7 +740,7 @@ export default function CheckNIDPage() {
                   placeholder={translate("firstNameKh")}
                   value={formData.lastNameKh}
                   onChange={(value) => handleInputChange("lastNameKh", value)}
-                  disabled={isLoading || isValidating}
+                  disabled={isLoading || isValidating || isSubmitting}
                 />
 
                 {/* Last Name (KH)*/}
@@ -563,7 +753,7 @@ export default function CheckNIDPage() {
                     value={formData.firstNameKh}
                     onChange={(e) => handleInputChange("firstNameKh", e.target.value)}
                     className="w-full h-10"
-                    disabled={isLoading || isValidating}
+                    disabled={isLoading || isValidating || isSubmitting}
                   />
                 </div>
 
@@ -577,7 +767,7 @@ export default function CheckNIDPage() {
                     value={formData.lastNameEn}
                     onChange={(e) => handleInputChange("lastNameEn", e.target.value)}
                     className="w-full h-10"
-                    disabled={isLoading || isValidating}
+                    disabled={isLoading || isValidating || isSubmitting}
                   />
                 </div>
 
@@ -591,7 +781,7 @@ export default function CheckNIDPage() {
                     value={formData.firstNameEn}
                     onChange={(e) => handleInputChange("firstNameEn", e.target.value)}
                     className="w-full h-10"
-                    disabled={isLoading || isValidating}
+                    disabled={isLoading || isValidating || isSubmitting}
                   />
                 </div>
 
@@ -603,7 +793,7 @@ export default function CheckNIDPage() {
                   <CustomDatePicker
                     value={formData.dob}
                     onChange={(value) => handleInputChange("dob", value)}
-                    disabled={isLoading || isValidating}
+                    disabled={isLoading || isValidating || isSubmitting}
                     placeholder={translate("dateOfBirth")}
                   />
                 </div>
@@ -616,7 +806,7 @@ export default function CheckNIDPage() {
                   <Select
                     value={formData.gender || ""}
                     onValueChange={(value) => handleInputChange("gender", value)}
-                    disabled={isLoading || isValidating}
+                    disabled={isLoading || isValidating || isSubmitting}
                   >
                     <SelectTrigger className="h-10">
                       <SelectValue placeholder={"Select a gender..."} />
@@ -633,7 +823,7 @@ export default function CheckNIDPage() {
                   <label className="text-base font-medium text-gray-700 block mb-1">
                     {translate("legalType")}
                   </label>
-                  <Select disabled={isLoading || isValidating}>
+                  <Select disabled={isLoading || isValidating || isSubmitting}>
                     <SelectTrigger className="h-10">
                       <SelectValue placeholder={"Select a legal type..."} />
                     </SelectTrigger>
@@ -653,7 +843,7 @@ export default function CheckNIDPage() {
                     value={formData.idNumber}
                     onChange={(e) => handleInputChange("idNumber", e.target.value)}
                     className="w-full h-10"
-                    disabled={isLoading || isValidating}
+                    disabled={isLoading || isValidating || isSubmitting}
                   />
                 </div>
 
@@ -667,7 +857,7 @@ export default function CheckNIDPage() {
                     value={formData.address}
                     onChange={(e) => handleInputChange("address", e.target.value)}
                     className="w-full h-10"
-                    disabled={isLoading || isValidating}
+                    disabled={isLoading || isValidating || isSubmitting}
                   />
                 </div>
 
@@ -681,7 +871,7 @@ export default function CheckNIDPage() {
                     value={formData.pob}
                     onChange={(e) => handleInputChange("pob", e.target.value)}
                     className="w-full h-10"
-                    disabled={isLoading || isValidating}
+                    disabled={isLoading || isValidating || isSubmitting}
                   />
                 </div>
 
@@ -693,7 +883,7 @@ export default function CheckNIDPage() {
                   <Select
                     value={selectedMaritalStatus}
                     onValueChange={setSelectedMaritalStatus}
-                    disabled={isLoading || isValidating || isLoadingMaritals}
+                    disabled={isLoading || isValidating || isLoadingMaritals || isSubmitting}
                   >
                     <SelectTrigger className="w-full h-10">
                       <SelectValue placeholder={isLoadingMaritals ? translate("loading") : "Select a marital..."} />
@@ -714,9 +904,12 @@ export default function CheckNIDPage() {
                     {translate("occupation")}
                   </label>
                   <Select
-                    value={selectedOccupation}
-                    onValueChange={setSelectedOccupation}
-                    disabled={isLoading || isValidating || isLoadingOccupations}
+                    value={selectedOccupation?.id.toString() || ""}
+                    onValueChange={(value) => {
+                      const occupation = occupations.find(o => o.id.toString() === value);
+                      setSelectedOccupation(occupation || null);
+                    }}
+                    disabled={isLoading || isValidating || isLoadingOccupations || isSubmitting}
                   >
                     <SelectTrigger className="w-full h-10">
                       <SelectValue placeholder={isLoadingOccupations ? translate("loading") : "Select a occupation..."} />
@@ -751,7 +944,7 @@ export default function CheckNIDPage() {
                     <Select
                       value={selectedReferenceBank}
                       onValueChange={setSelectedReferenceBank}
-                      disabled={isLoading || isValidating || isLoadingReferenceBanks}
+                      disabled={isLoading || isValidating || isLoadingReferenceBanks || isSubmitting}
                     >
                       <SelectTrigger className="w-40 h-10 rounded-r-none">
                         <SelectValue placeholder={isLoadingReferenceBanks ? translate("loading") : "Select ref..."} />
@@ -769,7 +962,7 @@ export default function CheckNIDPage() {
                       value={staffCode}
                       onChange={(e) => setStaffCode(e.target.value)}
                       className="flex-1 h-10 !rounded-l-none"
-                      disabled={isLoading || isValidating}
+                      disabled={isLoading || isValidating || isSubmitting}
                     />
                   </div>
                 </div>
@@ -780,8 +973,11 @@ export default function CheckNIDPage() {
                   onPhoneChange={(value) => setPhoneNumber(value)}
                   onVerificationSuccess={() => {
                     console.log("Phone verified:", phoneNumber);
+                    setIsPhoneVerified(true);
                   }}
-                  disabled={isLoading || isValidating}
+                  disabled={isLoading || isValidating || isSubmitting}
+                  validationErrors={validationErrors}
+                  onValidationChange={handleValidationChange}
                 />
               </div>
 
@@ -790,16 +986,16 @@ export default function CheckNIDPage() {
                 <Button
                   className="px-8 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-md"
                   onClick={handleOpenConfirmModal}
-                  disabled={isLoading || isValidating || isVerified}
+                  disabled={isLoading || isValidating || isPhoneVerified || isSubmitting}
                 >
                   {isValidating ? translate("processing") : translate("verification")}
                 </Button>
                 <Button
                   className="px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md"
-                  onClick={handleClear}
-                  disabled={isLoading || isValidating || !isVerified} ///
+                  onClick={handleSubmitAccount}
+                  disabled={isLoading || isValidating || !isPhoneVerified || isSubmitting}
                 >
-                  {translate("submit")}
+                  {isSubmitting ? "Submitting..." : translate("submit")}
                 </Button>
               </div>
             </div>
@@ -823,9 +1019,9 @@ export default function CheckNIDPage() {
         isOpen={showLocationModal}
         onClose={() => setShowLocationModal(false)}
         onSubmit={handleLocationSubmit}
-        formData={locationData}
-        setFormData={setLocationData}
-        addressFromForm={formData.address} // Add this line to pass the address
+        formData={locationFormData}
+        setFormData={setLocationFormData}
+        addressFromForm={formData.address}
         placeOfBirthFromForm={formData.pob}
       />
 

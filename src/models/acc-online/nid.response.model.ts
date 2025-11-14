@@ -11,6 +11,9 @@ export interface ResponseNID {
   issuedDate: string;
   address: string;
   pob: string;
+  MRZ1: string;
+  MRZ2: string;
+  MRZ3: string;
 }
 
 export interface ResponseValid {

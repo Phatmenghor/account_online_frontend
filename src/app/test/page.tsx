@@ -1,4 +1,3 @@
-// Test code 
 "use client";
 
 import { useState, useCallback } from "react";
@@ -73,10 +72,7 @@ export default function CheckNIDPage() {
     expiredDate: "",
     issuedDate: "",
     address: "",
-    pob: "",
-    MRZ1: "",
-    MRZ2: "",
-    MRZ3: ""
+    pob: ""
   });
 
   // Validation state
@@ -101,8 +97,6 @@ export default function CheckNIDPage() {
   });
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState<BranchModel | null>(null);
-
 
   const [locationData, setLocationData] = useState<LocationData>({
     province: "",
@@ -121,10 +115,9 @@ export default function CheckNIDPage() {
   const [selectedReferenceBank, setSelectedReferenceBank] = useState<string>("");
 
   const { data: branches, isLoading: isLoadingBranches } = useBranches();
-  // const [selectedBranch, setSelectedBranch] = useState<string>("");
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
 
   const [staffCode, setStaffCode] = useState<string>("");
-  const [legalType, setLegalType] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
@@ -188,7 +181,7 @@ export default function CheckNIDPage() {
         const path = err.path.join(".");
         errors[path] = err.message;
       });
-      setValidationErrors((prev) => ({ ...prev, ...errors }));
+      setValidationErrors((prev) => ({...prev, ...errors}));
       return false;
     }
 
@@ -211,13 +204,12 @@ export default function CheckNIDPage() {
       pob: formData.pob,
       maritalStatus: selectedMaritalStatus,
       occupation: selectedOccupation,
-      branch: selectedBranch?.branchkh || "",
+      branch: selectedBranch,
       referenceBank: selectedReferenceBank,
-      legalType: legalType,
       staffCode: staffCode,
       phoneNumber: phoneNumber,
       isPhoneVerified: isPhoneVerified,
-      // isVerified: isVerified,
+      isVerified: isVerified,
     };
 
     const result = NIDFormSchema.safeParse(fullData);
@@ -228,7 +220,7 @@ export default function CheckNIDPage() {
         const path = err.path.join(".");
         errors[path] = err.message;
       });
-      setValidationErrors((prev) => ({ ...prev, ...errors }));
+      setValidationErrors((prev) => ({...prev, ...errors}));
       return false;
     }
 
@@ -385,9 +377,6 @@ export default function CheckNIDPage() {
         issuedDate: formatDate(formData.issuedDate),
         address: formData.address,
         pob: formData.pob,
-        MRZ1: formData.MRZ1,
-        MRZ2: formData.MRZ2,
-        MRZ3: formData.MRZ3
       };
 
       const response = await validateNIDService(validationData);
@@ -403,7 +392,7 @@ export default function CheckNIDPage() {
         setShowErrorModal(true);
       } else {
         setIsVerified(true);
-        // validateField("isVerified", true);
+        validateField("isVerified", true);
         setShowLocationModal(true);
       }
     } catch (error: any) {
@@ -423,7 +412,7 @@ export default function CheckNIDPage() {
     // Validate both forms simultaneously
     const isVerificationValid = validateVerificationForm();
     const isFullFormValid = validateFullForm();
-
+    
     // Only show confirmation modal if both validations pass
     if (isVerificationValid && isFullFormValid) {
       setShowConfirmationModal(true);
@@ -531,10 +520,7 @@ export default function CheckNIDPage() {
       expiredDate: "",
       issuedDate: "",
       address: "",
-      pob: "",
-      MRZ1: "",
-      MRZ2: "",
-      MRZ3: ""
+      pob: ""
     });
     setUploadedImage(null);
     setImagePreview(null);
@@ -547,9 +533,8 @@ export default function CheckNIDPage() {
     setSelectedMaritalStatus("");
     setSelectedOccupation("");
     setSelectedReferenceBank("");
-    setSelectedBranch(null);
+    setSelectedBranch("");
     setStaffCode("");
-    setLegalType("");
     setPhoneNumber("");
     setLocationData({
       province: "",
@@ -566,14 +551,11 @@ export default function CheckNIDPage() {
     if (selfieInput) selfieInput.value = "";
   };
 
-  const onBranchChange = useCallback(
-    (branch: BranchModel) => {
-      setSelectedBranch(branch);
-      validateField("branch", branch.branchkh);
-    },
-    [selectedBranch]
-    // [] // Remove selectedBranch from dependencies
-  );
+  const onBranchChange = useCallback((branch: BranchModel) => {
+    const branchId = branch?.branchID || "";
+    setSelectedBranch(branchId);
+    validateField("branch", branchId);
+  }, []);
 
   return (
     <div className="flex flex-col h-screen">
@@ -792,24 +774,14 @@ export default function CheckNIDPage() {
                   <Label htmlFor="legalType" className="text-sm">
                     {translate("legalType")}
                   </Label>
-                  <Select
-                    value={legalType}
-                    onValueChange={(value) => {
-                      setLegalType(value);
-                      validateField("legalType", value);
-                    }}
-                    disabled={isLoading || isValidating}
-                  >
-                    <SelectTrigger className={`h-10 ${validationErrors.legalType ? 'border-red-500' : ''}`}>
+                  <Select disabled={isLoading || isValidating}>
+                    <SelectTrigger className="h-10">
                       <SelectValue placeholder="Select a legal type..." />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="national-id">National ID Card</SelectItem>
                     </SelectContent>
                   </Select>
-                  {validationErrors.legalType && (
-                    <p className="text-xs text-red-500">{validationErrors.legalType}</p>
-                  )}
                 </div>
 
                 {/* Legal ID */}
@@ -931,9 +903,8 @@ export default function CheckNIDPage() {
                   </Label>
                   <div className={validationErrors.branch ? 'border border-red-500 rounded' : ''}>
                     <ComboboxSelectBranch
-                      dataSelect={selectedBranch}
+                      dataSelect={branches.find(b => b.branchID === selectedBranch) || null}
                       onChangeSelected={onBranchChange}
-                      disabled={isLoading || isValidating}
                     />
                   </div>
                   {validationErrors.branch && (
@@ -998,19 +969,19 @@ export default function CheckNIDPage() {
                     validateField("isPhoneVerified", true);
                   }}
                   disabled={isLoading || isValidating}
-                  validationErrors={validationErrors}
-                  onValidationChange={(field, error) => {
-                    if (error) {
-                      setValidationErrors((prev) => ({ ...prev, [field]: error }));
-                    } else {
-                      setValidationErrors((prev) => {
-                        const newErrors = { ...prev };
-                        delete newErrors[field];
-                        return newErrors;
-                      });
-                    }
-                  }}
                 />
+
+                {/* Phone validation errors */}
+                {validationErrors.phoneNumber && (
+                  <div className="md:col-span-2">
+                    <p className="text-xs text-red-500">{validationErrors.phoneNumber}</p>
+                  </div>
+                )}
+                {validationErrors.isPhoneVerified && (
+                  <div className="md:col-span-2">
+                    <p className="text-xs text-red-500">{validationErrors.isPhoneVerified}</p>
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}

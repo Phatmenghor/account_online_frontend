@@ -37,13 +37,13 @@ export const NIDFormSchema = z.object({
     .max(15, "Phone number must not exceed 15 digits")
     .regex(/^[0-9]+$/, "Phone number must contain only digits"),
   isPhoneVerified: z.boolean().refine((val) => val === true, {
-    message: "Phone number must be verified",
+    message: "Phone number must be verified. And then input otp 6 digit",
   }),
   
   // Validation status
-  isVerified: z.boolean().refine((val) => val === true, {
-    message: "NID must be verified before submission",
-  }),
+  // isVerified: z.boolean().refine((val) => val === true, {
+  //   message: "NID must be verified before submission",
+  // }),
 
   // OTP Code
   // otpCode: z.string().min(1, "OTP code is required"),
@@ -67,3 +67,25 @@ export const NIDVerificationSchema = NIDFormSchema.pick({
 });
 
 export type NIDVerificationData = z.infer<typeof NIDVerificationSchema>;
+
+
+// Schema for Location/Address Form Validation
+export const LocationFormSchema = z.object({
+  // Current Address
+  currentAddress: z.object({
+    province: z.string().min(1, "Province is required"),
+    district: z.string().min(1, "District is required"),
+    commune: z.string().min(1, "Commune is required"),
+    village: z.string().min(1, "Village is required"),
+  }),
+  
+  // Place of Birth
+  placeOfBirth: z.object({
+    province: z.string().min(1, "Province is required"),
+    district: z.string().min(1, "District is required"),
+    commune: z.string().min(1, "Commune is required"),
+    village: z.string().min(1, "Village is required"),
+  }),
+});
+
+export type LocationFormData = z.infer<typeof LocationFormSchema>;
