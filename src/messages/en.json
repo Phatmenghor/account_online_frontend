@@ -32,7 +32,13 @@
     },
     "chooseOne": "--- Choose one ---",
     "yesIhave": "Yes, I have reviewed",
-    "noIneed": "No, I need to review"
+    "noIneed": "No, I need to review",
+    "selectBranch": "Select a branch...",
+    "selectRef": "Select ref...",
+    "selectGender": "Select a gender...",
+    "selectLegalType": "Select a legal type...",
+    "selectMarital": "Select a marital...",
+    "selectOccupation": "Select an occupation..."
   },
 
   "dashboard": {
