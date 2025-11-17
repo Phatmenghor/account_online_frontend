@@ -38,7 +38,17 @@
     "selectGender": "សូមជ្រើសរើសភេទ...",
     "selectLegalType": "សូមជ្រើសរើសប្រភេទ legal...",
     "selectMarital": "សូមជ្រើសរើសស្ថានភាពគ្រួសារ...",
-    "selectOccupation": "សូមជ្រើសរើសមុខរបរ..."
+    "selectOccupation": "សូមជ្រើសរើសមុខរបរ...",
+    "searchBranch": "ស្វែងរកសាខា...",
+
+    "selectProvince": "សូមជ្រើសរើសខេត្ត ...",
+    "selectDistrict": "សូមជ្រើសរើសស្រុក...",
+    "selectCommune": "សូមជ្រើសរើសឃុំ...",
+    "selectVillage": "សូមជ្រើសរើសភូមិ...",
+    "searchProvince": "ស្វែងរកខេត្ត...",
+    "searchDistrict": "ស្វែងរកស្រុក...",
+    "searchCommune": "ស្វែងរកឃុំ...",
+    "searchVillage": "ស្វែងរកភូមិ..."
   },
 
   "dashboard": {

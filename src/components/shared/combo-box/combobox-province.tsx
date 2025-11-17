@@ -261,7 +261,7 @@ export function ComboboxSelectProvince({
             ? translate("loading")
             : dataSelect
             ? getName(dataSelect)
-            : "Select a province..."}
+            : translate("selectProvince")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -271,7 +271,7 @@ export function ComboboxSelectProvince({
       >
         <Command>
           <CommandInput
-            placeholder="Search province..."
+            placeholder={translate("searchProvince")}
             value={searchTerm}
             onValueChange={setSearchTerm}
           />

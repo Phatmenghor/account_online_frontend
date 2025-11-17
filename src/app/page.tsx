@@ -467,14 +467,14 @@ export default function CheckNIDPage() {
       );
 
       if (hasCriticalErrors) {
-        setIsVerified(false);
+        // setIsVerified(false);
         setShowErrorModal(true);
       } else {
-        setIsVerified(true);
+        // setIsVerified(true);
         setShowLocationModal(true);
       }
     } catch (error: any) {
-      setIsVerified(false);
+      // setIsVerified(false);
       setValidationErrorData({
         title: translate("valid_fail"),
         message: error.apiMessage || "Failed to validate NID information.",
@@ -555,6 +555,9 @@ export default function CheckNIDPage() {
 
     console.log("Updated Address:", currentAddressString);
     console.log("Updated Place of Birth:", placeOfBirthString);
+
+    // Set isVerified to true ONLY after successful location submission
+    setIsVerified(true);
 
     AppToast({
       type: "success",

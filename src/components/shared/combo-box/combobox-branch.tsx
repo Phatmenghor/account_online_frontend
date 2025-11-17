@@ -133,7 +133,7 @@ export function ComboboxSelectBranch({
       >
         <Command>
           <CommandInput
-            placeholder="Search brand..."
+            placeholder={translate("searchBranch")}
             value={searchTerm}
             onValueChange={onChangeSearch}
           />

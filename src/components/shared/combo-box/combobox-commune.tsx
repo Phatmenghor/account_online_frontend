@@ -269,7 +269,7 @@ export function ComboboxSelectCommune({
             ? translate("loading")
             : dataSelect
             ? getName(dataSelect)
-            : "Select a commune..."}
+            : translate("selectCommune")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -279,7 +279,7 @@ export function ComboboxSelectCommune({
       >
         <Command>
           <CommandInput
-            placeholder="Search commune..."
+            placeholder={translate("searchCommune")}
             value={searchTerm}
             onValueChange={setSearchTerm}
           />

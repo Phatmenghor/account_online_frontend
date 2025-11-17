@@ -38,7 +38,17 @@
     "selectGender": "Select a gender...",
     "selectLegalType": "Select a legal type...",
     "selectMarital": "Select a marital...",
-    "selectOccupation": "Select an occupation..."
+    "selectOccupation": "Select an occupation...",
+    "searchBranch": "Search brand...",
+
+    "selectProvince": "Select a province...",
+    "selectDistrict": "Select a district...",
+    "selectCommune": "Select a commune...",
+    "selectVillage": "Select a village...",
+    "searchProvince": "Search village...",
+    "searchDistrict": "Search district...",
+    "searchCommune": "Search commune...",
+    "searchVillage": "Search village..."
   },
 
   "dashboard": {
