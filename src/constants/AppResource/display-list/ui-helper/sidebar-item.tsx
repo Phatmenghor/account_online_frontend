@@ -1,11 +1,13 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import {
   Calendar1Icon,
   Code,
   Dock,
   FolderClosed,
+  IdCard,
   LayoutDashboard,
   User,
   User2,
@@ -19,7 +21,7 @@ export function useNavItems() {
     {
       title: t("dashbaord"),
       href: ROUTES.DASHBOARD.INDEX,
-      icon: LayoutDashboard ,
+      icon: LayoutDashboard,
     },
     {
       title: t("users"),
@@ -44,7 +46,15 @@ export function useNavItems() {
           href: ROUTES.DASHBOARD.STATIC.REFERENCE,
           icon: FolderClosed,
         },
+
       ],
     },
+    {
+      title: t("accountOnline"),
+      href: ROUTES.DASHBOARD.ACCOUNT_ONLINE,
+      icon: IdCard
+
+    },
+
   ];
 }

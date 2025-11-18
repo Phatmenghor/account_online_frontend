@@ -22,6 +22,7 @@
     "marital": "Marital",
     "occupation": "Occupation",
     "reference": "Reference",
+    "accountOnline" : "Account Online",
     "index": "Master Data",
     "new": "New",
     "allStatus": "All Status",
@@ -32,7 +33,8 @@
     },
     "chooseOne": "--- Choose one ---",
     "yesIhave": "Yes, I have reviewed",
-    "noIneed": "No, I need to review"
+    "noIneed": "No, I need to review",
+    "searchBtn" : "Search"
   },
 
   "dashboard": {
@@ -93,7 +95,9 @@
     "nameKh": "Name (Khmer)",
     "occupationCode": "Occupation Code",
     "actions": "Actions",
-    "status": "Status"
+    "status": "Status",
+    "cif" : "Enter your CIF ...",
+    "legalId" : "Enter your Legal Id ..."
   },
 
   "NIDPage": {
@@ -162,7 +166,10 @@
     "submit": "Submit",
 
     "cfTitle": "Confirm Information",
-    "cfMessage": "Please confirm that you have reviewed your personal information."
+    "cfMessage": "Please confirm that you have reviewed your personal information.",
+    "cifNumber" : "CIF",
+    "phoneNumber" : "Phone Number",
+    "nationality" : "Nationality"
   },
 
   "address": {
