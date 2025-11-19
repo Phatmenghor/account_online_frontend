@@ -117,6 +117,7 @@
     "process": "Processing...",
     "check": "Check Now",
     "clear": "Clear",
+    "extracting_data": "Extracting Data",
     "extracting": "Extracting NID information...",
     "validating": "Validating NID information...",
 

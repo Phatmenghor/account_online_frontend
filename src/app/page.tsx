@@ -35,6 +35,7 @@ import { CreateOpenAccountReq } from "@/models/open-account/openAccount.request"
 import { createOpenAccountService } from "@/services/open-account/openAccount.service";
 import { NIDFormData, NIDFormSchema, NIDVerificationSchema } from "@/components/acc-online/form-field/form-validate-error";
 import { Label } from "@/components/ui/label";
+import LoadingModal from "@/components/shared/modal/extract-modal";
 
 export interface Image {
   idImage: string;
@@ -129,15 +130,21 @@ export default function CheckNIDPage() {
     village: "",
   });
 
+  const [loadingState, setLoadingState] = useState({
+    isLoading: false,
+    title: "",
+    message: ""
+  });
+
   // Use custom hooks for data fetching
   const { data: maritalStatuses, isLoading: isLoadingMaritals } = useMaritalStatuses();
-  const [selectedMaritalStatus, setSelectedMaritalStatus] = useState<string>("");
+  const [selectedMaritalStatus, setSelectedMaritalStatus] = useState<MaritalModel | null>(null);
 
   const { data: occupations, isLoading: isLoadingOccupations } = useOccupations();
   const [selectedOccupation, setSelectedOccupation] = useState<OccupationModel | null>(null);
 
   const { data: referenceBanks, isLoading: isLoadingReferenceBanks } = useReferenceBanks();
-  const [selectedReferenceBank, setSelectedReferenceBank] = useState<string>("");
+  const [selectedReferenceBank, setSelectedReferenceBank] = useState<ReferenceModel | null>(null);
 
   const [staffCode, setStaffCode] = useState<string>("");
   const [legalType, setLegalType] = useState<string>("");
@@ -146,7 +153,7 @@ export default function CheckNIDPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-
+  const [resetOtp, setResetOtp] = useState(false);
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -269,10 +276,10 @@ export default function CheckNIDPage() {
       address: formData.address,
       pob: formData.pob,
       legalType: legalType,
-      maritalStatus: selectedMaritalStatus,
+      maritalStatus: selectedMaritalStatus?.nameEn || "",
       occupation: selectedOccupation?.occupationCode || "",
       branch: selectedBranch?.branchkh || "",
-      referenceBank: selectedReferenceBank,
+      referenceBank: selectedReferenceBank?.nameEn || "",
       staffCode: staffCode,
       phoneNumber: phoneNumber,
       isPhoneVerified: isPhoneVerified,
@@ -307,7 +314,13 @@ export default function CheckNIDPage() {
         return;
       }
 
-      setIsLoading(true);
+      setLoadingState({
+        isLoading: true,
+        title: translate("extracting_data") || "Extracting Data",
+        message: translate("extracting") || "Extracting information from ID card..."
+      });
+
+      // setIsLoading(true);
       try {
         const base64WithPrefix = await convertToBase64(file);
         const base64ForService = base64WithPrefix.split(",")[1];
@@ -332,7 +345,13 @@ export default function CheckNIDPage() {
         toast.error("Image processing error", {
           description: "Failed to process the image. Please try again.",
         });
-        setIsLoading(false);
+        // setIsLoading(false);
+      } finally {
+        setLoadingState({
+          isLoading: false,
+          title: "",
+          message: ""
+        });
       }
     }
   };
@@ -583,7 +602,12 @@ export default function CheckNIDPage() {
   // Handle Submit Account Opening
   const handleSubmitAccount = async () => {
 
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
+    setLoadingState({
+    isLoading: true,
+    title: translate("submitting") || "Submitting",
+    message: translate("submitting_message") || "Creating your account..."
+  });
 
     try {
       const nidImageBase64 = uploadedImage!.idImage.split(",")[1] || uploadedImage!.idImage;
@@ -596,13 +620,12 @@ export default function CheckNIDPage() {
         dateOfBirth: formatDate(formData.dob),
         gender: convertGenderToAPI(formData.gender),
         placeOfBirth: formData.pob,
-        companyName: selectedReferenceBank ?
-          referenceBanks.find(r => r.id.toString() === selectedReferenceBank)?.nameEn || "CPBank"
-          : "CPBank",
+        companyName: selectedReferenceBank?.nameEn || "",
         referralId: staffCode || "",
         branchCode: selectedBranch!.branchID,
         occupation: selectedOccupation?.occupationCode || "",
-        maritalStatus: selectedMaritalStatus,
+        // maritalStatus: selectedMaritalStatus?.nameEn || "",
+        maritalStatus: selectedMaritalStatus ? getMaritalStatusString(selectedMaritalStatus.id.toString()) : "SINGLE", // ← FIXED LINE
         customerCurrentProvince: locationData.currentAddress.province?.provinceCode || "",
         customerCurrentDistrict: locationData.currentAddress.district?.districtCode || "",
         customerCurrentCommune: locationData.currentAddress.commune?.communeCode || "",
@@ -631,6 +654,10 @@ export default function CheckNIDPage() {
       // TODO: Replace with your actual API call
       const response = await createOpenAccountService(accountData);
 
+      console.log("API Response:", response);
+      console.log("##",accountData);
+      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -649,7 +676,12 @@ export default function CheckNIDPage() {
         description: error.message || "Please try again later.",
       });
     } finally {
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
+      setLoadingState({
+      isLoading: false,
+      title: "",
+      message: ""
+    });
     }
   };
 
@@ -680,9 +712,9 @@ export default function CheckNIDPage() {
     setValidationResult(null);
     setIsVerified(false);
     setIsPhoneVerified(false);
-    setSelectedMaritalStatus("");
+    setSelectedMaritalStatus(null);
     setSelectedOccupation(null);
-    setSelectedReferenceBank("");
+    setSelectedReferenceBank(null);
     setSelectedBranch(null);
     setStaffCode("");
     setPhoneNumber("");
@@ -707,6 +739,10 @@ export default function CheckNIDPage() {
       commune: "",
       village: "",
     });
+
+    // Trigger OTP reset
+  setResetOtp(true);
+  setTimeout(() => setResetOtp(false), 100);
 
     const fileInput = document.getElementById(
       "image-upload"
@@ -761,7 +797,7 @@ export default function CheckNIDPage() {
               </div>
 
               {/* Loading indicator */}
-              {(isLoading || isValidating) && (
+              {/* {(isLoading || isValidating) && (
                 <div className="flex justify-center items-center space-x-2 mb-6">
                   <Loader2 className="animate-spin h-6 w-6 text-blue-600" />
                   <span className="text-base text-gray-600">
@@ -770,7 +806,13 @@ export default function CheckNIDPage() {
                     {isSubmitting && "Submitting account..."}
                   </span>
                 </div>
-              )}
+              )} */}
+              {/* Add the Loading Modal when extract */}
+              <LoadingModal
+                isOpen={loadingState.isLoading}
+                title={loadingState.title}
+                message={loadingState.message}
+              />
 
               {/* ID Card and Selfie Upload Section */}
               <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 lg:gap-14 gap-8">
@@ -1035,9 +1077,10 @@ export default function CheckNIDPage() {
                     {translate("marital")}
                   </Label>
                   <Select
-                    value={selectedMaritalStatus}
+                    value={selectedMaritalStatus?.id.toString() || ""}
                     onValueChange={(value) => {
-                      setSelectedMaritalStatus(value);
+                      const marital = maritalStatuses.find(m => m.id.toString() === value);
+                      setSelectedMaritalStatus(marital || null);
                       validateField("maritalStatus", value);
                     }}
                     disabled={isLoading || isValidating || isLoadingMaritals}
@@ -1112,9 +1155,10 @@ export default function CheckNIDPage() {
                   </Label>
                   <div className="flex">
                     <Select
-                      value={selectedReferenceBank}
+                      value={selectedReferenceBank?.id.toString() || ""}
                       onValueChange={(value) => {
-                        setSelectedReferenceBank(value);
+                        const reference = referenceBanks.find(r => r.id.toString() === value);
+                        setSelectedReferenceBank(reference || null);
                         validateField("referenceBank", value);
                       }}
                       disabled={isLoading || isValidating || isLoadingReferenceBanks}
@@ -1163,17 +1207,8 @@ export default function CheckNIDPage() {
                   }}
                   disabled={isLoading || isValidating || isSubmitting}
                   validationErrors={validationErrors}
-                  onValidationChange={(field, error) => {
-                    if (error) {
-                      setValidationErrors((prev) => ({ ...prev, [field]: error }));
-                    } else {
-                      setValidationErrors((prev) => {
-                        const newErrors = { ...prev };
-                        delete newErrors[field];
-                        return newErrors;
-                      });
-                    }
-                  }}
+                  onValidationChange={handleValidationChange}
+                  reset={resetOtp}
                 />
               </div>
 

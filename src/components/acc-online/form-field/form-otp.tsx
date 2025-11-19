@@ -427,6 +427,7 @@ interface OTPInputProps {
   disabled?: boolean;
   validationErrors?: Record<string, string>;
   onValidationChange?: (field: string, error: string | null) => void;
+  reset?: boolean;
 }
 
 export default function OTPInput({
@@ -436,6 +437,7 @@ export default function OTPInput({
   disabled = false,
   validationErrors = {},
   onValidationChange,
+  reset 
 }: OTPInputProps) {
   const [otpCode, setOtpCode] = useState<string>("");
   const [isOtpSent, setIsOtpSent] = useState<boolean>(false);
@@ -727,23 +729,17 @@ export default function OTPInput({
   }, [otpCode, phoneNumber, isOtpVerified, isVerifyingOtp, lastVerifiedOtp, handleVerifyOtp]);
 
   // Reset function (can be called from parent)
-  const reset = useCallback(() => {
-    setOtpCode("");
-    setIsOtpSent(false);
-    setIsOtpVerified(false);
-    setOtpExpiresAt("");
-    setCountdown(0);
-    setLastVerifiedOtp("");
-    validateField("phoneNumber", "");
-    validateField("isPhoneVerified", false);
-  }, [validateField]);
-
-  // Expose reset method
   useEffect(() => {
-    (window as any).otpInputReset = reset;
-    return () => {
-      delete (window as any).otpInputReset;
-    };
+    if (reset) {
+      setOtpCode("");
+      setIsOtpSent(false);
+      setIsOtpVerified(false);
+      setOtpExpiresAt("");
+      setCountdown(0);
+      setLastVerifiedOtp("");
+      setIsSendingOtp(false);
+      setIsVerifyingOtp(false);
+    }
   }, [reset]);
 
   return (
