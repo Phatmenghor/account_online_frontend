@@ -15,7 +15,7 @@ interface CustomDialogProps {
   cancelLabel?: string;
   confirmButtonIcon?: React.ReactNode;
   onConfirm: () => Promise<void> | void;
-  variant?: "danger" | "warning" | "info";
+  variant?: "danger" | "warning" | "info" | "orange"; // ✅ added "orange"
   className?: string;
   size?: "sm" | "md" | "lg" | "xl" | "full";
   showIcon?: boolean;
@@ -29,7 +29,7 @@ const ConfirmDialog = ({
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   onConfirm,
-  variant = "danger",
+  variant,
   confirmButtonIcon,
   className,
   size = "md",
@@ -38,33 +38,20 @@ const ConfirmDialog = ({
   const [isMounted, setIsMounted] = useState(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
 
-  // Handle escape key press
   useEffect(() => {
     setIsMounted(true);
-
     const handleEscapeKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen && !isConfirmLoading) {
-        onClose();
-      }
+      if (e.key === "Escape" && isOpen && !isConfirmLoading) onClose();
     };
-
     window.addEventListener("keydown", handleEscapeKey);
-
-    return () => {
-      window.removeEventListener("keydown", handleEscapeKey);
-    };
+    return () => window.removeEventListener("keydown", handleEscapeKey);
   }, [isOpen, onClose, isConfirmLoading]);
 
-  // Handle confirmation with loading state
   const handleConfirm = async () => {
     try {
       setIsConfirmLoading(true);
       const result = onConfirm();
-
-      // Check if it's a promise
-      if (result instanceof Promise) {
-        await result;
-      }
+      if (result instanceof Promise) await result;
     } catch (error) {
       console.error("Confirmation error:", error);
     } finally {
@@ -72,35 +59,40 @@ const ConfirmDialog = ({
     }
   };
 
-  // Don't render on the server
   if (!isMounted) return null;
 
-  // Get variant styles
+  // ✅ Added orange color variant here
   const getVariantStyles = () => {
     switch (variant) {
       case "danger":
         return {
-          icon: <AlertCircle className="h-6 w-6 text-destructive" />,
-          confirmButtonVariant: "destructive" as const,
-          title: "text-destructive",
+          icon: <AlertCircle className="h-6 w-6 text-red-500" />,
+          confirmButtonClass: "bg-red-500 hover:bg-red-600 text-white",
+          title: "text-red-500",
         };
       case "warning":
         return {
-          icon: <AlertCircle className="h-6 w-6 text-amber-500" />,
-          confirmButtonVariant: "default" as const,
-          title: "text-amber-500",
+          icon: <AlertCircle className="h-6 w-6 text-yellow-500" />,
+          confirmButtonClass: "bg-yellow-500 hover:bg-yellow-600 text-white",
+          title: "text-yellow-500",
+        };
+      case "orange":
+        return {
+          icon: <AlertCircle className="h-6 w-6 text-orange-500" />,
+          confirmButtonClass: "bg-orange-500 hover:bg-orange-600 text-white",
+          title: "text-red-500",
         };
       case "info":
+
       default:
         return {
-          icon: <AlertCircle className="h-6 w-6 text-blue-500" />,
-          confirmButtonVariant: "default" as const,
-          title: "text-blue-500",
+          icon: <AlertCircle className="h-6 w-6 text-red-500" />,
+          confirmButtonClass: "bg-orange-500 hover:bg-orange-600 text-white",
+          title: "text-red-500",
         };
     }
   };
 
-  // Get size class
   const getSizeClass = () => {
     switch (size) {
       case "sm":
@@ -201,9 +193,12 @@ const ConfirmDialog = ({
                     {cancelLabel}
                   </Button>
                   <Button
-                    variant={variantStyles.confirmButtonVariant}
                     onClick={handleConfirm}
                     disabled={isConfirmLoading}
+                    className={cn(
+                      variantStyles.confirmButtonClass,
+                      "min-w-[110px]"
+                    )}
                   >
                     {isConfirmLoading ? (
                       <>

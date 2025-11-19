@@ -7,18 +7,18 @@ export interface TableColumn<T = any> {
   render?: (item: T, index: number) => ReactNode;
   sortable?: boolean;
   truncate?: boolean;
-  maxWidth?: string; // Max width for the column (flexible)
-  minWidth?: string; // Min width for the column (optional)
+  maxWidth?: string;
+  minWidth?: string;
 }
 
 interface DataTableProps<T = any> {
-  data: T[];
+  data: T[] | null;
   columns: TableColumn<T>[];
   loading?: boolean;
   emptyMessage?: string;
   className?: string;
   onRowClick?: (item: T) => void;
-  getRowKey?: (item: T, index: number) => number;
+  getRowKey?: (item: T, index: number) => string | number;
 }
 
 export function DataTable<T = any>({
@@ -30,6 +30,9 @@ export function DataTable<T = any>({
   onRowClick,
   getRowKey = (_, index) => index,
 }: DataTableProps<T>) {
+  // ✅ Ensure data is always an array
+  const tableData: T[] = Array.isArray(data) ? data : [];
+
   if (loading) {
     return (
       <div className={`rounded-md border overflow-x-auto ${className}`}>
@@ -87,15 +90,13 @@ export function DataTable<T = any>({
                   ...(column.minWidth && { minWidth: column.minWidth }),
                 }}
               >
-                <div className="flex items-center gap-1">
-                  <span>{column.label}</span>
-                </div>
+                {column.label}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {!data || data.length === 0 ? (
+          {tableData.length === 0 ? (
             <tr>
               <td
                 colSpan={columns.length}
@@ -105,7 +106,7 @@ export function DataTable<T = any>({
               </td>
             </tr>
           ) : (
-            data.map((item, index) => (
+            tableData.map((item, index) => (
               <tr
                 key={getRowKey(item, index)}
                 className={`text-sm transition-all duration-200 hover:bg-muted/30 ${

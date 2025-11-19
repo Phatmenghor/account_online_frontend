@@ -158,6 +158,7 @@ function UserPageContent() {
                 totalElements: prev.totalElements + 1,
               }
             : {
+            
                 content: [response],
                 pageNo: 1,
                 pageSize: 10,

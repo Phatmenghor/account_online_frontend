@@ -19,7 +19,7 @@ export function useNavItems() {
     {
       title: t("dashbaord"),
       href: ROUTES.DASHBOARD.INDEX,
-      icon: LayoutDashboard ,
+      icon: LayoutDashboard,
     },
     {
       title: t("users"),
@@ -43,6 +43,22 @@ export function useNavItems() {
           title: t("reference"),
           href: ROUTES.DASHBOARD.STATIC.REFERENCE,
           icon: FolderClosed,
+        },
+      ],
+    },
+
+    {
+      title: "AML",
+      href: "#", // main parent, not clickable
+      icon: Calendar1Icon,
+      subItems: [
+        {
+          title: "Management",
+          href: ROUTES.DASHBOARD.AML.MANAGEMENT,
+        },
+        {
+          title: "History",
+          href: ROUTES.DASHBOARD.AML.HISTORY,
         },
       ],
     },
