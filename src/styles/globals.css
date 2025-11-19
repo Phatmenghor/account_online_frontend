@@ -29,7 +29,7 @@
 
 @layer base {
   :root {
-    /* Enhanced color system with better UX contrast */
+    /* Enhanced color system with CPBank Orange */
     --background: 0 0% 100%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
@@ -37,37 +37,37 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Enhanced brand colors for better visual hierarchy */
-    --primary: 334 51% 39%; /* Brand main #A23469 */
+    /* CPBank Brand Orange (#F36F21 → hsl 23 89% 55%) */
+    --primary: 23 89% 55%;
     --primary-foreground: 0 0% 98%;
-    --primary-hover: 334 51% 34%; /* Darker for hover */
-    --primary-active: 334 51% 29%; /* Even darker for active */
+    --primary-hover: 23 89% 50%;
+    --primary-active: 23 89% 45%;
 
-    --secondary: 220 13% 95%; /* Lighter variant */
+    --secondary: 220 13% 95%;
     --secondary-foreground: 240 5.9% 10%;
     --secondary-hover: 220 13% 91%;
 
-    --muted: 220 13% 95%; /* Better neutral muted */
+    --muted: 220 13% 95%;
     --muted-foreground: 220 8.5% 46%;
     --muted-hover: 220 13% 91%;
 
-    --accent: 334 51% 95%; /* Subtle brand accent */
-    --accent-foreground: 334 51% 29%;
-    --accent-hover: 334 51% 91%;
+    --accent: 23 89% 95%;
+    --accent-foreground: 23 89% 45%;
+    --accent-hover: 23 89% 90%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --destructive-hover: 0 84% 55%;
 
-    /* Enhanced border system for better visual separation */
-    --border: 220 13% 91%; /* Softer default border */
-    --border-strong: 220 13% 75%; /* For emphasis */
-    --border-subtle: 220 13% 96%; /* For gentle separation */
+    /* Enhanced border system */
+    --border: 220 13% 91%;
+    --border-strong: 220 13% 75%;
+    --border-subtle: 220 13% 96%;
     --input: 220 13% 91%;
-    --input-focus: 334 51% 39%; /* Brand color for focus */
-    --ring: 334 51% 39%;
+    --input-focus: 23 89% 55%; /* CPBank Orange */
+    --ring: 23 89% 55%;
 
-    /* Enhanced status colors with full scale */
+    /* Status Colors */
     --success: 146 79% 41%;
     --success-foreground: 0 0% 98%;
     --success-50: 146 79% 96%;
@@ -93,13 +93,13 @@
     --info-hover: 215 79% 50%;
 
     /* Chart colors */
-    --chart-1: 334 51% 39%;
+    --chart-1: 23 89% 55%; /* CPBank Orange */
     --chart-2: 39 85% 55%;
     --chart-3: 215 79% 55%;
     --chart-4: 146 79% 41%;
     --chart-5: 2 85% 55%;
 
-    /* Enhanced spacing and sizing */
+    /* Spacing & sizing */
     --radius: 0.5rem;
     --card-radius: 0.75rem;
     --button-radius: 0.5rem;
@@ -107,24 +107,24 @@
     /* Sidebar colors */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 334 51% 39%;
+    --sidebar-primary: 23 89% 55%; /* CPBank Orange */
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 334 51% 95%;
-    --sidebar-accent-foreground: 334 51% 29%;
+    --sidebar-accent: 23 89% 95%;
+    --sidebar-accent-foreground: 23 89% 45%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 334 51% 39%;
+    --sidebar-ring: 23 89% 55%;
 
-    /* Enhanced surface colors for layering */
+    /* Surfaces */
     --surface-1: 0 0% 100%;
     --surface-2: 220 13% 98%;
     --surface-3: 220 13% 95%;
 
-    /* Animation durations for consistent UX */
+    /* Animations */
     --transition-fast: 150ms;
     --transition-normal: 250ms;
     --transition-slow: 350ms;
 
-    /* NProgress theme colors */
+    /* NProgress Colors */
     --nprogress-color: var(--primary);
     --nprogress-height: 2px;
     --nprogress-active-height: 2px;
@@ -133,7 +133,7 @@
     --nprogress-active-shadow: 0 0 8px hsl(var(--primary) / 0.4),
       0 0 12px hsl(var(--primary) / 0.2);
 
-    /* Enhanced shadows for depth */
+    /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
@@ -158,7 +158,7 @@
     line-height: 1.5;
   }
 
-  /* Enhanced scrollbar styling */
+  /* Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -177,7 +177,7 @@
     background: hsl(var(--primary));
   }
 
-  /* Enhanced dialog styling */
+  /* Dialog */
   dialog {
     @apply bg-card text-card-foreground shadow-xl p-0;
     border: 1px solid hsl(var(--border));
@@ -191,98 +191,69 @@
   }
 }
 
-/* NProgress Bar Styling - Minimal & Original Size */
+/* NProgress Bar (CPBank Orange) */
 #nprogress {
   pointer-events: none;
 }
 
 #nprogress .bar {
-  background: #a23469 !important;
+  background: #f36f21 !important;
   position: fixed;
   z-index: 1031;
   top: 0;
   left: 0;
   width: 100%;
-  height: 2px; /* Reduced from 3px to original size */
-  border-radius: 0;
-  /* Reduced shadow intensity for subtler look */
-  box-shadow: 0 0 5px rgba(162, 52, 105, 0.3), 0 0 8px rgba(162, 52, 105, 0.15);
+  height: 2px;
+  box-shadow: 0 0 5px rgba(243, 111, 33, 0.3), 0 0 8px rgba(243, 111, 33, 0.15);
   transition: all 0.2s ease-in-out;
 }
 
-/* Simplified peg (the moving glow effect at the end) */
 #nprogress .peg {
   display: block;
   position: absolute;
   right: 0px;
-  width: 80px; /* Reduced from 100px */
+  width: 80px;
   height: 100%;
   background: linear-gradient(
     to right,
     transparent,
-    rgba(162, 52, 105, 0.6),
-    #a23469
+    rgba(243, 111, 33, 0.6),
+    #f36f21
   ) !important;
-  /* Reduced shadow for subtler effect */
-  box-shadow: 0 0 8px rgba(162, 52, 105, 0.8), 0 0 4px #a23469;
-  transform: rotate(2deg) translate(0px, -2px); /* Reduced rotation and translation */
-  border-radius: 0;
+  box-shadow: 0 0 8px rgba(243, 111, 33, 0.8), 0 0 4px #f36f21;
+  transform: rotate(2deg) translate(0px, -2px);
 }
 
-/* Active route enhancement - keep it minimal */
 body.route-changing #nprogress .bar {
-  background: #a23469 !important;
-  height: 2px; /* Keep same height, don't increase */
-  /* Slightly more shadow when active but still subtle */
-  box-shadow: 0 0 8px rgba(162, 52, 105, 0.4), 0 0 12px rgba(162, 52, 105, 0.2);
+  background: #f36f21 !important;
+  box-shadow: 0 0 8px rgba(243, 111, 33, 0.4), 0 0 12px rgba(243, 111, 33, 0.2);
 }
 
 body.route-changing #nprogress .peg {
   background: linear-gradient(
     to right,
     transparent,
-    rgba(162, 52, 105, 0.8),
-    #a23469
+    rgba(243, 111, 33, 0.8),
+    #f36f21
   ) !important;
-  /* Subtle enhancement for active state */
-  box-shadow: 0 0 10px rgba(162, 52, 105, 0.9), 0 0 5px #a23469;
+  box-shadow: 0 0 10px rgba(243, 111, 33, 0.9), 0 0 5px #f36f21;
 }
 
-/* Remove animations for cleaner look */
-#nprogress .peg {
-  animation: none; /* Remove the pulse animation */
-}
-
-/* Hide spinner completely for minimal approach */
 #nprogress .spinner {
   display: none !important;
 }
 
-/* Optional: Even more minimal version (uncomment if you want super thin) */
-/*
-#nprogress .bar {
-  height: 1px !important;
-}
-
-body.route-changing #nprogress .bar {
-  height: 1px !important;
-}
-*/
-
 @layer components {
-  /* Modern table styling with shadcn approach */
   table {
     @apply w-full text-sm;
     border-collapse: separate;
     border-spacing: 0;
   }
 
-  /* Modern table container */
   .table-container {
     @apply w-full overflow-hidden rounded-lg border border-border bg-card shadow-sm;
   }
 
-  /* Table header with clean modern styling */
   thead {
     @apply bg-muted/50;
   }
@@ -291,11 +262,10 @@ body.route-changing #nprogress .bar {
     @apply px-4 py-3 text-left font-semibold text-sm text-muted-foreground;
     @apply border-b border-border;
     @apply first:rounded-tl-lg last:rounded-tr-lg;
-    white-space: nowrap;
     background: hsl(var(--muted) / 0.5);
+    white-space: nowrap;
   }
 
-  /* Clean table cells */
   td {
     @apply px-4 py-3 text-sm;
     @apply border-b border-border/50;
@@ -303,7 +273,6 @@ body.route-changing #nprogress .bar {
     transition: background-color var(--transition-fast) ease-in-out;
   }
 
-  /* Modern row styling */
   tbody tr {
     @apply transition-all duration-200 ease-in-out;
   }
@@ -312,115 +281,38 @@ body.route-changing #nprogress .bar {
     @apply bg-muted/30;
   }
 
-  tbody tr:hover td {
-    background-color: transparent;
-  }
-
-  /* Remove bottom border from last row */
   tbody tr:last-child td {
     @apply border-b-0;
   }
 
-  /* Round bottom corners for last row */
-  tbody tr:last-child td:first-child {
-    @apply rounded-bl-lg;
-  }
-
-  tbody tr:last-child td:last-child {
-    @apply rounded-br-lg;
-  }
-
-  /* Enhanced pagination */
   .pagination {
     @apply flex items-center justify-between mt-6 px-4 py-3 bg-card rounded-lg;
     @apply border border-border shadow-sm;
   }
 
-  /* Enhanced utility classes for status colors */
+  /* Status utility classes */
   .bg-success {
     background-color: hsl(var(--success));
-  }
-
-  .bg-success\/10 {
-    background-color: hsl(var(--success) / 0.1);
-  }
-
-  .text-success {
-    color: hsl(var(--success));
   }
 
   .bg-warning {
     background-color: hsl(var(--warning));
   }
 
-  .bg-warning\/10 {
-    background-color: hsl(var(--warning) / 0.1);
-  }
-
-  .text-warning {
-    color: hsl(var(--warning));
-  }
-
   .bg-info {
     background-color: hsl(var(--info));
-  }
-
-  .bg-info\/10 {
-    background-color: hsl(var(--info) / 0.1);
-  }
-
-  .text-info {
-    color: hsl(var(--info));
   }
 
   .bg-error {
     background-color: hsl(var(--error));
   }
 
-  .bg-error\/10 {
-    background-color: hsl(var(--error) / 0.1);
-  }
-
-  .text-error {
-    color: hsl(var(--error));
-  }
-
-  /* Enhanced primary variants */
   .bg-primary\/5 {
     background-color: hsl(var(--primary) / 0.05);
   }
-
-  .bg-primary\/10 {
-    background-color: hsl(var(--primary) / 0.1);
-  }
-
-  .bg-primary\/20 {
-    background-color: hsl(var(--primary) / 0.2);
-  }
-
-  .hover\:bg-primary\/5:hover {
-    background-color: hsl(var(--primary) / 0.05);
-  }
-
-  .hover\:bg-primary\/10:hover {
-    background-color: hsl(var(--primary) / 0.1);
-  }
-
-  .hover\:bg-muted\/30:hover {
-    background-color: hsl(var(--muted-hover));
-  }
-
-  /* Enhanced border utilities */
-  .border-strong {
-    border-color: hsl(var(--border-strong));
-  }
-
-  .border-subtle {
-    border-color: hsl(var(--border-subtle));
-  }
 }
 
-/* Cell truncation with responsive max-widths */
+/* Text truncation */
 .cell-truncate {
   white-space: nowrap;
   overflow: hidden;
