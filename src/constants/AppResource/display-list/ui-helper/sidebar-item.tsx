@@ -64,5 +64,11 @@ export function useNavItems() {
         },
       ],
     },
+    {
+      title: t("accountOnline"),
+      href: ROUTES.DASHBOARD.ACCOUNT_ONLINE,
+      icon: IdCard
+
+    },
   ];
 }
