@@ -36,6 +36,9 @@ import { createOpenAccountService } from "@/services/open-account/openAccount.se
 import { NIDFormData, NIDFormSchema, NIDVerificationSchema } from "@/components/acc-online/form-field/form-validate-error";
 import { Label } from "@/components/ui/label";
 import LoadingModal from "@/components/shared/modal/extract-modal";
+import SuccessModal from "@/components/acc-online/successModal";
+import SubmitSuccessModal from "@/components/shared/modal/submit-success-modal";
+import SubmitErrorModal from "@/components/shared/modal/submit-error-modal";
 
 export interface Image {
   idImage: string;
@@ -105,6 +108,19 @@ export default function CheckNIDPage() {
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState<BranchModel | null>(null);
+
+  // Success and Error Modal States
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successData, setSuccessData] = useState({
+    title: "",
+    message: "",
+  });
+
+  const [showSubmitErrorModal, setShowSubmitErrorModal] = useState(false);
+  const [submitErrorData, setSubmitErrorData] = useState({
+    title: "",
+    message: "",
+  });
 
   // Location data state - Store complete objects
   const [locationData, setLocationData] = useState<LocationSubmitData>({
@@ -283,7 +299,6 @@ export default function CheckNIDPage() {
       staffCode: staffCode,
       phoneNumber: phoneNumber,
       isPhoneVerified: isPhoneVerified,
-      // isVerified: isVerified,
     };
 
     const result = NIDFormSchema.safeParse(fullData);
@@ -320,7 +335,6 @@ export default function CheckNIDPage() {
         message: translate("extracting") || "Extracting information from ID card..."
       });
 
-      // setIsLoading(true);
       try {
         const base64WithPrefix = await convertToBase64(file);
         const base64ForService = base64WithPrefix.split(",")[1];
@@ -345,7 +359,6 @@ export default function CheckNIDPage() {
         toast.error("Image processing error", {
           description: "Failed to process the image. Please try again.",
         });
-        // setIsLoading(false);
       } finally {
         setLoadingState({
           isLoading: false,
@@ -486,14 +499,11 @@ export default function CheckNIDPage() {
       );
 
       if (hasCriticalErrors) {
-        // setIsVerified(false);
         setShowErrorModal(true);
       } else {
-        // setIsVerified(true);
         setShowLocationModal(true);
       }
     } catch (error: any) {
-      // setIsVerified(false);
       setValidationErrorData({
         title: translate("valid_fail"),
         message: error.apiMessage || "Failed to validate NID information.",
@@ -505,14 +515,6 @@ export default function CheckNIDPage() {
     }
   };
 
-  // const handleOpenConfirmModal = () => {
-  //   setShowConfirmationModal(true);
-  // };
-
-  // const handleConfirmValidation = async () => {
-  //   setShowConfirmationModal(false);
-  //   await handleValidateNID();
-  // };
   const handleOpenConfirmModal = () => {
     // Validate both forms simultaneously
     const isVerificationValid = validateVerificationForm();
@@ -601,13 +603,11 @@ export default function CheckNIDPage() {
 
   // Handle Submit Account Opening
   const handleSubmitAccount = async () => {
-
-    // setIsSubmitting(true);
     setLoadingState({
-    isLoading: true,
-    title: translate("submitting") || "Submitting",
-    message: translate("submitting_message") || "Creating your account..."
-  });
+      isLoading: true,
+      title: translate("submitting") || "Submitting",
+      message: translate("submitting_message") || "Creating your account..."
+    });
 
     try {
       const nidImageBase64 = uploadedImage!.idImage.split(",")[1] || uploadedImage!.idImage;
@@ -624,8 +624,7 @@ export default function CheckNIDPage() {
         referralId: staffCode || "",
         branchCode: selectedBranch!.branchID,
         occupation: selectedOccupation?.occupationCode || "",
-        // maritalStatus: selectedMaritalStatus?.nameEn || "",
-        maritalStatus: selectedMaritalStatus ? getMaritalStatusString(selectedMaritalStatus.id.toString()) : "SINGLE", // ← FIXED LINE
+        maritalStatus: selectedMaritalStatus ? getMaritalStatusString(selectedMaritalStatus.id.toString()) : "SINGLE",
         customerCurrentProvince: locationData.currentAddress.province?.provinceCode || "",
         customerCurrentDistrict: locationData.currentAddress.district?.districtCode || "",
         customerCurrentCommune: locationData.currentAddress.commune?.communeCode || "",
@@ -655,33 +654,35 @@ export default function CheckNIDPage() {
       const response = await createOpenAccountService(accountData);
 
       console.log("API Response:", response);
-      console.log("##",accountData);
-      
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      AppToast({
-        type: "success",
-        message: "Account opened successfully!",
-        description: "Your account has been created.",
+      // Show success modal with response data
+      setSuccessData({
+        title: translate("success_title") || "Account Created Success",
+        message: response?.message || "Your account has been created successfully!",
       });
+      setShowSuccessModal(true);
 
       // Optional: Clear form after successful submission
       // handleClear();
 
     } catch (error: any) {
       console.error("Account opening error:", error);
-      toast.error("Failed to open account", {
-        description: error.message || "Please try again later.",
+      
+      // Extract error message from the service open acc online
+      const errorMessage = error?.errorMessage || error?.message || "Failed to create account. Please try again.";
+      // Show error modal
+      setSubmitErrorData({
+        title: translate("error_title") || "Submission Failed",
+        message: errorMessage,
       });
+      setShowSubmitErrorModal(true);
+
     } finally {
-      // setIsSubmitting(false);
       setLoadingState({
-      isLoading: false,
-      title: "",
-      message: ""
-    });
+        isLoading: false,
+        title: "",
+        message: ""
+      });
     }
   };
 
@@ -741,8 +742,8 @@ export default function CheckNIDPage() {
     });
 
     // Trigger OTP reset
-  setResetOtp(true);
-  setTimeout(() => setResetOtp(false), 100);
+    setResetOtp(true);
+    setTimeout(() => setResetOtp(false), 100);
 
     const fileInput = document.getElementById(
       "image-upload"
@@ -759,13 +760,18 @@ export default function CheckNIDPage() {
     }
   };
 
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    // Optional: Clear form after closing success modal
+    handleClear();
+  };
+
   const onBranchChange = useCallback(
     (branch: BranchModel) => {
       setSelectedBranch(branch);
       validateField("branch", branch.branchkh);
     },
     [selectedBranch]
-    // []
   );
 
   return (
@@ -796,25 +802,14 @@ export default function CheckNIDPage() {
                 <Button onClick={handleClear}>{translate("clear")}</Button>
               </div>
 
-              {/* Loading indicator */}
-              {/* {(isLoading || isValidating) && (
-                <div className="flex justify-center items-center space-x-2 mb-6">
-                  <Loader2 className="animate-spin h-6 w-6 text-blue-600" />
-                  <span className="text-base text-gray-600">
-                    {isLoading && translate("extracting")}
-                    {isValidating && translate("validating")}
-                    {isSubmitting && "Submitting account..."}
-                  </span>
-                </div>
-              )} */}
               {/* Add the Loading Modal when extract */}
               <LoadingModal
                 isOpen={loadingState.isLoading}
                 title={loadingState.title}
                 message={loadingState.message}
               />
-
-              {/* ID Card and Selfie Upload Section */}
+              
+              {/* ID Card and Selfie Upload Section */} 
               <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 lg:gap-14 gap-8">
                 <div>
                   <p className="text-base text-gray-600 mb-4 text-center">
@@ -1277,6 +1272,22 @@ export default function CheckNIDPage() {
         title={validationErrorData.title}
         message={validationErrorData.message}
         description={validationErrorData.description}
+      />
+
+      {/* Success Modal - NEW */}
+      <SubmitSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        title={successData.title}
+        message={successData.message}
+      />
+
+      {/* Submit Error Modal - NEW */}
+      <SubmitErrorModal
+        isOpen={showSubmitErrorModal}
+        onClose={() => setShowSubmitErrorModal(false)}
+        title={submitErrorData.title}
+        message={submitErrorData.message}
       />
     </div>
   );

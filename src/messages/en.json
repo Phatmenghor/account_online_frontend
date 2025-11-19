@@ -181,12 +181,18 @@
     "processing": "Processing...",
     "verification": "Verification",
     "submit": "Submit",
+    "submitting": "Submitting",
+    "submitting_message": "Creating your account...",
+    "try_again": "Try Again",
 
     "cfTitle": "Confirm Information",
     "cfMessage": "Please confirm that you have reviewed your personal information.",
     "cifNumber": "CIF",
     "phoneNumber": "Phone Number",
-    "nationality": "Nationality"
+    "nationality": "Nationality",
+
+    "success_title": "Account Created Success",
+    "error_title": "Submission Failed"
   },
 
   "address": {
