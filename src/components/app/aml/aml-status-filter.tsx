@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
 
 interface AmlStatusFilterProps {
@@ -9,27 +15,11 @@ interface AmlStatusFilterProps {
   onChange: (status: AmlStatusEnum) => void;
 }
 
-const statusList: { label: string; value: AmlStatusEnum; color: string }[] = [
-  {
-    label: "All",
-    value: AmlStatusEnum.ALL,
-    color: "bg-gray-200 text-gray-800",
-  },
-  {
-    label: "Approved",
-    value: AmlStatusEnum.APPROVE,
-    color: "bg-green-100 text-green-800",
-  },
-  {
-    label: "Rejected",
-    value: AmlStatusEnum.REJECT,
-    color: "bg-red-100 text-red-800",
-  },
-  {
-    label: "Pending",
-    value: AmlStatusEnum.PENDING,
-    color: "bg-yellow-100 text-yellow-800",
-  },
+const statusList: { label: string; value: AmlStatusEnum }[] = [
+  { label: "All", value: AmlStatusEnum.ALL },
+  { label: "Approved", value: AmlStatusEnum.APPROVE },
+  { label: "Rejected", value: AmlStatusEnum.REJECT },
+  { label: "Pending", value: AmlStatusEnum.PENDING },
 ];
 
 export default function AmlStatusFilter({
@@ -38,24 +28,28 @@ export default function AmlStatusFilter({
 }: AmlStatusFilterProps) {
   const [status, setStatus] = useState<AmlStatusEnum>(selectedStatus);
 
-  const handleClick = (value: AmlStatusEnum) => {
-    setStatus(value);
-    onChange(value);
+  useEffect(() => {
+    setStatus(selectedStatus);
+  }, [selectedStatus]);
+
+  const handleChange = (value: string) => {
+    const selected = value as AmlStatusEnum;
+    setStatus(selected);
+    onChange(selected);
   };
 
   return (
-    <div className="flex gap-2">
-      {statusList.map((item) => (
-        <Button
-          key={item.value}
-          size="sm"
-          variant={status === item.value ? "default" : "outline"}
-          className={`${item.color} rounded-full px-3 py-1 text-sm font-medium`}
-          onClick={() => handleClick(item.value)}
-        >
-          {item.label}
-        </Button>
-      ))}
-    </div>
+    <Select value={status} onValueChange={handleChange}>
+      <SelectTrigger className="w-[150px] text-sm h-9">
+        <SelectValue placeholder="Select status" />
+      </SelectTrigger>
+      <SelectContent>
+        {statusList.map((item) => (
+          <SelectItem key={item.value} value={item.value}>
+            {item.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

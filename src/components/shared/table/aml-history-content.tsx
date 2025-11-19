@@ -13,6 +13,7 @@ import {
 } from "@/models/aml/history/response/history-response.model";
 import RiskBadge from "../badge/risk-level-badge";
 import AmlStatusBadge from "../badge/aml-badge";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface HistoryTableHandlers {
   handleViewHistoryDetail: (history: HistoryModel) => void;
@@ -103,11 +104,7 @@ export const createHistoryTableColumns = ({
       minWidth: "180px",
       truncate: true,
       render: (h) =>
-        h.createdAt ? (
-          <span>{new Date(h.createdAt).toLocaleString()}</span>
-        ) : (
-          "-"
-        ),
+        h.createdAt ? <span>{DateTimeFormat(h.createdAt)}</span> : "-",
     },
 
     /** Actions */

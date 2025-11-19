@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { HistoryModel } from "@/models/aml/history/response/history-response.model";
 import { getAmlHistoryByIdService } from "@/services/dashboard/aml/aml-history.service";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
+import AmlStatusBadge from "../badge/aml-badge";
 
 interface HistoryDetailModalProps {
   history?: HistoryModel;
@@ -77,19 +78,6 @@ export default function AmlHistoryDetailModal({
     }
   }, [historyId, initialHistory, isOpen]);
 
-  const getStatusColor = (status?: string) => {
-    switch (status?.toUpperCase()) {
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "APPROVED":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "REJECTED":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl h-[90vh] p-0 flex flex-col">
@@ -106,11 +94,12 @@ export default function AmlHistoryDetailModal({
               <DialogDescription className="text-base text-muted-foreground">
                 Record ID: {historyId ?? "Unknown"}
               </DialogDescription>
+
+              {/* Status Badge */}
               {history && (
-                <Badge className={getStatusColor(history.status)}>
-                  <Activity className="h-3 w-3" />
-                  <span className="ml-1">{history.status}</span>
-                </Badge>
+                <div className="mt-2 flex items-center gap-2">
+                  <AmlStatusBadge status={history.status} />
+                </div>
               )}
             </div>
           </div>

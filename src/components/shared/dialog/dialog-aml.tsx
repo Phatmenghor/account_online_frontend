@@ -1,6 +1,6 @@
 "use client";
 
-import { AmlStatusEnum } from "@/constants/AppResource/filter/status";
+import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
 import { CheckCircle, XCircle, Clock, Loader2 } from "lucide-react";
 import React from "react";
 

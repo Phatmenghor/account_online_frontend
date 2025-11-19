@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { AmlManagementModel } from "@/models/aml/management/response/aml-management.response";
 import { getAmlManagementByIdService } from "@/services/dashboard/aml/aml-management.service";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
+import AmlStatusBadge from "../badge/aml-badge";
 
 interface AmlAlertViewModalProps {
   alert?: AmlManagementModel;
@@ -79,19 +80,6 @@ export default function AmlViewDetailModal({
     }
   }, [alertId, initialAlert, isOpen]);
 
-  const getStatusColor = (status: string) => {
-    switch (status?.toUpperCase()) {
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "APPROVED":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "REJECTED":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
   const handleClose = () => onClose();
 
   return (
@@ -113,11 +101,11 @@ export default function AmlViewDetailModal({
                 Transaction: {alert?.trxnID ?? "Unknown"}
               </DialogDescription>
 
+              {/* Status Badge */}
               {alert && (
-                <Badge className={getStatusColor(alert.status)}>
-                  <Activity className="h-3 w-3" />
-                  <span className="ml-1">{alert.status}</span>
-                </Badge>
+                <div className="mt-2">
+                  <AmlStatusBadge status={alert.status} />
+                </div>
               )}
             </div>
           </div>
