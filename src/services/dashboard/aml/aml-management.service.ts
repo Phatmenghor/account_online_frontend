@@ -1,8 +1,9 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { axiosClientWithAuth } from "@/utils/axios";
-import { AllManagementRequest } from "@/models/aml/management/management.request";
-import { UpdateAmlModel } from "@/models/aml/management/request/aml.request.model";
-import { Data } from "@/models/aml/management/management.schema";
+import {
+  AllManagementRequest,
+  UpdateAmlModel,
+} from "@/models/aml/management/request/aml-management.request.model";
 
 /**
  * 🔹 Fetch all AML management data
@@ -59,14 +60,14 @@ export async function updateManagementService(
       const raw = error.response?.data;
       const message =
         (raw as { message?: string })?.message ||
-        "Failed to update management record.";
+        "Failed to update AML management record.";
       console.error("[updateManagementService] Axios error:", message);
       throw { errorMessage: message, rawError: raw };
     } else {
       console.error("[updateManagementService] Unexpected error:", error);
       throw {
         errorMessage:
-          "An unexpected error occurred while updating management record.",
+          "An unexpected error occurred while updating AML management record.",
         rawError: error,
       };
     }

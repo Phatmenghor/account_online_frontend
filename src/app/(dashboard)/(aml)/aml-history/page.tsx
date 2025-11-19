@@ -15,19 +15,12 @@ import { useSearchParams } from "next/navigation";
 import Loading from "@/components/shared/common/loading";
 import { createHistoryTableColumns } from "@/components/shared/table/history-content";
 import HistoryDetailModal from "@/components/shared/modal/history-detail";
-
-import {
-  getAllAmlHistoryService,
-  UpdateHistoryService,
-} from "@/services/dashboard/aml/aml-history.service";
-
+import { getAllAmlHistoryService } from "@/services/dashboard/aml/aml-history.service";
 import { AmlStatusEnum } from "@/constants/AppResource/filter/status";
 import {
-  
   AllHistoryModel,
   HistoryModel,
-} from "@/models/aml/management/respone/history-respones.model";
-import AmlConfirmDialog from "@/components/shared/dialog/dialog-aml";
+} from "@/models/aml/history/response/history-respones.model";
 
 function History() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,10 +34,10 @@ function History() {
 
   // Confirm dialog
   const [isConfirmAmlDialogOpen, setIsConfirmAmlDialogOpen] = useState(false);
-  const [selectedManagementId, setSelectedManagementId] = useState<number | null>(
-    null
-  );
-  const [selectedStatus, setSelectedStatus] = useState<AmlStatusEnum>(
+  const [selectedManagementId, setSelectedManagementId] = useState<
+    number | null
+  >(null);
+  const [statusFilter, setSelectedStatusFilter] = useState<AmlStatusEnum>(
     AmlStatusEnum.PENDING
   );
 
@@ -94,28 +87,6 @@ function History() {
     setIsHistoryDetailOpen(true);
   };
 
-  // OPEN CONFIRM DIALOG
-  const openConfirmAmlDialog = (history: HistoryModel, status: AmlStatusEnum) => {
-    setSelectedManagementId(history.id);
-    setSelectedStatus(status);
-    setIsConfirmAmlDialogOpen(true);
-  };
-
-  // CONFIRM STATUS UPDATE
-  const handleConfirmAmlStatus = async () => {
-    if (!selectedManagementId) return;
-
-    try {
-    
-      await loadHistory();
-    } catch (error) {
-      console.error("Error updating AML status:", error);
-    } finally {
-      setIsConfirmAmlDialogOpen(false);
-      setSelectedManagementId(null);
-    }
-  };
-
   return (
     <Card className="h-full flex flex-col">
       <CardContent className="space-y-6 p-6 flex flex-col h-full">
@@ -148,7 +119,6 @@ function History() {
                   data: historyData,
                   handlers: {
                     handleViewHistoryDetail,
-               
                   },
                 })}
                 loading={isLoading}
@@ -176,13 +146,6 @@ function History() {
             onClose={() => setIsHistoryDetailOpen(false)}
           />
         )}
-
-        <AmlConfirmDialog
-          isOpen={isConfirmAmlDialogOpen}
-          onClose={() => setIsConfirmAmlDialogOpen(false)}
-          status={selectedStatus}
-          onConfirm={handleConfirmAmlStatus}
-        />
       </CardContent>
     </Card>
   );

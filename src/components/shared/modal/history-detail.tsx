@@ -27,7 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-import { HistoryModel } from "@/models/aml/management/respone/history-respones.model";
+import { HistoryModel } from "@/models/aml/history/response/history-respones.model";
 import { getAllAmlHistoryService } from "@/services/dashboard/aml/aml-history.service";
 
 interface HistoryDetailModalProps {
@@ -43,7 +43,9 @@ export default function HistoryDetailModal({
   isOpen,
   onClose,
 }: HistoryDetailModalProps) {
-  const [history, setHistory] = useState<HistoryModel | undefined>(initialHistory);
+  const [history, setHistory] = useState<HistoryModel | undefined>(
+    initialHistory
+  );
   const [loading, setLoading] = useState(false);
 
   const getStatusColor = (status?: string) => {
@@ -86,7 +88,6 @@ export default function HistoryDetailModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl h-[90vh] p-0 flex flex-col gap-0">
-
         {/* HEADER */}
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4">
@@ -116,33 +117,61 @@ export default function HistoryDetailModal({
         {/* CONTENT */}
         <ScrollArea className="flex-1 min-h-0">
           <div className="p-6 space-y-8">
-
             {loading ? (
-              <div className="text-center text-muted-foreground">Loading history...</div>
+              <div className="text-center text-muted-foreground">
+                Loading history...
+              </div>
             ) : !history ? (
-              <div className="text-center text-muted-foreground">No history data available</div>
+              <div className="text-center text-muted-foreground">
+                No history data available
+              </div>
             ) : (
               <>
-
                 {/* CUSTOMER INFO */}
                 <section className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-                    <h3 className="text-lg font-semibold">Customer Information</h3>
+                    <h3 className="text-lg font-semibold">
+                      Customer Information
+                    </h3>
                   </div>
 
                   <div className="space-y-3">
-                    <InfoRow label="Legal ID" value={history.customerInfo.legalId} icon={<User />} />
+                    <InfoRow
+                      label="Legal ID"
+                      value={history.customerInfo.legalId}
+                      icon={<User />}
+                    />
                     <InfoRow
                       label="Name"
                       value={`${history.customerInfo.givenName} ${history.customerInfo.familyName}`}
                       icon={<User />}
                     />
-                    <InfoRow label="Phone" value={history.customerInfo.phoneNumber} icon={<Phone />} />
-                    <InfoRow label="Gender" value={history.customerInfo.gender} icon={<Tag />} />
-                    <InfoRow label="Date of Birth" value={history.customerInfo.dateOfBirth} icon={<Calendar />} />
-                    <InfoRow label="Nationality" value={history.customerInfo.nationality} icon={<Globe />} />
-                    <InfoRow label="Address" value={history.customerInfo.legalAddress} icon={<MapPin />} />
+                    <InfoRow
+                      label="Phone"
+                      value={history.customerInfo.phoneNumber}
+                      icon={<Phone />}
+                    />
+                    <InfoRow
+                      label="Gender"
+                      value={history.customerInfo.gender}
+                      icon={<Tag />}
+                    />
+                    <InfoRow
+                      label="Date of Birth"
+                      value={history.customerInfo.dateOfBirth}
+                      icon={<Calendar />}
+                    />
+                    <InfoRow
+                      label="Nationality"
+                      value={history.customerInfo.nationality}
+                      icon={<Globe />}
+                    />
+                    <InfoRow
+                      label="Address"
+                      value={history.customerInfo.legalAddress}
+                      icon={<MapPin />}
+                    />
                   </div>
                 </section>
 
@@ -150,20 +179,36 @@ export default function HistoryDetailModal({
                 <section className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-6 bg-red-600 rounded-full"></div>
-                    <h3 className="text-lg font-semibold">Screening Information</h3>
+                    <h3 className="text-lg font-semibold">
+                      Screening Information
+                    </h3>
                   </div>
 
                   <div className="space-y-3">
-                    <InfoRow label="Screening Result" value={history.screeningResult} icon={<Activity />} />
-                    <InfoRow label="Risk Level" value={history.riskLevel} icon={<Activity />} />
-                    <InfoRow label="Rule Score" value={history.totalRulesScore} icon={<Layers />} />
-                    <InfoRow label="Action Taken" value={history.actionTaken} icon={<ClipboardList />} />
+                    <InfoRow
+                      label="Screening Result"
+                      value={history.screeningResult}
+                      icon={<Activity />}
+                    />
+                    <InfoRow
+                      label="Risk Level"
+                      value={history.riskLevel}
+                      icon={<Activity />}
+                    />
+                    <InfoRow
+                      label="Rule Score"
+                      value={history.totalRulesScore}
+                      icon={<Layers />}
+                    />
+                    <InfoRow
+                      label="Action Taken"
+                      value={history.actionTaken}
+                      icon={<ClipboardList />}
+                    />
                   </div>
                 </section>
-
               </>
             )}
-
           </div>
         </ScrollArea>
 
@@ -173,7 +218,6 @@ export default function HistoryDetailModal({
             Close
           </Button>
         </DialogFooter>
-
       </DialogContent>
     </Dialog>
   );

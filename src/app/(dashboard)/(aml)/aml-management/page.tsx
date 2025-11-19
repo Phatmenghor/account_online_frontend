@@ -20,17 +20,16 @@ import {
 } from "@/services/dashboard/aml/aml-management.service";
 import { AmlStatusEnum } from "@/constants/AppResource/filter/status";
 import AmlConfirmDialog from "@/components/shared/dialog/dialog-aml";
-import AmlAlertViewModal from "@/components/shared/modal/management-detail";
+import AmlAlertViewModal from "@/components/shared/modal/aml-management-detail";
 import {
-  AllManagementModel,
-  ManagementModel,
-} from "@/models/aml/management/respone/management-response";
+  AllAmlManagementModel,
+  AmlManagementModel,
+} from "@/models/aml/management/respone/aml-management.response";
 
 function Management() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [amlManagement, setAmlManagement] = useState<AllManagementModel | null>(
-    null
-  );
+  const [amlManagement, setAmlManagement] =
+    useState<AllAmlManagementModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [statusFilter] = useState<string>("PENDING");
 
@@ -38,7 +37,7 @@ function Management() {
   const [isAmlManagementDetailOpen, setIsAmlManagementDetailOpen] =
     useState(false);
   const [selectedAmlManagement, setSelectedAmlManagement] =
-    useState<ManagementModel | null>(null);
+    useState<AmlManagementModel | null>(null);
 
   // Confirm Dialog
   const [isConfirmAmlDialogOpen, setIsConfirmAmlDialogOpen] = useState(false);
@@ -48,6 +47,7 @@ function Management() {
   const [selectedStatus, setSelectedStatus] = useState<AmlStatusEnum>(
     AmlStatusEnum.PENDING
   );
+  const [isConfirmLoading, setIsConfirmLoading] = useState(false);
 
   const searchParams = useSearchParams();
   const t = useTranslations();
@@ -91,14 +91,14 @@ function Management() {
   };
 
   // VIEW DETAIL HANDLER
-  const handleViewManagementDetail = (management: ManagementModel) => {
+  const handleViewManagementDetail = (management: AmlManagementModel) => {
     setSelectedAmlManagement(management);
     setIsAmlManagementDetailOpen(true);
   };
 
   // CONFIRM DIALOG
   const openConfirmAmlDialog = (
-    management: ManagementModel,
+    management: AmlManagementModel,
     status: AmlStatusEnum
   ) => {
     setSelectedManagementId(management?.id);
@@ -108,7 +108,7 @@ function Management() {
 
   const handleConfirmAmlStatus = async () => {
     if (!selectedManagementId) return;
-
+    setIsConfirmLoading(true);
     try {
       await updateManagementService(selectedManagementId, {
         status: selectedStatus,
@@ -119,6 +119,7 @@ function Management() {
       console.error("Error updating AML status:", error);
     } finally {
       setIsConfirmAmlDialogOpen(false);
+      setIsConfirmLoading(false);
       setSelectedManagementId(null);
     }
   };
@@ -178,6 +179,7 @@ function Management() {
         {/* CONFIRM DIALOG */}
         <AmlConfirmDialog
           isOpen={isConfirmAmlDialogOpen}
+          isLoading={isConfirmLoading}
           onClose={() => setIsConfirmAmlDialogOpen(false)}
           status={selectedStatus}
           onConfirm={handleConfirmAmlStatus}

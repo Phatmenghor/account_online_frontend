@@ -14,8 +14,8 @@ export const ROUTES = {
       REFERENCE: "/reference",
     },
     AML: {
-      MANAGEMENT: "/management",
-      HISTORY: "/history",
+      MANAGEMENT: "/aml-management",
+      HISTORY: "/aml-history",
     },
     ACCOUNT_ONLINE: "/account-online",
   },

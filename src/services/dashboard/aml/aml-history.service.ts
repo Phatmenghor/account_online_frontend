@@ -1,4 +1,4 @@
-import { AllHistoryRequest } from "@/models/aml/history/history.request";
+import { AllHistoryRequest } from "@/models/aml/history/request/history-request.model";
 import { axiosClientWithAuth } from "@/utils/axios";
 import axios from "axios";
 
@@ -27,18 +27,17 @@ export async function getAllAmlHistoryService(request: AllHistoryRequest) {
   }
 }
 
-
-export async function UpdateHistoryService(request: AllHistoryRequest) {
+export async function getAmlHistoryByIdService(id: number) {
   try {
     const response = await axiosClientWithAuth.post(
-      "/api/v1/aml/history-by/${id}",
-      request
+      `/api/v1/aml/history-by-id/${id}`
     );
     return response.data.data;
-  } catch (error) {
+  } catch (error: any) {
+    // Axios error handling (optional for mock)
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
-      const message = raw?.message || "Failed to fetch AML history.";
+      const message = raw?.message || "Failed to fetch aml history by id.";
       console.error("Axios error:", message);
 
       throw { errorMessage: message, rawError: raw };
@@ -46,7 +45,7 @@ export async function UpdateHistoryService(request: AllHistoryRequest) {
       console.error("Unexpected error:", error);
       throw {
         errorMessage:
-          "An unexpected error occurred while fetching AML history.",
+          "An unexpected error occurred while fetching aml history by id.",
         rawError: error,
       };
     }

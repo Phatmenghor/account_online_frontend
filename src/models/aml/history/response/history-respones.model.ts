@@ -1,5 +1,5 @@
-export interface AllManagementModel {
-  content: ManagementModel[];
+export interface AllHistoryModel {
+  content: HistoryModel[];
   pageNo: number;
   pageSize: number;
   totalElements: number;
@@ -7,16 +7,14 @@ export interface AllManagementModel {
   last: boolean;
 }
 
-export interface ManagementModel {
+export interface HistoryModel {
   id: number;
-  originalRequest: string;
-  originalResponse: string;
   customerInfo: CustomerInfo;
   status: string;
   screeningResult: string;
   riskLevel: string;
   actionTaken: string;
-  rulesTriggered: RulesTriggered[];
+  rulesTriggered: string;
   serviceName: string;
   totalRulesScore: number;
   trxnID: string;
@@ -31,8 +29,6 @@ export interface ManagementModel {
   maritalStatus: string;
   occupationCode: string;
   occupationStatus: string;
-  issuedDate: string;
-  expiredDate: string;
   remarks: string;
 }
 
@@ -43,14 +39,13 @@ export interface CustomerInfo {
   firstNameKh: string;
   lastNameKh: string;
   dateOfBirth: string;
-  placeOfBirth: string;
   gender: string;
   nationality: string;
   legalAddress: string;
   phoneNumber: string;
+  issuedDate: string;
+  expiredDate: string;
 }
-
-export interface RulesTriggered {}
 
 export interface ApprovedBy {
   id: number;
