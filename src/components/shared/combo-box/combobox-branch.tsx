@@ -15,41 +15,98 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { BranchModel } from "@/models/branch/branch.response";
+import { getAllBranchService } from "@/services/branch/branch.service";
+import { debounce } from "@/utils/debounce/debounce";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { useInView } from "react-intersection-observer";
 
-interface Branch {
-  branchID: string;
-  branchkh: string;
-}
 
 interface ComboboxSelectBranchProps {
-  dataSelect: Branch | null;
-  onChangeSelected: (item: Branch | null) => void;
+  dataSelect: BranchModel | null;
+  onChangeSelected: (item: BranchModel) => void; // Callback to notify parent about the selection change
   disabled?: boolean;
-  branches: Branch[];
-  isLoading?: boolean;
 }
 
 export function ComboboxSelectBranch({
-  dataSelect,
+   dataSelect,
   onChangeSelected,
   disabled = false,
-  branches,
-  isLoading = false,
 }: ComboboxSelectBranchProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [data, setData] = useState<BranchModel[]>([]);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(false);
+  const [loading, setLoading] = useState(false);
+  // change language
+  const translate = useTranslations("common");
 
-  // Filter branches based on search term
-  const filteredBranches = useMemo(() => {
-    if (!searchTerm) return branches;
-    
-    const lowerSearch = searchTerm.toLowerCase();
-    return branches.filter((branch) =>
-      branch.branchkh.toLowerCase().includes(lowerSearch)
-    );
-  }, [branches, searchTerm]);
+  // Intersection Observer Hook
+  const { ref, inView } = useInView({ threshold: 1 });
+
+  // Fetch data from API
+  const fetchData = async (search = "", newPage = 1) => {
+    if (loading || (lastPage && newPage > 1)) return;
+    setLoading(true);
+    try {
+      const result = await getAllBranchService({
+        search,
+        pageSize: 10,
+        pageNo: newPage,
+      });
+      if (!result) {
+        console.error("No data returned from getAllStaffService");
+        return;
+      }
+      if (newPage === 1) {
+        setData(result.content);
+      } else {
+        setData((prev) => [...prev, ...result.content]);
+      }
+      setPage(result.pageNo);
+      setLastPage(result.last);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data on mount
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // Handle search input with debounce
+  useEffect(() => {
+    const delaySearch = setTimeout(() => {
+      fetchData(searchTerm, 1);
+    }, 500);
+
+    return () => clearTimeout(delaySearch);
+  }, [searchTerm]);
+
+  // Load more when last item is visible
+  useEffect(() => {
+    if (inView && !lastPage && !loading) {
+      fetchData(searchTerm, page + 1);
+    }
+  }, [inView]);
+
+  async function onChangeSearch(value: string) {
+    setSearchTerm(value);
+    onSearchClick(value);
+  }
+
+  const onSearchClick = useCallback(
+    debounce(async (value: string) => {
+      fetchData(value);
+    }),
+    [searchTerm]
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -65,11 +122,8 @@ export function ComboboxSelectBranch({
           )}
           disabled={disabled}
         >
-          {isLoading
-            ? "Loading..."
-            : dataSelect
-            ? dataSelect.branchkh
-            : "--- Choose one ---"}
+          {/* Always show the name directly from dataSelect prop if available */}
+          {dataSelect ? dataSelect.branchkh : translate("selectBranch")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -79,9 +133,9 @@ export function ComboboxSelectBranch({
       >
         <Command>
           <CommandInput
-            placeholder="Search branch..."
+            placeholder={translate("searchBranch")}
             value={searchTerm}
-            onValueChange={setSearchTerm}
+            onValueChange={onChangeSearch}
           />
           <CommandList
             className="max-h-60 overflow-y-auto"
@@ -91,31 +145,31 @@ export function ComboboxSelectBranch({
               target.scrollTop += e.deltaY;
             }}
           >
-            <CommandEmpty>No branch found.</CommandEmpty>
+            <CommandEmpty>No brand found.</CommandEmpty>
             <CommandGroup>
-              {filteredBranches?.map((branch) => (
+              {data?.map((item, index) => (
                 <CommandItem
-                  key={branch.branchID}
-                  value={branch.branchkh}
+                  key={item.branchID}
+                  value={item.branchkh}
                   onSelect={() => {
-                    onChangeSelected(branch);
+                    onChangeSelected(item); // Notify parent about the change
                     setOpen(false);
                   }}
+                  ref={index === data.length - 1 ? ref : null} // Attach observer to last item
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      dataSelect?.branchID === branch.branchID
-                        ? "opacity-100"
-                        : "opacity-0"
+                      dataSelect?.branchID === item.branchID ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {branch.branchkh}
+                  {item.branchkh}
                 </CommandItem>
               ))}
             </CommandGroup>
 
-            {isLoading && (
+            {/* Loading spinner */}
+            {loading && (
               <div className="text-center py-2">
                 <Loader2 className="animate-spin text-gray-500 h-5 w-5 mx-auto" />
               </div>

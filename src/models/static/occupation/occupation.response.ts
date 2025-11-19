@@ -11,5 +11,6 @@ export interface OccupationModel {
   id: number
   nameEn: string
   nameKh: string
+  occupationCode: string
   status: string
 }

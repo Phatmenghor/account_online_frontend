@@ -135,7 +135,7 @@ export const useBranches = (): UseFetchDataResult<BranchModel> => {
     try {
       const response = await getAllBranchService({
         pageNo: 1,
-        pageSize: 30,
+        pageSize: 100,
       });
       setData(response.content || []);
     } catch (err: any) {

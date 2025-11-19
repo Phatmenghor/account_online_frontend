@@ -80,6 +80,17 @@ export const createOccupationTableColumns = ({
       ),
     },
     {
+      key: "occupationCode",
+      label: tMaster("occupationCode"),
+      truncate: true,
+      maxWidth: "200px",
+      minWidth: "120px",
+      render: (occupation) => (
+        <span className="font-medium">{occupation.occupationCode || "---"}</span>
+      ),
+    },
+
+    {
       key: "status",
       label: tMaster("status"),
       truncate: true,

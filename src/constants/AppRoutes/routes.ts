@@ -11,13 +11,9 @@ export const ROUTES = {
     STATIC: {
       MARITAL: "/marital",
       OCCUPATION: "/occupation",
-      REFERENCE: "/reference"
+      REFERENCE: "/reference",
     },
-    AML: {
-      MANAGEMENT: "/management",
-      HISTORY: "/history",
-    }
-
+    ACCOUNT_ONLINE: "/account-online",
   },
 };
 

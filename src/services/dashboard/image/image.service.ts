@@ -14,3 +14,8 @@ export async function uploadImageService(data: UploadImageReq) {
     throw error;
   }
 }
+
+export function getImageService(imageId: string): string {
+  // Return the full API URL for the image
+  return `http://192.168.103.106:9393/api/images/${imageId}`;
+}

@@ -196,6 +196,15 @@ export default function OccupationViewModal({
                         {occupation?.id || "N/A"}
                       </span>
                     </div>
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Occupation Code:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        {occupation?.occupationCode || "N/A"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

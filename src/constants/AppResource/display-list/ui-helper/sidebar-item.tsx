@@ -1,11 +1,13 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import {
   Calendar1Icon,
   Code,
   Dock,
   FolderClosed,
+  IdCard,
   LayoutDashboard,
   User,
   User2,
@@ -49,7 +51,7 @@ export function useNavItems() {
 
     {
       title: "AML",
-      href: "#", // main parent, not clickable
+      href: "#",
       icon: Calendar1Icon,
       subItems: [
         {

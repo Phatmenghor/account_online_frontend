@@ -22,6 +22,7 @@
     "marital": "Marital",
     "occupation": "Occupation",
     "reference": "Reference",
+    "accountOnline": "Account Online",
     "index": "Master Data",
     "new": "New",
     "allStatus": "All Status",
@@ -29,7 +30,27 @@
       "all": "All Status",
       "active": "Active",
       "delete": "Delete"
-    }
+    },
+    "chooseOne": "--- Choose one ---",
+    "yesIhave": "Yes, I have reviewed",
+    "noIneed": "No, I need to review",
+    "searchBtn": "Search",
+    "selectBranch": "Select a branch...",
+    "selectRef": "Select ref...",
+    "selectGender": "Select a gender...",
+    "selectLegalType": "Select a legal type...",
+    "selectMarital": "Select a marital...",
+    "selectOccupation": "Select an occupation...",
+    "searchBranch": "Search brand...",
+
+    "selectProvince": "Select a province...",
+    "selectDistrict": "Select a district...",
+    "selectCommune": "Select a commune...",
+    "selectVillage": "Select a village...",
+    "searchProvince": "Search village...",
+    "searchDistrict": "Search district...",
+    "searchCommune": "Search commune...",
+    "searchVillage": "Search village..."
   },
 
   "dashboard": {
@@ -88,8 +109,11 @@
     "search-occupation": "Search occupations...",
     "nameEn": "Name (English)",
     "nameKh": "Name (Khmer)",
+    "occupationCode": "Occupation Code",
     "actions": "Actions",
-    "status": "Status"
+    "status": "Status",
+    "cif": "Enter your CIF ...",
+    "legalId": "Enter your Legal Id ..."
   },
 
   "NIDPage": {
@@ -97,6 +121,7 @@
     "process": "Processing...",
     "check": "Check Now",
     "clear": "Clear",
+    "extracting_data": "Extracting Data",
     "extracting": "Extracting NID information...",
     "validating": "Validating NID information...",
 
@@ -130,6 +155,50 @@
 
     "header_acc": "Account Online Register",
     "img_card": "Please upload the front side of your ID card.",
-    "img_selfie": "Please upload a selfie image."
+    "img_selfie": "Please upload a selfie image.",
+
+    "firstNameKh": "First Name (KH)",
+    "lastNameKH": "Last Name (KH)",
+    "familyNameEn": "Family Name",
+    "givenNameEn": "Given Name",
+    "dateOfBirth": "Date Of Birth",
+    "legalId": "Legal ID",
+    "legalType": "Legal Type",
+    "address": "Address",
+    "pob": "Place Of Birth",
+    "marital": "Marital Status",
+    "occupation": "Occupation",
+    "branch": "Branch",
+    "reference": "Referer (Optional)",
+    "staffCode": "Staff Code",
+    "contactNumber": "Contact Number",
+    "otpCode": "OTP Code",
+    "reSendOtp": "Resend OTP",
+    "sendOtp": "Send OTP",
+    "chooseOne": "--- Choose one ---",
+    "loading": "Loading...",
+
+    "processing": "Processing...",
+    "verification": "Verification",
+    "submit": "Submit",
+
+    "cfTitle": "Confirm Information",
+    "cfMessage": "Please confirm that you have reviewed your personal information.",
+    "cifNumber": "CIF",
+    "phoneNumber": "Phone Number",
+    "nationality": "Nationality"
+  },
+
+  "address": {
+    "locationInfo": "Location Information",
+    "loading": "Auto-filling information...",
+    "selectAddress": "Select Your Address:",
+    "selectPlaceOfBirth": "Select Place of Birth:",
+    "province": "Province/City",
+    "district": "District",
+    "commune": "Commune",
+    "village": "Village",
+    "close": "Close",
+    "submit": "Submit"
   }
 }

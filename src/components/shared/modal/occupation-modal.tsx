@@ -66,10 +66,11 @@ export default function ModalOccupation({
     resolver: zodResolver(isCreate ? CreateOccupationSchema : UpdateOccupationSchema),
     defaultValues: isCreate
       ? {
-          nameEn: "",
-          nameKh: "",
-          status: Status.ACTIVE,
-        }
+        nameEn: "",
+        nameKh: "",
+        occupationCode: "",
+        status: Status.ACTIVE,
+      }
       : undefined,
   });
 
@@ -91,6 +92,7 @@ export default function ModalOccupation({
         id: occupation.id,
         nameEn: occupation.nameEn || "",
         nameKh: occupation.nameKh || "",
+        occupationCode: occupation.occupationCode || "",
         status: occupation.status || Status.ACTIVE,
       });
     } catch (err) {
@@ -108,6 +110,7 @@ export default function ModalOccupation({
       reset({
         nameEn: "",
         nameKh: "",
+        occupationCode: "",
         status: Status.ACTIVE,
       });
       setOccupationDetail(null);
@@ -125,6 +128,7 @@ export default function ModalOccupation({
       const payload: UpdateOccupationReq = {
         nameEn: updateData.nameEn?.trim(),
         nameKh: updateData.nameKh?.trim(),
+        occupationCode: updateData.occupationCode?.trim(),
         status: updateData.status,
       };
       onSave({ id: updateData.id, updates: payload });
@@ -144,9 +148,8 @@ export default function ModalOccupation({
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4 pr-8">
             <div
-              className={`p-2 rounded-full ${
-                isCreate ? "bg-green-100" : "bg-blue-100"
-              }`}
+              className={`p-2 rounded-full ${isCreate ? "bg-green-100" : "bg-blue-100"
+                }`}
             >
               {isCreate ? (
                 <FileText className="h-5 w-5 text-green-600" />
@@ -162,8 +165,8 @@ export default function ModalOccupation({
                 {isCreate
                   ? "Fill in the details to create a new occupation"
                   : occupationDetail
-                  ? `Update information for "${occupationDetail.nameEn || occupationDetail.nameKh}"`
-                  : "Loading occupation information..."}
+                    ? `Update information for "${occupationDetail.nameEn || occupationDetail.nameKh || occupationDetail.occupationCode}"`
+                    : "Loading occupation information..."}
               </DialogDescription>
             </div>
           </div>
@@ -220,9 +223,8 @@ export default function ModalOccupation({
                             id="nameEn"
                             placeholder="Teacher"
                             disabled={isSubmitting}
-                            className={`transition-colors ${
-                              errors.nameEn ? "border-red-500" : ""
-                            }`}
+                            className={`transition-colors ${errors.nameEn ? "border-red-500" : ""
+                              }`}
                           />
                         )}
                       />
@@ -247,9 +249,8 @@ export default function ModalOccupation({
                             id="nameKh"
                             placeholder="គ្រូបង្រៀន"
                             disabled={isSubmitting}
-                            className={`transition-colors ${
-                              errors.nameKh ? "border-red-500" : ""
-                            }`}
+                            className={`transition-colors ${errors.nameKh ? "border-red-500" : ""
+                              }`}
                           />
                         )}
                       />
@@ -259,6 +260,33 @@ export default function ModalOccupation({
                         </p>
                       )}
                     </div>
+
+                    {/* Occupation Code */}
+                    <div className="space-y-2">
+                      <Label htmlFor="occupationCode" className="text-sm font-medium">
+                        Occupation Code <span className="text-red-500">*</span>
+                      </Label>
+                      <Controller
+                        control={control}
+                        name="occupationCode"
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            id="occupationCode"
+                            placeholder="Enter occupation code"
+                            disabled={isSubmitting}
+                            className={`transition-colors ${errors.occupationCode ? "border-red-500" : ""
+                              }`}
+                          />
+                        )}
+                      />
+                      {errors.occupationCode && (
+                        <p className="text-sm text-red-600">
+                          {errors.occupationCode.message as string}
+                        </p>
+                      )}
+                    </div>
+
                   </div>
                 </div>
 
@@ -293,11 +321,10 @@ export default function ModalOccupation({
                                 <SelectItem key={s.value} value={s.value}>
                                   <div className="flex items-center gap-2">
                                     <div
-                                      className={`w-2 h-2 rounded-full ${
-                                        s.value === Status.ACTIVE
+                                      className={`w-2 h-2 rounded-full ${s.value === Status.ACTIVE
                                           ? "bg-green-500"
                                           : "bg-gray-400"
-                                      }`}
+                                        }`}
                                     ></div>
                                     {s.label}
                                   </div>
