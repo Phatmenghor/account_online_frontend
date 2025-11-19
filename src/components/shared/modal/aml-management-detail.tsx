@@ -32,7 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-import { AmlManagementModel } from "@/models/aml/management/respone/aml-management.response";
+import { AmlManagementModel } from "@/models/aml/management/response/aml-management.response";
 import { getAmlManagementByIdService } from "@/services/dashboard/aml/aml-management.service";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
 
@@ -43,7 +43,7 @@ interface AmlAlertViewModalProps {
   onClose: () => void;
 }
 
-export default function AmlAlertViewModal({
+export default function AmlViewDetailModal({
   alert: initialAlert,
   alertId,
   isOpen,

@@ -6,12 +6,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 import {
   AllHistoryModel,
   HistoryModel,
-} from "@/models/aml/history/response/history-respones.model";
+} from "@/models/aml/history/response/history-response.model";
+import RiskBadge from "../badge/risk-level-badge";
+import AmlStatusBadge from "../badge/aml-badge";
 
 interface HistoryTableHandlers {
   handleViewHistoryDetail: (history: HistoryModel) => void;
@@ -27,8 +28,6 @@ export const createHistoryTableColumns = ({
   handlers,
 }: HistoryTableOptions): TableColumn<HistoryModel>[] => {
   const { handleViewHistoryDetail } = handlers;
-  const tCommon = useTranslations("common");
-  const tMaster = useTranslations("master");
 
   return [
     /** Index */
@@ -43,7 +42,7 @@ export const createHistoryTableColumns = ({
     /** Legal ID */
     {
       key: "legalId",
-      label: tMaster("idNumber"),
+      label: "ID Number",
       minWidth: "150px",
       truncate: true,
       render: (h) => <span>{h.customerInfo?.legalId || "-"}</span>,
@@ -52,7 +51,7 @@ export const createHistoryTableColumns = ({
     /** Full Name */
     {
       key: "fullName",
-      label: tMaster("fullName"),
+      label: "Full Name",
       minWidth: "200px",
       truncate: true,
       render: (h) => (
@@ -65,39 +64,23 @@ export const createHistoryTableColumns = ({
     /** Risk Level */
     {
       key: "riskLevel",
-      label: tMaster("riskLevel"),
+      label: "Risk Level",
       minWidth: "150px",
-      render: (h) => (
-        <span
-          className={`font-medium ${
-            h.riskLevel === "HIGH"
-              ? "text-red-600"
-              : h.riskLevel === "MEDIUM"
-              ? "text-yellow-600"
-              : "text-green-600"
-          }`}
-        >
-          {h.riskLevel}
-        </span>
-      ),
+      render: (h) => <RiskBadge riskLevel={h.riskLevel} />,
     },
 
     /** Status */
     {
       key: "status",
-      label: tMaster("status"),
+      label: "Status",
       minWidth: "150px",
-      render: (h) => (
-        <span className="font-medium capitalize">
-          {h.status?.toLowerCase() || "-"}
-        </span>
-      ),
+      render: (h) => <AmlStatusBadge status={h.status} />,
     },
 
     /** Service Name */
     {
       key: "serviceName",
-      label: tMaster("serviceName"),
+      label: "Service Name",
       minWidth: "180px",
       truncate: true,
       render: (h) => <span>{h.serviceName || "-"}</span>,
@@ -106,7 +89,7 @@ export const createHistoryTableColumns = ({
     /** Total Rules Score */
     {
       key: "totalRulesScore",
-      label: tMaster("score"),
+      label: "Score",
       minWidth: "120px",
       render: (h) => (
         <span className="font-semibold text-gray-700">{h.totalRulesScore}</span>
@@ -116,7 +99,7 @@ export const createHistoryTableColumns = ({
     /** Created At */
     {
       key: "createdAt",
-      label: tMaster("createdAt"),
+      label: "Created At",
       minWidth: "180px",
       truncate: true,
       render: (h) =>
@@ -130,7 +113,7 @@ export const createHistoryTableColumns = ({
     /** Actions */
     {
       key: "actions",
-      label: tMaster("actions"),
+      label: "Actions",
       minWidth: "100px",
       maxWidth: "100px",
       render: (history) => (
@@ -145,7 +128,7 @@ export const createHistoryTableColumns = ({
                 <Eye className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>{tCommon("view")}</TooltipContent>
+            <TooltipContent>View</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       ),

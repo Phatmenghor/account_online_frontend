@@ -13,14 +13,15 @@ import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Loading from "@/components/shared/common/loading";
-import { createHistoryTableColumns } from "@/components/shared/table/history-content";
-import HistoryDetailModal from "@/components/shared/modal/history-detail";
+import { createHistoryTableColumns } from "@/components/shared/table/aml-history-content";
 import { getAllAmlHistoryService } from "@/services/dashboard/aml/aml-history.service";
-import { AmlStatusEnum } from "@/constants/AppResource/filter/status";
 import {
   AllHistoryModel,
   HistoryModel,
-} from "@/models/aml/history/response/history-respones.model";
+} from "@/models/aml/history/response/history-response.model";
+import AmlHistoryDetailModal from "@/components/shared/modal/history-detail";
+import AmlStatusFilter from "@/components/app/aml/aml-status-filter";
+import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
 
 function History() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,12 +34,8 @@ function History() {
     useState<HistoryModel | null>(null);
 
   // Confirm dialog
-  const [isConfirmAmlDialogOpen, setIsConfirmAmlDialogOpen] = useState(false);
-  const [selectedManagementId, setSelectedManagementId] = useState<
-    number | null
-  >(null);
-  const [statusFilter, setSelectedStatusFilter] = useState<AmlStatusEnum>(
-    AmlStatusEnum.PENDING
+  const [statusFilter, setStatusFilter] = useState<AmlStatusEnum | undefined>(
+    undefined
   );
 
   const searchParams = useSearchParams();
@@ -64,6 +61,7 @@ function History() {
         search: debouncedSearchQuery,
         pageNo: currentPage,
         pageSize: 15,
+        status: statusFilter === AmlStatusEnum.ALL ? undefined : statusFilter,
       });
       setHistoryData(response);
     } catch (error) {
@@ -72,6 +70,10 @@ function History() {
       setIsLoading(false);
     }
   }, [debouncedSearchQuery, currentPage]);
+
+  const handleStatusChange = (status: AmlStatusEnum) => {
+    setStatusFilter(status);
+  };
 
   useEffect(() => {
     loadHistory();
@@ -104,6 +106,10 @@ function History() {
                 className="pl-8 w-full text-xs h-9"
               />
             </div>
+            <AmlStatusFilter
+              selectedStatus={statusFilter}
+              onChange={handleStatusChange}
+            />
           </div>
         </div>
 
@@ -140,7 +146,7 @@ function History() {
 
         {/* MODALS */}
         {selectedHistoryRecord && (
-          <HistoryDetailModal
+          <AmlHistoryDetailModal
             history={selectedHistoryRecord}
             isOpen={isHistoryDetailOpen}
             onClose={() => setIsHistoryDetailOpen(false)}

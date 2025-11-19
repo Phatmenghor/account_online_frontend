@@ -9,11 +9,13 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
-import { AmlStatusEnum } from "@/constants/AppResource/filter/status";
 import {
   AllAmlManagementModel,
   AmlManagementModel,
-} from "@/models/aml/management/respone/aml-management.response";
+} from "@/models/aml/management/response/aml-management.response";
+import RiskBadge from "../badge/risk-level-badge";
+import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
+import AmlStatusBadge from "../badge/aml-badge";
 
 interface ManagementTableHandlers {
   handleViewManagementDetail: (management: AmlManagementModel) => void;
@@ -79,9 +81,7 @@ export const createManagementTableColumns = ({
       truncate: true,
       maxWidth: "120px",
       minWidth: "120px",
-      render: (m) => (
-        <span className="font-medium">{m.riskLevel || "---"}</span>
-      ),
+      render: (m) => <RiskBadge riskLevel={m.riskLevel} />,
     },
 
     // Total Score
@@ -116,7 +116,7 @@ export const createManagementTableColumns = ({
       truncate: true,
       maxWidth: "120px",
       minWidth: "120px",
-      render: (m) => <span className="font-medium">{m.status || "---"}</span>,
+      render: (m) => <AmlStatusBadge status={m.status} />,
     },
 
     // Actions

@@ -13,18 +13,18 @@ import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Loading from "@/components/shared/common/loading";
-import { createManagementTableColumns } from "@/components/shared/table/management-content";
+import { createManagementTableColumns } from "@/components/shared/table/aml-management-content";
 import {
   getAllAmlManagementService,
   updateManagementService,
 } from "@/services/dashboard/aml/aml-management.service";
-import { AmlStatusEnum } from "@/constants/AppResource/filter/status";
 import AmlConfirmDialog from "@/components/shared/dialog/dialog-aml";
-import AmlAlertViewModal from "@/components/shared/modal/aml-management-detail";
 import {
   AllAmlManagementModel,
   AmlManagementModel,
-} from "@/models/aml/management/respone/aml-management.response";
+} from "@/models/aml/management/response/aml-management.response";
+import AmlViewDetailModal from "@/components/shared/modal/aml-management-detail";
+import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
 
 function Management() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -186,7 +186,7 @@ function Management() {
         />
 
         {/* VIEW DETAIL MODAL */}
-        <AmlAlertViewModal
+        <AmlViewDetailModal
           isOpen={isAmlManagementDetailOpen}
           onClose={() => setIsAmlManagementDetailOpen(false)}
           alert={selectedAmlManagement!}
