@@ -13,6 +13,10 @@ export const ROUTES = {
       OCCUPATION: "/occupation",
       REFERENCE: "/reference",
     },
+    AML: {
+      MANAGEMENT: "/history",
+      HISTORY: "/management"
+    },
     ACCOUNT_ONLINE: "/account-online",
   },
 };
