@@ -33,6 +33,9 @@ import { ComboboxSelectBranch } from "@/components/shared/combo-box/combobox-bra
 import { BranchModel } from "@/models/branch/branch.response";
 import { CreateOpenAccountReq } from "@/models/open-account/openAccount.request";
 import { createOpenAccountService } from "@/services/open-account/openAccount.service";
+import { NIDFormData, NIDFormSchema, NIDVerificationSchema } from "@/components/acc-online/form-field/form-validate-error";
+import { Label } from "@/components/ui/label";
+import LoadingModal from "@/components/shared/modal/extract-modal";
 
 export interface Image {
   idImage: string;
@@ -78,6 +81,7 @@ export default function CheckNIDPage() {
     MRZ2: "",
     MRZ3: ""
   });
+
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<Image | null>(null);
 
@@ -126,30 +130,38 @@ export default function CheckNIDPage() {
     village: "",
   });
 
+  const [loadingState, setLoadingState] = useState({
+    isLoading: false,
+    title: "",
+    message: ""
+  });
+
   // Use custom hooks for data fetching
   const { data: maritalStatuses, isLoading: isLoadingMaritals } = useMaritalStatuses();
-  const [selectedMaritalStatus, setSelectedMaritalStatus] = useState<string>("");
+  const [selectedMaritalStatus, setSelectedMaritalStatus] = useState<MaritalModel | null>(null);
 
   const { data: occupations, isLoading: isLoadingOccupations } = useOccupations();
   const [selectedOccupation, setSelectedOccupation] = useState<OccupationModel | null>(null);
 
   const { data: referenceBanks, isLoading: isLoadingReferenceBanks } = useReferenceBanks();
-  const [selectedReferenceBank, setSelectedReferenceBank] = useState<string>("");
+  const [selectedReferenceBank, setSelectedReferenceBank] = useState<ReferenceModel | null>(null);
 
   const [staffCode, setStaffCode] = useState<string>("");
+  const [legalType, setLegalType] = useState<string>("");
 
   // phone send otp
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [resetOtp, setResetOtp] = useState(false);
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  // Get current locale
+  // Get current locale language
   const { locale: currentLocale } = useClientLocale();
-
-  // change language
   const translate = useTranslations("NIDPage");
+  const translateSelect = useTranslations("common");
 
   // Helper function to get marital name based on locale
   const getMaritalName = (marital: MaritalModel) => {
@@ -185,6 +197,26 @@ export default function CheckNIDPage() {
     return "SINGLE";
   };
 
+  // Validate a single field
+  const validateField = (fieldName: keyof NIDFormData, value: any) => {
+    try {
+      const fieldSchema = NIDFormSchema.shape[fieldName];
+      fieldSchema.parse(value);
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+    } catch (error: any) {
+      if (error.issues?.[0]) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          [fieldName]: error.issues[0].message,
+        }));
+      }
+    }
+  };
+
   // Validation handler from OTP component
   const handleValidationChange = useCallback((field: string, error: string | null) => {
     setValidationErrors(prev => {
@@ -197,6 +229,77 @@ export default function CheckNIDPage() {
       return newErrors;
     });
   }, []);
+
+  // Validate entire form for verification
+  const validateVerificationForm = (): boolean => {
+    const verificationData = {
+      idImage: uploadedImage?.idImage || "",
+      selfieImage: selfieImage || "",
+      lastNameKh: formData.lastNameKh,
+      firstNameKh: formData.firstNameKh,
+      lastNameEn: formData.lastNameEn,
+      firstNameEn: formData.firstNameEn,
+      dob: formData.dob,
+      gender: formData.gender,
+      idNumber: formData.idNumber,
+      address: formData.address,
+      pob: formData.pob,
+    };
+
+    const result = NIDVerificationSchema.safeParse(verificationData);
+
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const path = err.path.join(".");
+        errors[path] = err.message;
+      });
+      setValidationErrors((prev) => ({ ...prev, ...errors }));
+      return false;
+    }
+
+    return true;
+  };
+
+  // Validate entire form for final submission
+  const validateFullForm = (): boolean => {
+    const fullData: NIDFormData = {
+      idImage: uploadedImage?.idImage || "",
+      selfieImage: selfieImage || "",
+      lastNameKh: formData.lastNameKh,
+      firstNameKh: formData.firstNameKh,
+      lastNameEn: formData.lastNameEn,
+      firstNameEn: formData.firstNameEn,
+      dob: formData.dob,
+      gender: formData.gender,
+      idNumber: formData.idNumber,
+      address: formData.address,
+      pob: formData.pob,
+      legalType: legalType,
+      maritalStatus: selectedMaritalStatus?.nameEn || "",
+      occupation: selectedOccupation?.occupationCode || "",
+      branch: selectedBranch?.branchkh || "",
+      referenceBank: selectedReferenceBank?.nameEn || "",
+      staffCode: staffCode,
+      phoneNumber: phoneNumber,
+      isPhoneVerified: isPhoneVerified,
+      // isVerified: isVerified,
+    };
+
+    const result = NIDFormSchema.safeParse(fullData);
+
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const path = err.path.join(".");
+        errors[path] = err.message;
+      });
+      setValidationErrors((prev) => ({ ...prev, ...errors }));
+      return false;
+    }
+
+    return true;
+  };
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -211,7 +314,13 @@ export default function CheckNIDPage() {
         return;
       }
 
-      setIsLoading(true);
+      setLoadingState({
+        isLoading: true,
+        title: translate("extracting_data") || "Extracting Data",
+        message: translate("extracting") || "Extracting information from ID card..."
+      });
+
+      // setIsLoading(true);
       try {
         const base64WithPrefix = await convertToBase64(file);
         const base64ForService = base64WithPrefix.split(",")[1];
@@ -227,13 +336,22 @@ export default function CheckNIDPage() {
         });
         setImagePreview(base64WithPrefix);
 
+        // Validate image field
+        validateField("idImage", base64WithPrefix);
+
         await handleExtractNID(imageRequestData);
       } catch (error) {
         console.error("Error converting image to base64", error);
         toast.error("Image processing error", {
           description: "Failed to process the image. Please try again.",
         });
-        setIsLoading(false);
+        // setIsLoading(false);
+      } finally {
+        setLoadingState({
+          isLoading: false,
+          title: "",
+          message: ""
+        });
       }
     }
   };
@@ -256,6 +374,10 @@ export default function CheckNIDPage() {
         const base64ForService = base64WithPrefix.split(",")[1];
         setSelfieImage(base64ForService);
         setSelfiePreview(base64WithPrefix);
+
+        // Validate selfie field
+        validateField("selfieImage", base64WithPrefix);
+
         toast.success("Selfie uploaded successfully!");
       } catch (error) {
         console.error("Error uploading selfie", error);
@@ -301,6 +423,17 @@ export default function CheckNIDPage() {
 
       console.log("Normalized data:", normalizedData);
       setFormData(normalizedData);
+
+      // Validate all extracted fields to clear any validation errors
+      validateField("lastNameKh", normalizedData.lastNameKh);
+      validateField("firstNameKh", normalizedData.firstNameKh);
+      validateField("lastNameEn", normalizedData.lastNameEn);
+      validateField("firstNameEn", normalizedData.firstNameEn);
+      validateField("dob", normalizedData.dob);
+      validateField("gender", normalizedData.gender);
+      validateField("idNumber", normalizedData.idNumber);
+      validateField("address", normalizedData.address);
+      validateField("pob", normalizedData.pob);
 
       AppToast({
         type: "success",
@@ -353,14 +486,14 @@ export default function CheckNIDPage() {
       );
 
       if (hasCriticalErrors) {
-        setIsPhoneVerified(false);
+        // setIsVerified(false);
         setShowErrorModal(true);
       } else {
-        setIsPhoneVerified(true);
+        // setIsVerified(true);
         setShowLocationModal(true);
       }
     } catch (error: any) {
-      setIsPhoneVerified(false);
+      // setIsVerified(false);
       setValidationErrorData({
         title: translate("valid_fail"),
         message: error.apiMessage || "Failed to validate NID information.",
@@ -372,8 +505,33 @@ export default function CheckNIDPage() {
     }
   };
 
+  // const handleOpenConfirmModal = () => {
+  //   setShowConfirmationModal(true);
+  // };
+
+  // const handleConfirmValidation = async () => {
+  //   setShowConfirmationModal(false);
+  //   await handleValidateNID();
+  // };
   const handleOpenConfirmModal = () => {
-    setShowConfirmationModal(true);
+    // Validate both forms simultaneously
+    const isVerificationValid = validateVerificationForm();
+    const isFullFormValid = validateFullForm();
+
+    // Only show confirmation modal if both validations pass
+    if (isVerificationValid && isFullFormValid) {
+      setShowConfirmationModal(true);
+    } else {
+      // Show toast with first error
+      const firstErrorKey = Object.keys(validationErrors)[0];
+      if (firstErrorKey) {
+        AppToast({
+          type: "error",
+          message: "Validation Error",
+          description: validationErrors[firstErrorKey],
+        });
+      }
+    }
   };
 
   const handleConfirmValidation = async () => {
@@ -410,8 +568,15 @@ export default function CheckNIDPage() {
       pob: placeOfBirthString
     }));
 
+    // Validate updated fields
+    validateField("address", currentAddressString);
+    validateField("pob", placeOfBirthString);
+
     console.log("Updated Address:", currentAddressString);
     console.log("Updated Place of Birth:", placeOfBirthString);
+
+    // Set isVerified to true ONLY after successful location submission
+    setIsVerified(true);
 
     AppToast({
       type: "success",
@@ -426,57 +591,23 @@ export default function CheckNIDPage() {
     setShowLocationModal(false);
   };
 
+  const handleInputChange = (field: keyof ResponseNID, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+    validateField(field as keyof NIDFormData, value);
+  };
+
   // Handle Submit Account Opening
   const handleSubmitAccount = async () => {
-    // Comprehensive validation
-    const errors: Record<string, string> = {};
 
-    if (!isPhoneVerified) {
-      errors.verification = "Please verify your NID first";
-    }
-
-    if (!uploadedImage?.idImage) {
-      errors.nidImage = "Please upload your NID card image";
-    }
-
-    if (!selfieImage) {
-      errors.selfieImage = "Please upload your selfie image";
-    }
-
-    if (!selectedBranch) {
-      errors.branch = "Please select a branch";
-    }
-
-    if (!selectedOccupation) {
-      errors.occupation = "Please select an occupation";
-    }
-
-    if (!selectedMaritalStatus) {
-      errors.maritalStatus = "Please select marital status";
-    }
-
-    if (!phoneNumber || validationErrors.phoneNumber) {
-      errors.phoneNumber = "Please provide a valid phone number";
-    }
-
-    if (!validationErrors.isPhoneVerified && !isPhoneVerified) {
-      errors.phoneVerification = "Please verify your phone number";
-    }
-
-    if (!locationData.currentAddress.province || !locationData.placeOfBirth.province) {
-      errors.location = "Please complete location information";
-    }
-
-    // Show all errors
-    if (Object.keys(errors).length > 0) {
-      const firstError = Object.values(errors)[0];
-      toast.error("Validation Error", {
-        description: firstError,
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
+    setLoadingState({
+    isLoading: true,
+    title: translate("submitting") || "Submitting",
+    message: translate("submitting_message") || "Creating your account..."
+  });
 
     try {
       const nidImageBase64 = uploadedImage!.idImage.split(",")[1] || uploadedImage!.idImage;
@@ -489,13 +620,12 @@ export default function CheckNIDPage() {
         dateOfBirth: formatDate(formData.dob),
         gender: convertGenderToAPI(formData.gender),
         placeOfBirth: formData.pob,
-        companyName: selectedReferenceBank ?
-          referenceBanks.find(r => r.id.toString() === selectedReferenceBank)?.nameEn || "CPBank"
-          : "CPBank",
+        companyName: selectedReferenceBank?.nameEn || "",
         referralId: staffCode || "",
         branchCode: selectedBranch!.branchID,
         occupation: selectedOccupation?.occupationCode || "",
-        maritalStatus: getMaritalStatusString(selectedMaritalStatus),
+        // maritalStatus: selectedMaritalStatus?.nameEn || "",
+        maritalStatus: selectedMaritalStatus ? getMaritalStatusString(selectedMaritalStatus.id.toString()) : "SINGLE", // ← FIXED LINE
         customerCurrentProvince: locationData.currentAddress.province?.provinceCode || "",
         customerCurrentDistrict: locationData.currentAddress.district?.districtCode || "",
         customerCurrentCommune: locationData.currentAddress.commune?.communeCode || "",
@@ -513,10 +643,8 @@ export default function CheckNIDPage() {
         legalMrz2: formData.MRZ2,
         legalMrz3: formData.MRZ3,
         phoneNumber: phoneNumber,
-        // nidImage: nidImageBase64,
-        // selfieImage: selfieImage || ""
-        nidImage: nidImageBase64?.slice(0, 20) + "...",
-        selfieImage: selfieImage?.slice(0, 20) + "...",
+        nidImage: nidImageBase64,
+        selfieImage: selfieImage || "",
       };
 
       console.log("=== ACCOUNT OPENING SUBMISSION DATA ===");
@@ -525,6 +653,10 @@ export default function CheckNIDPage() {
 
       // TODO: Replace with your actual API call
       const response = await createOpenAccountService(accountData);
+
+      console.log("API Response:", response);
+      console.log("##",accountData);
+      
 
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -544,15 +676,13 @@ export default function CheckNIDPage() {
         description: error.message || "Please try again later.",
       });
     } finally {
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
+      setLoadingState({
+      isLoading: false,
+      title: "",
+      message: ""
+    });
     }
-  };
-
-  const handleInputChange = (field: keyof ResponseNID, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
   };
 
   const clearInput: ResponseNID = {
@@ -580,10 +710,11 @@ export default function CheckNIDPage() {
     setSelfieImage(null);
     setSelfiePreview(null);
     setValidationResult(null);
+    setIsVerified(false);
     setIsPhoneVerified(false);
-    setSelectedMaritalStatus("");
+    setSelectedMaritalStatus(null);
     setSelectedOccupation(null);
-    setSelectedReferenceBank("");
+    setSelectedReferenceBank(null);
     setSelectedBranch(null);
     setStaffCode("");
     setPhoneNumber("");
@@ -609,6 +740,10 @@ export default function CheckNIDPage() {
       village: "",
     });
 
+    // Trigger OTP reset
+  setResetOtp(true);
+  setTimeout(() => setResetOtp(false), 100);
+
     const fileInput = document.getElementById(
       "image-upload"
     ) as HTMLInputElement;
@@ -627,8 +762,10 @@ export default function CheckNIDPage() {
   const onBranchChange = useCallback(
     (branch: BranchModel) => {
       setSelectedBranch(branch);
+      validateField("branch", branch.branchkh);
     },
-    []
+    [selectedBranch]
+    // []
   );
 
   return (
@@ -660,7 +797,7 @@ export default function CheckNIDPage() {
               </div>
 
               {/* Loading indicator */}
-              {(isLoading || isValidating || isSubmitting) && (
+              {/* {(isLoading || isValidating) && (
                 <div className="flex justify-center items-center space-x-2 mb-6">
                   <Loader2 className="animate-spin h-6 w-6 text-blue-600" />
                   <span className="text-base text-gray-600">
@@ -669,7 +806,13 @@ export default function CheckNIDPage() {
                     {isSubmitting && "Submitting account..."}
                   </span>
                 </div>
-              )}
+              )} */}
+              {/* Add the Loading Modal when extract */}
+              <LoadingModal
+                isOpen={loadingState.isLoading}
+                title={loadingState.title}
+                message={loadingState.message}
+              />
 
               {/* ID Card and Selfie Upload Section */}
               <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 lg:gap-14 gap-8">
@@ -677,14 +820,12 @@ export default function CheckNIDPage() {
                   <p className="text-base text-gray-600 mb-4 text-center">
                     {translate("img_card")}
                   </p>
-
                   <div className="relative">
                     <div className="absolute lg:-top-5 -top-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
                     <div className="absolute lg:-top-5 -top-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
                     <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
                     <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
-
-                    <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                    <div className={`relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity ${validationErrors.idImage ? 'border-2 border-red-500' : ''}`}>
                       <input
                         type="file"
                         accept="image/*"
@@ -700,19 +841,21 @@ export default function CheckNIDPage() {
                       />
                     </div>
                   </div>
+                  {validationErrors.idImage && (
+                    <p className="text-xs text-red-500 mt-2 text-center">{validationErrors.idImage}</p>
+                  )}
                 </div>
+
                 <div>
                   <p className="text-base text-gray-600 mb-4 text-center">
                     {translate("img_selfie")}
                   </p>
-
                   <div className="relative">
                     <div className="absolute lg:-top-5 -top-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
                     <div className="absolute lg:-top-5 -top-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
                     <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
                     <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
-
-                    <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                    <div className={`relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity ${validationErrors.selfieImage ? 'border-2 border-red-500' : ''}`}>
                       <input
                         type="file"
                         accept="image/*"
@@ -728,165 +871,222 @@ export default function CheckNIDPage() {
                       />
                     </div>
                   </div>
+                  {validationErrors.selfieImage && (
+                    <p className="text-xs text-red-500 mt-2 text-center">{validationErrors.selfieImage}</p>
+                  )}
                 </div>
               </div>
 
               {/* Form Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                 {/* First Name (KH) */}
-                <FormInputField
-                  label={translate("firstNameKh")}
-                  placeholder={translate("firstNameKh")}
-                  value={formData.lastNameKh}
-                  onChange={(value) => handleInputChange("lastNameKh", value)}
-                  disabled={isLoading || isValidating || isSubmitting}
-                />
-
-                {/* Last Name (KH)*/}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
-                    {translate("lastNameKH")}
-                  </label>
+                <div className="space-y-1">
+                  <Label htmlFor="lastNameKh" className="text-sm">
+                    {translate("firstNameKh")}
+                  </Label>
                   <Input
+                    id="lastNameKh"
+                    placeholder={translate("firstNameKh")}
+                    value={formData.lastNameKh}
+                    onChange={(e) => handleInputChange("lastNameKh", e.target.value)}
+                    className={`w-full h-10 ${validationErrors.lastNameKh ? 'border-red-500' : ''}`}
+                    disabled={isLoading || isValidating || isSubmitting}
+                  />
+                  {validationErrors.lastNameKh && (
+                    <p className="text-xs text-red-500">{validationErrors.lastNameKh}</p>
+                  )}
+                </div>
+
+                {/* Last Name (KH) */}
+                <div className="space-y-1">
+                  <Label htmlFor="firstNameKh" className="text-sm">
+                    {translate("lastNameKH")}
+                  </Label>
+                  <Input
+                    id="firstNameKh"
                     placeholder={translate("lastNameKH")}
                     value={formData.firstNameKh}
                     onChange={(e) => handleInputChange("firstNameKh", e.target.value)}
-                    className="w-full h-10"
+                    className={`w-full h-10 ${validationErrors.firstNameKh ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
+                  {validationErrors.firstNameKh && (
+                    <p className="text-xs text-red-500">{validationErrors.firstNameKh}</p>
+                  )}
                 </div>
 
                 {/* Family Name */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="lastNameEn" className="text-sm">
                     {translate("familyNameEn")}
-                  </label>
+                  </Label>
                   <Input
+                    id="lastNameEn"
                     placeholder={translate("familyNameEn")}
                     value={formData.lastNameEn}
                     onChange={(e) => handleInputChange("lastNameEn", e.target.value)}
-                    className="w-full h-10"
+                    className={`w-full h-10 ${validationErrors.lastNameEn ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
+                  {validationErrors.lastNameEn && (
+                    <p className="text-xs text-red-500">{validationErrors.lastNameEn}</p>
+                  )}
                 </div>
 
                 {/* Given Name */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="firstNameEn" className="text-sm">
                     {translate("givenNameEn")}
-                  </label>
+                  </Label>
                   <Input
+                    id="firstNameEn"
                     placeholder={translate("givenNameEn")}
                     value={formData.firstNameEn}
                     onChange={(e) => handleInputChange("firstNameEn", e.target.value)}
-                    className="w-full h-10"
+                    className={`w-full h-10 ${validationErrors.firstNameEn ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
+                  {validationErrors.firstNameEn && (
+                    <p className="text-xs text-red-500">{validationErrors.firstNameEn}</p>
+                  )}
                 </div>
 
                 {/* Date Of Birth */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="dob" className="text-sm">
                     {translate("dateOfBirth")}
-                  </label>
-                  <CustomDatePicker
-                    value={formData.dob}
-                    onChange={(value) => handleInputChange("dob", value)}
-                    disabled={isLoading || isValidating || isSubmitting}
-                    placeholder={translate("dateOfBirth")}
-                  />
+                  </Label>
+                  <div className={validationErrors.dob ? 'border border-red-500 rounded' : ''}>
+                    <CustomDatePicker
+                      value={formData.dob}
+                      onChange={(value) => handleInputChange("dob", value)}
+                      disabled={isLoading || isValidating || isSubmitting}
+                      placeholder={translate("dateOfBirth")}
+                    />
+                  </div>
+                  {validationErrors.dob && (
+                    <p className="text-xs text-red-500">{validationErrors.dob}</p>
+                  )}
                 </div>
 
                 {/* Gender */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="gender" className="text-sm">
                     {translate("gender")}
-                  </label>
+                  </Label>
                   <Select
                     value={formData.gender || ""}
                     onValueChange={(value) => handleInputChange("gender", value)}
                     disabled={isLoading || isValidating || isSubmitting}
                   >
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder={"Select a gender..."} />
+                    <SelectTrigger className={`h-10 ${validationErrors.gender ? 'border-red-500' : ''}`}>
+                      <SelectValue placeholder={translateSelect("selectGender")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Female">Female</SelectItem>
                       <SelectItem value="Male">Male</SelectItem>
                     </SelectContent>
                   </Select>
+                  {validationErrors.gender && (
+                    <p className="text-xs text-red-500">{validationErrors.gender}</p>
+                  )}
                 </div>
 
                 {/* Legal Type */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="legalType" className="text-sm">
                     {translate("legalType")}
-                  </label>
-                  <Select disabled={isLoading || isValidating || isSubmitting}>
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder={"Select a legal type..."} />
+                  </Label>
+                  <Select
+                    value={legalType}
+                    onValueChange={(value) => {
+                      setLegalType(value);
+                      validateField("legalType", value);
+                    }}
+                    disabled={isLoading || isValidating || isSubmitting}
+                  >
+                    <SelectTrigger className={`h-10 ${validationErrors.legalType ? 'border-red-500' : ''}`}>
+                      <SelectValue placeholder={translateSelect("selectLegalType")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="national-id">National ID Card</SelectItem>
                     </SelectContent>
                   </Select>
+                  {validationErrors.legalType && (
+                    <p className="text-xs text-red-500">{validationErrors.legalType}</p>
+                  )}
                 </div>
 
                 {/* Legal ID */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="idNumber" className="text-sm">
                     {translate("legalId")}
-                  </label>
+                  </Label>
                   <Input
+                    id="idNumber"
                     placeholder={translate("legalId")}
                     value={formData.idNumber}
                     onChange={(e) => handleInputChange("idNumber", e.target.value)}
-                    className="w-full h-10"
+                    className={`w-full h-10 ${validationErrors.idNumber ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
+                  {validationErrors.idNumber && (
+                    <p className="text-xs text-red-500">{validationErrors.idNumber}</p>
+                  )}
                 </div>
 
                 {/* Address */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="address" className="text-sm">
                     {translate("address")}
-                  </label>
+                  </Label>
                   <Input
+                    id="address"
                     placeholder={translate("address")}
                     value={formData.address}
                     onChange={(e) => handleInputChange("address", e.target.value)}
-                    className="w-full h-10"
+                    className={`w-full h-10 ${validationErrors.address ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
+                  {validationErrors.address && (
+                    <p className="text-xs text-red-500">{validationErrors.address}</p>
+                  )}
                 </div>
 
                 {/* Place Of Birth */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="pob" className="text-sm">
                     {translate("pob")}
-                  </label>
+                  </Label>
                   <Input
+                    id="pob"
                     placeholder={translate("pob")}
                     value={formData.pob}
                     onChange={(e) => handleInputChange("pob", e.target.value)}
-                    className="w-full h-10"
+                    className={`w-full h-10 ${validationErrors.pob ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
+                  {validationErrors.pob && (
+                    <p className="text-xs text-red-500">{validationErrors.pob}</p>
+                  )}
                 </div>
 
                 {/* Marital Status */}
-                <div className="md:col-span-2">
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="md:col-span-2 space-y-1">
+                  <Label htmlFor="maritalStatus" className="text-sm">
                     {translate("marital")}
-                  </label>
+                  </Label>
                   <Select
-                    value={selectedMaritalStatus}
-                    onValueChange={setSelectedMaritalStatus}
-                    disabled={isLoading || isValidating || isLoadingMaritals || isSubmitting}
+                    value={selectedMaritalStatus?.id.toString() || ""}
+                    onValueChange={(value) => {
+                      const marital = maritalStatuses.find(m => m.id.toString() === value);
+                      setSelectedMaritalStatus(marital || null);
+                      validateField("maritalStatus", value);
+                    }}
+                    disabled={isLoading || isValidating || isLoadingMaritals}
                   >
-                    <SelectTrigger className="w-full h-10">
-                      <SelectValue placeholder={isLoadingMaritals ? translate("loading") : "Select a marital..."} />
+                    <SelectTrigger className={`w-full h-10 ${validationErrors.maritalStatus ? 'border-red-500' : ''}`}>
+                      <SelectValue placeholder={isLoadingMaritals ? translate("loading") : translateSelect("selectMarital")} />
                     </SelectTrigger>
                     <SelectContent>
                       {maritalStatuses.map((marital) => (
@@ -896,23 +1096,27 @@ export default function CheckNIDPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {validationErrors.maritalStatus && (
+                    <p className="text-xs text-red-500">{validationErrors.maritalStatus}</p>
+                  )}
                 </div>
 
                 {/* Occupation */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="occupation" className="text-sm">
                     {translate("occupation")}
-                  </label>
+                  </Label>
                   <Select
                     value={selectedOccupation?.id.toString() || ""}
                     onValueChange={(value) => {
                       const occupation = occupations.find(o => o.id.toString() === value);
                       setSelectedOccupation(occupation || null);
+                      validateField("occupation", value);
                     }}
-                    disabled={isLoading || isValidating || isLoadingOccupations || isSubmitting}
+                    disabled={isLoading || isValidating || isLoadingOccupations}
                   >
-                    <SelectTrigger className="w-full h-10">
-                      <SelectValue placeholder={isLoadingOccupations ? translate("loading") : "Select a occupation..."} />
+                    <SelectTrigger className={`w-full h-10 ${validationErrors.occupation ? 'border-red-500' : ''}`}>
+                      <SelectValue placeholder={isLoadingOccupations ? translate("loading") : translateSelect("selectOccupation")} />
                     </SelectTrigger>
                     <SelectContent>
                       {occupations.map((occupation) => (
@@ -922,32 +1126,45 @@ export default function CheckNIDPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {validationErrors.occupation && (
+                    <p className="text-xs text-red-500">{validationErrors.occupation}</p>
+                  )}
                 </div>
 
                 {/* Branch */}
-                <div>
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="space-y-1">
+                  <Label htmlFor="branch" className="text-sm">
                     {translate("branch")}
-                  </label>
-                  <ComboboxSelectBranch
-                    dataSelect={selectedBranch}
-                    onChangeSelected={onBranchChange}
-                  />
+                  </Label>
+                  <div className={validationErrors.branch ? 'border border-red-500 rounded' : ''}>
+                    <ComboboxSelectBranch
+                      dataSelect={selectedBranch}
+                      onChangeSelected={onBranchChange}
+                      disabled={isLoading || isValidating || isSubmitting}
+                    />
+                  </div>
+                  {validationErrors.branch && (
+                    <p className="text-xs text-red-500">{validationErrors.branch}</p>
+                  )}
                 </div>
 
                 {/* Reference */}
-                <div className="md:col-span-2">
-                  <label className="text-base font-medium text-gray-700 block mb-1">
+                <div className="md:col-span-2 space-y-1">
+                  <Label htmlFor="reference" className="text-sm">
                     {translate("reference")}
-                  </label>
+                  </Label>
                   <div className="flex">
                     <Select
-                      value={selectedReferenceBank}
-                      onValueChange={setSelectedReferenceBank}
-                      disabled={isLoading || isValidating || isLoadingReferenceBanks || isSubmitting}
+                      value={selectedReferenceBank?.id.toString() || ""}
+                      onValueChange={(value) => {
+                        const reference = referenceBanks.find(r => r.id.toString() === value);
+                        setSelectedReferenceBank(reference || null);
+                        validateField("referenceBank", value);
+                      }}
+                      disabled={isLoading || isValidating || isLoadingReferenceBanks}
                     >
-                      <SelectTrigger className="w-40 h-10 rounded-r-none">
-                        <SelectValue placeholder={isLoadingReferenceBanks ? translate("loading") : "Select ref..."} />
+                      <SelectTrigger className={`w-40 h-10 rounded-r-none ${validationErrors.referenceBank ? 'border-red-500' : ''}`}>
+                        <SelectValue placeholder={isLoadingReferenceBanks ? translate("loading") : translateSelect("selectRef")} />
                       </SelectTrigger>
                       <SelectContent>
                         {referenceBanks.map((reference) => (
@@ -960,24 +1177,38 @@ export default function CheckNIDPage() {
                     <Input
                       placeholder={translate("staffCode")}
                       value={staffCode}
-                      onChange={(e) => setStaffCode(e.target.value)}
+                      onChange={(e) => {
+                        setStaffCode(e.target.value);
+                        validateField("staffCode", e.target.value);
+                      }}
                       className="flex-1 h-10 !rounded-l-none"
                       disabled={isLoading || isValidating || isSubmitting}
                     />
                   </div>
+                  {validationErrors.referenceBank && (
+                    <p className="text-xs text-red-500">{validationErrors.referenceBank}</p>
+                  )}
+                  {validationErrors.staffCode && (
+                    <p className="text-xs text-red-500">{validationErrors.staffCode}</p>
+                  )}
                 </div>
 
-                {/* Contact Number & OTP Code*/}
+                {/* Contact Number & OTP Code */}
                 <OTPInput
                   phoneNumber={phoneNumber}
-                  onPhoneChange={(value) => setPhoneNumber(value)}
+                  onPhoneChange={(value) => {
+                    setPhoneNumber(value);
+                    validateField("phoneNumber", value);
+                  }}
                   onVerificationSuccess={() => {
                     console.log("Phone verified:", phoneNumber);
                     setIsPhoneVerified(true);
+                    validateField("isPhoneVerified", true);
                   }}
                   disabled={isLoading || isValidating || isSubmitting}
                   validationErrors={validationErrors}
                   onValidationChange={handleValidationChange}
+                  reset={resetOtp}
                 />
               </div>
 
@@ -986,16 +1217,16 @@ export default function CheckNIDPage() {
                 <Button
                   className="px-8 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-md"
                   onClick={handleOpenConfirmModal}
-                  disabled={isLoading || isValidating || isPhoneVerified || isSubmitting}
+                  disabled={isLoading || isValidating || isVerified}
                 >
                   {isValidating ? translate("processing") : translate("verification")}
                 </Button>
                 <Button
                   className="px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md"
                   onClick={handleSubmitAccount}
-                  disabled={isLoading || isValidating || !isPhoneVerified || isSubmitting}
+                  disabled={isLoading || isValidating || !isVerified}
                 >
-                  {isSubmitting ? "Submitting..." : translate("submit")}
+                  {translate("submit")}
                 </Button>
               </div>
             </div>

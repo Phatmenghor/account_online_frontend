@@ -269,7 +269,7 @@ export function ComboboxSelectDistrict({
             ? translate("loading")
             : dataSelect
             ? getName(dataSelect)
-            : "Select a district..."}
+            : translate("selectDistrict")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -279,7 +279,7 @@ export function ComboboxSelectDistrict({
       >
         <Command>
           <CommandInput
-            placeholder="Search district..."
+            placeholder={translate("searchDistrict")}
             value={searchTerm}
             onValueChange={setSearchTerm}
           />

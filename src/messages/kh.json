@@ -22,7 +22,7 @@
     "marital": "ស្ថានភាពគ្រួសារ",
     "occupation": "មុខរបរ",
     "reference": "អ្នកយោង",
-    "accountOnline" : "គណនីអនទ្បាញ",
+    "accountOnline": "គណនីអនទ្បាញ",
     "index": "ទិន្នន័យមេ",
     "new": "ថ្មី",
     "allStatus": "ស្ថានភាពទាំងអស់",
@@ -34,7 +34,23 @@
     "chooseOne": "--- សូមជ្រើសរើស ---",
     "yesIhave": "បាទ/ចាស ខ្ញុំបានពិនិត្យរួចហើយ",
     "noIneed": "ទេ ខ្ញុំត្រូវពិនិត្យម្តងទៀត",
-    "searchBtn" : "ស្វែងរក"
+    "searchBtn": "ស្វែងរក",
+    "selectBranch": "សូមជ្រើសរើសសាខា...",
+    "selectRef": "អ្នកណែនាំ...",
+    "selectGender": "សូមជ្រើសរើសភេទ...",
+    "selectLegalType": "សូមជ្រើសរើសប្រភេទ legal...",
+    "selectMarital": "សូមជ្រើសរើសស្ថានភាពគ្រួសារ...",
+    "selectOccupation": "សូមជ្រើសរើសមុខរបរ...",
+    "searchBranch": "ស្វែងរកសាខា...",
+
+    "selectProvince": "សូមជ្រើសរើសខេត្ត ...",
+    "selectDistrict": "សូមជ្រើសរើសស្រុក...",
+    "selectCommune": "សូមជ្រើសរើសឃុំ...",
+    "selectVillage": "សូមជ្រើសរើសភូមិ...",
+    "searchProvince": "ស្វែងរកខេត្ត...",
+    "searchDistrict": "ស្វែងរកស្រុក...",
+    "searchCommune": "ស្វែងរកឃុំ...",
+    "searchVillage": "ស្វែងរកភូមិ..."
   },
 
   "dashboard": {
@@ -96,15 +112,16 @@
     "occupationCode": "លេខកូដមុខរបរ",
     "actions": "សកម្មភាព",
     "status": "ស្ថានភាព",
-    "cif" : "សូមបញ្ចូល CIF ...",
-    "legalId" : "សូមបញ្ចូល Legal Id ..."
+    "cif": "សូមបញ្ចូល CIF ...",
+    "legalId": "សូមបញ្ចូល Legal Id ..."
   },
-  
+
   "NIDPage": {
     "head_text": "ការផ្ទៀងផ្ទាត់អត្តសញ្ញាណប័ណ្ណ",
     "process": "កំពុងដំណើរការ...",
     "check": "ពិនិត្យឥឡូវនេះ",
     "clear": "សម្អាត",
+    "extracting_data": "ព័ត៌មានអត្តសញ្ញាណប័ណ្ណ",
     "extracting": "កំពុងដកស្រង់ព័ត៌មានអត្តសញ្ញាណប័ណ្ណ...",
     "validating": "កំពុងផ្ទៀងផ្ទាត់ព័ត៌មានអត្តសញ្ញាណប័ណ្ណ...",
 
@@ -160,16 +177,16 @@
     "sendOtp": "ផ្ញើ OTP",
     "chooseOne": "--- សូមជ្រើសរើស ---",
     "loading": "កំពុងផ្ទុក...",
-    
+
     "processing": "កំពុងដំណើរការ...",
     "verification": "ផ្ទៀងផ្ទាត់",
     "submit": "បញ្ចូន",
-    
+
     "cfTitle": "បញ្ជាក់ព័ត៌មាន",
     "cfMessage": "សូមបញ្ជាក់ថាអ្នកបានពិនិត្យព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នករួចហើយ",
-    "cifNumber" : "CIF",
-    "phoneNumber" : "លេខទូរស័ព្ទ",
-    "nationality" : "សញ្ញាតិ"
+    "cifNumber": "CIF",
+    "phoneNumber": "លេខទូរស័ព្ទ",
+    "nationality": "សញ្ញាតិ"
   },
 
   "address": {

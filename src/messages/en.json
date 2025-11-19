@@ -22,7 +22,7 @@
     "marital": "Marital",
     "occupation": "Occupation",
     "reference": "Reference",
-    "accountOnline" : "Account Online",
+    "accountOnline": "Account Online",
     "index": "Master Data",
     "new": "New",
     "allStatus": "All Status",
@@ -34,7 +34,23 @@
     "chooseOne": "--- Choose one ---",
     "yesIhave": "Yes, I have reviewed",
     "noIneed": "No, I need to review",
-    "searchBtn" : "Search"
+    "searchBtn": "Search",
+    "selectBranch": "Select a branch...",
+    "selectRef": "Select ref...",
+    "selectGender": "Select a gender...",
+    "selectLegalType": "Select a legal type...",
+    "selectMarital": "Select a marital...",
+    "selectOccupation": "Select an occupation...",
+    "searchBranch": "Search brand...",
+
+    "selectProvince": "Select a province...",
+    "selectDistrict": "Select a district...",
+    "selectCommune": "Select a commune...",
+    "selectVillage": "Select a village...",
+    "searchProvince": "Search village...",
+    "searchDistrict": "Search district...",
+    "searchCommune": "Search commune...",
+    "searchVillage": "Search village..."
   },
 
   "dashboard": {
@@ -96,8 +112,8 @@
     "occupationCode": "Occupation Code",
     "actions": "Actions",
     "status": "Status",
-    "cif" : "Enter your CIF ...",
-    "legalId" : "Enter your Legal Id ..."
+    "cif": "Enter your CIF ...",
+    "legalId": "Enter your Legal Id ..."
   },
 
   "NIDPage": {
@@ -105,6 +121,7 @@
     "process": "Processing...",
     "check": "Check Now",
     "clear": "Clear",
+    "extracting_data": "Extracting Data",
     "extracting": "Extracting NID information...",
     "validating": "Validating NID information...",
 
@@ -167,9 +184,9 @@
 
     "cfTitle": "Confirm Information",
     "cfMessage": "Please confirm that you have reviewed your personal information.",
-    "cifNumber" : "CIF",
-    "phoneNumber" : "Phone Number",
-    "nationality" : "Nationality"
+    "cifNumber": "CIF",
+    "phoneNumber": "Phone Number",
+    "nationality": "Nationality"
   },
 
   "address": {

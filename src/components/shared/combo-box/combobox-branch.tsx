@@ -123,7 +123,7 @@ export function ComboboxSelectBranch({
           disabled={disabled}
         >
           {/* Always show the name directly from dataSelect prop if available */}
-          {dataSelect ? dataSelect.branchkh : "Select a branch..."}
+          {dataSelect ? dataSelect.branchkh : translate("selectBranch")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -133,7 +133,7 @@ export function ComboboxSelectBranch({
       >
         <Command>
           <CommandInput
-            placeholder="Search brand..."
+            placeholder={translate("searchBranch")}
             value={searchTerm}
             onValueChange={onChangeSearch}
           />
