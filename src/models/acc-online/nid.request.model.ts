@@ -5,7 +5,6 @@ export interface ApiResponse<T> {
 }
 
 export interface RequestIdImage {
-  applicationName: string,
   idImage: string;
 }
 

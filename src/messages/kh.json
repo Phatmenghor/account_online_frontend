@@ -78,7 +78,11 @@
   },
 
   "auth": {
+    "welcomeTitle": "សូមស្វាគមន៍មកកាន់ CPBank",
     "login": "ចូល",
+    "loginButton": "ចូល",
+    "loginWelcome": "សូមស្វាគមន៍",
+    "loggingIn": "កំពុងចូល...",
     "logout": "ចាកចេញ",
     "email": "អ៊ីមែល",
     "emailAddress": "អាសយដ្ឋានអ៊ីមែល",
@@ -173,20 +177,26 @@
     "staffCode": "លេខកូដបុគ្គលិក",
     "contactNumber": "លេខទូរស័ព្ទរបស់អ្នក",
     "otpCode": "លេខ PIN សម្ងាត់",
-    "reSendOtp": "ផ្ញើម្តងទៀត",
-    "sendOtp": "ផ្ញើ OTP",
+    "reSendOtp": "ផ្ញើរម្តងទៀត",
+    "sendOtp": "ផ្ញើរ OTP",
     "chooseOne": "--- សូមជ្រើសរើស ---",
     "loading": "កំពុងផ្ទុក...",
 
     "processing": "កំពុងដំណើរការ...",
     "verification": "ផ្ទៀងផ្ទាត់",
     "submit": "បញ្ចូន",
+    "submitting": "កំពុងដាក់ស្នើ",
+    "submitting_message": "កំពុងបង្កើតគណនីរបស់អ្នក...",
+    "try_again": "ព្យាយាមម្តងទៀត",
 
     "cfTitle": "បញ្ជាក់ព័ត៌មាន",
     "cfMessage": "សូមបញ្ជាក់ថាអ្នកបានពិនិត្យព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នករួចហើយ",
     "cifNumber": "CIF",
     "phoneNumber": "លេខទូរស័ព្ទ",
-    "nationality": "សញ្ញាតិ"
+    "nationality": "សញ្ញាតិ",
+
+    "success_title": "បង្កើតគណនីបានជោគជ័យ!",
+    "error_title": "ការដាក់ស្នើបរាជ័យ"
   },
 
   "address": {

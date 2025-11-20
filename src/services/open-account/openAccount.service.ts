@@ -5,7 +5,7 @@ import axios from "axios";
 export async function createOpenAccountService(request: CreateOpenAccountReq) {
   try {
     const response = await axiosClientWithAuth.post("/api/v1/public/open-account", request);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;

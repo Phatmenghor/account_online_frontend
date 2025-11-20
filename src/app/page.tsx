@@ -70,6 +70,9 @@ import {
 } from "@/components/acc-online/form-field/form-validate-error";
 import { Label } from "@/components/ui/label";
 import LoadingModal from "@/components/shared/modal/extract-modal";
+import SuccessModal from "@/components/acc-online/successModal";
+import SubmitSuccessModal from "@/components/shared/modal/submit-success-modal";
+import SubmitErrorModal from "@/components/shared/modal/submit-error-modal";
 
 export interface Image {
   idImage: string;
@@ -144,6 +147,19 @@ export default function CheckNIDPage() {
     null
   );
 
+  // Success and Error Modal States
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successData, setSuccessData] = useState({
+    title: "",
+    message: "",
+  });
+
+  const [showSubmitErrorModal, setShowSubmitErrorModal] = useState(false);
+  const [submitErrorData, setSubmitErrorData] = useState({
+    title: "",
+    message: "",
+  });
+
   // Location data state - Store complete objects
   const [locationData, setLocationData] = useState<LocationSubmitData>({
     currentAddress: {
@@ -198,6 +214,7 @@ export default function CheckNIDPage() {
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [resetOtp, setResetOtp] = useState(false);
+  const [datePickerKey, setDatePickerKey] = useState(0);
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState<
@@ -335,7 +352,6 @@ export default function CheckNIDPage() {
       staffCode: staffCode,
       phoneNumber: phoneNumber,
       isPhoneVerified: isPhoneVerified,
-      // isVerified: isVerified,
     };
 
     const result = NIDFormSchema.safeParse(fullData);
@@ -373,13 +389,11 @@ export default function CheckNIDPage() {
           translate("extracting") || "Extracting information from ID card...",
       });
 
-      // setIsLoading(true);
       try {
         const base64WithPrefix = await convertToBase64(file);
         const base64ForService = base64WithPrefix.split(",")[1];
 
         const imageRequestData: RequestIdImage = {
-          applicationName: "DEVELOPMENT",
           idImage: base64ForService,
         };
 
@@ -398,7 +412,6 @@ export default function CheckNIDPage() {
         toast.error("Image processing error", {
           description: "Failed to process the image. Please try again.",
         });
-        // setIsLoading(false);
       } finally {
         setLoadingState({
           isLoading: false,
@@ -538,14 +551,11 @@ export default function CheckNIDPage() {
       );
 
       if (hasCriticalErrors) {
-        // setIsVerified(false);
         setShowErrorModal(true);
       } else {
-        // setIsVerified(true);
         setShowLocationModal(true);
       }
     } catch (error: any) {
-      // setIsVerified(false);
       setValidationErrorData({
         title: translate("valid_fail"),
         message: error.apiMessage || "Failed to validate NID information.",
@@ -557,14 +567,6 @@ export default function CheckNIDPage() {
     }
   };
 
-  // const handleOpenConfirmModal = () => {
-  //   setShowConfirmationModal(true);
-  // };
-
-  // const handleConfirmValidation = async () => {
-  //   setShowConfirmationModal(false);
-  //   await handleValidateNID();
-  // };
   const handleOpenConfirmModal = () => {
     // Validate both forms simultaneously
     const isVerificationValid = validateVerificationForm();
@@ -655,7 +657,6 @@ export default function CheckNIDPage() {
 
   // Handle Submit Account Opening
   const handleSubmitAccount = async () => {
-    // setIsSubmitting(true);
     setLoadingState({
       isLoading: true,
       title: translate("submitting") || "Submitting",
@@ -678,10 +679,9 @@ export default function CheckNIDPage() {
         referralId: staffCode || "",
         branchCode: selectedBranch!.branchID,
         occupation: selectedOccupation?.occupationCode || "",
-        // maritalStatus: selectedMaritalStatus?.nameEn || "",
         maritalStatus: selectedMaritalStatus
           ? getMaritalStatusString(selectedMaritalStatus.id.toString())
-          : "SINGLE", // ← FIXED LINE
+          : "SINGLE",
         customerCurrentProvince:
           locationData.currentAddress.province?.provinceCode || "",
         customerCurrentDistrict:
@@ -719,26 +719,32 @@ export default function CheckNIDPage() {
       const response = await createOpenAccountService(accountData);
 
       console.log("API Response:", response);
-      console.log("##", accountData);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      AppToast({
-        type: "success",
-        message: "Account opened successfully!",
-        description: "Your account has been created.",
+      // Show success modal with response data
+      setSuccessData({
+        title: translate("success_title") || "Account Created Success",
+        message:
+          response?.message || "Your account has been created successfully!",
       });
+      setShowSuccessModal(true);
 
       // Optional: Clear form after successful submission
       // handleClear();
     } catch (error: any) {
       console.error("Account opening error:", error);
-      toast.error("Failed to open account", {
-        description: error.message || "Please try again later.",
+
+      // Extract error message from the service open acc online
+      const errorMessage =
+        error?.errorMessage ||
+        error?.message ||
+        "Failed to create account. Please try again.";
+      // Show error modal
+      setSubmitErrorData({
+        title: translate("error_title") || "Submission Failed",
+        message: errorMessage,
       });
+      setShowSubmitErrorModal(true);
     } finally {
-      // setIsSubmitting(false);
       setLoadingState({
         isLoading: false,
         title: "",
@@ -778,6 +784,7 @@ export default function CheckNIDPage() {
     setSelectedOccupation(null);
     setSelectedReferenceBank(null);
     setSelectedBranch(null);
+    setLegalType("");
     setStaffCode("");
     setPhoneNumber("");
     setValidationErrors({});
@@ -802,6 +809,9 @@ export default function CheckNIDPage() {
       village: "",
     });
 
+    // Force date picker to reset by changing its key
+    setDatePickerKey((prev) => prev + 1);
+
     // Trigger OTP reset
     setResetOtp(true);
     setTimeout(() => setResetOtp(false), 100);
@@ -821,13 +831,18 @@ export default function CheckNIDPage() {
     }
   };
 
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    // Optional: Clear form after closing success modal
+    handleClear();
+  };
+
   const onBranchChange = useCallback(
     (branch: BranchModel) => {
       setSelectedBranch(branch);
       validateField("branch", branch.branchkh);
     },
     [selectedBranch]
-    // []
   );
 
   return (
@@ -848,23 +863,12 @@ export default function CheckNIDPage() {
           <Card className="p-8 mb-6 shadow-lg">
             <div className="mx-auto">
               <div className="mb-8 flex justify-between">
-                <h1 className="text-sm md:text-3xl text-gray-800 mb-2">
+                <h1 className="text-lg md:text-3xl text-gray-800 mb-2">
                   {translate("header_acc")}
                 </h1>
                 <Button onClick={handleClear}>{translate("clear")}</Button>
               </div>
 
-              {/* Loading indicator */}
-              {/* {(isLoading || isValidating) && (
-                <div className="flex justify-center items-center space-x-2 mb-6">
-                  <Loader2 className="animate-spin h-6 w-6 text-blue-600" />
-                  <span className="text-base text-gray-600">
-                    {isLoading && translate("extracting")}
-                    {isValidating && translate("validating")}
-                    {isSubmitting && "Submitting account..."}
-                  </span>
-                </div>
-              )} */}
               {/* Add the Loading Modal when extract */}
               <LoadingModal
                 isOpen={loadingState.isLoading}
@@ -874,7 +878,6 @@ export default function CheckNIDPage() {
 
               {/* ID Card and Selfie Upload Section */}
               <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 lg:gap-14 gap-8">
-                {/* ID Card Section */}
                 <div>
                   <p className="text-base text-gray-600 mb-4 text-center">
                     {translate("img_card")}
@@ -894,7 +897,6 @@ export default function CheckNIDPage() {
                       <input
                         type="file"
                         accept="image/*"
-                        // capture="environment" // ✅ ADD THIS LINE
                         onChange={handleImageUpload}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         id="image-upload"
@@ -917,7 +919,6 @@ export default function CheckNIDPage() {
                   )}
                 </div>
 
-                {/* Selfie Section */}
                 <div>
                   <p className="text-base text-gray-600 mb-4 text-center">
                     {translate("img_selfie")}
@@ -937,7 +938,6 @@ export default function CheckNIDPage() {
                       <input
                         type="file"
                         accept="image/*"
-                        // capture="user" // ✅ ADD THIS LINE (uses front camera for selfie)
                         onChange={handleSelfieUpload}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         id="image-upload-user"
@@ -965,7 +965,7 @@ export default function CheckNIDPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name (KH) */}
                 <div className="space-y-1">
-                  <Label htmlFor="lastNameKh" className="text-sm">
+                  <Label htmlFor="lastNameKh" className="text-sm sm:text-base">
                     {translate("firstNameKh")}
                   </Label>
                   <Input
@@ -975,7 +975,7 @@ export default function CheckNIDPage() {
                     onChange={(e) =>
                       handleInputChange("lastNameKh", e.target.value)
                     }
-                    className={`w-full h-10 ${
+                    className={`w-full h-10 text-sm ${
                       validationErrors.lastNameKh ? "border-red-500" : ""
                     }`}
                     disabled={isLoading || isValidating || isSubmitting}
@@ -989,7 +989,7 @@ export default function CheckNIDPage() {
 
                 {/* Last Name (KH) */}
                 <div className="space-y-1">
-                  <Label htmlFor="firstNameKh" className="text-sm">
+                  <Label htmlFor="firstNameKh" className="text-sm sm:text-base">
                     {translate("lastNameKH")}
                   </Label>
                   <Input
@@ -999,7 +999,7 @@ export default function CheckNIDPage() {
                     onChange={(e) =>
                       handleInputChange("firstNameKh", e.target.value)
                     }
-                    className={`w-full h-10 ${
+                    className={`w-full h-10 text-sm ${
                       validationErrors.firstNameKh ? "border-red-500" : ""
                     }`}
                     disabled={isLoading || isValidating || isSubmitting}
@@ -1013,7 +1013,7 @@ export default function CheckNIDPage() {
 
                 {/* Family Name */}
                 <div className="space-y-1">
-                  <Label htmlFor="lastNameEn" className="text-sm">
+                  <Label htmlFor="lastNameEn" className="text-sm sm:text-base">
                     {translate("familyNameEn")}
                   </Label>
                   <Input
@@ -1023,7 +1023,7 @@ export default function CheckNIDPage() {
                     onChange={(e) =>
                       handleInputChange("lastNameEn", e.target.value)
                     }
-                    className={`w-full h-10 ${
+                    className={`w-full h-10 text-sm ${
                       validationErrors.lastNameEn ? "border-red-500" : ""
                     }`}
                     disabled={isLoading || isValidating || isSubmitting}
@@ -1037,7 +1037,7 @@ export default function CheckNIDPage() {
 
                 {/* Given Name */}
                 <div className="space-y-1">
-                  <Label htmlFor="firstNameEn" className="text-sm">
+                  <Label htmlFor="firstNameEn" className="text-sm sm:text-base">
                     {translate("givenNameEn")}
                   </Label>
                   <Input
@@ -1047,7 +1047,7 @@ export default function CheckNIDPage() {
                     onChange={(e) =>
                       handleInputChange("firstNameEn", e.target.value)
                     }
-                    className={`w-full h-10 ${
+                    className={`w-full h-10 text-sm ${
                       validationErrors.firstNameEn ? "border-red-500" : ""
                     }`}
                     disabled={isLoading || isValidating || isSubmitting}
@@ -1061,7 +1061,7 @@ export default function CheckNIDPage() {
 
                 {/* Date Of Birth */}
                 <div className="space-y-1">
-                  <Label htmlFor="dob" className="text-sm">
+                  <Label htmlFor="dob" className="text-sm sm:text-base">
                     {translate("dateOfBirth")}
                   </Label>
                   <div
@@ -1072,6 +1072,7 @@ export default function CheckNIDPage() {
                     }
                   >
                     <CustomDatePicker
+                      key={datePickerKey}
                       value={formData.dob}
                       onChange={(value) => handleInputChange("dob", value)}
                       disabled={isLoading || isValidating || isSubmitting}
@@ -1087,7 +1088,7 @@ export default function CheckNIDPage() {
 
                 {/* Gender */}
                 <div className="space-y-1">
-                  <Label htmlFor="gender" className="text-sm">
+                  <Label htmlFor="gender" className="text-sm sm:text-base">
                     {translate("gender")}
                   </Label>
                   <Select
@@ -1120,7 +1121,7 @@ export default function CheckNIDPage() {
 
                 {/* Legal Type */}
                 <div className="space-y-1">
-                  <Label htmlFor="legalType" className="text-sm">
+                  <Label htmlFor="legalType" className="text-sm sm:text-base">
                     {translate("legalType")}
                   </Label>
                   <Select
@@ -1155,7 +1156,7 @@ export default function CheckNIDPage() {
 
                 {/* Legal ID */}
                 <div className="space-y-1">
-                  <Label htmlFor="idNumber" className="text-sm">
+                  <Label htmlFor="idNumber" className="text-sm sm:text-base">
                     {translate("legalId")}
                   </Label>
                   <Input
@@ -1165,7 +1166,7 @@ export default function CheckNIDPage() {
                     onChange={(e) =>
                       handleInputChange("idNumber", e.target.value)
                     }
-                    className={`w-full h-10 ${
+                    className={`w-full h-10 text-sm ${
                       validationErrors.idNumber ? "border-red-500" : ""
                     }`}
                     disabled={isLoading || isValidating || isSubmitting}
@@ -1179,7 +1180,7 @@ export default function CheckNIDPage() {
 
                 {/* Address */}
                 <div className="space-y-1">
-                  <Label htmlFor="address" className="text-sm">
+                  <Label htmlFor="address" className="text-sm sm:text-base">
                     {translate("address")}
                   </Label>
                   <Input
@@ -1189,7 +1190,7 @@ export default function CheckNIDPage() {
                     onChange={(e) =>
                       handleInputChange("address", e.target.value)
                     }
-                    className={`w-full h-10 ${
+                    className={`w-full h-10 text-sm ${
                       validationErrors.address ? "border-red-500" : ""
                     }`}
                     disabled={isLoading || isValidating || isSubmitting}
@@ -1203,7 +1204,7 @@ export default function CheckNIDPage() {
 
                 {/* Place Of Birth */}
                 <div className="space-y-1">
-                  <Label htmlFor="pob" className="text-sm">
+                  <Label htmlFor="pob" className="text-sm sm:text-base">
                     {translate("pob")}
                   </Label>
                   <Input
@@ -1211,7 +1212,7 @@ export default function CheckNIDPage() {
                     placeholder={translate("pob")}
                     value={formData.pob}
                     onChange={(e) => handleInputChange("pob", e.target.value)}
-                    className={`w-full h-10 ${
+                    className={`w-full h-10 text-sm ${
                       validationErrors.pob ? "border-red-500" : ""
                     }`}
                     disabled={isLoading || isValidating || isSubmitting}
@@ -1225,7 +1226,10 @@ export default function CheckNIDPage() {
 
                 {/* Marital Status */}
                 <div className="md:col-span-2 space-y-1">
-                  <Label htmlFor="maritalStatus" className="text-sm">
+                  <Label
+                    htmlFor="maritalStatus"
+                    className="text-sm sm:text-base"
+                  >
                     {translate("marital")}
                   </Label>
                   <Select
@@ -1240,7 +1244,7 @@ export default function CheckNIDPage() {
                     disabled={isLoading || isValidating || isLoadingMaritals}
                   >
                     <SelectTrigger
-                      className={`w-full h-10 ${
+                      className={`w-full h-10 text-sm ${
                         validationErrors.maritalStatus ? "border-red-500" : ""
                       }`}
                     >
@@ -1272,7 +1276,7 @@ export default function CheckNIDPage() {
 
                 {/* Occupation */}
                 <div className="space-y-1">
-                  <Label htmlFor="occupation" className="text-sm">
+                  <Label htmlFor="occupation" className="text-sm sm:text-base">
                     {translate("occupation")}
                   </Label>
                   <Select
@@ -1287,7 +1291,7 @@ export default function CheckNIDPage() {
                     disabled={isLoading || isValidating || isLoadingOccupations}
                   >
                     <SelectTrigger
-                      className={`w-full h-10 ${
+                      className={`w-full h-10 text-sm ${
                         validationErrors.occupation ? "border-red-500" : ""
                       }`}
                     >
@@ -1319,7 +1323,7 @@ export default function CheckNIDPage() {
 
                 {/* Branch */}
                 <div className="space-y-1">
-                  <Label htmlFor="branch" className="text-sm">
+                  <Label htmlFor="branch" className="text-sm sm:text-base">
                     {translate("branch")}
                   </Label>
                   <div
@@ -1344,7 +1348,7 @@ export default function CheckNIDPage() {
 
                 {/* Reference */}
                 <div className="md:col-span-2 space-y-1">
-                  <Label htmlFor="reference" className="text-sm">
+                  <Label htmlFor="reference" className="text-sm sm:text-base">
                     {translate("reference")}
                   </Label>
                   <div className="flex">
@@ -1392,7 +1396,7 @@ export default function CheckNIDPage() {
                         setStaffCode(e.target.value);
                         validateField("staffCode", e.target.value);
                       }}
-                      className="flex-1 h-10 !rounded-l-none"
+                      className="flex-1 h-10 !rounded-l-none text-sm"
                       disabled={isLoading || isValidating || isSubmitting}
                     />
                   </div>
@@ -1494,6 +1498,22 @@ export default function CheckNIDPage() {
         title={validationErrorData.title}
         message={validationErrorData.message}
         description={validationErrorData.description}
+      />
+
+      {/* Success Modal - NEW */}
+      <SubmitSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        title={successData.title}
+        message={successData.message}
+      />
+
+      {/* Submit Error Modal - NEW */}
+      <SubmitErrorModal
+        isOpen={showSubmitErrorModal}
+        onClose={() => setShowSubmitErrorModal(false)}
+        title={submitErrorData.title}
+        message={submitErrorData.message}
       />
     </div>
   );

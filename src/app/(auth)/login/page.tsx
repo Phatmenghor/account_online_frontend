@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginService } from "@/services/auth/login.service";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { Form } from "@/components/ui/form";
 import {
   FormControl,
@@ -17,13 +18,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { AppToast } from "@/components/shared/toast/app-toast";
 import { useTranslations } from "next-intl";
 
 const formSchema = z.object({
-  username: z.string({ message: "Please enter a valid email address" }),
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(8, {
     message: "Password must be at least 8 characters",
   }),
@@ -79,101 +81,138 @@ export default function LoginPage() {
     }
   }
 
-  return (
-    <main className="flex items-center justify-center bg-background">
-      <section className="mx-auto flex w-full flex-col justify-center space-y-4 sm:w-[400px]">
-        <article className="relative group">
-          {/* Gradient border animation */}
-          <span
-            aria-hidden
-            className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-gray-500 to-gray-600 opacity-70 blur transition duration-1000 group-hover:opacity-100 group-hover:duration-200 animate-gradient-x"
-          />
-          {/* Login card */}
-          <section className="relative rounded-xl border bg-card p-8 shadow-xl">
-            <header className="space-y-2 text-center">
-              <h1 className="text-2xl font-bold tracking-tight">
-                {t("loginTitle")}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {t("loginSubtitle")}
-              </p>
-            </header>
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      form.handleSubmit(onSubmit)();
+    }
+  };
 
+  return (
+    <div className="flex h-screen w-full">
+      {/* Left side with full background image */}
+      <div className="hidden flex-1 relative md:block">
+        <Image
+          src="/assets/cpbank.png"
+          alt="CPBank Background"
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* Overlay */}
+        {/* <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+          <div className="text-center text-white px-8">
+            <h2 className="text-4xl font-bold mb-4">
+              {t("welcomeTitle") || "Welcome to CPBank"}
+            </h2>
+            <p className="text-xl opacity-90">
+              {t("welcomeSubtitle") || "Admin Dashboard System"}
+            </p>
+          </div>
+        </div> */}
+      </div>
+
+      {/* Right side with login form */}
+      <div className="flex flex-1 items-center justify-center bg-gray-50 p-4">
+        <Card className="w-full max-w-md border border-gray-200 p-8 shadow-lg">
+          <CardHeader className="space-y-1 p-0 pb-6">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {t("loginWelcome") || "Welcome,"}
+            </h1>
+            <p className="text-gray-500">
+              {t("loginSubtitle") || "Please login to continue"}
+            </p>
+          </CardHeader>
+          <CardContent className="p-0">
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
-                {isLoading ?? (
-                  <div className="flex justify-center items-center space-x-2">
-                    <Loader2 className="animate-spin h-6 w-6 text-black" />
-                    <span className="text-sm text-gray-500">Loading...</span>
-                  </div>
-                )}
+              <div className="space-y-5">
+                {/* Username Field */}
                 <FormField
                   control={form.control}
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        {t("username") || "Username"}
+                        <span className="text-red-500 ml-1">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="name@example.com"
-                          disabled={form.formState.isSubmitting}
-                          autoComplete="off"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder={
+                              t("usernamePlaceholder") || "Enter your username"
+                            }
+                            disabled={isLoading}
+                            className="pl-10 h-11 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            onKeyDown={handleKeyPress}
+                          />
+                        </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-sm text-red-500" />
                     </FormItem>
                   )}
                 />
+
+                {/* Password Field */}
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        {t("password") || "Password"}
+                        <span className="text-red-500 ml-1">*</span>
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                           <Input
-                            type={showPassword ? "text" : "password"}
-                            disabled={form.formState.isSubmitting}
-                            placeholder="••••••••"
-                            autoComplete="new-password"
                             {...field}
+                            type={showPassword ? "text" : "password"}
+                            placeholder={
+                              t("passwordPlaceholder") || "Enter your password"
+                            }
+                            disabled={isLoading}
+                            className="pl-10 pr-10 h-11 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            onKeyDown={handleKeyPress}
                           />
-                          <Button
+                          <button
                             type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute hover:bg-transparent right-0 top-0 h-full px-3"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                             onClick={() => setShowPassword(!showPassword)}
+                            disabled={isLoading}
                           >
                             {showPassword ? (
-                              <EyeOff className="h-4 w-4 text-muted-foreground" />
+                              <EyeOff className="h-5 w-5" />
                             ) : (
-                              <Eye className="h-4 w-4 text-muted-foreground" />
+                              <Eye className="h-5 w-5" />
                             )}
-                          </Button>
+                          </button>
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-sm text-red-500" />
                     </FormItem>
                   )}
                 />
+
+                {/* Submit Button */}
                 <Button
-                  type="submit"
-                  className="w-full shadow-md active:scale-95 font-semibold transition-all duration-300 hover:shadow-lg focus:outline-none"
+                  type="button"
+                  onClick={form.handleSubmit(onSubmit)}
+                  className="w-full h-11 bg-primary hover:bg-primary/90 transition-colors mt-6"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Signing in..." : "Sign in"}
+                  {isLoading
+                    ? t("loggingIn") || "Signing in..."
+                    : t("loginButton") || "Login"}
                 </Button>
-              </form>
+              </div>
             </Form>
-          </section>
-        </article>
-      </section>
-    </main>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
