@@ -9,26 +9,31 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
-import { AmlStatusEnum } from "@/constants/AppResource/filter/status";
-import { AllManagementModel, ManagementModel } from "@/models/aml/management/respone/management-response";
+import {
+  AllAmlManagementModel,
+  AmlManagementModel,
+} from "@/models/aml/management/response/aml-management.response";
+import RiskBadge from "../badge/risk-level-badge";
+import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
+import AmlStatusBadge from "../badge/aml-badge";
 
 interface ManagementTableHandlers {
-  handleViewManagementDetail: (management: ManagementModel) => void;
+  handleViewManagementDetail: (management: AmlManagementModel) => void;
   openConfirmAmlDialog: (
-    management: ManagementModel,
+    management: AmlManagementModel,
     status: AmlStatusEnum
   ) => void;
 }
 
 interface ManagementTableOptions {
-  data: AllManagementModel | null;
+  data: AllAmlManagementModel | null;
   handlers: ManagementTableHandlers;
 }
 
 export const createManagementTableColumns = ({
   data,
   handlers,
-}: ManagementTableOptions): TableColumn<ManagementModel>[] => {
+}: ManagementTableOptions): TableColumn<AmlManagementModel>[] => {
   const { handleViewManagementDetail, openConfirmAmlDialog } = handlers;
 
   const tCommon = useTranslations("common");
@@ -40,26 +45,81 @@ export const createManagementTableColumns = ({
       label: "#",
       maxWidth: "60px",
       minWidth: "60px",
-      render: (_, index) => <span className="font-medium"></span>,
+      render: (_, index) => <span className="font-medium">{index + 1}</span>,
     },
+
+    // Legal ID
     {
-      key: "idNumber",
-      label: "Id Number",
+      key: "legalId",
+      label: "ID Number",
       truncate: true,
-      maxWidth: "300px",
+      maxWidth: "200px",
       minWidth: "150px",
-      render: (management) => <span className="font-medium"></span>,
+      render: (m) => (
+        <span className="font-medium">{m.customerInfo?.legalId || "---"}</span>
+      ),
     },
+
+    // Customer Name
+    {
+      key: "customerName",
+      label: "Customer Name",
+      truncate: true,
+      maxWidth: "240px",
+      minWidth: "180px",
+      render: (m) => (
+        <span className="font-medium">
+          {m.customerInfo?.givenName} {m.customerInfo?.familyName}
+        </span>
+      ),
+    },
+
+    // Risk Level
+    {
+      key: "riskLevel",
+      label: "Risk Level",
+      truncate: true,
+      maxWidth: "120px",
+      minWidth: "120px",
+      render: (m) => <RiskBadge riskLevel={m.riskLevel} />,
+    },
+
+    // Total Score
+    {
+      key: "totalRulesScore",
+      label: "Score",
+      maxWidth: "100px",
+      minWidth: "80px",
+      render: (m) => (
+        <span className="font-medium">{m.totalRulesScore ?? "---"}</span>
+      ),
+    },
+
+    // Created Date
+    {
+      key: "createdAt",
+      label: "Created At",
+      truncate: true,
+      maxWidth: "160px",
+      minWidth: "150px",
+      render: (m) => (
+        <span className="font-medium">
+          {new Date(m.createdAt).toLocaleString()}
+        </span>
+      ),
+    },
+
+    // Status
     {
       key: "status",
       label: "Status",
       truncate: true,
-      maxWidth: "300px",
-      minWidth: "150px",
-      render: (management) => (
-        <span className="font-medium">{management.status || "---"}</span>
-      ),
+      maxWidth: "120px",
+      minWidth: "120px",
+      render: (m) => <AmlStatusBadge status={m.status} />,
     },
+
+    // Actions
     {
       key: "actions",
       label: tMaster("actions"),
@@ -93,7 +153,7 @@ export const createManagementTableColumns = ({
                   onClick={() =>
                     openConfirmAmlDialog(management, AmlStatusEnum.APPROVE)
                   }
-                  className="border-white-500 text-orange-500 hover:bg-orange-50"
+                  className="border-orange-500 text-orange-600 hover:bg-orange-50"
                 >
                   <CheckCircle className="h-4 w-4" />
                 </Button>
@@ -112,7 +172,7 @@ export const createManagementTableColumns = ({
                   onClick={() =>
                     openConfirmAmlDialog(management, AmlStatusEnum.REJECT)
                   }
-                  className="border-red-500 text-red-500 hover:bg-red-50"
+                  className="border-red-500 text-red-600 hover:bg-red-50"
                 >
                   <XCircle className="h-4 w-4" />
                 </Button>

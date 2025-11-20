@@ -1,7 +1,7 @@
 "use client";
 
-import { AmlStatusEnum } from "@/constants/AppResource/filter/status";
-import { CheckCircle, XCircle, Clock, Info } from "lucide-react";
+import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
+import { CheckCircle, XCircle, Clock, Loader2 } from "lucide-react";
 import React from "react";
 
 interface AmlConfirmDialogProps {
@@ -11,6 +11,7 @@ interface AmlConfirmDialogProps {
   onConfirm: () => Promise<void> | void;
   title?: string;
   description?: string;
+  isLoading: boolean;
   amlDetails?: {
     id: string;
     name: string;
@@ -38,6 +39,7 @@ const AmlConfirmDialog = ({
   status,
   onConfirm,
   title,
+  isLoading,
   description,
   amlDetails,
 }: AmlConfirmDialogProps) => {
@@ -65,7 +67,6 @@ const AmlConfirmDialog = ({
           defaultDescription:
             "You are about to reject this AML record. This action cannot be undone.",
         };
-      case AmlStatusEnum.PENDING:
       default:
         return {
           variant: "warning",
@@ -108,7 +109,6 @@ const AmlConfirmDialog = ({
             Rejected
           </span>
         );
-      case AmlStatusEnum.PENDING:
       default:
         return (
           <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -120,7 +120,7 @@ const AmlConfirmDialog = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6">
+      <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
@@ -137,7 +137,7 @@ const AmlConfirmDialog = ({
           {description || dialogProps.defaultDescription}
         </p>
 
-        {/* AML Details Section */}
+        {/* Details */}
         {amlDetails && (
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-6 space-y-2">
             <DetailRow label="AML ID" value={amlDetails.id} />
@@ -153,20 +153,36 @@ const AmlConfirmDialog = ({
           </div>
         )}
 
-        {/* Action Buttons */}
+        {/* Buttons */}
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors"
+            disabled={isLoading}
+            className={`px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors ${
+              isLoading && "opacity-50 cursor-not-allowed"
+            }`}
           >
             Cancel
           </button>
+
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${getButtonColor()} transition-colors`}
+            disabled={isLoading}
+            className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 ${getButtonColor()} transition-colors ${
+              isLoading && "opacity-70 cursor-not-allowed"
+            }`}
           >
-            {dialogProps.confirmButtonIcon}
-            {dialogProps.confirmLabel}
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                {dialogProps.confirmButtonIcon}
+                {dialogProps.confirmLabel}
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -174,7 +190,6 @@ const AmlConfirmDialog = ({
   );
 };
 
-// Helper component for detail rows
 const DetailRow = ({
   label,
   value,

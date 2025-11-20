@@ -1,36 +1,32 @@
 #!/bin/bash
 
+# Load environment variables from .env file
+if [ -f .env.production ]; then
+  export $(grep -v '^#' .env.production | xargs)
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Function to print colored output
-print_status() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
+print_status() { echo -e "${GREEN}[INFO]${NC} $1"; }
+print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
+print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 # Exit on any error
 set -e
 
-print_status "Starting deployment process for Internal Dev frontend on port 2333..."
+print_status "Starting deployment process for $APP_NAME on port $PORT..."
 
-# Pull latest code from development branch
-print_status "Pulling latest code from development branch..."
-git pull origin development
+# Pull latest code
+print_status "Pulling latest code from $GIT_BRANCH branch..."
+git pull origin "$GIT_BRANCH"
 
-# Install dependencies with force flag
+# Install dependencies
 print_status "Installing dependencies..."
-npm i next --force
+npm install --force
 
 # Build the application
 print_status "Building application..."
@@ -42,28 +38,28 @@ mkdir -p logs
 
 # Stop existing PM2 process
 print_status "Stopping existing PM2 process..."
-pm2 stop ksit 2>/dev/null || true
+pm2 stop "$APP_NAME" 2>/dev/null || true
 
 # Delete existing PM2 process
 print_status "Deleting existing PM2 process..."
-pm2 delete ksit 2>/dev/null || true
+pm2 delete "$APP_NAME" 2>/dev/null || true
 
-# Create PM2 configuration file with port 8443
-print_status "Creating PM2 configuration for port 8443..."
-cat > pm2.config.js << 'EOF'
+# Create PM2 config dynamically
+print_status "Creating PM2 configuration..."
+cat > pm2.config.js <<EOF
 module.exports = {
   apps: [
     {
-      name: 'internal_dev_frontend',
+      name: '$APP_NAME',
       script: 'npm',
       args: 'start',
       instances: 1,
       exec_mode: 'fork',
       watch: false,
       env: {
-        NODE_ENV: 'production',
-        PORT: '3015',
-        EXTERNAL_PORT: '9999'
+        NODE_ENV: '$NODE_ENV',
+        PORT: '$PORT',
+        EXTERNAL_PORT: '$EXTERNAL_PORT'
       },
       env_file: '.env.production',
       log_file: './logs/app.log',
@@ -84,14 +80,14 @@ module.exports = {
 EOF
 
 # Start PM2 process
-print_status "Starting PM2 process on port 2333..."
+print_status "Starting PM2 process..."
 pm2 start pm2.config.js
 
 # Save PM2 configuration
 print_status "Saving PM2 configuration..."
 pm2 save
 
-print_status "🎉 Deployment completed! App running on http://192.168.103.106:2333"
+print_status "🎉 Deployment completed! App running on port $PORT (External port: $EXTERNAL_PORT)"
 
 # Show PM2 status
 print_status "Current PM2 status:"

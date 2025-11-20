@@ -176,7 +176,7 @@ export function CustomDatePicker({
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal h-10 px-3 text-sm",
+            "w-full justify-start text-left font-normal h-9 px-3 text-sm relative",
             !selectedDate && "text-muted-foreground",
             error && "border-red-500 focus:border-red-500",
             !error && "focus:border-green-500",
@@ -185,8 +185,8 @@ export function CustomDatePicker({
           )}
           disabled={disabled}
         >
-          <Calendar className="mr-2 h-4 w-4" />
-          <span className="flex-1">
+          <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4" />
+          <span className="flex-1 ml-6">
             {selectedDate ? formatDate(selectedDate) : placeholder}
           </span>
           {selectedDate && !disabled && (
@@ -194,14 +194,15 @@ export function CustomDatePicker({
               type="button"
               variant="ghost"
               size="sm"
-              className="ml-1 h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
               onClick={clearSelection}
+              className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
             >
               <X className="h-3 w-3" />
             </Button>
           )}
         </Button>
       </PopoverTrigger>
+
       <PopoverContent className="w-72 p-0" align="start">
         {/* Header */}
         <div className="flex items-center justify-between p-3 border-b bg-muted/30">
@@ -236,7 +237,7 @@ export function CustomDatePicker({
                 value={viewDate.getFullYear().toString()}
                 onValueChange={handleYearChange}
               >
-                <SelectTrigger className="h-8 text-sm w-auto min-w-[65px] border-0 bg-transparent hover:bg-accent">
+                <SelectTrigger className="h-8 text-sm w-auto min-w-[80px] border-0 bg-transparent hover:bg-accent">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -273,9 +274,9 @@ export function CustomDatePicker({
         <div className="p-3">
           {/* Days header */}
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {DAYS.map((day) => (
+            {DAYS.map((day, index) => (
               <div
-                key={day}
+                key={`${day}-${index}`}
                 className="h-8 w-8 flex items-center justify-center text-xs font-medium text-muted-foreground"
               >
                 {day}
