@@ -53,7 +53,7 @@ export const createUserTableColumns = ({
     },
     {
       key: "avatar",
-      label: tUser("profile"),
+      label: "Profile",
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
@@ -68,7 +68,7 @@ export const createUserTableColumns = ({
     },
     {
       key: "idCard",
-      label: tUser("idCard"),
+      label: "Username",
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
@@ -78,7 +78,7 @@ export const createUserTableColumns = ({
     },
     {
       key: "fullName",
-      label: tUser("fullName"),
+      label: "Full Name",
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
@@ -88,7 +88,7 @@ export const createUserTableColumns = ({
     },
     {
       key: "email",
-      label: tUser("email"),
+      label: "Email",
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
@@ -102,7 +102,7 @@ export const createUserTableColumns = ({
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
-      label: tUser("userRole"),
+      label: "Role",
       render: (user) => <RoleBadge role={user.userRole} />,
     },
     {
@@ -110,7 +110,7 @@ export const createUserTableColumns = ({
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
-      label: tUser("createdAt"),
+      label: "Created At",
       render: (user) => (
         <span className="text-muted-foreground">
           {DateTimeFormat(user.createdAt)}
@@ -119,7 +119,7 @@ export const createUserTableColumns = ({
     },
     {
       key: "actions",
-      label: tUser("actions"),
+      label: "Actions",
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
