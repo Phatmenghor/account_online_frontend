@@ -83,7 +83,7 @@ export default function ReferenceViewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl h-[90vh] p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-2xl p-0 gap-0 flex flex-col">
         {/* Header */}
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4 pr-8">
@@ -92,7 +92,7 @@ export default function ReferenceViewModal({
             </div>
             <div className="flex-1">
               <DialogTitle className="text-xl font-semibold">
-                Bank Details
+                Reference Bank Details
               </DialogTitle>
               <DialogDescription className="text-base text-muted-foreground">
                 {reference?.nameEn
@@ -136,7 +136,6 @@ export default function ReferenceViewModal({
                         Name (English):
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        <BookType className="h-4 w-4" />
                         {reference?.nameEn || "N/A"}
                       </span>
                     </div>
@@ -146,7 +145,6 @@ export default function ReferenceViewModal({
                         Name (Khmer):
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        <BookType className="h-4 w-4" />
                         {reference?.nameKh || "N/A"}
                       </span>
                     </div>
@@ -168,33 +166,10 @@ export default function ReferenceViewModal({
                         Status:
                       </Label>
                       <div className="flex items-center gap-2">
-                        <Tag className="h-4 w-4" />
                         <span className="text-sm">
                           {reference?.status || "ACTIVE"}
                         </span>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* System Information */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
-                    <h3 className="text-lg font-semibold">
-                      System Information
-                    </h3>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <Label className="text-sm font-medium text-muted-foreground">
-                        Bank ID:
-                      </Label>
-                      <span className="text-sm flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        {reference?.id || "N/A"}
-                      </span>
                     </div>
                   </div>
                 </div>

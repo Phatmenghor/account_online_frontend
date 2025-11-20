@@ -45,7 +45,6 @@ export const createMaritalTableColumns = ({
   };
 
   const tCommon = useTranslations("common");
-  const tMaster = useTranslations("master");
 
   return [
     {
@@ -61,7 +60,7 @@ export const createMaritalTableColumns = ({
     },
     {
       key: "nameEn",
-      label: tMaster("nameEn"),
+      label: "Name (English)",
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
@@ -71,7 +70,7 @@ export const createMaritalTableColumns = ({
     },
     {
       key: "nameKh",
-      label: tMaster("nameKh"),
+      label: "Name (Khmer)",
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
@@ -81,7 +80,7 @@ export const createMaritalTableColumns = ({
     },
     {
       key: "status",
-      label: tMaster("status"),
+      label: "Status",
       truncate: true,
       maxWidth: "150px",
       minWidth: "100px",
@@ -94,7 +93,7 @@ export const createMaritalTableColumns = ({
     },
     {
       key: "actions",
-      label: tMaster("actions"),
+      label: "Actions",
       maxWidth: "180px",
       minWidth: "160px",
       render: (marital) => (
