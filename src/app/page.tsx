@@ -170,6 +170,7 @@ export default function CheckNIDPage() {
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [resetOtp, setResetOtp] = useState(false);
+  const [datePickerKey, setDatePickerKey] = useState(0);
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -717,6 +718,7 @@ export default function CheckNIDPage() {
     setSelectedOccupation(null);
     setSelectedReferenceBank(null);
     setSelectedBranch(null);
+    setLegalType(""); 
     setStaffCode("");
     setPhoneNumber("");
     setValidationErrors({});
@@ -740,6 +742,9 @@ export default function CheckNIDPage() {
       commune: "",
       village: "",
     });
+
+    // Force date picker to reset by changing its key
+    setDatePickerKey(prev => prev + 1);
 
     // Trigger OTP reset
     setResetOtp(true);
@@ -953,6 +958,7 @@ export default function CheckNIDPage() {
                   </Label>
                   <div className={validationErrors.dob ? 'border border-red-500 rounded' : ''}>
                     <CustomDatePicker
+                      key={datePickerKey}
                       value={formData.dob}
                       onChange={(value) => handleInputChange("dob", value)}
                       disabled={isLoading || isValidating || isSubmitting}

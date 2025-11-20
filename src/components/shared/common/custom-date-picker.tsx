@@ -62,6 +62,10 @@ export function CustomDatePicker({
       if (!isNaN(date.getTime())) {
         setSelectedDate(date);
         setViewDate(date);
+      } else {
+        // Clear the selected date when value is empty
+        setSelectedDate(null);
+        setViewDate(new Date());
       }
     }
   }, [value]);
