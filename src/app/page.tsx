@@ -879,7 +879,6 @@ export default function CheckNIDPage() {
 
               {/* ID Card and Selfie Upload Section */}
               <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 lg:gap-14 gap-8">
-                {/* ID Card Section */}
                 <div>
                   <p className="text-base text-gray-600 mb-4 text-center">
                     {translate("img_card")}
@@ -899,7 +898,6 @@ export default function CheckNIDPage() {
                       <input
                         type="file"
                         accept="image/*"
-                        // capture="environment" // ✅ ADD THIS LINE
                         onChange={handleImageUpload}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         id="image-upload"
@@ -922,7 +920,6 @@ export default function CheckNIDPage() {
                   )}
                 </div>
 
-                {/* Selfie Section */}
                 <div>
                   <p className="text-base text-gray-600 mb-4 text-center">
                     {translate("img_selfie")}
@@ -942,7 +939,6 @@ export default function CheckNIDPage() {
                       <input
                         type="file"
                         accept="image/*"
-                        // capture="user" // ✅ ADD THIS LINE (uses front camera for selfie)
                         onChange={handleSelfieUpload}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         id="image-upload-user"
