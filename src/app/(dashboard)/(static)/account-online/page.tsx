@@ -68,6 +68,32 @@ function AccountPageContent() {
         setAccount(null)
         fetchingAccount();
     }
+    const downloadImage = async (fileName: string) => {
+        if (!fileName) return alert("No image to download");
+
+        try {
+            // Fetch the image as blob
+            const response = await fetch(`http://192.168.103.106:9393/api/images/${fileName}`);
+            if (!response.ok) throw new Error("Failed to fetch image");
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            // Create temporary link and click it
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = fileName; // Use file name dynamically
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            window.URL.revokeObjectURL(url); // Clean up memory
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+
 
     return (
         <Card className="h-full flex flex-col">
@@ -81,7 +107,7 @@ function AccountPageContent() {
                                     aria-label="search-reference"
                                     autoComplete="search-reference"
                                     type="search"
-                                    placeholder={t("master.cif")}
+                                    placeholder={"Enter your CIF ..."}
                                     value={searchCif}
                                     onChange={handleSearchCifChange}
                                     className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"
@@ -94,7 +120,7 @@ function AccountPageContent() {
                                     aria-label="search-reference"
                                     autoComplete="search-reference"
                                     type="search"
-                                    placeholder={t("master.legalId")}
+                                    placeholder={"Enter your Legal Id ..."}
                                     value={searchLegalId}
                                     onChange={handleSearchLegalIdChange}
                                     className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"
@@ -103,7 +129,7 @@ function AccountPageContent() {
                             </div>
                         </div>
                         <div>
-                            <Button onClick={() => handleSearch()}>{t("common.searchBtn")}</Button>
+                            <Button onClick={() => handleSearch()}>{"Search"}</Button>
                         </div>
                     </div>
                     <div className="w-full p-4">
@@ -125,12 +151,14 @@ function AccountPageContent() {
 
                                 <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden group cursor-pointer">
                                     <a
-                                        href={
-                                            account?.data?.nidImage
-                                                ? `http://192.168.103.106:9393/api/images/${account.data.nidImage}`
-                                                : "/app/image_selfie.jpg?height=192&width=320"
-                                        }
-                                        download="card_image.jpg"
+                                        href="#"
+                                        className="w-full h-full object-cover"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (account?.data?.nidImage) downloadImage(account.data.nidImage);
+
+                                        }}
+
 
 
                                     >
@@ -147,7 +175,7 @@ function AccountPageContent() {
                                         {/* Hover Text */}
                                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center 
                         opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <p className="text-white text-lg font-semibold">Download Image</p>
+                                            <p className="text-white text-lg font-semibold" >Download Image</p>
                                         </div>
                                     </a>
                                 </div>
@@ -166,10 +194,10 @@ function AccountPageContent() {
                                 <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
 
                                 <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden group cursor-pointer">
-                                    <a href={account?.data?.selfieImage
-                                        ? `http://192.168.103.106:9393/api/images/${account.data.selfieImage}`
-                                        : "/app/image_selfie.jpg?height=192&width=320"}
-                                        download="selfie_image.jpg"
+                                    <a
+                                        href="#"
+                                        onClick={() => downloadImage(account?.data?.selfieImage ?? "/app/image_selfie.jpg?height=192&width=320")}
+
                                     >
                                         <img
                                             src={
@@ -195,8 +223,8 @@ function AccountPageContent() {
 
                         {/* First Name (KH) */}
                         <FormInputField
-                            label={translate("firstNameKh")}
-                            placeholder={translate("firstNameKh")}
+                            label={"First Name (KH)"}
+                            placeholder={"First Name (KH)"}
                             value={account?.data?.legalFirstNameKh ?? ""}
                             onChange={(value) => null}
                             disabled={true}
@@ -205,10 +233,10 @@ function AccountPageContent() {
                         {/* Last Name (KH)*/}
                         <div>
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("lastNameKH")}
+                                {"Last Name (KH)"}
                             </label>
                             <Input
-                                placeholder={translate("lastNameKH")}
+                                placeholder="Last Name (KH)"
                                 value={account?.data?.legalLastNameKh || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -219,10 +247,10 @@ function AccountPageContent() {
                         {/* Family Name */}
                         <div>
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("familyNameEn")}
+                                Family Name
                             </label>
                             <Input
-                                placeholder={translate("familyNameEn")}
+                                placeholder="Family Name"
                                 value={account?.data?.legalLastNameEn || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -233,10 +261,10 @@ function AccountPageContent() {
                         {/* Given Name */}
                         <div>
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("givenNameEn")}
+                                Given Name
                             </label>
                             <Input
-                                placeholder={translate("givenNameEn")}
+                                placeholder="Given Name"
                                 value={account?.data?.legalFirstNameEn || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -246,10 +274,10 @@ function AccountPageContent() {
                         {/* Marital Status */}
                         <div >
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("marital")}
+                                Marital Status
                             </label>
                             <Input
-                                placeholder={translate("marital")}
+                                placeholder="Marital Status"
                                 value={account?.data?.maritalStatus || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -259,10 +287,10 @@ function AccountPageContent() {
                         {/* Gender*/}
                         <div >
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("gender")}
+                                Gender
                             </label>
                             <Input
-                                placeholder={translate("gender")}
+                                placeholder="Gender"
                                 value={account?.data?.legalGender || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -272,10 +300,10 @@ function AccountPageContent() {
                         {/* occupation*/}
                         <div >
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("occupation")}
+                                Occupation
                             </label>
                             <Input
-                                placeholder={translate("occupation")}
+                                placeholder="Occupation"
                                 value={account?.data?.occupation || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -285,10 +313,10 @@ function AccountPageContent() {
                         {/* DOB*/}
                         <div >
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("dateOfBirth")}
+                                Date Of Birth
                             </label>
                             <Input
-                                placeholder={translate("dateOfBirth")}
+                                placeholder="Date Of Birth"
                                 value={account?.data?.legalDateOfBirth || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -298,10 +326,10 @@ function AccountPageContent() {
                         {/* Nationality*/}
                         <div >
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("nationality")}
+                                Nationality
                             </label>
                             <Input
-                                placeholder={translate("nationality")}
+                                placeholder="Nationality"
                                 value={account?.data?.nationality || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -311,10 +339,10 @@ function AccountPageContent() {
                         {/* Phone Number*/}
                         <div >
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("phoneNumber")}
+                                Phone Number
                             </label>
                             <Input
-                                placeholder={translate("phoneNumber")}
+                                placeholder="Phone Number"
                                 value={account?.data?.phoneNumber || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -324,10 +352,10 @@ function AccountPageContent() {
                         {/* CIF*/}
                         <div>
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("cifNumber")}
+                                CIF
                             </label>
                             <Input
-                                placeholder={translate("cifNumber")}
+                                placeholder="CIF"
                                 value={account?.data?.cif || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -337,10 +365,10 @@ function AccountPageContent() {
                         {/* Legal ID */}
                         <div>
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("legalId")}
+                                Legal ID
                             </label>
                             <Input
-                                placeholder={translate("legalId")}
+                                placeholder="Legal ID"
                                 value={account?.data?.legalId || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -350,10 +378,10 @@ function AccountPageContent() {
                         {/* Address */}
                         <div>
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("address")}
+                                Address
                             </label>
                             <Input
-                                placeholder={translate("address")}
+                                placeholder="Address"
                                 value={account?.data?.legalAddress || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
@@ -364,10 +392,10 @@ function AccountPageContent() {
                         {/* Place Of Birth */}
                         <div>
                             <label className="text-base font-medium text-gray-700 block mb-1">
-                                {translate("pob")}
+                                Place Of Birth
                             </label>
                             <Input
-                                placeholder={translate("pob")}
+                                placeholder="Place Of Birth"
                                 value={account?.data?.legalPlaceOfBirth || ""}
                                 onChange={(e) => null}
                                 className="w-full h-10"
