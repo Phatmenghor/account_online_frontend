@@ -1072,6 +1072,7 @@ export default function CheckNIDPage() {
                     }
                   >
                     <CustomDatePicker
+                      className="h-10"
                       key={datePickerKey}
                       value={formData.dob}
                       onChange={(value) => handleInputChange("dob", value)}

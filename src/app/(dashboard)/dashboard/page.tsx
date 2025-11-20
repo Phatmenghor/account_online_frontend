@@ -62,8 +62,6 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-4">AML Dashboard</h1>
-
       {/* Date Filter */}
       <div className="flex gap-2 mb-4 items-center">
         <CustomDatePicker

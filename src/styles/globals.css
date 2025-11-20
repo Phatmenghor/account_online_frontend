@@ -29,75 +29,79 @@
 
 @layer base {
   :root {
-    /* Enhanced color system with CPBank Orange */
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    /* Neutral colors */
+    --background: 0 0% 98%;
+    --foreground: 222 47% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 222 47% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 222 47% 15%;
 
-    /* CPBank Brand Orange (#F36F21 → hsl 23 89% 55%) */
-    --primary: 23 89% 55%;
+    /* Primary brand color (soft CPBank orange) */
+    --primary: 23 70% 55%;
     --primary-foreground: 0 0% 98%;
-    --primary-hover: 23 89% 50%;
-    --primary-active: 23 89% 45%;
+    --primary-hover: 23 70% 50%;
+    --primary-active: 23 70% 45%;
 
-    --secondary: 220 13% 95%;
-    --secondary-foreground: 240 5.9% 10%;
-    --secondary-hover: 220 13% 91%;
+    /* Secondary color (soft blue) */
+    --secondary: 215 70% 50%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-hover: 215 70% 45%;
 
-    --muted: 220 13% 95%;
-    --muted-foreground: 220 8.5% 46%;
-    --muted-hover: 220 13% 91%;
+    /* Muted / background tones */
+    --muted: 220 10% 95%;
+    --muted-foreground: 220 8% 50%;
+    --muted-hover: 220 10% 90%;
 
-    --accent: 23 89% 95%;
-    --accent-foreground: 23 89% 45%;
-    --accent-hover: 23 89% 90%;
+    /* Accent color (soft orange) */
+    --accent: 23 60% 90%;
+    --accent-foreground: 23 60% 40%;
+    --accent-hover: 23 60% 85%;
 
-    --destructive: 0 84% 60%;
+    /* Destructive (soft red) */
+    --destructive: 2 60% 50%;
     --destructive-foreground: 0 0% 98%;
-    --destructive-hover: 0 84% 55%;
+    --destructive-hover: 2 60% 45%;
 
-    /* Enhanced border system */
+    /* Borders */
     --border: 220 13% 91%;
     --border-strong: 220 13% 75%;
     --border-subtle: 220 13% 96%;
     --input: 220 13% 91%;
-    --input-focus: 23 89% 55%; /* CPBank Orange */
-    --ring: 23 89% 55%;
+    --input-focus: 23 70% 50%;
+    --ring: 23 70% 50%;
 
-    /* Status Colors */
-    --success: 146 79% 41%;
+    /* Status colors */
+    --success: 146 60% 45%;
     --success-foreground: 0 0% 98%;
-    --success-50: 146 79% 96%;
-    --success-100: 146 79% 91%;
-    --success-hover: 146 79% 36%;
+    --success-50: 146 60% 90%;
+    --success-100: 146 60% 85%;
+    --success-hover: 146 60% 40%;
 
-    --warning: 39 85% 55%;
+    --warning: 39 70% 50%;
     --warning-foreground: 0 0% 98%;
-    --warning-50: 39 85% 96%;
-    --warning-100: 39 85% 91%;
-    --warning-hover: 39 85% 50%;
+    --warning-50: 39 70% 90%;
+    --warning-100: 39 70% 85%;
+    --warning-hover: 39 70% 45%;
 
-    --error: 2 85% 55%;
+    --error: 2 60% 50%;
     --error-foreground: 0 0% 98%;
-    --error-50: 2 85% 96%;
-    --error-100: 2 85% 91%;
-    --error-hover: 2 85% 50%;
+    --error-50: 2 60% 90%;
+    --error-100: 2 60% 85%;
+    --error-hover: 2 60% 45%;
 
-    --info: 215 79% 55%;
+    --info: 215 60% 50%;
     --info-foreground: 0 0% 98%;
-    --info-50: 215 79% 96%;
-    --info-100: 215 79% 91%;
-    --info-hover: 215 79% 50%;
+    --info-50: 215 60% 90%;
+    --info-100: 215 60% 85%;
+    --info-hover: 215 60% 45%;
 
     /* Chart colors */
-    --chart-1: 23 89% 55%; /* CPBank Orange */
-    --chart-2: 39 85% 55%;
-    --chart-3: 215 79% 55%;
-    --chart-4: 146 79% 41%;
-    --chart-5: 2 85% 55%;
+    --chart-1: 23 70% 55%;
+    --chart-2: 39 70% 50%;
+    --chart-3: 215 60% 50%;
+    --chart-4: 146 60% 45%;
+    --chart-5: 2 60% 50%;
 
     /* Spacing & sizing */
     --radius: 0.5rem;
@@ -106,13 +110,13 @@
 
     /* Sidebar colors */
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 23 89% 55%; /* CPBank Orange */
+    --sidebar-foreground: 222 47% 20%;
+    --sidebar-primary: 23 70% 55%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 23 89% 95%;
-    --sidebar-accent-foreground: 23 89% 45%;
+    --sidebar-accent: 23 60% 90%;
+    --sidebar-accent-foreground: 23 60% 40%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 23 89% 55%;
+    --sidebar-ring: 23 70% 50%;
 
     /* Surfaces */
     --surface-1: 0 0% 100%;
@@ -191,20 +195,21 @@
   }
 }
 
-/* NProgress Bar (CPBank Orange) */
+/* NProgress Bar (bank-friendly colors) */
 #nprogress {
   pointer-events: none;
 }
 
 #nprogress .bar {
-  background: #f36f21 !important;
+  background: hsl(var(--primary)) !important;
   position: fixed;
   z-index: 1031;
   top: 0;
   left: 0;
   width: 100%;
   height: 2px;
-  box-shadow: 0 0 5px rgba(243, 111, 33, 0.3), 0 0 8px rgba(243, 111, 33, 0.15);
+  box-shadow: 0 0 5px hsla(var(--primary) / 0.3),
+    0 0 8px hsla(var(--primary) / 0.15);
   transition: all 0.2s ease-in-out;
 }
 
@@ -217,26 +222,27 @@
   background: linear-gradient(
     to right,
     transparent,
-    rgba(243, 111, 33, 0.6),
-    #f36f21
+    hsla(var(--primary) / 0.6),
+    hsl(var(--primary))
   ) !important;
-  box-shadow: 0 0 8px rgba(243, 111, 33, 0.8), 0 0 4px #f36f21;
+  box-shadow: 0 0 8px hsla(var(--primary) / 0.8), 0 0 4px hsl(var(--primary));
   transform: rotate(2deg) translate(0px, -2px);
 }
 
 body.route-changing #nprogress .bar {
-  background: #f36f21 !important;
-  box-shadow: 0 0 8px rgba(243, 111, 33, 0.4), 0 0 12px rgba(243, 111, 33, 0.2);
+  background: hsl(var(--primary)) !important;
+  box-shadow: 0 0 8px hsla(var(--primary) / 0.4),
+    0 0 12px hsla(var(--primary) / 0.2);
 }
 
 body.route-changing #nprogress .peg {
   background: linear-gradient(
     to right,
     transparent,
-    rgba(243, 111, 33, 0.8),
-    #f36f21
+    hsla(var(--primary) / 0.8),
+    hsl(var(--primary))
   ) !important;
-  box-shadow: 0 0 10px rgba(243, 111, 33, 0.9), 0 0 5px #f36f21;
+  box-shadow: 0 0 10px hsla(var(--primary) / 0.9), 0 0 5px hsl(var(--primary));
 }
 
 #nprogress .spinner {

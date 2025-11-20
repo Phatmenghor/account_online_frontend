@@ -291,7 +291,7 @@ function UserPageContent() {
                 aria-label="search-user"
                 autoComplete="search-user"
                 type="search"
-                placeholder={t("user.search-user")}
+                placeholder="Search users..."
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"
@@ -307,7 +307,7 @@ function UserPageContent() {
             </div> */}
           </div>
           <div>
-            <Button onClick={handleAddUser}>{t("common.new")}</Button>
+            <Button onClick={handleAddUser}>New</Button>
           </div>
         </div>
 

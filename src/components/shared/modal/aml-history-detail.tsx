@@ -31,6 +31,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+
 import { HistoryModel } from "@/models/aml/history/response/history-response.model";
 import { getAmlHistoryByIdService } from "@/services/dashboard/aml/aml-history.service";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
@@ -78,26 +79,29 @@ export default function AmlHistoryDetailModal({
     }
   }, [historyId, initialHistory, isOpen]);
 
+  const handleClose = () => onClose();
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl h-[90vh] p-0 flex flex-col">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-3xl h-[90vh] p-0 gap-0 flex flex-col">
         {/* Header */}
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
               <Shield className="w-6 h-6 text-foreground" />
             </div>
+
             <div className="flex-1">
               <DialogTitle className="text-xl font-semibold">
                 AML History Details
               </DialogTitle>
+
               <DialogDescription className="text-base text-muted-foreground">
                 Record ID: {historyId ?? "Unknown"}
               </DialogDescription>
 
-              {/* Status Badge */}
               {history && (
-                <div className="mt-2 flex items-center gap-2">
+                <div className="mt-2">
                   <AmlStatusBadge status={history.status} />
                 </div>
               )}
@@ -105,7 +109,7 @@ export default function AmlHistoryDetailModal({
           </div>
         </DialogHeader>
 
-        {/* Content Body */}
+        {/* Body */}
         <ScrollArea className="flex-1 min-h-0">
           <div className="p-6 space-y-8">
             {loading ? (
@@ -118,7 +122,7 @@ export default function AmlHistoryDetailModal({
               </div>
             ) : (
               <>
-                {/* Customer Information */}
+                {/* 1. Customer Info */}
                 <Section title="Customer Information" color="blue">
                   <InfoRow
                     label="Legal ID"
@@ -167,7 +171,7 @@ export default function AmlHistoryDetailModal({
                   />
                 </Section>
 
-                {/* KYC & Personal Info */}
+                {/* 2. KYC & Personal */}
                 <Section title="KYC & Personal Info" color="orange">
                   <InfoRow
                     label="Current Address Name"
@@ -211,13 +215,8 @@ export default function AmlHistoryDetailModal({
                   />
                 </Section>
 
-                {/* Screening & Risk Info */}
+                {/* 3. Screening */}
                 <Section title="Screening Information" color="red">
-                  <InfoRow
-                    label="Screening Result"
-                    value={history.screeningResult}
-                    icon={<Activity />}
-                  />
                   <InfoRow
                     label="Risk Level"
                     value={history.riskLevel}
@@ -240,7 +239,7 @@ export default function AmlHistoryDetailModal({
                   />
                 </Section>
 
-                {/* Rules Triggered */}
+                {/* 4. Rules Triggered */}
                 <Section title="Rules Triggered" color="purple">
                   {history.rulesTriggered ? (
                     history.rulesTriggered.split(",").map((rule, i) => (
@@ -254,24 +253,26 @@ export default function AmlHistoryDetailModal({
                   )}
                 </Section>
 
-                {/* Changed By */}
+                {/* 5. Changed By */}
                 <Section title="Changed By" color="green">
                   {history.approvedBy && (
                     <ChangeCard title="Approved By" color="green">
                       <UserInfoRows data={history.approvedBy} />
                     </ChangeCard>
                   )}
+
                   {history.rejectedBy && (
                     <ChangeCard title="Rejected By" color="red">
                       <UserInfoRows data={history.rejectedBy} />
                     </ChangeCard>
                   )}
+
                   {!history.approvedBy && !history.rejectedBy && (
                     <p className="text-muted-foreground">No change history</p>
                   )}
                 </Section>
 
-                {/* Audit Info */}
+                {/* 6. Audit */}
                 <Section title="Audit Information" color="gray">
                   <InfoRow
                     label="Created At"
@@ -291,7 +292,7 @@ export default function AmlHistoryDetailModal({
 
         {/* Footer */}
         <DialogFooter className="px-6 py-4 border-t bg-muted/30 flex-shrink-0">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={handleClose}>
             Close
           </Button>
         </DialogFooter>
@@ -300,7 +301,9 @@ export default function AmlHistoryDetailModal({
   );
 }
 
-/* Section Wrapper */
+/* ---------------------------------------------
+ * SECTION WRAPPER
+ * -------------------------------------------*/
 function Section({
   title,
   color,
@@ -318,9 +321,10 @@ function Section({
     orange: "bg-orange-600",
     gray: "bg-gray-600",
   };
+
   return (
     <section className="space-y-4">
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-2">
         <div className={`w-1 h-6 rounded-full ${colorMap[color]}`}></div>
         <h3 className="text-lg font-semibold">{title}</h3>
       </div>
@@ -329,7 +333,9 @@ function Section({
   );
 }
 
-/* Change Card */
+/* ---------------------------------------------
+ * CHANGE CARD
+ * -------------------------------------------*/
 function ChangeCard({
   title,
   color,
@@ -339,7 +345,11 @@ function ChangeCard({
   color: string;
   children: React.ReactNode;
 }) {
-  const colorMap: any = { green: "text-green-700", red: "text-red-700" };
+  const colorMap: any = {
+    green: "text-green-700",
+    red: "text-red-700",
+  };
+
   return (
     <div className="space-y-3 border p-4 rounded-lg">
       <h4 className={`font-semibold ${colorMap[color]}`}>{title}</h4>
@@ -348,7 +358,9 @@ function ChangeCard({
   );
 }
 
-/* User Info Rows */
+/* ---------------------------------------------
+ * USER INFO SET
+ * -------------------------------------------*/
 function UserInfoRows({ data }: { data: any }) {
   return (
     <>
@@ -365,7 +377,9 @@ function UserInfoRows({ data }: { data: any }) {
   );
 }
 
-/* Info Row */
+/* ---------------------------------------------
+ * ROW COMPONENT
+ * -------------------------------------------*/
 function InfoRow({
   label,
   icon,
@@ -376,14 +390,14 @@ function InfoRow({
   value: string | number | undefined;
 }) {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-start">
       <Label className="text-sm font-medium text-muted-foreground">
         {label}:
       </Label>
-      <span className="text-sm flex items-center gap-2">
-        {icon}
-        {value ?? "N/A"}
-      </span>
+
+      <div className="flex items-center gap-2 max-w-[60%] text-right">
+        <span className="text-sm">{value ?? "N/A"}</span>
+      </div>
     </div>
   );
 }

@@ -239,7 +239,7 @@ function OccupationPageContent() {
                 aria-label="search-occupation"
                 autoComplete="search-occupation"
                 type="search"
-                placeholder={t("master.search-occupation")}
+                placeholder="Search occupations..."
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"
@@ -263,7 +263,7 @@ function OccupationPageContent() {
             </Select>
           </div>
           <div>
-            <Button onClick={handleAddOccupation}>{t("common.new")}</Button>
+            <Button onClick={handleAddOccupation}>New</Button>
           </div>
         </div>
 

@@ -404,12 +404,9 @@ function InfoRow({
   return (
     <div className="flex justify-between">
       <Label className="text-sm font-medium text-muted-foreground">
-        {label}:
+        {label}:``
       </Label>
-      <span className="text-sm flex items-center gap-2">
-        {icon}
-        {value ?? "N/A"}
-      </span>
+      <span className="text-sm flex items-center gap-2">{value ?? "N/A"}</span>
     </div>
   );
 }

@@ -45,7 +45,6 @@ export const createOccupationTableColumns = ({
   };
 
   const tCommon = useTranslations("common");
-  const tMaster = useTranslations("master");
 
   return [
     {
@@ -61,7 +60,7 @@ export const createOccupationTableColumns = ({
     },
     {
       key: "nameEn",
-      label: tMaster("nameEn"),
+      label: "Name (English)",
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
@@ -71,7 +70,7 @@ export const createOccupationTableColumns = ({
     },
     {
       key: "nameKh",
-      label: tMaster("nameKh"),
+      label: "Name (Khmer)",
       truncate: true,
       maxWidth: "300px",
       minWidth: "150px",
@@ -81,7 +80,7 @@ export const createOccupationTableColumns = ({
     },
     {
       key: "occupationCode",
-      label: tMaster("occupationCode"),
+      label: "Occupation Code",
       truncate: true,
       maxWidth: "200px",
       minWidth: "120px",
@@ -92,7 +91,7 @@ export const createOccupationTableColumns = ({
 
     {
       key: "status",
-      label: tMaster("status"),
+      label: "Status",
       truncate: true,
       maxWidth: "150px",
       minWidth: "100px",

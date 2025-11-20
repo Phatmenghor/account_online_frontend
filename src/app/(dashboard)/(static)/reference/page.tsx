@@ -238,7 +238,7 @@ function ReferencePageContent() {
                 aria-label="search-reference"
                 autoComplete="search-reference"
                 type="search"
-                placeholder={t("master.search-reference")}
+                placeholder="Search references..."
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"
@@ -262,7 +262,7 @@ function ReferencePageContent() {
             </Select>
           </div>
           <div>
-            <Button onClick={handleAddReference}>{t("common.new")}</Button>
+            <Button onClick={handleAddReference}>New</Button>
           </div>
         </div>
 

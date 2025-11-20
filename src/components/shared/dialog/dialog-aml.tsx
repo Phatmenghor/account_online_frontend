@@ -3,6 +3,7 @@
 import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
 import { CheckCircle, XCircle, Clock, Loader2 } from "lucide-react";
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AmlConfirmDialogProps {
   isOpen: boolean;
@@ -43,8 +44,6 @@ const AmlConfirmDialog = ({
   description,
   amlDetails,
 }: AmlConfirmDialogProps) => {
-  if (!isOpen) return null;
-
   const getDialogProps = (): DialogProps => {
     switch (status) {
       case AmlStatusEnum.APPROVE:
@@ -119,74 +118,93 @@ const AmlConfirmDialog = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            {dialogProps.icon}
-            <h2 className="text-xl font-semibold">
-              {title || dialogProps.defaultTitle}
-            </h2>
-          </div>
-          {getStatusBadge()}
-        </div>
-
-        {/* Description */}
-        <p className="text-gray-600 mb-6">
-          {description || dialogProps.defaultDescription}
-        </p>
-
-        {/* Details */}
-        {amlDetails && (
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-6 space-y-2">
-            <DetailRow label="AML ID" value={amlDetails.id} />
-            <DetailRow label="Name" value={amlDetails.name} />
-            <DetailRow label="Risk Score" value={amlDetails.riskScore} />
-            <DetailRow label="Flagged Date" value={amlDetails.flaggedDate} />
-            {amlDetails.source && (
-              <DetailRow label="Source" value={amlDetails.source} />
-            )}
-            {amlDetails.country && (
-              <DetailRow label="Country" value={amlDetails.country} />
-            )}
-          </div>
-        )}
-
-        {/* Buttons */}
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            disabled={isLoading}
-            className={`px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors ${
-              isLoading && "opacity-50 cursor-not-allowed"
-            }`}
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          {/* Dialog Box */}
+          <motion.div
+            className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative"
+            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 50 }}
+            transition={{ type: "spring", stiffness: 180, damping: 18 }}
           >
-            Cancel
-          </button>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                {dialogProps.icon}
+                <h2 className="text-xl font-semibold">
+                  {title || dialogProps.defaultTitle}
+                </h2>
+              </div>
+              {getStatusBadge()}
+            </div>
 
-          <button
-            onClick={onConfirm}
-            disabled={isLoading}
-            className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 ${getButtonColor()} transition-colors ${
-              isLoading && "opacity-70 cursor-not-allowed"
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                {dialogProps.confirmButtonIcon}
-                {dialogProps.confirmLabel}
-              </>
+            {/* Description */}
+            <p className="text-gray-600 mb-6">
+              {description || dialogProps.defaultDescription}
+            </p>
+
+            {/* Details Section */}
+            {amlDetails && (
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-6 space-y-2">
+                <DetailRow label="AML ID" value={amlDetails.id} />
+                <DetailRow label="Name" value={amlDetails.name} />
+                <DetailRow label="Risk Score" value={amlDetails.riskScore} />
+                <DetailRow
+                  label="Flagged Date"
+                  value={amlDetails.flaggedDate}
+                />
+                {amlDetails.source && (
+                  <DetailRow label="Source" value={amlDetails.source} />
+                )}
+                {amlDetails.country && (
+                  <DetailRow label="Country" value={amlDetails.country} />
+                )}
+              </div>
             )}
-          </button>
-        </div>
-      </div>
-    </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={onClose}
+                disabled={isLoading}
+                className={`px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors ${
+                  isLoading && "opacity-50 cursor-not-allowed"
+                }`}
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={onConfirm}
+                disabled={isLoading}
+                className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 ${getButtonColor()} transition-colors ${
+                  isLoading && "opacity-70 cursor-not-allowed"
+                }`}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    {dialogProps.confirmButtonIcon}
+                    {dialogProps.confirmLabel}
+                  </>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
