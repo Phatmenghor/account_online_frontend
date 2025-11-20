@@ -1,4 +1,3 @@
-// Test code
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -171,6 +170,7 @@ export default function CheckNIDPage() {
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [resetOtp, setResetOtp] = useState(false);
+  const [datePickerKey, setDatePickerKey] = useState(0);
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -651,6 +651,7 @@ export default function CheckNIDPage() {
       console.log(JSON.stringify(accountData, null, 2));
       console.log("=======================================");
 
+      // TODO: Replace with your actual API call
       const response = await createOpenAccountService(accountData);
 
       console.log("API Response:", response);
@@ -717,6 +718,7 @@ export default function CheckNIDPage() {
     setSelectedOccupation(null);
     setSelectedReferenceBank(null);
     setSelectedBranch(null);
+    setLegalType(""); 
     setStaffCode("");
     setPhoneNumber("");
     setValidationErrors({});
@@ -740,6 +742,9 @@ export default function CheckNIDPage() {
       commune: "",
       village: "",
     });
+
+    // Force date picker to reset by changing its key
+    setDatePickerKey(prev => prev + 1);
 
     // Trigger OTP reset
     setResetOtp(true);
@@ -808,7 +813,8 @@ export default function CheckNIDPage() {
                 title={loadingState.title}
                 message={loadingState.message}
               />
-                  {/* ID Card and Selfie Upload Section */}
+              
+              {/* ID Card and Selfie Upload Section */} 
               <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 lg:gap-14 gap-8">
                 <div>
                   <p className="text-base text-gray-600 mb-4 text-center">
@@ -875,7 +881,7 @@ export default function CheckNIDPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name (KH) */}
                 <div className="space-y-1">
-                  <Label htmlFor="lastNameKh" className="text-sm">
+                  <Label htmlFor="lastNameKh" className="text-sm sm:text-base">
                     {translate("firstNameKh")}
                   </Label>
                   <Input
@@ -883,7 +889,7 @@ export default function CheckNIDPage() {
                     placeholder={translate("firstNameKh")}
                     value={formData.lastNameKh}
                     onChange={(e) => handleInputChange("lastNameKh", e.target.value)}
-                    className={`w-full h-10 ${validationErrors.lastNameKh ? 'border-red-500' : ''}`}
+                    className={`w-full h-10 text-sm ${validationErrors.lastNameKh ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
                   {validationErrors.lastNameKh && (
@@ -893,7 +899,7 @@ export default function CheckNIDPage() {
 
                 {/* Last Name (KH) */}
                 <div className="space-y-1">
-                  <Label htmlFor="firstNameKh" className="text-sm">
+                  <Label htmlFor="firstNameKh" className="text-sm sm:text-base">
                     {translate("lastNameKH")}
                   </Label>
                   <Input
@@ -901,7 +907,7 @@ export default function CheckNIDPage() {
                     placeholder={translate("lastNameKH")}
                     value={formData.firstNameKh}
                     onChange={(e) => handleInputChange("firstNameKh", e.target.value)}
-                    className={`w-full h-10 ${validationErrors.firstNameKh ? 'border-red-500' : ''}`}
+                    className={`w-full h-10 text-sm ${validationErrors.firstNameKh ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
                   {validationErrors.firstNameKh && (
@@ -911,7 +917,7 @@ export default function CheckNIDPage() {
 
                 {/* Family Name */}
                 <div className="space-y-1">
-                  <Label htmlFor="lastNameEn" className="text-sm">
+                  <Label htmlFor="lastNameEn" className="text-sm sm:text-base">
                     {translate("familyNameEn")}
                   </Label>
                   <Input
@@ -919,7 +925,7 @@ export default function CheckNIDPage() {
                     placeholder={translate("familyNameEn")}
                     value={formData.lastNameEn}
                     onChange={(e) => handleInputChange("lastNameEn", e.target.value)}
-                    className={`w-full h-10 ${validationErrors.lastNameEn ? 'border-red-500' : ''}`}
+                    className={`w-full h-10 text-sm ${validationErrors.lastNameEn ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
                   {validationErrors.lastNameEn && (
@@ -929,7 +935,7 @@ export default function CheckNIDPage() {
 
                 {/* Given Name */}
                 <div className="space-y-1">
-                  <Label htmlFor="firstNameEn" className="text-sm">
+                  <Label htmlFor="firstNameEn" className="text-sm sm:text-base">
                     {translate("givenNameEn")}
                   </Label>
                   <Input
@@ -937,7 +943,7 @@ export default function CheckNIDPage() {
                     placeholder={translate("givenNameEn")}
                     value={formData.firstNameEn}
                     onChange={(e) => handleInputChange("firstNameEn", e.target.value)}
-                    className={`w-full h-10 ${validationErrors.firstNameEn ? 'border-red-500' : ''}`}
+                    className={`w-full h-10 text-sm ${validationErrors.firstNameEn ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
                   {validationErrors.firstNameEn && (
@@ -947,11 +953,12 @@ export default function CheckNIDPage() {
 
                 {/* Date Of Birth */}
                 <div className="space-y-1">
-                  <Label htmlFor="dob" className="text-sm">
+                  <Label htmlFor="dob" className="text-sm sm:text-base">
                     {translate("dateOfBirth")}
                   </Label>
                   <div className={validationErrors.dob ? 'border border-red-500 rounded' : ''}>
                     <CustomDatePicker
+                      key={datePickerKey}
                       value={formData.dob}
                       onChange={(value) => handleInputChange("dob", value)}
                       disabled={isLoading || isValidating || isSubmitting}
@@ -965,7 +972,7 @@ export default function CheckNIDPage() {
 
                 {/* Gender */}
                 <div className="space-y-1">
-                  <Label htmlFor="gender" className="text-sm">
+                  <Label htmlFor="gender" className="text-sm sm:text-base">
                     {translate("gender")}
                   </Label>
                   <Select
@@ -988,7 +995,7 @@ export default function CheckNIDPage() {
 
                 {/* Legal Type */}
                 <div className="space-y-1">
-                  <Label htmlFor="legalType" className="text-sm">
+                  <Label htmlFor="legalType" className="text-sm sm:text-base">
                     {translate("legalType")}
                   </Label>
                   <Select
@@ -1013,7 +1020,7 @@ export default function CheckNIDPage() {
 
                 {/* Legal ID */}
                 <div className="space-y-1">
-                  <Label htmlFor="idNumber" className="text-sm">
+                  <Label htmlFor="idNumber" className="text-sm sm:text-base">
                     {translate("legalId")}
                   </Label>
                   <Input
@@ -1021,7 +1028,7 @@ export default function CheckNIDPage() {
                     placeholder={translate("legalId")}
                     value={formData.idNumber}
                     onChange={(e) => handleInputChange("idNumber", e.target.value)}
-                    className={`w-full h-10 ${validationErrors.idNumber ? 'border-red-500' : ''}`}
+                    className={`w-full h-10 text-sm ${validationErrors.idNumber ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
                   {validationErrors.idNumber && (
@@ -1031,7 +1038,7 @@ export default function CheckNIDPage() {
 
                 {/* Address */}
                 <div className="space-y-1">
-                  <Label htmlFor="address" className="text-sm">
+                  <Label htmlFor="address" className="text-sm sm:text-base">
                     {translate("address")}
                   </Label>
                   <Input
@@ -1039,7 +1046,7 @@ export default function CheckNIDPage() {
                     placeholder={translate("address")}
                     value={formData.address}
                     onChange={(e) => handleInputChange("address", e.target.value)}
-                    className={`w-full h-10 ${validationErrors.address ? 'border-red-500' : ''}`}
+                    className={`w-full h-10 text-sm ${validationErrors.address ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
                   {validationErrors.address && (
@@ -1049,7 +1056,7 @@ export default function CheckNIDPage() {
 
                 {/* Place Of Birth */}
                 <div className="space-y-1">
-                  <Label htmlFor="pob" className="text-sm">
+                  <Label htmlFor="pob" className="text-sm sm:text-base">
                     {translate("pob")}
                   </Label>
                   <Input
@@ -1057,7 +1064,7 @@ export default function CheckNIDPage() {
                     placeholder={translate("pob")}
                     value={formData.pob}
                     onChange={(e) => handleInputChange("pob", e.target.value)}
-                    className={`w-full h-10 ${validationErrors.pob ? 'border-red-500' : ''}`}
+                    className={`w-full h-10 text-sm ${validationErrors.pob ? 'border-red-500' : ''}`}
                     disabled={isLoading || isValidating || isSubmitting}
                   />
                   {validationErrors.pob && (
@@ -1067,7 +1074,7 @@ export default function CheckNIDPage() {
 
                 {/* Marital Status */}
                 <div className="md:col-span-2 space-y-1">
-                  <Label htmlFor="maritalStatus" className="text-sm">
+                  <Label htmlFor="maritalStatus" className="text-sm sm:text-base">
                     {translate("marital")}
                   </Label>
                   <Select
@@ -1079,7 +1086,7 @@ export default function CheckNIDPage() {
                     }}
                     disabled={isLoading || isValidating || isLoadingMaritals}
                   >
-                    <SelectTrigger className={`w-full h-10 ${validationErrors.maritalStatus ? 'border-red-500' : ''}`}>
+                    <SelectTrigger className={`w-full h-10 text-sm ${validationErrors.maritalStatus ? 'border-red-500' : ''}`}>
                       <SelectValue placeholder={isLoadingMaritals ? translate("loading") : translateSelect("selectMarital")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -1097,7 +1104,7 @@ export default function CheckNIDPage() {
 
                 {/* Occupation */}
                 <div className="space-y-1">
-                  <Label htmlFor="occupation" className="text-sm">
+                  <Label htmlFor="occupation" className="text-sm sm:text-base">
                     {translate("occupation")}
                   </Label>
                   <Select
@@ -1109,7 +1116,7 @@ export default function CheckNIDPage() {
                     }}
                     disabled={isLoading || isValidating || isLoadingOccupations}
                   >
-                    <SelectTrigger className={`w-full h-10 ${validationErrors.occupation ? 'border-red-500' : ''}`}>
+                    <SelectTrigger className={`w-full h-10 text-sm ${validationErrors.occupation ? 'border-red-500' : ''}`}>
                       <SelectValue placeholder={isLoadingOccupations ? translate("loading") : translateSelect("selectOccupation")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -1127,7 +1134,7 @@ export default function CheckNIDPage() {
 
                 {/* Branch */}
                 <div className="space-y-1">
-                  <Label htmlFor="branch" className="text-sm">
+                  <Label htmlFor="branch" className="text-sm sm:text-base">
                     {translate("branch")}
                   </Label>
                   <div className={validationErrors.branch ? 'border border-red-500 rounded' : ''}>
@@ -1144,7 +1151,7 @@ export default function CheckNIDPage() {
 
                 {/* Reference */}
                 <div className="md:col-span-2 space-y-1">
-                  <Label htmlFor="reference" className="text-sm">
+                  <Label htmlFor="reference" className="text-sm sm:text-base">
                     {translate("reference")}
                   </Label>
                   <div className="flex">
@@ -1175,7 +1182,7 @@ export default function CheckNIDPage() {
                         setStaffCode(e.target.value);
                         validateField("staffCode", e.target.value);
                       }}
-                      className="flex-1 h-10 !rounded-l-none"
+                      className="flex-1 h-10 !rounded-l-none text-sm"
                       disabled={isLoading || isValidating || isSubmitting}
                     />
                   </div>

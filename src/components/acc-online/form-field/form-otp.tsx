@@ -746,7 +746,7 @@ export default function OTPInput({
     <>
       {/* Contact Number */}
       <div>
-        <label className="text-base font-medium text-gray-700 block mb-1">
+        <label className="text-sm sm:text-base font-medium text-gray-700 block mb-1">
           {translate("contactNumber")}
           {isOtpVerified && (
             <span className="float-right text-green-600 text-sm flex items-center gap-1">
@@ -761,7 +761,7 @@ export default function OTPInput({
             value={phoneNumber}
             onChange={(e) => handlePhoneChange(e.target.value)}
             onBlur={handlePhoneBlur}
-            className={`w-full h-10 ${validationErrors.phoneNumber ? 'border-red-500' : ''}`}
+            className={`w-full h-10 text-sm ${validationErrors.phoneNumber ? 'border-red-500' : ''}`}
             disabled={disabled || isSendingOtp}
             maxLength={15}
           />
@@ -779,7 +779,7 @@ export default function OTPInput({
 
       {/* OTP Code */}
       <div>
-        <label className="text-base font-medium text-gray-700 block mb-1">
+        <label className="text-sm sm:text-base font-medium text-gray-700 block mb-1">
           {translate("otpCode")}
           <button
             type="button"
@@ -805,7 +805,7 @@ export default function OTPInput({
             value={otpCode}
             onChange={(e) => handleOtpChange(e.target.value)}
             maxLength={6}
-            className={`w-full h-10 ${validationErrors.isPhoneVerified ? 'border-red-500' : ''}`}
+            className={`w-full h-10 text-sm ${validationErrors.isPhoneVerified ? 'border-red-500' : ''}`}
           />
           {isVerifyingOtp && (
             <Loader2 className="absolute right-3 top-2.5 h-5 w-5 animate-spin text-blue-600" />
