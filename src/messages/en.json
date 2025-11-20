@@ -78,7 +78,11 @@
   },
 
   "auth": {
+    "username": "Username",
     "login": "Login",
+    "loginButton": "Login",
+    "loginWelcome": "Welcome,",
+    "loggingIn": "Signing in...",
     "logout": "Logout",
     "email": "Email",
     "emailAddress": "Email Address",

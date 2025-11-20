@@ -78,7 +78,11 @@
   },
 
   "auth": {
+    "welcomeTitle": "សូមស្វាគមន៍មកកាន់ CPBank",
     "login": "ចូល",
+    "loginButton": "ចូល",
+    "loginWelcome": "សូមស្វាគមន៍",
+    "loggingIn": "កំពុងចូល...",
     "logout": "ចាកចេញ",
     "email": "អ៊ីមែល",
     "emailAddress": "អាសយដ្ឋានអ៊ីមែល",
@@ -173,8 +177,8 @@
     "staffCode": "លេខកូដបុគ្គលិក",
     "contactNumber": "លេខទូរស័ព្ទរបស់អ្នក",
     "otpCode": "លេខ PIN សម្ងាត់",
-    "reSendOtp": "ផ្ញើម្តងទៀត",
-    "sendOtp": "ផ្ញើ OTP",
+    "reSendOtp": "ផ្ញើរម្តងទៀត",
+    "sendOtp": "ផ្ញើរ OTP",
     "chooseOne": "--- សូមជ្រើសរើស ---",
     "loading": "កំពុងផ្ទុក...",
 

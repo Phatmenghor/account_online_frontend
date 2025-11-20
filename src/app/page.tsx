@@ -394,7 +394,6 @@ export default function CheckNIDPage() {
         const base64ForService = base64WithPrefix.split(",")[1];
 
         const imageRequestData: RequestIdImage = {
-          applicationName: "DEVELOPMENT",
           idImage: base64ForService,
         };
 
