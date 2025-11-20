@@ -61,16 +61,16 @@ export default function LanguageSwitcher({
           <Button
             variant="ghost"
             size="sm"
-            className={cn("h-8 px-2", className)}
+            className={cn("h-10 px-3 gap-2", className)}
             disabled={isLoading}
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
               <>
-                <span className="text-sm">{currentLocaleConfig.flag}</span>
-                <span className="ml-1 text-xs font-medium">
-                  {currentLocaleConfig.code}
+                <span className="text-2xl">{currentLocaleConfig.flag}</span>
+                <span className="text-sm font-semibold">
+                  {currentLocaleConfig.code.toUpperCase()}
                 </span>
               </>
             )}
@@ -113,17 +113,22 @@ export default function LanguageSwitcher({
           <Button
             variant="ghost"
             size="sm"
-            className={cn("h-8 w-8 p-0", className)}
+            className={cn("h-10 px-3 gap-2", className)}
             disabled={isLoading}
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              <img
-                src={currentLocaleConfig.flag}
-                alt={`${currentLocaleConfig.nativeName} flag`}
-                className="w-5 h-4 object-cover rounded-sm"
-              />
+              <>
+                <img
+                  src={currentLocaleConfig.flag}
+                  alt={`${currentLocaleConfig.nativeName} flag`}
+                  className="w-7 h-5 object-cover rounded-sm"
+                />
+                <span className="text-sm font-semibold">
+                  {currentLocaleConfig.code.toUpperCase()}
+                </span>
+              </>
             )}
           </Button>
         </DropdownMenuTrigger>
@@ -177,20 +182,19 @@ export default function LanguageSwitcher({
           <Button
             variant="outline"
             size="sm"
-            className="h-9 px-3"
+            className="h-10 px-3 gap-2"
             disabled={isLoading}
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              <Languages className="h-4 w-4 mr-2" />
+              <>
+                <span className="text-2xl">{currentLocaleConfig.flag}</span>
+                <span className="font-semibold">
+                  {currentLocaleConfig.code.toUpperCase()}
+                </span>
+              </>
             )}
-            <span className="hidden sm:inline-block mr-1">
-              {currentLocaleConfig.flag}
-            </span>
-            <span className="font-medium">
-              {currentLocaleConfig.nativeName}
-            </span>
           </Button>
         </DropdownMenuTrigger>
 

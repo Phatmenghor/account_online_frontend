@@ -801,7 +801,7 @@ export default function CheckNIDPage() {
           <Card className="p-8 mb-6 shadow-lg">
             <div className="mx-auto">
               <div className="mb-8 flex justify-between">
-                <h1 className="text-sm md:text-3xl text-gray-800 mb-2">
+                <h1 className="text-lg md:text-3xl text-gray-800 mb-2">
                   {translate("header_acc")}
                 </h1>
                 <Button onClick={handleClear}>{translate("clear")}</Button>
