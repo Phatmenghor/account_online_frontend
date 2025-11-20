@@ -270,9 +270,9 @@ export function CustomDatePicker({
         <div className="p-3">
           {/* Days header */}
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {DAYS.map((day) => (
+            {DAYS.map((day, index) => (
               <div
-                key={day}
+                key={`${day}-${index}`}
                 className="h-8 w-8 flex items-center justify-center text-xs font-medium text-muted-foreground"
               >
                 {day}

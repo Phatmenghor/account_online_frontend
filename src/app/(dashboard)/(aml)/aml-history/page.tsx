@@ -88,10 +88,6 @@ function History() {
     setIsHistoryDetailOpen(true);
   };
 
-  const handleApplyDateFilter = () => {
-    loadHistory();
-  };
-
   const handleResetDateFilter = () => {
     setStartDate(null);
     setEndDate(null);
