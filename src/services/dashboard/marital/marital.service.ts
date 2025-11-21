@@ -1,16 +1,19 @@
-import { AllMaritalReq, CreateMaritalReq, UpdateMaritalReq } from "@/models/static/marital/marital.request";
+import {
+  AllMaritalReq,
+  CreateMaritalReq,
+  UpdateMaritalReq,
+} from "@/models/static/marital/marital.request";
 import { axiosClientWithAuth } from "@/utils/axios";
 import axios from "axios";
 
 export async function getAllMaritalService(request: AllMaritalReq) {
-    try {
-        const response = await axiosClientWithAuth.post(
-            "/api/v1/marital-status/all",
-            request
-        );
-        return response.data.data;
-    }
-    catch (error) {
+  try {
+    const response = await axiosClientWithAuth.post(
+      "/api/v1/marital-status/all",
+      request
+    );
+    return response.data.data;
+  } catch (error) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
       const message = raw?.message || "Failed to fetch maritals.";
@@ -20,8 +23,7 @@ export async function getAllMaritalService(request: AllMaritalReq) {
     } else {
       console.error("Unexpected error:", error);
       throw {
-        errorMessage:
-          "An unexpected error occurred while fetching maritals.",
+        errorMessage: "An unexpected error occurred while fetching maritals.",
         rawError: error,
       };
     }
@@ -30,7 +32,9 @@ export async function getAllMaritalService(request: AllMaritalReq) {
 
 export async function getMaritalByIdService(id: number) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/marital-status/get-by-id/${id}`);
+    const response = await axiosClientWithAuth.post(
+      `/api/v1/marital-status/get-by-id/${id}`
+    );
     return response.data.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
@@ -52,7 +56,10 @@ export async function getMaritalByIdService(id: number) {
 
 export async function createMaritalService(request: CreateMaritalReq) {
   try {
-    const response = await axiosClientWithAuth.post("/api/v1/aml/all-status", request);
+    const response = await axiosClientWithAuth.post(
+      "/api/v1/marital-status/create",
+      request
+    );
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -76,7 +83,10 @@ export async function updateMaritalService(
   update: UpdateMaritalReq
 ) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/marital-status/update/${id}`, update);
+    const response = await axiosClientWithAuth.post(
+      `/api/v1/marital-status/update/${id}`,
+      update
+    );
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -97,7 +107,9 @@ export async function updateMaritalService(
 
 export async function deleteMaritalService(id: number) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/marital-status/delete/${id}`);
+    const response = await axiosClientWithAuth.post(
+      `/api/v1/marital-status/delete/${id}`
+    );
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -114,4 +126,4 @@ export async function deleteMaritalService(id: number) {
       };
     }
   }
-} 
+}
