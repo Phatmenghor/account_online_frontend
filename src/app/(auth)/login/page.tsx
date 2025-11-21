@@ -62,7 +62,7 @@ export default function LoginPage() {
         startTransition(() => {
           AppToast({
             type: "success",
-            message: "Login successfully",
+            message: "Your login successfully",
           });
         });
       }
@@ -116,10 +116,10 @@ export default function LoginPage() {
         <Card className="w-full max-w-md border border-gray-200 p-8 shadow-lg">
           <CardHeader className="space-y-1 p-0 pb-6">
             <h1 className="text-2xl font-bold text-gray-900">
-              {t("loginWelcome") || "Welcome,"}
+              {"Welcome Account Online,"}
             </h1>
             <p className="text-gray-500">
-              {t("loginSubtitle") || "Please login to continue"}
+              {"Sign in to your admin account to continue"}
             </p>
           </CardHeader>
           <CardContent className="p-0">
@@ -132,7 +132,7 @@ export default function LoginPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        {t("username") || "Username"}
+                        {"Username"}
                         <span className="text-red-500 ml-1">*</span>
                       </FormLabel>
                       <FormControl>
@@ -141,9 +141,7 @@ export default function LoginPage() {
                           <Input
                             {...field}
                             type="text"
-                            placeholder={
-                              t("usernamePlaceholder") || "Enter your username"
-                            }
+                            placeholder={"Enter your username"}
                             disabled={isLoading}
                             className="pl-10 h-11 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
                             onKeyDown={handleKeyPress}
@@ -162,7 +160,7 @@ export default function LoginPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        {t("password") || "Password"}
+                        {"Password"}
                         <span className="text-red-500 ml-1">*</span>
                       </FormLabel>
                       <FormControl>
@@ -171,9 +169,7 @@ export default function LoginPage() {
                           <Input
                             {...field}
                             type={showPassword ? "text" : "password"}
-                            placeholder={
-                              t("passwordPlaceholder") || "Enter your password"
-                            }
+                            placeholder={"Enter your password"}
                             disabled={isLoading}
                             className="pl-10 pr-10 h-11 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
                             onKeyDown={handleKeyPress}
@@ -204,9 +200,7 @@ export default function LoginPage() {
                   className="w-full h-11 bg-primary hover:bg-primary/90 transition-colors mt-6"
                   disabled={isLoading}
                 >
-                  {isLoading
-                    ? t("loggingIn") || "Signing in..."
-                    : t("loginButton") || "Login"}
+                  {isLoading ? "Signing in..." : "Login"}
                 </Button>
               </div>
             </Form>
