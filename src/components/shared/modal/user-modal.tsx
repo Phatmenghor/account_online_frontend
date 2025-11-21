@@ -234,7 +234,8 @@ export default function ModalUser({
                           htmlFor="username"
                           className="text-sm font-medium"
                         >
-                          Username <span className="text-red-500">*</span>
+                          Username (ID Card)
+                          <span className="text-red-500"> *</span>
                         </Label>
                         <Controller
                           control={control}
@@ -243,7 +244,7 @@ export default function ModalUser({
                             <Input
                               {...field}
                               id="username"
-                              placeholder="johndoe"
+                              placeholder="Enter username (e.g., 5589)"
                               disabled={isSubmitting}
                               className={`transition-colors h-10 ${
                                 errors.username ? "border-red-500" : ""
@@ -292,7 +293,7 @@ export default function ModalUser({
                             {...field}
                             id="email"
                             type="email"
-                            placeholder="john@example.com"
+                            placeholder="Enter official email address"
                             disabled={isSubmitting}
                             className={`transition-colors h-10 ${
                               errors.email ? "border-red-500" : ""
@@ -322,7 +323,7 @@ export default function ModalUser({
                               {...field}
                               id="password"
                               type={showPassword ? "text" : "password"}
-                              placeholder="Enter secure password"
+                              placeholder="Create a secure password (min. 8 characters)"
                               disabled={isSubmitting}
                               className={`transition-colors pr-10 h-10 ${
                                 (errors as any).password ? "border-red-500" : ""
@@ -369,7 +370,7 @@ export default function ModalUser({
                           <Input
                             {...field}
                             id="fullName"
-                            placeholder="John Doe"
+                            placeholder="Enter your full name"
                             disabled={isSubmitting}
                             className="transition-colors h-10"
                           />
@@ -388,7 +389,7 @@ export default function ModalUser({
                           <Input
                             {...field}
                             id="position"
-                            placeholder="Software Engineer"
+                            placeholder="Enter your position (e.g., Branch Officer)"
                             disabled={isSubmitting}
                             className="transition-colors h-10"
                           />

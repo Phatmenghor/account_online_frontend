@@ -225,7 +225,7 @@ export default function ModalMarital({
                           <Input
                             {...field}
                             id="nameEn"
-                            placeholder="Single"
+                            placeholder="Enter your name english"
                             disabled={isSubmitting}
                             className={`transition-colors ${
                               errors.nameEn ? "border-red-500" : ""
@@ -252,7 +252,7 @@ export default function ModalMarital({
                           <Input
                             {...field}
                             id="nameKh"
-                            placeholder="នៅលីវ"
+                            placeholder="Enter your name khmer"
                             disabled={isSubmitting}
                             className={`transition-colors ${
                               errors.nameKh ? "border-red-500" : ""

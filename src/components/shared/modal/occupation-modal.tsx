@@ -234,7 +234,7 @@ export default function ModalOccupation({
                           <Input
                             {...field}
                             id="nameEn"
-                            placeholder="Teacher"
+                            placeholder="Enter your name english"
                             disabled={isSubmitting}
                             className={`transition-colors ${
                               errors.nameEn ? "border-red-500" : ""
@@ -261,7 +261,7 @@ export default function ModalOccupation({
                           <Input
                             {...field}
                             id="nameKh"
-                            placeholder="គ្រូបង្រៀន"
+                            placeholder="Enter your name khmer"
                             disabled={isSubmitting}
                             className={`transition-colors ${
                               errors.nameKh ? "border-red-500" : ""

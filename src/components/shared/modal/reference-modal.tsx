@@ -227,7 +227,7 @@ export default function ModalReference({
                           <Input
                             {...field}
                             id="nameEn"
-                            placeholder="CP Bank"
+                            placeholder="Enter name in english"
                             disabled={isSubmitting}
                             className={`transition-colors ${
                               errors.nameEn ? "border-red-500" : ""
@@ -254,7 +254,7 @@ export default function ModalReference({
                           <Input
                             {...field}
                             id="nameKh"
-                            placeholder="ធនាគារ ប្រៃសណីយ៍កម្ពុជា"
+                            placeholder="Enter name in khmer"
                             disabled={isSubmitting}
                             className={`transition-colors ${
                               errors.nameKh ? "border-red-500" : ""
