@@ -65,7 +65,14 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+		fontFamily: {
+        // poppins: ["Poppins", "sans-serif"],
+        // kantumruy: ["var(--font-kantumruy)"],
+        // inter: ["var(--font-inter)", "sans-serif"],
+        // sans: ["var(--font-inter)", "var(--font-kantumruy)", "sans-serif"],
+        kantumruy: ["var(--font-kantumruy)", "sans-serif"],
+      	},
   	}
   },
   plugins: [require("tailwindcss-animate")],
