@@ -30,8 +30,11 @@ export const createOccupationTableColumns = ({
   data,
   handlers,
 }: OccupationTableOptions): TableColumn<OccupationModel>[] => {
-  const { handleEditOccupation, handleViewOccupationDetail, handleDeleteOccupation } =
-    handlers;
+  const {
+    handleEditOccupation,
+    handleViewOccupationDetail,
+    handleDeleteOccupation,
+  } = handlers;
 
   const getStatusColor = (status: string) => {
     switch (status?.toUpperCase()) {
@@ -85,7 +88,9 @@ export const createOccupationTableColumns = ({
       maxWidth: "200px",
       minWidth: "120px",
       render: (occupation) => (
-        <span className="font-medium">{occupation.occupationCode || "---"}</span>
+        <span className="font-medium">
+          {occupation.occupationCode || "---"}
+        </span>
       ),
     },
 
@@ -119,7 +124,7 @@ export const createOccupationTableColumns = ({
                   <Edit className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("edit")}</TooltipContent>
+              <TooltipContent>{"Edit"}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -132,7 +137,7 @@ export const createOccupationTableColumns = ({
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("view")}</TooltipContent>
+              <TooltipContent>{"View"}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -145,7 +150,7 @@ export const createOccupationTableColumns = ({
                   <Trash className="h-3 w-3" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("delete")}</TooltipContent>
+              <TooltipContent>{"Delete"}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
