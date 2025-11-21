@@ -44,7 +44,7 @@ export default function DashboardLayout({
 
         {/* Main Content - ONLY THIS SCROLLS */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 md:px-6 md:py-6">
-          <div className="mx-auto max-w-7xl">{children}</div>
+          <div className="mx-auto ">{children}</div>
         </main>
       </div>
     </div>
