@@ -54,7 +54,7 @@ export default async function RootLayout({
   return (
     <html lang={serverLocale} className={kantumruyPro.variable}>
       <head>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/assets/cp.png" />   
       </head>
       <body className="font-kantumruy antialiased">
         <LocaleProvider

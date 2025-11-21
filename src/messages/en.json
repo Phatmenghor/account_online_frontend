@@ -179,6 +179,7 @@
     "otpCode": "OTP Code",
     "reSendOtp": "Resend OTP",
     "sendOtp": "Send OTP",
+    "otp6Digit": "Enter 6-digit OTP",
     "chooseOne": "--- Choose one ---",
     "loading": "Loading...",
 
@@ -196,7 +197,27 @@
     "nationality": "Nationality",
 
     "success_title": "Account Created Success",
-    "error_title": "Submission Failed"
+    "error_title": "Submission Failed",
+
+    "err_idImage": "ID card image is required",
+    "err_selfieImage": "Selfie image is required",
+    "err_lastNameKh": "First name (Khmer) is required",
+    "err_firstNameKh": "Last name (Khmer) is required",
+    "err_lastNameEn": "Family name (English) is required",
+    "err_firstNameEn": "Given name (English) is required",
+    "err_dob": "Date of birth is required",
+    "err_gender": "Gender is required",
+    "err_idNumber": "Legal ID is required",
+    "err_address": "Address is required",
+    "err_pob": "Place of birth is required",
+    "err_maritalStatus": "Marital status is required",
+    "err_occupation": "Occupation is required",
+    "err_branch": "Branch is required",
+    "err_legalType": "Legal type is required",
+    "err_phoneNumber_min": "Phone number must be at least 8 digits",
+    "err_phoneNumber_max": "Phone number must not exceed 15 digits",
+    "err_phoneNumber_regex": "Phone number must contain only digits",
+    "err_isPhoneVerified": "Phone number must be verified. And then input otp 6 digit"
   },
 
   "address": {

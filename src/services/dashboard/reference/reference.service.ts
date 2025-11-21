@@ -1,16 +1,19 @@
-import { AllReferenceReq, CreateReferenceReq, UpdateReferenceReq } from "@/models/static/reference/reference.request";
+import {
+  AllReferenceReq,
+  CreateReferenceReq,
+  UpdateReferenceReq,
+} from "@/models/static/reference/reference.request";
 import { axiosClientWithAuth } from "@/utils/axios";
 import axios from "axios";
 
 export async function getAllReferenceService(request: AllReferenceReq) {
-    try {
-        const response = await axiosClientWithAuth.post(
-            "/api/v1/reference/banks/all",
-            request
-        );
-        return response.data.data;
-    }
-    catch (error) {
+  try {
+    const response = await axiosClientWithAuth.post(
+      "/api/v1/reference/banks/all",
+      request
+    );
+    return response.data.data;
+  } catch (error) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
       const message = raw?.message || "Failed to fetch references.";
@@ -20,8 +23,7 @@ export async function getAllReferenceService(request: AllReferenceReq) {
     } else {
       console.error("Unexpected error:", error);
       throw {
-        errorMessage:
-          "An unexpected error occurred while fetching references.",
+        errorMessage: "An unexpected error occurred while fetching references.",
         rawError: error,
       };
     }
@@ -30,7 +32,9 @@ export async function getAllReferenceService(request: AllReferenceReq) {
 
 export async function getReferenceByIdService(id: number) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/reference/banks/get-by-id/${id}`);
+    const response = await axiosClientWithAuth.post(
+      `/api/v1/reference/banks/get-by-id/${id}`
+    );
     return response.data.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
@@ -52,7 +56,10 @@ export async function getReferenceByIdService(id: number) {
 
 export async function createReferenceService(request: CreateReferenceReq) {
   try {
-    const response = await axiosClientWithAuth.post("/api/v1/reference/banks/create", request);
+    const response = await axiosClientWithAuth.post(
+      "/api/v1/reference/banks/create",
+      request
+    );
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -76,7 +83,10 @@ export async function updateReferenceService(
   update: UpdateReferenceReq
 ) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/reference/banks/update/${id}`, update);
+    const response = await axiosClientWithAuth.post(
+      `/api/v1/reference/banks/update/${id}`,
+      update
+    );
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -97,7 +107,9 @@ export async function updateReferenceService(
 
 export async function deleteReferenceService(id: number) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/reference/banks/delete/{id}${id}`);
+    const response = await axiosClientWithAuth.post(
+      `/api/v1/reference/banks/delete/${id}`
+    );
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

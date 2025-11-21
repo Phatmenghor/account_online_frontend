@@ -16,8 +16,12 @@ export default function Footer() {
           {/* Contact Info */}
           <div>
             <p>
-              <span className="font-semibold text-sm">Office Phone: </span>
-              <span className="text-sm">+855 (0) 70 200 002 | 1800 200 888</span>
+              <span className="font-semibold text-sm">
+                សម្រាប់លេខ Hotline:{" "}
+              </span>
+              <span className="text-sm">
+                070 200 002 | 1800 200 888 (ឥតគិតថ្លៃ)
+              </span>
             </p>
             <p>
               <span className="font-semibold text-sm">Email: </span>
@@ -36,8 +40,8 @@ export default function Footer() {
           <p>
             <span className="font-semibold text-sm">Address: </span>
             <span className="text-sm">
-              Building No 263, 1st – 6th Floor, Street No 110 ⊥ 61, Group 11, Phum 1,
-              Sangkat Vat Phnum, Khan Doun Penh, Phnom Penh, Cambodia.
+              Building No 263, 1st – 6th Floor, Street No 110 ⊥ 61, Group 11,
+              Phum 1, Sangkat Vat Phnum, Khan Doun Penh, Phnom Penh, Cambodia.
             </span>
           </p>
           <p className="mt-1">
