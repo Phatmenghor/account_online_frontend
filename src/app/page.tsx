@@ -119,10 +119,6 @@ export default function CheckNIDPage() {
     MRZ3: "",
   });
 
-  // Initialize schemas with translations
-  const NIDFormSchema = useNIDFormSchema();
-  const NIDVerificationSchema = useNIDVerificationSchema();
-
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<Image | null>(null);
 
@@ -229,6 +225,10 @@ export default function CheckNIDPage() {
   const { locale: currentLocale } = useClientLocale();
   const translate = useTranslations("NIDPage");
   const translateSelect = useTranslations("common");
+
+  // Initialize schemas with translations - will recreate when locale changes
+  const NIDFormSchema = useNIDFormSchema();
+  const NIDVerificationSchema = useNIDVerificationSchema();
 
   // Helper function to get marital name based on locale
   const getMaritalName = (marital: MaritalModel) => {

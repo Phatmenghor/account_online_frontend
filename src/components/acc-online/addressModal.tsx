@@ -17,7 +17,7 @@ import { AddressSelectReq } from "@/models/address/select-address/selectAddress.
 import { PosSelectReq } from "@/models/address/select-pos/selectPos.request"
 import { getPosSelectService } from "@/services/address/selectPos.service"
 import { useTranslations } from "next-intl"
-import { LocationFormData, LocationFormSchema } from "./form-field/form-validate-error"
+import { LocationFormData, useLocationFormSchema } from "./form-field/form-validate-error"
 
 interface LocationData {
   province: string
@@ -62,6 +62,8 @@ const LocationModal = ({
 }: LocationModalProps) => {
   const { locale: currentLocale } = useClientLocale()
   const translate = useTranslations("address");
+
+  const LocationFormSchema = useLocationFormSchema(); 
 
   // Validation state
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})

@@ -230,6 +230,11 @@
     "commune": "Commune",
     "village": "Village",
     "close": "Close",
-    "submit": "Submit"
+    "submit": "Submit",
+
+    "err_province": "Province is required",
+    "err_district": "District is required",
+    "err_commune": "Commune is required",
+    "err_village": "Village is required"
   }
 }
