@@ -52,7 +52,7 @@ export function useNavItems() {
     {
       title: "AML",
       href: "#",
-      icon: Calendar1Icon,
+      icon: FolderClosed,
       subItems: [
         {
           title: "Management",

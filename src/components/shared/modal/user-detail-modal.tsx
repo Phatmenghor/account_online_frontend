@@ -142,7 +142,6 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                         Email:
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        <Mail className="h-4 w-4" />
                         {user?.email || "N/A"}
                       </span>
                     </div>
@@ -152,7 +151,6 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                         Full Name:
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        <User className="h-4 w-4" />
                         {user?.fullName || "N/A"}
                       </span>
                     </div>
@@ -162,7 +160,6 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                         Position:
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        <Briefcase className="h-4 w-4" />
                         {user?.position || "N/A"}
                       </span>
                     </div>
@@ -193,7 +190,6 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                         User Role:
                       </Label>
                       <div className="flex items-center gap-2">
-                        {getRoleIcon(user?.userRole ?? "")}
                         <span className="text-sm">
                           {user?.userRole || "USER"}
                         </span>
@@ -207,12 +203,10 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                       <span className="text-sm flex items-center gap-2">
                         {user.userRole === "SUPER" ? (
                           <>
-                            <Award className="h-4 w-4 text-yellow-500" />
                             Full Access
                           </>
                         ) : (
                           <>
-                            <Award className="h-4 w-4 text-gray-500" />
                             Limited Access
                           </>
                         )}
@@ -236,7 +230,6 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                         Created At:
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
                         {formatDate(user?.createdAt ?? "")}
                       </span>
                     </div>
@@ -246,7 +239,6 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                         Last Updated:
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
                         {formatDate(user?.updatedAt ?? "")}
                       </span>
                     </div>

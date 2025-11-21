@@ -247,7 +247,7 @@ export default function ProfileTab({
                           <FormItem>
                             <FormLabel>
                               {fieldName === "username"
-                                ? "Id Card"
+                                ? "Username"
                                 : fieldName.charAt(0).toUpperCase() +
                                   fieldName.slice(1)}
                             </FormLabel>
