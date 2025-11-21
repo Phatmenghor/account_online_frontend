@@ -39,16 +39,16 @@ const ConfirmationModal = ({
         <p className="text-gray-600 text-center mb-8 leading-relaxed">{message}</p>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        <div className="flex justify-center gap-3 max-[375px]:flex-col">
           <Button
             onClick={onConfirm}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-md transition-colors"
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium md:px-4 px-3 py-3 rounded-md transition-colors"
           >
             {translate("yesIhave")}
           </Button>
           <Button
             onClick={onCancel}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-md transition-colors"
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium md:px-4 px-3 py-3 rounded-md transition-colors"
           >
            {translate("noIneed")}
           </Button>
