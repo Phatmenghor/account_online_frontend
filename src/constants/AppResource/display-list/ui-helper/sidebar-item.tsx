@@ -58,7 +58,7 @@ export function useNavItems() {
       ],
     },
     {
-      title: "Account Online",
+      title: "Account Final",
       href: ROUTES.DASHBOARD.ACCOUNT_ONLINE,
       icon: IdCard,
     },
