@@ -158,7 +158,6 @@ function UserPageContent() {
                 totalElements: prev.totalElements + 1,
               }
             : {
-            
                 content: [response],
                 pageNo: 1,
                 pageSize: 10,
@@ -288,7 +287,7 @@ function UserPageContent() {
             <div className="relative w-full md:w-[350px]">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                aria-label="search-user"
+                // aria-label="search-users"
                 autoComplete="search-user"
                 type="search"
                 placeholder="Search users..."

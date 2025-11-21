@@ -8,16 +8,31 @@ import { LocaleProvider } from "@/context/provider/local-provider";
 import { ClientProviders } from "@/context/provider/client-provider";
 import { ToastProvider } from "@/components/shared/toast/app-toast";
 
-const geistSans = localFont({
-  src: "../../public/fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-
-const geistMono = localFont({
-  src: "../../public/fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+// Define Kantumruy Pro font
+const kantumruyPro = localFont({
+  src: [
+    {
+      path: "../../public/fonts/KantumruyPro/KantumruyPro-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/KantumruyPro/KantumruyPro-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/KantumruyPro/KantumruyPro-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/KantumruyPro/KantumruyPro-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-kantumruy",
 });
 
 export const metadata: Metadata = {
@@ -37,14 +52,11 @@ export default async function RootLayout({
   console.log("Layout - Server locale:", serverLocale);
 
   return (
-    <html
-      lang={serverLocale}
-      className={`${geistSans.variable} ${geistMono.variable}`}
-    >
+    <html lang={serverLocale} className={kantumruyPro.variable}>
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="antialiased">
+      <body className="font-kantumruy antialiased">
         <LocaleProvider
           initialLocale={serverLocale}
           initialMessages={serverMessages}
