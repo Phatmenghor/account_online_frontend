@@ -142,7 +142,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
         )}
       >
         {/* Header */}
-        <div className="flex h-14 items-center justify-between border-b px-3 relative">
+        <div className="flex h-16 items-center justify-between border-b px-3 relative">
           {isOpen ? (
             <Link
               href={ROUTES.DASHBOARD.INDEX}
