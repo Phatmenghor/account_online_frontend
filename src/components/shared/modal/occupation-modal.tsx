@@ -30,7 +30,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, FilePenLine, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
-import { CreateOccupationReq, UpdateOccupationReq } from "@/models/static/occupation/occupation.request";
+import {
+  CreateOccupationReq,
+  UpdateOccupationReq,
+} from "@/models/static/occupation/occupation.request";
 import { OccupationModel } from "@/models/static/occupation/occupation.response";
 import { Status } from "@/constants/AppResource/display-list/enum/status";
 import { getOccupationByIdService } from "@/services/dashboard/occupation/occupation.service";
@@ -59,18 +62,21 @@ export default function ModalOccupation({
 }: ModalOccupationProps) {
   const isCreate = mode === ModalMode.CREATE_MODE;
 
-  const [occupationDetail, setOccupationDetail] = useState<OccupationModel | null>(null);
+  const [occupationDetail, setOccupationDetail] =
+    useState<OccupationModel | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
 
   const form = useForm<CreateOccupationForm | UpdateOccupationForm>({
-    resolver: zodResolver(isCreate ? CreateOccupationSchema : UpdateOccupationSchema),
+    resolver: zodResolver(
+      isCreate ? CreateOccupationSchema : UpdateOccupationSchema
+    ),
     defaultValues: isCreate
       ? {
-        nameEn: "",
-        nameKh: "",
-        occupationCode: "",
-        status: Status.ACTIVE,
-      }
+          nameEn: "",
+          nameKh: "",
+          occupationCode: "",
+          status: Status.ACTIVE,
+        }
       : undefined,
   });
 
@@ -143,13 +149,14 @@ export default function ModalOccupation({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl h-[90vh] p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-2xl w-full max-h-[90vh] p-0 flex flex-col gap-0">
         {/* Header */}
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4 pr-8">
             <div
-              className={`p-2 rounded-full ${isCreate ? "bg-green-100" : "bg-blue-100"
-                }`}
+              className={`p-2 rounded-full ${
+                isCreate ? "bg-green-100" : "bg-blue-100"
+              }`}
             >
               {isCreate ? (
                 <FileText className="h-5 w-5 text-green-600" />
@@ -165,22 +172,28 @@ export default function ModalOccupation({
                 {isCreate
                   ? "Fill in the details to create a new occupation"
                   : occupationDetail
-                    ? `Update information for "${occupationDetail.nameEn || occupationDetail.nameKh || occupationDetail.occupationCode}"`
-                    : "Loading occupation information..."}
+                  ? `Update information for "${
+                      occupationDetail.nameEn ||
+                      occupationDetail.nameKh ||
+                      occupationDetail.occupationCode
+                    }"`
+                  : "Loading occupation information..."}
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
         {/* Content */}
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="p-6">
+        <div className="flex-1 min-h-0 overflow-auto">
+          <div className="p-6 space-y-8">
             {/* Loading State */}
             {isLoadingData ? (
               <Loading />
             ) : !isCreate && !occupationDetail ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No occupation data available</p>
+                <p className="text-muted-foreground">
+                  No occupation data available
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -221,10 +234,11 @@ export default function ModalOccupation({
                           <Input
                             {...field}
                             id="nameEn"
-                            placeholder="Teacher"
+                            placeholder="Enter your name english"
                             disabled={isSubmitting}
-                            className={`transition-colors ${errors.nameEn ? "border-red-500" : ""
-                              }`}
+                            className={`transition-colors ${
+                              errors.nameEn ? "border-red-500" : ""
+                            }`}
                           />
                         )}
                       />
@@ -247,10 +261,11 @@ export default function ModalOccupation({
                           <Input
                             {...field}
                             id="nameKh"
-                            placeholder="គ្រូបង្រៀន"
+                            placeholder="Enter your name khmer"
                             disabled={isSubmitting}
-                            className={`transition-colors ${errors.nameKh ? "border-red-500" : ""
-                              }`}
+                            className={`transition-colors ${
+                              errors.nameKh ? "border-red-500" : ""
+                            }`}
                           />
                         )}
                       />
@@ -263,7 +278,10 @@ export default function ModalOccupation({
 
                     {/* Occupation Code */}
                     <div className="space-y-2">
-                      <Label htmlFor="occupationCode" className="text-sm font-medium">
+                      <Label
+                        htmlFor="occupationCode"
+                        className="text-sm font-medium"
+                      >
                         Occupation Code <span className="text-red-500">*</span>
                       </Label>
                       <Controller
@@ -275,8 +293,9 @@ export default function ModalOccupation({
                             id="occupationCode"
                             placeholder="Enter occupation code"
                             disabled={isSubmitting}
-                            className={`transition-colors ${errors.occupationCode ? "border-red-500" : ""
-                              }`}
+                            className={`transition-colors ${
+                              errors.occupationCode ? "border-red-500" : ""
+                            }`}
                           />
                         )}
                       />
@@ -286,7 +305,6 @@ export default function ModalOccupation({
                         </p>
                       )}
                     </div>
-
                   </div>
                 </div>
 
@@ -321,10 +339,11 @@ export default function ModalOccupation({
                                 <SelectItem key={s.value} value={s.value}>
                                   <div className="flex items-center gap-2">
                                     <div
-                                      className={`w-2 h-2 rounded-full ${s.value === Status.ACTIVE
+                                      className={`w-2 h-2 rounded-full ${
+                                        s.value === Status.ACTIVE
                                           ? "bg-green-500"
                                           : "bg-gray-400"
-                                        }`}
+                                      }`}
                                     ></div>
                                     {s.label}
                                   </div>
@@ -352,7 +371,9 @@ export default function ModalOccupation({
                     </h4>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Occupation ID:</span>
+                        <span className="text-muted-foreground">
+                          Occupation ID:
+                        </span>
                         <p className="font-medium">{occupationDetail.id}</p>
                       </div>
                       <div>
@@ -369,10 +390,10 @@ export default function ModalOccupation({
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0">
+        <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0 gap-4">
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             {isSubmitting ? (
               <>

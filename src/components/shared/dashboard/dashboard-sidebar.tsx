@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
-
-import { Button } from "@/components/ui/button";
+import { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,18 +12,44 @@ import { UserModel } from "@/models/user/user.response";
 import { useNavItems } from "@/constants/AppResource/display-list/ui-helper/sidebar-item";
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
 import { getUserProfileService } from "@/services/dashboard/user/user.service";
+import { ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
 
-interface SidebarProps {
+// ✨ Centralized Permission Configuration
+const ROLE_PERMISSIONS = {
+  SUPER: [
+    ROUTES.DASHBOARD.AML.HISTORY,
+    ROUTES.DASHBOARD.AML.MANAGEMENT,
+    ROUTES.DASHBOARD.STATIC.MARITAL,
+    ROUTES.DASHBOARD.STATIC.OCCUPATION,
+    ROUTES.DASHBOARD.STATIC.REFERENCE,
+    ROUTES.DASHBOARD.USER,
+  ],
+  ADMIN: [
+    ROUTES.DASHBOARD.AML.HISTORY,
+    ROUTES.DASHBOARD.AML.MANAGEMENT,
+    ROUTES.DASHBOARD.STATIC.MARITAL,
+    ROUTES.DASHBOARD.STATIC.OCCUPATION,
+    ROUTES.DASHBOARD.STATIC.REFERENCE,
+  ],
+  DEVELOPER: "ALL",
+} as const;
+
+interface DashboardSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
+export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [authUser, setAuthUser] = useState<UserModel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
+  const hasInitialized = useRef(false);
+
+  const navItems = useNavItems();
 
   const toggleSubmenu = (title: string) => {
     setOpenSubmenus((prev) => ({
@@ -34,8 +57,6 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
       [title]: !prev[title],
     }));
   };
-
-  const navItems = useNavItems();
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -53,190 +74,169 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
     loadUserProfile();
   }, []);
 
-  // Filter navigation items based on user role
+  // ✨ Initialize all submenus as open by default
+  useEffect(() => {
+    if (!hasInitialized.current && navItems.length > 0) {
+      const initialOpenState: Record<string, boolean> = {};
+
+      navItems.forEach((item) => {
+        if (item.subItems && item.subItems.length > 0) {
+          initialOpenState[item.title] = true;
+        }
+      });
+
+      setOpenSubmenus(initialOpenState);
+      hasInitialized.current = true;
+    }
+  }, [navItems]);
+
+  // ✨ Simplified Permission Filter
   const getFilteredNavItems = () => {
     if (!authUser?.userRole) return [];
 
-    const userRole = authUser.userRole.toUpperCase();
+    const userRole =
+      authUser.userRole.toUpperCase() as keyof typeof ROLE_PERMISSIONS;
+    const allowedRoutes = ROLE_PERMISSIONS[userRole];
 
-    if (userRole === "SUPER") {
-      // SUPER gets all tabs (static, aml, and user)
-      const allowedTabs = [
-        ROUTES.DASHBOARD.AML.HISTORY,
-        ROUTES.DASHBOARD.AML.MANAGEMENT,
-        ROUTES.DASHBOARD.STATIC.MARITAL,
-        ROUTES.DASHBOARD.STATIC.OCCUPATION,
-        ROUTES.DASHBOARD.STATIC.REFERENCE,
-        ROUTES.DASHBOARD.USER
-      ];
-      
-      return navItems
-        .map((item) => {
-          // If item has subItems, filter them
-          if (item.subItems && item.subItems.length > 0) {
-            const filteredSubItems = item.subItems.filter((sub) =>
-              allowedTabs.includes(sub.href)
-            );
-            // Only include parent if it has visible children
-            if (filteredSubItems.length > 0) {
-              return { ...item, subItems: filteredSubItems };
-            }
-            return null;
-          }
-          // For regular items, check if href is allowed
-          if (item.href && allowedTabs.includes(item.href)) {
-            return item;
-          }
-          return null;
-        })
-        .filter((item): item is NonNullable<typeof item> => item !== null); // Type-safe filter
-  
-    } else if (userRole === "ADMIN") {
-      // ADMIN gets only static and aml tabs
-      const allowedTabs = [
-        ROUTES.DASHBOARD.AML.HISTORY,
-        ROUTES.DASHBOARD.AML.MANAGEMENT,
-        ROUTES.DASHBOARD.STATIC.MARITAL,
-        ROUTES.DASHBOARD.STATIC.OCCUPATION,
-        ROUTES.DASHBOARD.STATIC.REFERENCE
-      ];
-      
-      return navItems
-        .map((item) => {
-          if (item.subItems && item.subItems.length > 0) {
-            const filteredSubItems = item.subItems.filter((sub) =>
-              allowedTabs.includes(sub.href)
-            );
-            if (filteredSubItems.length > 0) {
-              return { ...item, subItems: filteredSubItems };
-            }
-            return null;
-          }
-          if (item.href && allowedTabs.includes(item.href)) {
-            return item;
-          }
-          return null;
-        })
-        .filter((item): item is NonNullable<typeof item> => item !== null);
-        
-    } else if (userRole === "DEVELOPER") {
-      // Show all navigation items for developer
-      return navItems;
-    }
+    if (!allowedRoutes) return [];
+    if (allowedRoutes === "ALL") return navItems;
 
-    return [];
+    return navItems
+      .map((item) => {
+        if (item.subItems && item.subItems.length > 0) {
+          const filteredSubItems = item.subItems.filter((subItem) =>
+            allowedRoutes.includes(subItem.href)
+          );
+          return filteredSubItems.length > 0
+            ? { ...item, subItems: filteredSubItems }
+            : null;
+        }
+
+        return item.href && allowedRoutes.includes(item.href) ? item : null;
+      })
+      .filter(Boolean) as any[];
   };
-  
+
   const filteredNavItems = getFilteredNavItems();
+
+  // Hide sidebar on mobile
+  if (isMobile && !isOpen) {
+    return null;
+  }
 
   return (
     <>
-      {/* Mobile overlay */}
+      {/* Mobile Overlay */}
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={onToggle}
         />
       )}
 
-      {/* Sidebar */}
-      <div
+      {/* Collapsible Sidebar */}
+      <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card transition-all duration-300 ease-in-out shadow-lg",
-          isOpen ? "w-64" : "w-[70px]",
-          isMobile && !isOpen && "hidden"
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card shadow-lg transition-all duration-300 ease-in-out",
+          isMobile ? "w-64" : isOpen ? "w-64" : "w-16"
         )}
       >
-        {/* Sidebar header */}
-        <div className="flex h-14 items-center justify-between border-b px-3">
-          <Link
-            href={ROUTES.DASHBOARD.INDEX}
-            className={cn(
-              "flex items-center transition-all duration-300",
-              isOpen ? "gap-2" : "justify-center w-full"
-            )}
-          >
-            <img
-              src={AppIcons.APP.APP_LOGO}
-              alt="Internal Dev Logo"
-              className={cn(
-                "w-10 h-10 transition-all duration-300",
-                isOpen ? "mr-0" : "mx-auto h-8 w-7"
-              )}
-            />
-            {isOpen && (
-              <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+        {/* Header */}
+        <div className="flex h-16 items-center justify-between border-b px-3 relative">
+          {isOpen ? (
+            <Link
+              href={ROUTES.DASHBOARD.INDEX}
+              className="flex items-center gap-2 transition-opacity duration-200"
+            >
+              <img
+                src={AppIcons.APP.APP_LOGO}
+                alt="Internal Dev Logo"
+                className="w-10 h-10"
+              />
+              <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white whitespace-nowrap">
                 Account Online
               </span>
-            )}
-          </Link>
+            </Link>
+          ) : (
+            <Link
+              href={ROUTES.DASHBOARD.INDEX}
+              className="flex items-center justify-center w-full"
+            >
+              <img
+                src={AppIcons.APP.APP_LOGO}
+                alt="Internal Dev Logo"
+                className="w-10 h-10"
+              />
+            </Link>
+          )}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggle}
-            className={cn(
-              "transition-transform duration-300",
-              !isOpen && "rotate-180"
-            )}
-            aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-          >
-            {isOpen ? (
+          {/* Toggle Button - Hide on mobile */}
+          {!isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggle}
+              className={cn(
+                "absolute -right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full border bg-background shadow-md hover:bg-accent transition-all duration-200",
+                !isOpen && "rotate-180"
+              )}
+            >
               <ChevronLeft className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
+            </Button>
+          )}
         </div>
 
-        {/* Navigation items */}
+        {/* Navigation */}
         <ScrollArea className="flex-1 py-2">
-          <nav className="grid gap-1 px-2">
+          <nav className={cn("grid gap-0.5", isOpen ? "px-2" : "px-1")}>
             {filteredNavItems.map((item) => (
               <div key={item.title} className="flex flex-col">
-                {/* If item has subItems, use button to toggle submenu */}
                 {item.subItems ? (
                   <>
-                    <button
-                      type="button"
-                      onClick={() => toggleSubmenu(item.title)}
-                      className={cn(
-                        "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
-                        openSubmenus[item.title] &&
-                        "bg-accent text-accent-foreground",
-                        !isOpen && "justify-center px-0"
-                      )}
-                    >
-                      <item.icon className="h-5 w-5" />
-                      <span
+                    {/* Parent Item */}
+                    {isOpen ? (
+                      <div
                         className={cn(
-                          "whitespace-nowrap transition-all duration-300 ease-in-out",
-                          isOpen
-                            ? "opacity-100 translate-x-0 max-w-xs"
-                            : "opacity-0 -translate-x-4 max-w-0"
+                          "flex h-9 w-full items-center gap-2 rounded-md px-2 text-sm font-medium",
+                          "hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                        )}
+                        onClick={() => toggleSubmenu(item.title)}
+                      >
+                        <item.icon className="h-5 w-5 flex-shrink-0" />
+                        <span className="flex-1">{item.title}</span>
+                        <ChevronRight
+                          className={cn(
+                            "h-4 w-4 transition-transform duration-200",
+                            openSubmenus[item.title] && "rotate-90"
+                          )}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={cn(
+                          "flex h-9 w-full items-center justify-center rounded-md px-2",
+                          "hover:bg-accent hover:text-accent-foreground transition-colors group relative"
                         )}
                       >
-                        {item.title}
-                      </span>
-                      <ChevronRight
-                        className={cn(
-                          "ml-auto h-4 w-4 transition-transform duration-200",
-                          openSubmenus[item.title] && "rotate-90"
-                        )}
-                      />
-                    </button>
+                        <item.icon className="h-5 w-5" />
+                        {/* Tooltip */}
+                        <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                          {item.title}
+                        </div>
+                      </div>
+                    )}
 
-                    {/* Render submenu links */}
-                    {openSubmenus[item.title] && isOpen && (
-                      <div className="ml-6 flex flex-col gap-1 mt-1">
-                        {item.subItems.map((sub) => (
+                    {/* Sub Items */}
+                    {isOpen && openSubmenus[item.title] && (
+                      <div className="ml-4 flex flex-col gap-0.5 mt-0.5 animate-in slide-in-from-top-1 duration-200">
+                        {item.subItems.map((sub: any) => (
                           <Link
                             key={sub.href}
                             href={sub.href}
                             className={cn(
-                              "flex h-8 items-center rounded-md px-2 text-sm font-normal hover:bg-accent hover:text-accent-foreground transition-colors",
+                              "flex h-8 items-center rounded-md px-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
                               pathname === sub.href &&
-                              "bg-accent text-accent-foreground"
+                                "bg-accent text-accent-foreground font-medium"
                             )}
                           >
                             {sub.title}
@@ -246,27 +246,25 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
                     )}
                   </>
                 ) : (
-                  // Regular route link
+                  /* Normal item */
                   <Link
                     href={item.href}
                     className={cn(
-                      "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
+                      "flex h-9 w-full items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors group relative",
                       pathname === item.href &&
-                      "bg-accent text-accent-foreground",
-                      !isOpen && "justify-center px-0"
+                        "bg-accent text-accent-foreground",
+                      !isOpen && "justify-center"
                     )}
                   >
-                    <item.icon className="h-5 w-5" />
-                    <span
-                      className={cn(
-                        "whitespace-nowrap transition-all duration-300 ease-in-out",
-                        isOpen
-                          ? "opacity-100 translate-x-0 max-w-xs"
-                          : "opacity-0 -translate-x-4 max-w-0"
-                      )}
-                    >
-                      {item.title}
-                    </span>
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    {isOpen && <span>{item.title}</span>}
+
+                    {/* Tooltip for collapsed state */}
+                    {!isOpen && (
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                        {item.title}
+                      </div>
+                    )}
                   </Link>
                 )}
               </div>
@@ -274,18 +272,25 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
           </nav>
         </ScrollArea>
 
-        {/* Sidebar footer / user profile */}
-        <div className="border-t p-4">
+        {/* Footer User Profile */}
+        <div className="border-t p-3">
           {isLoading ? (
             <div className="animate-pulse flex flex-col gap-2">
-              <div className="h-10 w-full bg-slate-200 rounded-md dark:bg-slate-700" />
-              <div className="h-4 w-3/4 bg-slate-200 rounded-md dark:bg-slate-700" />
+              <div
+                className={cn(
+                  "h-10 bg-slate-200 rounded-md dark:bg-slate-700",
+                  isOpen ? "w-full" : "w-10 mx-auto"
+                )}
+              />
+              {isOpen && (
+                <div className="h-4 w-3/4 bg-slate-200 rounded-md dark:bg-slate-700" />
+              )}
             </div>
           ) : (
             <SidebarUserProfile user={authUser} isOpen={isOpen} />
           )}
         </div>
-      </div>
+      </aside>
     </>
   );
 }

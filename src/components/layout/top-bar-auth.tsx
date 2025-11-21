@@ -9,9 +9,6 @@ export function TopBarAuth() {
         <div className="flex items-center">
           <img src="/app/CP-bank-Logo.png" alt="Bank Logo" className="h-12" />
         </div>
-
-        {/* <ThemeToggle /> */}
-        <LanguageSwitcher variant="flag-only" />
       </div>
     </div>
   );

@@ -122,7 +122,7 @@ export const createManagementTableColumns = ({
     // Actions
     {
       key: "actions",
-      label: tMaster("actions"),
+      label: "Actions",
       maxWidth: "180px",
       minWidth: "160px",
       render: (management) => (

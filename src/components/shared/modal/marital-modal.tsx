@@ -30,7 +30,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, FilePenLine, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
-import { CreateMaritalReq, UpdateMaritalReq } from "@/models/static/marital/marital.request";
+import {
+  CreateMaritalReq,
+  UpdateMaritalReq,
+} from "@/models/static/marital/marital.request";
 import { MaritalModel } from "@/models/static/marital/marital.response";
 import { Status } from "@/constants/AppResource/display-list/enum/status";
 import { getMaritalByIdService } from "@/services/dashboard/marital/marital.service";
@@ -139,7 +142,7 @@ export default function ModalMarital({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl h-[90vh] p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-2xl w-full max-h-[90vh] p-0 flex flex-col gap-0">
         {/* Header */}
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4 pr-8">
@@ -162,7 +165,9 @@ export default function ModalMarital({
                 {isCreate
                   ? "Fill in the details to create a new marital status"
                   : maritalDetail
-                  ? `Update information for "${maritalDetail.nameEn || maritalDetail.nameKh}"`
+                  ? `Update information for "${
+                      maritalDetail.nameEn || maritalDetail.nameKh
+                    }"`
                   : "Loading marital status information..."}
               </DialogDescription>
             </div>
@@ -170,14 +175,16 @@ export default function ModalMarital({
         </DialogHeader>
 
         {/* Content */}
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="p-6">
+        <div className="flex-1 min-h-0 overflow-auto">
+          <div className="p-6 space-y-8">
             {/* Loading State */}
             {isLoadingData ? (
               <Loading />
             ) : !isCreate && !maritalDetail ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No marital data available</p>
+                <p className="text-muted-foreground">
+                  No marital data available
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -218,7 +225,7 @@ export default function ModalMarital({
                           <Input
                             {...field}
                             id="nameEn"
-                            placeholder="Single"
+                            placeholder="Enter your name english"
                             disabled={isSubmitting}
                             className={`transition-colors ${
                               errors.nameEn ? "border-red-500" : ""
@@ -245,7 +252,7 @@ export default function ModalMarital({
                           <Input
                             {...field}
                             id="nameKh"
-                            placeholder="នៅលីវ"
+                            placeholder="Enter your name khmer"
                             disabled={isSubmitting}
                             className={`transition-colors ${
                               errors.nameKh ? "border-red-500" : ""
@@ -325,7 +332,9 @@ export default function ModalMarital({
                     </h4>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Marital ID:</span>
+                        <span className="text-muted-foreground">
+                          Marital ID:
+                        </span>
                         <p className="font-medium">{maritalDetail.id}</p>
                       </div>
                       <div>
@@ -342,15 +351,17 @@ export default function ModalMarital({
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0">
+        <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0 gap-4">
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             {isSubmitting ? (
               <>
                 <Loader2 className="h-3 w-3 animate-spin" />
-                {isCreate ? "Creating marital status..." : "Updating marital status..."}
+                {isCreate
+                  ? "Creating marital status..."
+                  : "Updating marital status..."}
               </>
             ) : isDirty ? (
               <>

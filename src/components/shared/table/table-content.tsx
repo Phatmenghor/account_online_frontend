@@ -136,7 +136,7 @@ export const createUserTableColumns = ({
                   <Edit className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("edit")}</TooltipContent>
+              <TooltipContent>{"Edit User"}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -149,7 +149,7 @@ export const createUserTableColumns = ({
                   <RotateCcw className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("reset-password")}</TooltipContent>
+              <TooltipContent>{"Reset password"}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -162,7 +162,7 @@ export const createUserTableColumns = ({
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("view")}</TooltipContent>
+              <TooltipContent>{"View"}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -175,7 +175,7 @@ export const createUserTableColumns = ({
                   <Trash className="h-3 w-3" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("delete")}</TooltipContent>
+              <TooltipContent>{"Delete"}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>

@@ -1,6 +1,12 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import {
+  startTransition,
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { CustomPagination } from "@/components/shared/pagination/custom-pagination";
 import { DataTable } from "@/components/shared/table/data-table";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +31,7 @@ import {
 } from "@/models/aml/management/response/aml-management.response";
 import AmlViewDetailModal from "@/components/shared/modal/aml-management-detail";
 import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
+import { AppToast } from "@/components/shared/toast/app-toast";
 
 function Management() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -110,11 +117,32 @@ function Management() {
     if (!selectedManagementId) return;
     setIsConfirmLoading(true);
     try {
-      await updateManagementService(selectedManagementId, {
+      const response = await updateManagementService(selectedManagementId, {
         status: selectedStatus,
       });
 
-      await loadManagement();
+      // Optimistic update + remove approved/rejected items
+      setAmlManagement((prev: any) => {
+        if (!prev) return null;
+
+        const updatedList = prev.content
+          // keep everything except the one just updated
+          .filter((item: any) => item.id !== selectedManagementId);
+
+        return {
+          ...prev,
+          content: updatedList,
+          totalElements: updatedList.length,
+        };
+      });
+
+      startTransition(() => {
+        AppToast({
+          type: "success",
+          message: `AML ${selectedStatus} successfully`,
+          description: `AML has been ${selectedStatus.toLowerCase()}.`,
+        });
+      });
     } catch (error) {
       console.error("Error updating AML status:", error);
     } finally {
