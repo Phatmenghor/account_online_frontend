@@ -65,8 +65,8 @@ import { CreateOpenAccountReq } from "@/models/open-account/openAccount.request"
 import { createOpenAccountService } from "@/services/open-account/openAccount.service";
 import {
   NIDFormData,
-  NIDFormSchema,
-  NIDVerificationSchema,
+  useNIDFormSchema,
+  useNIDVerificationSchema,
 } from "@/components/acc-online/form-field/form-validate-error";
 import { Label } from "@/components/ui/label";
 import LoadingModal from "@/components/shared/modal/extract-modal";
@@ -118,6 +118,10 @@ export default function CheckNIDPage() {
     MRZ2: "",
     MRZ3: "",
   });
+
+  // Initialize schemas with translations
+  const NIDFormSchema = useNIDFormSchema();
+  const NIDVerificationSchema = useNIDVerificationSchema();
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<Image | null>(null);
@@ -489,6 +493,10 @@ export default function CheckNIDPage() {
 
       console.log("Normalized data:", normalizedData);
       setFormData(normalizedData);
+
+      // Auto-select legal type to "national-id" after successful extraction
+      setLegalType("national-id");
+      validateField("legalType", "national-id");
 
       // Validate all extracted fields to clear any validation errors
       validateField("lastNameKh", normalizedData.lastNameKh);
