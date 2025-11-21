@@ -25,10 +25,6 @@ import { STATUS_REPORT_OPTIONS } from "@/constants/AppResource/filter/status";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { usePagination } from "@/hooks/use-pagination";
 
-import {
-  ReportData,
-  ReportSchema,
-} from "@/components/acc-online/form-field/form-validate-error";
 import Loading from "@/components/shared/common/loading";
 import { AllReportModel, ReportModel } from "@/models/report/report.response";
 import { AllReportRequestModel } from "@/models/report/report.request";
@@ -37,6 +33,21 @@ import {
   getAccountOnlineReportAllViewService,
 } from "@/services/report/acc-online-report.service";
 import { exportReportToExcel } from "@/utils/export-file/exportReportExcel";
+import z from "zod";
+
+// Form data type
+export type ReportData = {
+  fromDate: string;
+  toDate: string;
+  status: string;
+};
+
+// Zod schema for validation
+export const ReportSchema = z.object({
+  fromDate: z.string().min(1, "From Date is required"),
+  toDate: z.string().min(1, "To Date is required"),
+  status: z.string().optional(),
+});
 
 const defaultForm: ReportData = { fromDate: "", toDate: "", status: "" };
 
@@ -57,6 +68,7 @@ function ReportPageContent() {
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [report, setReport] = useState<AllReportModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExportLoading, setIsExportLoading] = useState(false);
 
   const { currentPage, updateUrlWithPage, handlePageChange } = usePagination({
     baseRoute: ROUTES.DASHBOARD.REPORT,
@@ -101,18 +113,23 @@ function ReportPageContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, statusFilter, formData]);
+  }, [currentPage, statusFilter, formData.fromDate, formData.toDate]);
 
   useEffect(() => {
     // Only trigger search if both dates are filled
     if (formData.fromDate && formData.toDate) {
-      handleSearch();
+      loadReport();
     }
-    // We intentionally exclude handleSearch from deps to avoid infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.fromDate, formData.toDate, statusFilter]);
+  }, [
+    formData.fromDate,
+    formData.toDate,
+    statusFilter,
+    currentPage,
+    loadReport,
+  ]);
 
   const handleExportExcel = async () => {
+    setIsExportLoading(true);
     try {
       const req: AllReportRequestModel = {
         pageNo: 1,
@@ -130,6 +147,8 @@ function ReportPageContent() {
       toast.success("Excel export ready.");
     } catch (err: any) {
       toast.error(err.errorMessage || "Failed to export Excel.");
+    } finally {
+      setIsExportLoading(false);
     }
   };
 
@@ -237,8 +256,37 @@ function ReportPageContent() {
               className="flex items-center gap-2"
               onClick={handleExportExcel}
               variant="secondary"
+              disabled={isExportLoading} // optional: disable button while loading
             >
-              <Download size={16} /> Export
+              {isExportLoading ? (
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                  Exporting...
+                </span>
+              ) : (
+                <>
+                  <Download size={16} /> Export
+                </>
+              )}
             </Button>
           </div>
         </div>

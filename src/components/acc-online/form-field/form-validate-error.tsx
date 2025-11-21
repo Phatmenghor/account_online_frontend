@@ -10,24 +10,24 @@
 //   // Images
 //   idImage: z.string().min(1, translate("err_idImage")),
 //   selfieImage: z.string().min(1, "Selfie image is required"),
-  
+
 //   // Personal Information (Khmer)
 //   lastNameKh: z.string().min(1, "First name (Khmer) is required"),
 //   firstNameKh: z.string().min(1, "Last name (Khmer) is required"),
-  
+
 //   // Personal Information (English)
 //   lastNameEn: z.string().min(1, "Family name (English) is required"),
 //   firstNameEn: z.string().min(1, "Given name (English) is required"),
-  
+
 //   // Date and Identity
 //   dob: z.string().min(1, "Date of birth is required"),
 //   gender: z.string().min(1, "Gender is required"),
 //   idNumber: z.string().min(1, "Legal ID is required"),
-  
+
 //   // Address Information
 //   address: z.string().min(1, "Address is required"),
 //   pob: z.string().min(1, "Place of birth is required"),
-  
+
 //   // Additional Information
 //   maritalStatus: z.string().min(1, "Marital status is required"),
 //   occupation: z.string().min(1, "Occupation is required"),
@@ -35,7 +35,7 @@
 //   legalType: z.string().min(1, "Legal type is required"),
 //   referenceBank: z.string().optional(),
 //   staffCode: z.string().optional(),
-  
+
 //   // Phone and OTP
 //   phoneNumber: z.string()
 //     .min(9, "Phone number must be at least 9 digits")
@@ -65,7 +65,6 @@
 
 // export type NIDVerificationData = z.infer<typeof NIDVerificationSchema>;
 
-
 // // Schema for Location/Address Form Validation
 // export const LocationFormSchema = z.object({
 //   // Current Address
@@ -75,7 +74,7 @@
 //     commune: z.string().min(1, "Commune is required"),
 //     village: z.string().min(1, "Village is required"),
 //   }),
-  
+
 //   // Place of Birth
 //   placeOfBirth: z.object({
 //     province: z.string().min(1, "Province is required"),
@@ -87,36 +86,36 @@
 
 // export type LocationFormData = z.infer<typeof LocationFormSchema>;
 
-"use client"
+"use client";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
 // Schema for NID Form Validation
 export const useNIDFormSchema = () => {
   const translate = useTranslations("NIDPage");
-  
+
   return z.object({
     // Images
     idImage: z.string().min(1, translate("err_idImage")),
     selfieImage: z.string().min(1, translate("err_selfieImage")),
-    
+
     // Personal Information (Khmer)
     lastNameKh: z.string().min(1, translate("err_lastNameKh")),
     firstNameKh: z.string().min(1, translate("err_firstNameKh")),
-    
+
     // Personal Information (English)
     lastNameEn: z.string().min(1, translate("err_lastNameEn")),
     firstNameEn: z.string().min(1, translate("err_firstNameEn")),
-    
+
     // Date and Identity
     dob: z.string().min(1, translate("err_dob")),
     gender: z.string().min(1, translate("err_gender")),
     idNumber: z.string().min(1, translate("err_idNumber")),
-    
+
     // Address Information
     address: z.string().min(1, translate("err_address")),
     pob: z.string().min(1, translate("err_pob")),
-    
+
     // Additional Information
     maritalStatus: z.string().min(1, translate("err_maritalStatus")),
     occupation: z.string().min(1, translate("err_occupation")),
@@ -124,9 +123,10 @@ export const useNIDFormSchema = () => {
     legalType: z.string().min(1, translate("err_legalType")),
     referenceBank: z.string().optional(),
     staffCode: z.string().optional(),
-    
+
     // Phone and OTP
-    phoneNumber: z.string()
+    phoneNumber: z
+      .string()
       .min(8, translate("err_phoneNumber_min"))
       .max(15, translate("err_phoneNumber_max"))
       .regex(/^[0-9]+$/, translate("err_phoneNumber_regex")),
@@ -155,12 +155,14 @@ export const useNIDVerificationSchema = () => {
   });
 };
 
-export type NIDVerificationData = z.infer<ReturnType<typeof useNIDVerificationSchema>>;
+export type NIDVerificationData = z.infer<
+  ReturnType<typeof useNIDVerificationSchema>
+>;
 
 // Schema for Location/Address Form Validation
 export const useLocationFormSchema = () => {
   const translate = useTranslations("address");
-  
+
   return z.object({
     // Current Address
     currentAddress: z.object({
@@ -169,7 +171,7 @@ export const useLocationFormSchema = () => {
       commune: z.string().min(1, translate("err_commune")),
       village: z.string().min(1, translate("err_village")),
     }),
-    
+
     // Place of Birth
     placeOfBirth: z.object({
       province: z.string().min(1, translate("err_province")),
@@ -180,4 +182,6 @@ export const useLocationFormSchema = () => {
   });
 };
 
-export type LocationFormData = z.infer<ReturnType<typeof useLocationFormSchema>>;
+export type LocationFormData = z.infer<
+  ReturnType<typeof useLocationFormSchema>
+>;

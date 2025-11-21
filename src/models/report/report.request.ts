@@ -7,6 +7,6 @@ export interface AllReportRequestModel {
 }
 
 export interface AllReportExcelReq {
-  fromDate?: string;
-  toDate?: string;
+  fromDate: string;
+  toDate: string;
 }
