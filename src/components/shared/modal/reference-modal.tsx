@@ -30,7 +30,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, FilePenLine, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
-import { CreateReferenceReq, UpdateReferenceReq } from "@/models/static/reference/reference.request";
+import {
+  CreateReferenceReq,
+  UpdateReferenceReq,
+} from "@/models/static/reference/reference.request";
 import { ReferenceModel } from "@/models/static/reference/reference.response";
 import { Status } from "@/constants/AppResource/display-list/enum/status";
 import { getReferenceByIdService } from "@/services/dashboard/reference/reference.service";
@@ -59,11 +62,15 @@ export default function ModalReference({
 }: ModalReferenceProps) {
   const isCreate = mode === ModalMode.CREATE_MODE;
 
-  const [referenceDetail, setReferenceDetail] = useState<ReferenceModel | null>(null);
+  const [referenceDetail, setReferenceDetail] = useState<ReferenceModel | null>(
+    null
+  );
   const [isLoadingData, setIsLoadingData] = useState(false);
 
   const form = useForm<CreateReferenceForm | UpdateReferenceForm>({
-    resolver: zodResolver(isCreate ? CreateReferenceSchema : UpdateReferenceSchema),
+    resolver: zodResolver(
+      isCreate ? CreateReferenceSchema : UpdateReferenceSchema
+    ),
     defaultValues: isCreate
       ? {
           nameEn: "",
@@ -139,7 +146,7 @@ export default function ModalReference({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl h-[90vh] p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-2xl w-full max-h-[90vh] p-0 flex flex-col gap-0">
         {/* Header */}
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4 pr-8">
@@ -162,7 +169,9 @@ export default function ModalReference({
                 {isCreate
                   ? "Fill in the details to create a new bank"
                   : referenceDetail
-                  ? `Update information for "${referenceDetail.nameEn || referenceDetail.nameKh}"`
+                  ? `Update information for "${
+                      referenceDetail.nameEn || referenceDetail.nameKh
+                    }"`
                   : "Loading bank information..."}
               </DialogDescription>
             </div>
@@ -170,8 +179,8 @@ export default function ModalReference({
         </DialogHeader>
 
         {/* Content */}
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="p-6">
+        <div className="flex-1 min-h-0 overflow-auto">
+          <div className="p-6 space-y-8">
             {/* Loading State */}
             {isLoadingData ? (
               <Loading />
@@ -342,10 +351,10 @@ export default function ModalReference({
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0">
+        <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0 gap-4">
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             {isSubmitting ? (
               <>

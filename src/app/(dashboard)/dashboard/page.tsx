@@ -7,6 +7,7 @@ import { getAccountOnlineReportService } from "@/services/dashboard/aml/aml.serv
 import { Button } from "@/components/ui/button";
 import { Search, XCircle } from "lucide-react";
 import { CustomDatePicker } from "@/components/shared/common/custom-date-picker";
+import Loading from "@/components/shared/common/loading";
 
 // Helper to format date as YYYY-MM-DD
 const formatDate = (date: Date) => {
@@ -20,11 +21,14 @@ const Dashboard = () => {
   const [data, setData] = useState<AllAmlStatisticsModel>([]);
   const [loading, setLoading] = useState(false);
 
-  // Default fromDate: 7 days ago, toDate: today
+  // Previous month → Same day last month until today
   const today = new Date();
-  const defaultFromDate = formatDate(
-    new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
-  );
+
+  // Get same day last month
+  const lastMonth = new Date(today);
+  lastMonth.setMonth(today.getMonth() - 1);
+
+  const defaultFromDate = formatDate(lastMonth);
   const defaultToDate = formatDate(today);
 
   const [fromDate, setFromDate] = useState<string>(defaultFromDate);
@@ -60,43 +64,34 @@ const Dashboard = () => {
     fetchData(defaultFromDate, defaultToDate);
   };
 
+  const totalAml = data.reduce((acc, curr) => acc + curr.amlCount, 0);
+  const totalSuccess = data.reduce((acc, curr) => acc + curr.successCount, 0);
+  const totalFailure = data.reduce((acc, curr) => acc + curr.failureCount, 0);
+
   return (
-    <div>
-      {/* Date Filter */}
-      <div className="flex gap-2 mb-4 items-center">
-        <CustomDatePicker
-          value={fromDate}
-          onChange={setFromDate}
-          placeholder="From Date"
-        />
-        <CustomDatePicker
-          value={toDate}
-          onChange={setToDate}
-          placeholder="To Date"
-        />
-
-        <Button
-          variant="outline"
-          className="flex items-center gap-2"
-          onClick={handleSearch}
-          disabled={!fromDate || !toDate}
-        >
-          <Search className="w-5 h-5" /> Apply
-        </Button>
-
-        {(fromDate !== defaultFromDate || toDate !== defaultToDate) && (
-          <Button
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={handleClear}
-          >
-            <XCircle className="w-5 h-5" /> Clear
-          </Button>
-        )}
+    <div className="flex flex-col h-[calc(100vh-5rem)]">
+      {/* Chart Container */}
+      <div className="flex-1 min-h-0 border rounded-lg p-4">
+        <div className="w-full h-full">
+          {loading && data.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <Loading />
+            </div>
+          ) : (
+            <AmlStatisticsChart
+              data={data}
+              fromDate={fromDate}
+              toDate={toDate}
+              onFromDateChange={setFromDate}
+              onToDateChange={setToDate}
+              onSearch={handleSearch}
+              onClear={handleClear}
+              defaultFromDate={defaultFromDate}
+              defaultToDate={defaultToDate}
+            />
+          )}
+        </div>
       </div>
-
-      {/* Chart */}
-      {loading ? <p>Loading...</p> : <AmlStatisticsChart data={data} />}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+// Updated ModalUser with improved spacing for UX
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
@@ -164,8 +165,7 @@ export default function ModalUser({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl h-[90vh] p-0 gap-0 flex flex-col">
-        {/* Header */}
+      <DialogContent className="max-w-2xl w-full max-h-[90vh] p-0 flex flex-col gap-0">
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4 pr-8">
             <div
@@ -196,10 +196,8 @@ export default function ModalUser({
           </div>
         </DialogHeader>
 
-        {/* Content */}
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="p-6">
-            {/* Loading State */}
+        <div className="flex-1 min-h-0 overflow-auto">
+          <div className="p-6 space-y-8">
             {isLoadingData ? (
               <Loading />
             ) : !isCreate && !userDetail ? (
@@ -208,16 +206,14 @@ export default function ModalUser({
               </div>
             ) : (
               <div className="space-y-6">
-                {/* Error Display */}
                 {error && (
-                  <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                  <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md mt-2">
                     <p className="text-sm text-destructive font-medium">
                       {error}
                     </p>
                   </div>
                 )}
 
-                {/* Hidden ID field for update mode */}
                 {!isCreate && (
                   <Controller
                     control={control}
@@ -226,14 +222,12 @@ export default function ModalUser({
                   />
                 )}
 
-                {/* Account Credentials Section */}
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                     Account Credentials
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Username - Create Mode Only */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {isCreate && (
                       <div className="space-y-2">
                         <Label
@@ -251,7 +245,7 @@ export default function ModalUser({
                               id="username"
                               placeholder="johndoe"
                               disabled={isSubmitting}
-                              className={`transition-colors ${
+                              className={`transition-colors h-10 ${
                                 errors.username ? "border-red-500" : ""
                               }`}
                             />
@@ -265,7 +259,6 @@ export default function ModalUser({
                       </div>
                     )}
 
-                    {/* Username - Edit Mode (Read Only) */}
                     {!isCreate && userDetail && (
                       <div className="space-y-2">
                         <Label
@@ -278,7 +271,7 @@ export default function ModalUser({
                           id="username-readonly"
                           value={userDetail.idCard || "Not provided"}
                           disabled
-                          className="bg-muted/50 cursor-not-allowed"
+                          className="bg-muted/50 cursor-not-allowed h-10"
                         />
                         <p className="text-xs text-muted-foreground">
                           Username cannot be modified
@@ -286,7 +279,6 @@ export default function ModalUser({
                       </div>
                     )}
 
-                    {/* Email Field */}
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-sm font-medium">
                         Email{" "}
@@ -302,7 +294,7 @@ export default function ModalUser({
                             type="email"
                             placeholder="john@example.com"
                             disabled={isSubmitting}
-                            className={`transition-colors ${
+                            className={`transition-colors h-10 ${
                               errors.email ? "border-red-500" : ""
                             }`}
                           />
@@ -316,7 +308,6 @@ export default function ModalUser({
                     </div>
                   </div>
 
-                  {/* Password - Create Mode Only */}
                   {isCreate && (
                     <div className="space-y-2">
                       <Label htmlFor="password" className="text-sm font-medium">
@@ -333,7 +324,7 @@ export default function ModalUser({
                               type={showPassword ? "text" : "password"}
                               placeholder="Enter secure password"
                               disabled={isSubmitting}
-                              className={`transition-colors pr-10 ${
+                              className={`transition-colors pr-10 h-10 ${
                                 (errors as any).password ? "border-red-500" : ""
                               }`}
                             />
@@ -361,14 +352,12 @@ export default function ModalUser({
                   )}
                 </div>
 
-                {/* Personal Information Section */}
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                     Personal Information
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Full Name */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="fullName" className="text-sm font-medium">
                         Full Name
@@ -382,13 +371,12 @@ export default function ModalUser({
                             id="fullName"
                             placeholder="John Doe"
                             disabled={isSubmitting}
-                            className="transition-colors"
+                            className="transition-colors h-10"
                           />
                         )}
                       />
                     </div>
 
-                    {/* Position */}
                     <div className="space-y-2">
                       <Label htmlFor="position" className="text-sm font-medium">
                         Position
@@ -402,7 +390,7 @@ export default function ModalUser({
                             id="position"
                             placeholder="Software Engineer"
                             disabled={isSubmitting}
-                            className="transition-colors"
+                            className="transition-colors h-10"
                           />
                         )}
                       />
@@ -410,14 +398,12 @@ export default function ModalUser({
                   </div>
                 </div>
 
-                {/* Permissions & Access Section */}
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                     Permissions & Access
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* User Permission */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label
                         htmlFor="userPermission"
@@ -437,7 +423,7 @@ export default function ModalUser({
                           >
                             <SelectTrigger
                               id="userPermission"
-                              className="transition-colors"
+                              className="transition-colors h-10"
                             >
                               <SelectValue placeholder="Select user permission" />
                             </SelectTrigger>
@@ -458,7 +444,6 @@ export default function ModalUser({
                       )}
                     </div>
 
-                    {/* Role - Create Mode Only */}
                     {isCreate && (
                       <div className="space-y-2">
                         <Label htmlFor="role" className="text-sm font-medium">
@@ -475,7 +460,7 @@ export default function ModalUser({
                             >
                               <SelectTrigger
                                 id="role"
-                                className="transition-colors"
+                                className="transition-colors h-10"
                               >
                                 <SelectValue placeholder="Select role" />
                               </SelectTrigger>
@@ -492,7 +477,6 @@ export default function ModalUser({
                       </div>
                     )}
 
-                    {/* Status - Edit Mode Only */}
                     {!isCreate && (
                       <div className="space-y-2">
                         <Label htmlFor="status" className="text-sm font-medium">
@@ -509,7 +493,7 @@ export default function ModalUser({
                             >
                               <SelectTrigger
                                 id="status"
-                                className="transition-colors"
+                                className="transition-colors h-10"
                               >
                                 <SelectValue placeholder="Select status" />
                               </SelectTrigger>
@@ -542,14 +526,13 @@ export default function ModalUser({
                   </div>
                 </div>
 
-                {/* User Info Card - Read Only (edit mode only) */}
                 {!isCreate && userDetail && (
                   <div className="mt-2 p-4 bg-muted/30 rounded-lg border border-border">
                     <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                       <div className="w-2 h-2 bg-primary rounded-full"></div>
                       System Information (Read Only)
                     </h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-2 gap-6 text-sm">
                       <div>
                         <span className="text-muted-foreground">User ID:</span>
                         <p className="font-medium">{userDetail.id}</p>
@@ -568,10 +551,9 @@ export default function ModalUser({
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
-        {/* Footer */}
-        <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0">
+        <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0 gap-4">
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             {isSubmitting ? (
               <>
