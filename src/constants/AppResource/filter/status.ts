@@ -1,4 +1,4 @@
-import { AmlStatusEnum, Status } from "../display-list/enum/status";
+import { AmlStatusEnum, Status, StatusReport } from "../display-list/enum/status";
 
 export const STATUS_FILTER = [
   { value: "ALL", label: "All Status" },
@@ -16,4 +16,12 @@ export const AmlStatusList: AmlStatusEnum[] = [
   AmlStatusEnum.PENDING,
   AmlStatusEnum.APPROVE,
   AmlStatusEnum.REJECT,
+];
+
+
+// Report status
+export const STATUS_REPORT_OPTIONS = [
+  { value: StatusReport.AML, label: "AML" },
+  { value: StatusReport.FAILURE, label: "Failure" },
+  { value: StatusReport.SUCCESS, label: "Success" },
 ];

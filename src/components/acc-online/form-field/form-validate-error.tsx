@@ -89,3 +89,14 @@ export const LocationFormSchema = z.object({
 });
 
 export type LocationFormData = z.infer<typeof LocationFormSchema>;
+
+
+// report validation
+export const ReportSchema = z.object({
+
+  fromDate: z.string().min(1, "From date is required"),
+  toDate: z.string().min(1, "To date is required"),
+  
+});
+
+export type ReportData = z.infer<typeof ReportSchema>;

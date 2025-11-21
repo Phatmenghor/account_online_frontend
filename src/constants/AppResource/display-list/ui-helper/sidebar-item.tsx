@@ -70,5 +70,10 @@ export function useNavItems() {
       icon: IdCard
 
     },
+     {
+      title: "Report",
+      href: ROUTES.DASHBOARD.REPORT,
+      icon: IdCard
+    },
   ];
 }

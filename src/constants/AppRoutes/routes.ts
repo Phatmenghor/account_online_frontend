@@ -18,6 +18,7 @@ export const ROUTES = {
       HISTORY: "/aml-history",
     },
     ACCOUNT_ONLINE: "/account-online",
+    REPORT : "/report"
   },
 };
 
