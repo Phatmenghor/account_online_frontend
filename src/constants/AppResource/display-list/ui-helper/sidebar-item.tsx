@@ -22,26 +22,10 @@ export function useNavItems() {
       icon: User2,
     },
     {
-      title: "Master Data",
-      href: "#", // main parent, not clickable
-      icon: Calendar1Icon,
-      subItems: [
-        {
-          title: "Marital",
-          href: ROUTES.DASHBOARD.STATIC.MARITAL,
-        },
-        {
-          title: "Occupation",
-          href: ROUTES.DASHBOARD.STATIC.OCCUPATION,
-        },
-        {
-          title: "Reference",
-          href: ROUTES.DASHBOARD.STATIC.REFERENCE,
-          icon: FolderClosed,
-        },
-      ],
+      title: "Account Final",
+      href: ROUTES.DASHBOARD.ACCOUNT_ONLINE,
+      icon: IdCard,
     },
-
     {
       title: "AML",
       href: "#",
@@ -58,9 +42,23 @@ export function useNavItems() {
       ],
     },
     {
-      title: "Account Final",
-      href: ROUTES.DASHBOARD.ACCOUNT_ONLINE,
-      icon: IdCard,
+      title: "Master Data",
+      href: "#",
+      icon: Calendar1Icon,
+      subItems: [
+        {
+          title: "Marital",
+          href: ROUTES.DASHBOARD.STATIC.MARITAL,
+        },
+        {
+          title: "Occupation",
+          href: ROUTES.DASHBOARD.STATIC.OCCUPATION,
+        },
+        {
+          title: "Reference",
+          href: ROUTES.DASHBOARD.STATIC.REFERENCE,
+        },
+      ],
     },
   ];
 }
