@@ -30,8 +30,11 @@ export const createReferenceTableColumns = ({
   data,
   handlers,
 }: ReferenceTableOptions): TableColumn<ReferenceModel>[] => {
-  const { handleEditReference, handleViewReferenceDetail, handleDeleteReference } =
-    handlers;
+  const {
+    handleEditReference,
+    handleViewReferenceDetail,
+    handleDeleteReference,
+  } = handlers;
 
   const getStatusColor = (status: string) => {
     switch (status?.toUpperCase()) {
@@ -108,7 +111,7 @@ export const createReferenceTableColumns = ({
                   <Edit className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("edit")}</TooltipContent>
+              <TooltipContent>{"Edit"}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -121,7 +124,7 @@ export const createReferenceTableColumns = ({
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("view")}</TooltipContent>
+              <TooltipContent>{"View"}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -134,7 +137,7 @@ export const createReferenceTableColumns = ({
                   <Trash className="h-3 w-3" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("delete")}</TooltipContent>
+              <TooltipContent>{"Delete"}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>

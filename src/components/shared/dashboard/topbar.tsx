@@ -39,37 +39,53 @@ export function TopBar({ onMenuClick }: TopBarProps) {
   const handleLogout = () => {
     logoutToken();
     logoutRole();
-
     router.replace(ROUTES.AUTH.LOGIN);
   };
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
-        {isMobile && (
-          <Button variant="ghost" size="icon" onClick={onMenuClick}>
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
-        )}
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:px-6 lg:px-8 shadow-sm">
+        <div className="flex items-center gap-4 flex-1">
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onMenuClick}
+              className="hover:bg-accent rounded-lg transition-all duration-200 active:scale-95"
+            >
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          )}
 
-        <Link
-          href={ROUTES.DASHBOARD.INDEX}
-          className="flex items-center gap-2 font-semibold"
-        >
-          <img
-            src={AppIcons.APP.CPBANK}
-            alt="Special Account"
-            className="w-72 h-12"
-          />
-        </Link>
+          {/* Logo */}
+          <Link
+            href={ROUTES.DASHBOARD.INDEX}
+            className="flex items-center gap-3 group transition-all duration-200"
+          >
+            <div className="relative">
+              <img
+                src={AppIcons.APP.CPBANK}
+                alt="Special Account"
+                className="h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+              />
+            </div>
+          </Link>
+        </div>
 
         <div className="flex items-center gap-3 justify-end flex-1">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowLogoutAlert(true)}
-            className="flex items-center gap-2 hover:text-destructive transition-colors"
+            className={cn(
+              "group relative overflow-hidden",
+              "border-border hover:border-destructive/50",
+              "hover:bg-destructive/10 hover:text-destructive",
+              "transition-all duration-200 active:scale-95",
+              "shadow-sm hover:shadow-md"
+            )}
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline text-xs font-medium">Logout</span>
@@ -77,19 +93,29 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         </div>
       </header>
 
+      {/* Logout Confirmation Dialog */}
       <AlertDialog open={showLogoutAlert} onOpenChange={setShowLogoutAlert}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you sure you want to logout?
+        <AlertDialogContent className="sm:max-w-[425px]">
+          <AlertDialogHeader className="space-y-3">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+              <LogOut className="h-6 w-6 text-destructive" />
+            </div>
+            <AlertDialogTitle className="text-center text-xl">
+              Logout Confirmation
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              You will need to login again to access your dashboard.
+            <AlertDialogDescription className="text-center">
+              Are you sure you want to logout? You'll need to sign in again to
+              access your dashboard and account information.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
+          <AlertDialogFooter className="sm:space-x-2">
+            <AlertDialogCancel className="sm:mt-0">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLogout}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Yes, Logout
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
