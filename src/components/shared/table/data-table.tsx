@@ -56,7 +56,7 @@ export function DataTable<T = any>({
             </tr>
           </thead>
           <tbody>
-            {[...Array(5)].map((_, i) => (
+            {[...Array(12)].map((_, i) => (
               <tr key={i}>
                 {columns.map((column) => (
                   <td
