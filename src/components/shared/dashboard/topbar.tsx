@@ -74,22 +74,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
           </Link>
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Theme Toggle */}
-          <div className="hidden sm:block">
-            <ThemeToggle />
-          </div>
-
-          {/* Language Switcher */}
-          <div className="flex items-center">
-            <LanguageSwitcher variant="flag-only" />
-          </div>
-
-          {/* Divider */}
-          <div className="hidden sm:block h-6 w-px bg-border" />
-
-          {/* Logout Button */}
+        <div className="flex items-center gap-3 justify-end flex-1">
           <Button
             variant="outline"
             size="sm"
@@ -102,10 +87,8 @@ export function TopBar({ onMenuClick }: TopBarProps) {
               "shadow-sm hover:shadow-md"
             )}
           >
-            <LogOut className="h-4 w-4 transition-transform duration-200 group-hover:rotate-12" />
-            <span className="hidden sm:inline ml-2 text-sm font-medium">
-              Logout
-            </span>
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline text-xs font-medium">Logout</span>
           </Button>
         </div>
       </header>

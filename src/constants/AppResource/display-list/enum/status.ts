@@ -9,3 +9,9 @@ export enum AmlStatusEnum {
   APPROVE = "APPROVE",
   REJECT = "REJECT",
 }
+
+export enum StatusReport {
+  SUCCESS = "SUCCESS",
+  AML = "AML",
+  FAILURE = "FAILURE"
+}

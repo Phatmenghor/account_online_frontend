@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { AppToast } from "@/components/shared/toast/app-toast";
 import { useTranslations } from "next-intl";
+import { UserRole } from "@/utils/authorization/authorization";
 
 const formSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -58,7 +59,14 @@ export default function LoginPage() {
       });
 
       if (response) {
-        router.replace(ROUTES.DASHBOARD.INDEX);
+        if (response?.userRole?.userRole == UserRole.DEVELOPER) {
+          router.replace(ROUTES.DASHBOARD.INDEX);
+        } else if (response?.userRole?.userRole == UserRole.SUPER) {
+          router.replace(ROUTES.DASHBOARD.USER);
+        } else {
+          router.replace(ROUTES.DASHBOARD.AML.MANAGEMENT);
+        }
+
         startTransition(() => {
           AppToast({
             type: "success",
