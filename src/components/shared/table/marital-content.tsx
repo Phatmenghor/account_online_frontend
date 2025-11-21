@@ -87,7 +87,7 @@ export const createMaritalTableColumns = ({
       render: (marital) => (
         // <span className="font-medium">{marital.status || "---"}</span>
         <Badge className={getStatusColor(marital?.status ?? "")}>
-            <span className="ml-1">{marital?.status || "ACTIVE"}</span>
+          <span className="ml-1">{marital?.status || "ACTIVE"}</span>
         </Badge>
       ),
     },
@@ -109,7 +109,7 @@ export const createMaritalTableColumns = ({
                   <Edit className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("edit")}</TooltipContent>
+              <TooltipContent>{"Edit"}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -122,7 +122,7 @@ export const createMaritalTableColumns = ({
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("view")}</TooltipContent>
+              <TooltipContent>{"View"}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -135,7 +135,7 @@ export const createMaritalTableColumns = ({
                   <Trash className="h-3 w-3" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{tCommon("delete")}</TooltipContent>
+              <TooltipContent>{"Delete"}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
