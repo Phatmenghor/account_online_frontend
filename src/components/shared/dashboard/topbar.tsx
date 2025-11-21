@@ -65,8 +65,6 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         </Link>
 
         <div className="flex items-center gap-3 justify-end flex-1">
-          <LanguageSwitcher variant="flag-only" />
-
           <Button
             variant="outline"
             size="sm"
@@ -74,9 +72,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             className="flex items-center gap-2 hover:text-destructive transition-colors"
           >
             <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline text-xs font-medium">
-              Logout
-            </span>
+            <span className="hidden sm:inline text-xs font-medium">Logout</span>
           </Button>
         </div>
       </header>

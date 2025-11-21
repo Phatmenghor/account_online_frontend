@@ -1,48 +1,41 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import {
   Calendar1Icon,
-  Code,
-  Dock,
   FolderClosed,
   IdCard,
   LayoutDashboard,
-  User,
   User2,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 export function useNavItems() {
-  const t = useTranslations("common");
-
   return [
     {
-      title: t("dashbaord"),
+      title: "Dashboard",
       href: ROUTES.DASHBOARD.INDEX,
       icon: LayoutDashboard,
     },
     {
-      title: t("users"),
+      title: "Users",
       href: ROUTES.DASHBOARD.USER,
       icon: User2,
     },
     {
-      title: t("index"),
+      title: "Master Data",
       href: "#", // main parent, not clickable
       icon: Calendar1Icon,
       subItems: [
         {
-          title: t("marital"),
+          title: "Marital",
           href: ROUTES.DASHBOARD.STATIC.MARITAL,
         },
         {
-          title: t("occupation"),
+          title: "Occupation",
           href: ROUTES.DASHBOARD.STATIC.OCCUPATION,
         },
         {
-          title: t("reference"),
+          title: "Reference",
           href: ROUTES.DASHBOARD.STATIC.REFERENCE,
           icon: FolderClosed,
         },
@@ -65,10 +58,9 @@ export function useNavItems() {
       ],
     },
     {
-      title: t("accountOnline"),
+      title: "Account Online",
       href: ROUTES.DASHBOARD.ACCOUNT_ONLINE,
-      icon: IdCard
-
+      icon: IdCard,
     },
   ];
 }

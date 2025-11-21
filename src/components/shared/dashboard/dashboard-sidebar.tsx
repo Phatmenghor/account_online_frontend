@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -16,12 +13,7 @@ import { useNavItems } from "@/constants/AppResource/display-list/ui-helper/side
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
 import { getUserProfileService } from "@/services/dashboard/user/user.service";
 
-interface SidebarProps {
-  isOpen: boolean;
-  onToggle: () => void;
-}
-
-export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
+export function DashboardSidebar() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [authUser, setAuthUser] = useState<UserModel | null>(null);
@@ -60,213 +52,131 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
     const userRole = authUser.userRole.toUpperCase();
 
     if (userRole === "SUPER") {
-      // SUPER gets all tabs (static, aml, and user)
       const allowedTabs = [
         ROUTES.DASHBOARD.AML.HISTORY,
         ROUTES.DASHBOARD.AML.MANAGEMENT,
         ROUTES.DASHBOARD.STATIC.MARITAL,
         ROUTES.DASHBOARD.STATIC.OCCUPATION,
         ROUTES.DASHBOARD.STATIC.REFERENCE,
-        ROUTES.DASHBOARD.USER
+        ROUTES.DASHBOARD.USER,
       ];
-      
+
       return navItems
         .map((item) => {
-          // If item has subItems, filter them
           if (item.subItems && item.subItems.length > 0) {
-            const filteredSubItems = item.subItems.filter((sub) =>
-              allowedTabs.includes(sub.href)
+            const filtered = item.subItems.filter((s) =>
+              allowedTabs.includes(s.href)
             );
-            // Only include parent if it has visible children
-            if (filteredSubItems.length > 0) {
-              return { ...item, subItems: filteredSubItems };
-            }
-            return null;
+            return filtered.length ? { ...item, subItems: filtered } : null;
           }
-          // For regular items, check if href is allowed
-          if (item.href && allowedTabs.includes(item.href)) {
-            return item;
-          }
-          return null;
+          return item.href && allowedTabs.includes(item.href) ? item : null;
         })
-        .filter((item): item is NonNullable<typeof item> => item !== null); // Type-safe filter
-  
-    } else if (userRole === "ADMIN") {
-      // ADMIN gets only static and aml tabs
+        .filter(Boolean) as any[];
+    }
+
+    if (userRole === "ADMIN") {
       const allowedTabs = [
         ROUTES.DASHBOARD.AML.HISTORY,
         ROUTES.DASHBOARD.AML.MANAGEMENT,
         ROUTES.DASHBOARD.STATIC.MARITAL,
         ROUTES.DASHBOARD.STATIC.OCCUPATION,
-        ROUTES.DASHBOARD.STATIC.REFERENCE
+        ROUTES.DASHBOARD.STATIC.REFERENCE,
       ];
-      
+
       return navItems
         .map((item) => {
           if (item.subItems && item.subItems.length > 0) {
-            const filteredSubItems = item.subItems.filter((sub) =>
-              allowedTabs.includes(sub.href)
+            const filtered = item.subItems.filter((s) =>
+              allowedTabs.includes(s.href)
             );
-            if (filteredSubItems.length > 0) {
-              return { ...item, subItems: filteredSubItems };
-            }
-            return null;
+            return filtered.length ? { ...item, subItems: filtered } : null;
           }
-          if (item.href && allowedTabs.includes(item.href)) {
-            return item;
-          }
-          return null;
+          return item.href && allowedTabs.includes(item.href) ? item : null;
         })
-        .filter((item): item is NonNullable<typeof item> => item !== null);
-        
-    } else if (userRole === "DEVELOPER") {
-      // Show all navigation items for developer
-      return navItems;
+        .filter(Boolean) as any[];
+    }
+
+    if (userRole === "DEVELOPER") {
+      return navItems; // Developer sees all items
     }
 
     return [];
   };
-  
+
   const filteredNavItems = getFilteredNavItems();
 
   return (
     <>
-      {/* Mobile overlay */}
-      {isMobile && isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
-          onClick={onToggle}
-        />
-      )}
-
-      {/* Sidebar */}
+      {/* Always-Open Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card transition-all duration-300 ease-in-out shadow-lg",
-          isOpen ? "w-64" : "w-[70px]",
-          isMobile && !isOpen && "hidden"
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card w-64 shadow-lg"
         )}
       >
-        {/* Sidebar header */}
-        <div className="flex h-14 items-center justify-between border-b px-3">
+        {/* Header */}
+        <div className="flex h-14 items-center justify-start border-b px-3">
           <Link
             href={ROUTES.DASHBOARD.INDEX}
-            className={cn(
-              "flex items-center transition-all duration-300",
-              isOpen ? "gap-2" : "justify-center w-full"
-            )}
+            className="flex items-center gap-2"
           >
             <img
               src={AppIcons.APP.APP_LOGO}
               alt="Internal Dev Logo"
-              className={cn(
-                "w-10 h-10 transition-all duration-300",
-                isOpen ? "mr-0" : "mx-auto h-8 w-7"
-              )}
+              className="w-10 h-10"
             />
-            {isOpen && (
-              <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                Account Online
-              </span>
-            )}
+            <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+              Account Online
+            </span>
           </Link>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggle}
-            className={cn(
-              "transition-transform duration-300",
-              !isOpen && "rotate-180"
-            )}
-            aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-          >
-            {isOpen ? (
-              <ChevronLeft className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
         </div>
 
-        {/* Navigation items */}
+        {/* Navigation */}
         <ScrollArea className="flex-1 py-2">
-          <nav className="grid gap-1 px-2">
+          <nav className="grid gap-0.5 px-2">
             {filteredNavItems.map((item) => (
               <div key={item.title} className="flex flex-col">
-                {/* If item has subItems, use button to toggle submenu */}
                 {item.subItems ? (
                   <>
-                    <button
-                      type="button"
-                      onClick={() => toggleSubmenu(item.title)}
+                    {/* Parent Item */}
+                    <div
                       className={cn(
-                        "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
-                        openSubmenus[item.title] &&
-                        "bg-accent text-accent-foreground",
-                        !isOpen && "justify-center px-0"
+                        "flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm font-medium",
+                        "hover:bg-accent hover:text-accent-foreground"
                       )}
                     >
                       <item.icon className="h-5 w-5" />
-                      <span
-                        className={cn(
-                          "whitespace-nowrap transition-all duration-300 ease-in-out",
-                          isOpen
-                            ? "opacity-100 translate-x-0 max-w-xs"
-                            : "opacity-0 -translate-x-4 max-w-0"
-                        )}
-                      >
-                        {item.title}
-                      </span>
-                      <ChevronRight
-                        className={cn(
-                          "ml-auto h-4 w-4 transition-transform duration-200",
-                          openSubmenus[item.title] && "rotate-90"
-                        )}
-                      />
-                    </button>
+                      <span>{item.title}</span>
+                    </div>
 
-                    {/* Render submenu links */}
-                    {openSubmenus[item.title] && isOpen && (
-                      <div className="ml-6 flex flex-col gap-1 mt-1">
-                        {item.subItems.map((sub) => (
-                          <Link
-                            key={sub.href}
-                            href={sub.href}
-                            className={cn(
-                              "flex h-8 items-center rounded-md px-2 text-sm font-normal hover:bg-accent hover:text-accent-foreground transition-colors",
-                              pathname === sub.href &&
+                    {/* Sub Items */}
+                    <div className="ml-4 flex flex-col gap-0.5 mt-0.5">
+                      {item.subItems.map((sub: any) => (
+                        <Link
+                          key={sub.href}
+                          href={sub.href}
+                          className={cn(
+                            "flex h-7 items-center rounded-md px-2 text-sm hover:bg-accent hover:text-accent-foreground",
+                            pathname === sub.href &&
                               "bg-accent text-accent-foreground"
-                            )}
-                          >
-                            {sub.title}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
+                          )}
+                        >
+                          {sub.title}
+                        </Link>
+                      ))}
+                    </div>
                   </>
                 ) : (
-                  // Regular route link
+                  /* Normal item */
                   <Link
                     href={item.href}
                     className={cn(
-                      "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
+                      "flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
                       pathname === item.href &&
-                      "bg-accent text-accent-foreground",
-                      !isOpen && "justify-center px-0"
+                        "bg-accent text-accent-foreground"
                     )}
                   >
                     <item.icon className="h-5 w-5" />
-                    <span
-                      className={cn(
-                        "whitespace-nowrap transition-all duration-300 ease-in-out",
-                        isOpen
-                          ? "opacity-100 translate-x-0 max-w-xs"
-                          : "opacity-0 -translate-x-4 max-w-0"
-                      )}
-                    >
-                      {item.title}
-                    </span>
+                    <span>{item.title}</span>
                   </Link>
                 )}
               </div>
@@ -274,7 +184,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
           </nav>
         </ScrollArea>
 
-        {/* Sidebar footer / user profile */}
+        {/* Footer User Profile */}
         <div className="border-t p-4">
           {isLoading ? (
             <div className="animate-pulse flex flex-col gap-2">
@@ -282,7 +192,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
               <div className="h-4 w-3/4 bg-slate-200 rounded-md dark:bg-slate-700" />
             </div>
           ) : (
-            <SidebarUserProfile user={authUser} isOpen={isOpen} />
+            <SidebarUserProfile user={authUser} isOpen={true} />
           )}
         </div>
       </div>

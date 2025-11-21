@@ -23,10 +23,7 @@ export default function DashboardLayout({
 
   return (
     <div className="dashboard-fixed-height overflow-x-hidden flex min-h-screen w-full bg-background">
-      <DashboardSidebar
-        isOpen={isSidebarOpen}
-        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-      />
+      <DashboardSidebar />
       <div
         className={cn(
           "dashboard-content flex-1 overflow-auto transition-all duration-300 flex flex-col",
