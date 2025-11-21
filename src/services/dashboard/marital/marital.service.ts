@@ -52,7 +52,7 @@ export async function getMaritalByIdService(id: number) {
 
 export async function createMaritalService(request: CreateMaritalReq) {
   try {
-    const response = await axiosClientWithAuth.post("/api/v1/aml/all-status", request);
+    const response = await axiosClientWithAuth.post("/api/v1/marital-status/create", request);
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

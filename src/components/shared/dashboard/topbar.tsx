@@ -75,7 +75,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline text-xs font-medium">
-              {t("auth.logout")}
+              Logout
             </span>
           </Button>
         </div>

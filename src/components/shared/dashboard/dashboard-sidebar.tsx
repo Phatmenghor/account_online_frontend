@@ -53,6 +53,82 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
     loadUserProfile();
   }, []);
 
+  // Filter navigation items based on user role
+  const getFilteredNavItems = () => {
+    if (!authUser?.userRole) return [];
+
+    const userRole = authUser.userRole.toUpperCase();
+
+    if (userRole === "SUPER") {
+      // SUPER gets all tabs (static, aml, and user)
+      const allowedTabs = [
+        ROUTES.DASHBOARD.AML.HISTORY,
+        ROUTES.DASHBOARD.AML.MANAGEMENT,
+        ROUTES.DASHBOARD.STATIC.MARITAL,
+        ROUTES.DASHBOARD.STATIC.OCCUPATION,
+        ROUTES.DASHBOARD.STATIC.REFERENCE,
+        ROUTES.DASHBOARD.USER
+      ];
+      
+      return navItems
+        .map((item) => {
+          // If item has subItems, filter them
+          if (item.subItems && item.subItems.length > 0) {
+            const filteredSubItems = item.subItems.filter((sub) =>
+              allowedTabs.includes(sub.href)
+            );
+            // Only include parent if it has visible children
+            if (filteredSubItems.length > 0) {
+              return { ...item, subItems: filteredSubItems };
+            }
+            return null;
+          }
+          // For regular items, check if href is allowed
+          if (item.href && allowedTabs.includes(item.href)) {
+            return item;
+          }
+          return null;
+        })
+        .filter((item): item is NonNullable<typeof item> => item !== null); // Type-safe filter
+  
+    } else if (userRole === "ADMIN") {
+      // ADMIN gets only static and aml tabs
+      const allowedTabs = [
+        ROUTES.DASHBOARD.AML.HISTORY,
+        ROUTES.DASHBOARD.AML.MANAGEMENT,
+        ROUTES.DASHBOARD.STATIC.MARITAL,
+        ROUTES.DASHBOARD.STATIC.OCCUPATION,
+        ROUTES.DASHBOARD.STATIC.REFERENCE
+      ];
+      
+      return navItems
+        .map((item) => {
+          if (item.subItems && item.subItems.length > 0) {
+            const filteredSubItems = item.subItems.filter((sub) =>
+              allowedTabs.includes(sub.href)
+            );
+            if (filteredSubItems.length > 0) {
+              return { ...item, subItems: filteredSubItems };
+            }
+            return null;
+          }
+          if (item.href && allowedTabs.includes(item.href)) {
+            return item;
+          }
+          return null;
+        })
+        .filter((item): item is NonNullable<typeof item> => item !== null);
+        
+    } else if (userRole === "DEVELOPER") {
+      // Show all navigation items for developer
+      return navItems;
+    }
+
+    return [];
+  };
+  
+  const filteredNavItems = getFilteredNavItems();
+
   return (
     <>
       {/* Mobile overlay */}
@@ -116,7 +192,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
         {/* Navigation items */}
         <ScrollArea className="flex-1 py-2">
           <nav className="grid gap-1 px-2">
-            {navItems.map((item) => (
+            {filteredNavItems.map((item) => (
               <div key={item.title} className="flex flex-col">
                 {/* If item has subItems, use button to toggle submenu */}
                 {item.subItems ? (
@@ -127,7 +203,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
                       className={cn(
                         "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
                         openSubmenus[item.title] &&
-                          "bg-accent text-accent-foreground",
+                        "bg-accent text-accent-foreground",
                         !isOpen && "justify-center px-0"
                       )}
                     >
@@ -160,7 +236,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
                             className={cn(
                               "flex h-8 items-center rounded-md px-2 text-sm font-normal hover:bg-accent hover:text-accent-foreground transition-colors",
                               pathname === sub.href &&
-                                "bg-accent text-accent-foreground"
+                              "bg-accent text-accent-foreground"
                             )}
                           >
                             {sub.title}
@@ -176,7 +252,7 @@ export function DashboardSidebar({ isOpen, onToggle }: SidebarProps) {
                     className={cn(
                       "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors overflow-hidden",
                       pathname === item.href &&
-                        "bg-accent text-accent-foreground",
+                      "bg-accent text-accent-foreground",
                       !isOpen && "justify-center px-0"
                     )}
                   >
