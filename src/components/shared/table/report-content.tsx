@@ -2,6 +2,7 @@ import { indexDisplay } from "@/utils/common/common";
 import { TableColumn } from "./data-table";
 import { Badge } from "@/components/ui/badge";
 import { AllReportModel, ReportModel } from "@/models/report/report.response";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 // Unified color map
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -72,7 +73,9 @@ export const Report = (data: AllReportModel): TableColumn<ReportModel>[] => {
       maxWidth: "300px",
       minWidth: "150px",
       render: (report) => (
-        <span className="font-medium">{report.createdAt || "---"}</span>
+        <span className="font-medium">
+          {DateTimeFormat(report.createdAt) || "---"}
+        </span>
       ),
     },
   ];
