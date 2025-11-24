@@ -71,7 +71,11 @@ export function useNavItems() {
         {
           title: "Village",
           href: ROUTES.DASHBOARD.STATIC.VILLAGE
-        }
+        },
+        {
+          title: "Legal Type",
+          href: ROUTES.DASHBOARD.STATIC.LEGAL_TYPE,
+        },
       ],
     },
     {

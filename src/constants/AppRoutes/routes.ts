@@ -14,7 +14,8 @@ export const ROUTES = {
       REFERENCE: "/reference",
       DISTRICT: "/district",
       COMMUNE: "/commune",
-      VILLAGE: "/village"
+      VILLAGE: "/village",
+      LEGAL_TYPE: "/legal-type",
     },
     AML: {
       MANAGEMENT: "/aml-management",
