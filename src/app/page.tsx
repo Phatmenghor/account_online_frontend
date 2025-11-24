@@ -65,8 +65,8 @@ import { CreateOpenAccountReq } from "@/models/open-account/openAccount.request"
 import { createOpenAccountService } from "@/services/open-account/openAccount.service";
 import {
   NIDFormData,
-  useNIDFormSchema,
-  useNIDVerificationSchema,
+  NIDFormSchema,
+  NIDVerificationSchema,
 } from "@/components/acc-online/form-field/form-validate-error";
 import { Label } from "@/components/ui/label";
 import LoadingModal from "@/components/shared/modal/extract-modal";
@@ -225,10 +225,6 @@ export default function CheckNIDPage() {
   const { locale: currentLocale } = useClientLocale();
   const translate = useTranslations("NIDPage");
   const translateSelect = useTranslations("common");
-
-  // Initialize schemas with translations - will recreate when locale changes
-  const NIDFormSchema = useNIDFormSchema();
-  const NIDVerificationSchema = useNIDVerificationSchema();
 
   // Helper function to get marital name based on locale
   const getMaritalName = (marital: MaritalModel) => {
@@ -922,7 +918,7 @@ export default function CheckNIDPage() {
                   </div>
                   {validationErrors.idImage && (
                     <p className="text-xs text-red-500 mt-2 text-center">
-                      {validationErrors.idImage}
+                      {translate("err_idImage")}
                     </p>
                   )}
                 </div>
@@ -963,7 +959,7 @@ export default function CheckNIDPage() {
                   </div>
                   {validationErrors.selfieImage && (
                     <p className="text-xs text-red-500 mt-2 text-center">
-                      {validationErrors.selfieImage}
+                      {translate("err_selfieImage")}
                     </p>
                   )}
                 </div>
@@ -990,7 +986,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.lastNameKh && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.lastNameKh}
+                      {translate("err_firstNameKh")}
                     </p>
                   )}
                 </div>
@@ -1014,7 +1010,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.firstNameKh && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.firstNameKh}
+                      {translate("err_lastNameKh")}
                     </p>
                   )}
                 </div>
@@ -1038,7 +1034,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.lastNameEn && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.lastNameEn}
+                      {translate("err_lastNameEn")}
                     </p>
                   )}
                 </div>
@@ -1062,7 +1058,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.firstNameEn && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.firstNameEn}
+                      {translate("err_firstNameEn")}
                     </p>
                   )}
                 </div>
@@ -1090,7 +1086,7 @@ export default function CheckNIDPage() {
                   </div>
                   {validationErrors.dob && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.dob}
+                      {translate("err_dob")}
                     </p>
                   )}
                 </div>
@@ -1123,7 +1119,7 @@ export default function CheckNIDPage() {
                   </Select>
                   {validationErrors.gender && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.gender}
+                      {translate("err_gender")}
                     </p>
                   )}
                 </div>
@@ -1158,7 +1154,7 @@ export default function CheckNIDPage() {
                   </Select>
                   {validationErrors.legalType && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.legalType}
+                      {translate("err_legalType")}
                     </p>
                   )}
                 </div>
@@ -1182,7 +1178,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.idNumber && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.idNumber}
+                      {translate("err_idNumber")}
                     </p>
                   )}
                 </div>
@@ -1206,7 +1202,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.address && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.address}
+                      {translate("err_address")}
                     </p>
                   )}
                 </div>
@@ -1228,7 +1224,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.pob && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.pob}
+                      {translate("err_pob")}
                     </p>
                   )}
                 </div>
@@ -1278,7 +1274,7 @@ export default function CheckNIDPage() {
                   </Select>
                   {validationErrors.maritalStatus && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.maritalStatus}
+                      {translate("err_maritalStatus")}
                     </p>
                   )}
                 </div>
@@ -1325,7 +1321,7 @@ export default function CheckNIDPage() {
                   </Select>
                   {validationErrors.occupation && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.occupation}
+                      {translate("err_occupation")}
                     </p>
                   )}
                 </div>
@@ -1350,7 +1346,7 @@ export default function CheckNIDPage() {
                   </div>
                   {validationErrors.branch && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.branch}
+                      {translate("err_branch")}
                     </p>
                   )}
                 </div>

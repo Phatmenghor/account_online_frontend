@@ -361,7 +361,9 @@ export default function OTPInput({
           )}
         </div>
         {validationErrors.phoneNumber && (
-          <p className="text-xs text-red-500 mt-1">{validationErrors.phoneNumber}</p>
+          <p className="text-xs text-red-500 mt-1">
+            {translate("err_phoneNumber_regex")}
+          </p>
         )}
       </div>
 
@@ -403,7 +405,9 @@ export default function OTPInput({
           )}
         </div>
         {validationErrors.isPhoneVerified && (
-          <p className="text-xs text-red-500 mt-1">{validationErrors.isPhoneVerified}</p>
+          <p className="text-xs text-red-500 mt-1">
+            {translate("err_isPhoneVerified")}
+          </p>
         )}
       </div>
     </>
