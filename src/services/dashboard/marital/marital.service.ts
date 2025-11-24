@@ -1,10 +1,35 @@
 import {
   AllMaritalReq,
+  AllPublicMaritalReq,
   CreateMaritalReq,
   UpdateMaritalReq,
 } from "@/models/static/marital/marital.request";
 import { axiosClientWithAuth } from "@/utils/axios";
 import axios from "axios";
+
+export async function getAllPublicMaritalService(request: AllPublicMaritalReq) {
+  try {
+    const response = await axiosClientWithAuth.post(
+      "/api/v1/public/master-data/marital-status/all",
+      request
+    );
+    return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const raw = error.response?.data;
+      const message = raw?.message || "Failed to fetch maritals.";
+      console.error("Axios error:", message);
+
+      throw { errorMessage: message, rawError: raw };
+    } else {
+      console.error("Unexpected error:", error);
+      throw {
+        errorMessage: "An unexpected error occurred while fetching maritals.",
+        rawError: error,
+      };
+    }
+  }
+}
 
 export async function getAllMaritalService(request: AllMaritalReq) {
   try {

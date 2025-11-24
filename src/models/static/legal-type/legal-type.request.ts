@@ -18,3 +18,7 @@ export interface AllLegalTypeReq {
   search?: string;
   status?: string;
 }
+
+export interface AllPublicLegalTypeReq {
+  search?: string;
+}

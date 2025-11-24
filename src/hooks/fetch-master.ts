@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { getAllMaritalService } from "@/services/dashboard/marital/marital.service";
-import { getAllOccupationService } from "@/services/dashboard/occupation/occupation.service";
-import { getAllReferenceService } from "@/services/dashboard/reference/reference.service";
-import { getAllBranchService } from "@/services/branch/branch.service";
+import { getAllPublicMaritalService } from "@/services/dashboard/marital/marital.service";
+import { getAllPublicOccupationService } from "@/services/dashboard/occupation/occupation.service";
+import { getAllPublicReferenceService } from "@/services/dashboard/reference/reference.service";
+import { getAllPublicBranchService } from "@/services/branch/branch.service";
 import { MaritalModel } from "@/models/static/marital/marital.response";
 import { OccupationModel } from "@/models/static/occupation/occupation.response";
 import { ReferenceModel } from "@/models/static/reference/reference.response";
 import { BranchModel } from "@/models/branch/branch.response";
+import { LegalTypeModel } from "@/models/static/legal-type/legal-type.response";
+import { getAllPublicLegalTypeService } from "@/services/dashboard/legal-type/legal-type.service";
 
 /**
  * Generic hook for fetching data with loading and error states
@@ -31,12 +33,8 @@ export const useMaritalStatuses = (): UseFetchDataResult<MaritalModel> => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await getAllMaritalService({
-        pageNo: 1,
-        pageSize: 100,
-        status: "ACTIVE"
-      });
-      setData(response.content || []);
+      const response = await getAllPublicMaritalService({});
+      setData(response || []);
     } catch (err: any) {
       console.error("Failed to fetch marital statuses:", err);
       setError(err);
@@ -65,16 +63,42 @@ export const useOccupations = (): UseFetchDataResult<OccupationModel> => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await getAllOccupationService({
-        pageNo: 1,
-        pageSize: 100,
-        status: "ACTIVE"
-      });
-      setData(response.content || []);
+      const response = await getAllPublicOccupationService({});
+      setData(response || []);
     } catch (err: any) {
       console.error("Failed to fetch occupations:", err);
       setError(err);
       toast.error("Failed to load occupations");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return { data, isLoading, error, refetch: fetchData };
+};
+
+/**
+ * Hook to fetch Legal Type
+ */
+export const useLegalTypes = (): UseFetchDataResult<LegalTypeModel> => {
+  const [data, setData] = useState<LegalTypeModel[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await getAllPublicLegalTypeService({});
+      setData(response || []);
+    } catch (err: any) {
+      console.error("Failed to fetch legal type:", err);
+      setError(err);
+      toast.error("Failed to load legal type");
     } finally {
       setIsLoading(false);
     }
@@ -99,12 +123,8 @@ export const useReferenceBanks = (): UseFetchDataResult<ReferenceModel> => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await getAllReferenceService({
-        pageNo: 1,
-        pageSize: 100,
-        status: "ACTIVE"
-      });
-      setData(response.content || []);
+      const response = await getAllPublicReferenceService({});
+      setData(response || []);
     } catch (err: any) {
       console.error("Failed to fetch reference banks:", err);
       setError(err);
@@ -133,11 +153,11 @@ export const useBranches = (): UseFetchDataResult<BranchModel> => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await getAllBranchService({
+      const response = await getAllPublicBranchService({
         pageNo: 1,
         pageSize: 100,
       });
-      setData(response.content || []);
+      setData(response || []);
     } catch (err: any) {
       console.error("Failed to fetch branches:", err);
       setError(err);
