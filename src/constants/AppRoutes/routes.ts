@@ -12,13 +12,15 @@ export const ROUTES = {
       MARITAL: "/marital",
       OCCUPATION: "/occupation",
       REFERENCE: "/reference",
+      BRANCH: "/branch",
+      PROVINCE: "/province",
     },
     AML: {
       MANAGEMENT: "/aml-management",
       HISTORY: "/aml-history",
     },
     ACCOUNT_ONLINE: "/account-online",
-    REPORT : "/report"
+    REPORT: "/report",
   },
 };
 

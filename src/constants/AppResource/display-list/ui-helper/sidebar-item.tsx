@@ -59,6 +59,14 @@ export function useNavItems() {
           title: "Reference",
           href: ROUTES.DASHBOARD.STATIC.REFERENCE,
         },
+        {
+          title: "Branch",
+          href: ROUTES.DASHBOARD.STATIC.BRANCH,
+        },
+        {
+          title: "Province",
+          href: ROUTES.DASHBOARD.STATIC.PROVINCE,
+        },
       ],
     },
     {
