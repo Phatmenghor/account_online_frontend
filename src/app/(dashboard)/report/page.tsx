@@ -154,9 +154,9 @@ function ReportPageContent() {
 
   return (
     <Card className="h-full flex flex-col bg-white shadow-lg rounded-xl">
-      <CardContent className="flex flex-col space-y-6 p-6 h-full">
+      <CardContent className="flex flex-col space-y-2 p-6 h-full">
         {/* FILTER SECTION */}
-        <div className="bg-white shadow-md rounded-xl p-6 mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div className="bg-white shadow-md rounded-xl p-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
             {/* From Date */}
             <div className="space-y-1">

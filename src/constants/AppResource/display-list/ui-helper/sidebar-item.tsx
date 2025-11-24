@@ -8,8 +8,8 @@ import {
   IdCard,
   LayoutDashboard,
   User2,
+  MapPin,
 } from "lucide-react";
-import { title } from "process";
 
 export function useNavItems() {
   return [
@@ -33,14 +33,8 @@ export function useNavItems() {
       href: "#",
       icon: FolderClosed,
       subItems: [
-        {
-          title: "Management",
-          href: ROUTES.DASHBOARD.AML.MANAGEMENT,
-        },
-        {
-          title: "History",
-          href: ROUTES.DASHBOARD.AML.HISTORY,
-        },
+        { title: "Management", href: ROUTES.DASHBOARD.AML.MANAGEMENT },
+        { title: "History", href: ROUTES.DASHBOARD.AML.HISTORY },
       ],
     },
     {
@@ -48,34 +42,20 @@ export function useNavItems() {
       href: "#",
       icon: Calendar1Icon,
       subItems: [
-        {
-          title: "Marital",
-          href: ROUTES.DASHBOARD.STATIC.MARITAL,
-        },
-        {
-          title: "Occupation",
-          href: ROUTES.DASHBOARD.STATIC.OCCUPATION,
-        },
-        {
-          title: "Reference",
-          href: ROUTES.DASHBOARD.STATIC.REFERENCE,
-        },
-        {
-          title: "District",
-          href: ROUTES.DASHBOARD.STATIC.DISTRICT
-        },
-        {
-          title: "Commune",
-          href: ROUTES.DASHBOARD.STATIC.COMMUNE
-        },
-        {
-          title: "Village",
-          href: ROUTES.DASHBOARD.STATIC.VILLAGE
-        },
-        {
-          title: "Legal Type",
-          href: ROUTES.DASHBOARD.STATIC.LEGAL_TYPE,
-        },
+        { title: "Marital", href: ROUTES.DASHBOARD.STATIC.MARITAL },
+        { title: "Occupation", href: ROUTES.DASHBOARD.STATIC.OCCUPATION },
+        { title: "Reference", href: ROUTES.DASHBOARD.STATIC.REFERENCE },
+        { title: "Legal Type", href: ROUTES.DASHBOARD.STATIC.LEGAL_TYPE },
+      ],
+    },
+    {
+      title: "Location",
+      href: "#",
+      icon: MapPin,
+      subItems: [
+        { title: "District", href: ROUTES.DASHBOARD.STATIC.DISTRICT },
+        { title: "Commune", href: ROUTES.DASHBOARD.STATIC.COMMUNE },
+        { title: "Village", href: ROUTES.DASHBOARD.STATIC.VILLAGE },
       ],
     },
     {
