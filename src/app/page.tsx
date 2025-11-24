@@ -45,6 +45,7 @@ import {
   normalizeGender,
 } from "@/utils/format/BranchFormat";
 import {
+  useLegalTypes,
   useMaritalStatuses,
   useOccupations,
   useReferenceBanks,
@@ -65,14 +66,15 @@ import { CreateOpenAccountReq } from "@/models/open-account/openAccount.request"
 import { createOpenAccountService } from "@/services/open-account/openAccount.service";
 import {
   NIDFormData,
-  useNIDFormSchema,
-  useNIDVerificationSchema,
+  NIDFormSchema,
+  NIDVerificationSchema,
 } from "@/components/acc-online/form-field/form-validate-error";
 import { Label } from "@/components/ui/label";
 import LoadingModal from "@/components/shared/modal/extract-modal";
 import SuccessModal from "@/components/acc-online/successModal";
 import SubmitSuccessModal from "@/components/shared/modal/submit-success-modal";
 import SubmitErrorModal from "@/components/shared/modal/submit-error-modal";
+import { LegalTypeModel } from "@/models/static/legal-type/legal-type.response";
 
 export interface Image {
   idImage: string;
@@ -206,8 +208,12 @@ export default function CheckNIDPage() {
   const [selectedReferenceBank, setSelectedReferenceBank] =
     useState<ReferenceModel | null>(null);
 
+  const { data: LegalType, isLoading: isLegalTypeLoading } = useLegalTypes();
+  const [selectedLegalType, setSelectedLegalType] =
+    useState<LegalTypeModel | null>(null);
+
   const [staffCode, setStaffCode] = useState<string>("");
-  const [legalType, setLegalType] = useState<string>("");
+  // const [legalType, setLegalType] = useState<string>("");
 
   // phone send otp
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -225,10 +231,6 @@ export default function CheckNIDPage() {
   const { locale: currentLocale } = useClientLocale();
   const translate = useTranslations("NIDPage");
   const translateSelect = useTranslations("common");
-
-  // Initialize schemas with translations - will recreate when locale changes
-  const NIDFormSchema = useNIDFormSchema();
-  const NIDVerificationSchema = useNIDVerificationSchema();
 
   // Helper function to get marital name based on locale
   const getMaritalName = (marital: MaritalModel) => {
@@ -348,7 +350,7 @@ export default function CheckNIDPage() {
       idNumber: formData.idNumber,
       address: formData.address,
       pob: formData.pob,
-      legalType: legalType,
+      legalType: selectedLegalType?.legalTypeValue ?? "NATIONAL.ID",
       maritalStatus: selectedMaritalStatus?.nameEn || "",
       occupation: selectedOccupation?.occupationCode || "",
       branch: selectedBranch?.branchkh || "",
@@ -495,7 +497,7 @@ export default function CheckNIDPage() {
       setFormData(normalizedData);
 
       // Auto-select legal type to "national-id" after successful extraction
-      setLegalType("national-id");
+      // setLegalType("national-id");
       validateField("legalType", "national-id");
 
       // Validate all extracted fields to clear any validation errors
@@ -532,7 +534,7 @@ export default function CheckNIDPage() {
     setIsValidating(true);
     try {
       const validationData: RequestValidModel = {
-        applicationName: "DEVELOPMENT",
+        applicationName: "ACCOUNT_ONLINE",
         idNumber: formData.idNumber,
         lastNameKh: formData.lastNameKh,
         firstNameKh: formData.firstNameKh,
@@ -710,7 +712,7 @@ export default function CheckNIDPage() {
         legalIssueDate: formatDate(formData.issuedDate),
         legalExpireDate: formatDate(formData.expiredDate),
         legalAddress: formData.address,
-        legalDocType: "NATIONAL.ID",
+        legalDocType: selectedLegalType?.legalTypeValue || "",
         legalMrz1: formData.MRZ1,
         legalMrz2: formData.MRZ2,
         legalMrz3: formData.MRZ3,
@@ -792,7 +794,7 @@ export default function CheckNIDPage() {
     setSelectedOccupation(null);
     setSelectedReferenceBank(null);
     setSelectedBranch(null);
-    setLegalType("");
+    setSelectedLegalType(null);
     setStaffCode("");
     setPhoneNumber("");
     setValidationErrors({});
@@ -922,7 +924,7 @@ export default function CheckNIDPage() {
                   </div>
                   {validationErrors.idImage && (
                     <p className="text-xs text-red-500 mt-2 text-center">
-                      {validationErrors.idImage}
+                      {translate("err_idImage")}
                     </p>
                   )}
                 </div>
@@ -963,7 +965,7 @@ export default function CheckNIDPage() {
                   </div>
                   {validationErrors.selfieImage && (
                     <p className="text-xs text-red-500 mt-2 text-center">
-                      {validationErrors.selfieImage}
+                      {translate("err_selfieImage")}
                     </p>
                   )}
                 </div>
@@ -990,7 +992,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.lastNameKh && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.lastNameKh}
+                      {translate("err_firstNameKh")}
                     </p>
                   )}
                 </div>
@@ -1014,7 +1016,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.firstNameKh && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.firstNameKh}
+                      {translate("err_lastNameKh")}
                     </p>
                   )}
                 </div>
@@ -1038,7 +1040,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.lastNameEn && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.lastNameEn}
+                      {translate("err_lastNameEn")}
                     </p>
                   )}
                 </div>
@@ -1062,7 +1064,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.firstNameEn && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.firstNameEn}
+                      {translate("err_firstNameEn")}
                     </p>
                   )}
                 </div>
@@ -1090,7 +1092,7 @@ export default function CheckNIDPage() {
                   </div>
                   {validationErrors.dob && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.dob}
+                      {translate("err_dob")}
                     </p>
                   )}
                 </div>
@@ -1123,42 +1125,54 @@ export default function CheckNIDPage() {
                   </Select>
                   {validationErrors.gender && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.gender}
+                      {translate("err_gender")}
                     </p>
                   )}
                 </div>
 
-                {/* Legal Type */}
-                <div className="space-y-1">
+                {/* Legal Type new*/}
+                <div className="md:col-span-2 space-y-1">
                   <Label htmlFor="legalType" className="text-sm sm:text-base">
                     {translate("legalType")}
                   </Label>
                   <Select
-                    value={legalType}
+                    value={selectedLegalType?.id.toString() || ""}
                     onValueChange={(value) => {
-                      setLegalType(value);
+                      const legalType = LegalType.find(
+                        (m) => m.id.toString() === value
+                      );
+                      setSelectedLegalType(legalType || null);
                       validateField("legalType", value);
                     }}
-                    disabled={isLoading || isValidating || isSubmitting}
+                    disabled={isLoading || isValidating || isLegalTypeLoading}
                   >
                     <SelectTrigger
-                      className={`h-10 ${
+                      className={`w-full h-10 text-sm ${
                         validationErrors.legalType ? "border-red-500" : ""
                       }`}
                     >
                       <SelectValue
-                        placeholder={translateSelect("selectLegalType")}
+                        placeholder={
+                          isLoadingOccupations
+                            ? translate("loading")
+                            : translateSelect("selectLegalType")
+                        }
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="national-id">
-                        National ID Card
-                      </SelectItem>
+                      {LegalType.map((legalType) => (
+                        <SelectItem
+                          key={legalType.id}
+                          value={legalType.id.toString()}
+                        >
+                          {legalType.nameEn}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {validationErrors.legalType && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.legalType}
+                      {translate("err_legalType")}
                     </p>
                   )}
                 </div>
@@ -1182,7 +1196,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.idNumber && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.idNumber}
+                      {translate("err_idNumber")}
                     </p>
                   )}
                 </div>
@@ -1206,7 +1220,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.address && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.address}
+                      {translate("err_address")}
                     </p>
                   )}
                 </div>
@@ -1228,7 +1242,7 @@ export default function CheckNIDPage() {
                   />
                   {validationErrors.pob && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.pob}
+                      {translate("err_pob")}
                     </p>
                   )}
                 </div>
@@ -1278,7 +1292,7 @@ export default function CheckNIDPage() {
                   </Select>
                   {validationErrors.maritalStatus && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.maritalStatus}
+                      {translate("err_maritalStatus")}
                     </p>
                   )}
                 </div>
@@ -1325,7 +1339,7 @@ export default function CheckNIDPage() {
                   </Select>
                   {validationErrors.occupation && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.occupation}
+                      {translate("err_occupation")}
                     </p>
                   )}
                 </div>
@@ -1350,7 +1364,7 @@ export default function CheckNIDPage() {
                   </div>
                   {validationErrors.branch && (
                     <p className="text-xs text-red-500">
-                      {validationErrors.branch}
+                      {translate("err_branch")}
                     </p>
                   )}
                 </div>

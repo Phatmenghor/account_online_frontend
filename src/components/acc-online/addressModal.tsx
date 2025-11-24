@@ -17,7 +17,7 @@ import { AddressSelectReq } from "@/models/address/select-address/selectAddress.
 import { PosSelectReq } from "@/models/address/select-pos/selectPos.request"
 import { getPosSelectService } from "@/services/address/selectPos.service"
 import { useTranslations } from "next-intl"
-import { LocationFormData, useLocationFormSchema } from "./form-field/form-validate-error"
+import { LocationFormData, LocationFormSchema } from "./form-field/form-validate-error"
 
 interface LocationData {
   province: string
@@ -62,8 +62,6 @@ const LocationModal = ({
 }: LocationModalProps) => {
   const { locale: currentLocale } = useClientLocale()
   const translate = useTranslations("address");
-
-  const LocationFormSchema = useLocationFormSchema(); 
 
   // Validation state
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
@@ -461,7 +459,9 @@ const LocationModal = ({
                       />
                     </div>
                     {validationErrors['currentAddress.province'] && (
-                      <p className="text-xs text-red-500 mt-1">{validationErrors['currentAddress.province']}</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        {translate("err_province")}
+                      </p>
                     )}
                   </div>
 
@@ -483,7 +483,9 @@ const LocationModal = ({
                       />
                     </div>
                     {validationErrors['currentAddress.district'] && (
-                      <p className="text-xs text-red-500 mt-1">{validationErrors['currentAddress.district']}</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        {translate("err_district")}
+                      </p>
                     )}
                   </div>
 
@@ -505,7 +507,9 @@ const LocationModal = ({
                       />
                     </div>
                     {validationErrors['currentAddress.commune'] && (
-                      <p className="text-xs text-red-500 mt-1">{validationErrors['currentAddress.commune']}</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        {translate("err_commune")}
+                      </p>
                     )}
                   </div>
 
@@ -527,7 +531,9 @@ const LocationModal = ({
                       />
                     </div>
                     {validationErrors['currentAddress.village'] && (
-                      <p className="text-xs text-red-500 mt-1">{validationErrors['currentAddress.village']}</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        {translate("err_village")}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -567,7 +573,9 @@ const LocationModal = ({
                       />
                     </div>
                     {validationErrors['placeOfBirth.province'] && (
-                      <p className="text-xs text-red-500 mt-1">{validationErrors['placeOfBirth.province']}</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        {translate("err_province")}
+                      </p>
                     )}
                   </div>
 
@@ -588,7 +596,9 @@ const LocationModal = ({
                       />
                     </div>
                     {validationErrors['placeOfBirth.district'] && (
-                      <p className="text-xs text-red-500 mt-1">{validationErrors['placeOfBirth.district']}</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        {translate("err_district")}
+                      </p>
                     )}
                   </div>
 
@@ -609,7 +619,9 @@ const LocationModal = ({
                       />
                     </div>
                     {validationErrors['placeOfBirth.commune'] && (
-                      <p className="text-xs text-red-500 mt-1">{validationErrors['placeOfBirth.commune']}</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        {translate("err_commune")}
+                      </p>
                     )}
                   </div>
 
@@ -630,7 +642,9 @@ const LocationModal = ({
                       />
                     </div>
                     {validationErrors['placeOfBirth.village'] && (
-                      <p className="text-xs text-red-500 mt-1">{validationErrors['placeOfBirth.village']}</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        {translate("err_village")}
+                      </p>
                     )}
                   </div>
                 </div>

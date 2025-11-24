@@ -8,6 +8,7 @@ import {
   IdCard,
   LayoutDashboard,
   User2,
+  MapPin,
 } from "lucide-react";
 
 export function useNavItems() {
@@ -32,14 +33,8 @@ export function useNavItems() {
       href: "#",
       icon: FolderClosed,
       subItems: [
-        {
-          title: "Management",
-          href: ROUTES.DASHBOARD.AML.MANAGEMENT,
-        },
-        {
-          title: "History",
-          href: ROUTES.DASHBOARD.AML.HISTORY,
-        },
+        { title: "Management", href: ROUTES.DASHBOARD.AML.MANAGEMENT },
+        { title: "History", href: ROUTES.DASHBOARD.AML.HISTORY },
       ],
     },
     {
@@ -48,25 +43,30 @@ export function useNavItems() {
       icon: Calendar1Icon,
       subItems: [
         {
-          title: "Marital",
-          href: ROUTES.DASHBOARD.STATIC.MARITAL,
-        },
-        {
-          title: "Occupation",
-          href: ROUTES.DASHBOARD.STATIC.OCCUPATION,
+          title: "Branch",
+          href: ROUTES.DASHBOARD.STATIC.BRANCH,
         },
         {
           title: "Reference",
           href: ROUTES.DASHBOARD.STATIC.REFERENCE,
         },
-        {
-          title: "Branch",
-          href: ROUTES.DASHBOARD.STATIC.BRANCH,
-        },
+        { title: "Marital", href: ROUTES.DASHBOARD.STATIC.MARITAL },
+        { title: "Occupation", href: ROUTES.DASHBOARD.STATIC.OCCUPATION },
+        { title: "Legal Type", href: ROUTES.DASHBOARD.STATIC.LEGAL_TYPE },
+      ],
+    },
+    {
+      title: "Location",
+      href: "#",
+      icon: MapPin,
+      subItems: [
         {
           title: "Province",
           href: ROUTES.DASHBOARD.STATIC.PROVINCE,
         },
+        { title: "District", href: ROUTES.DASHBOARD.STATIC.DISTRICT },
+        { title: "Commune", href: ROUTES.DASHBOARD.STATIC.COMMUNE },
+        { title: "Village", href: ROUTES.DASHBOARD.STATIC.VILLAGE },
       ],
     },
     {

@@ -14,6 +14,10 @@ export const ROUTES = {
       REFERENCE: "/reference",
       BRANCH: "/branch",
       PROVINCE: "/province",
+      DISTRICT: "/district",
+      COMMUNE: "/commune",
+      VILLAGE: "/village",
+      LEGAL_TYPE: "/legal-type",
     },
     AML: {
       MANAGEMENT: "/aml-management",

@@ -223,10 +223,6 @@ export default function ModalUser({
                 )}
 
                 <div className="space-y-5">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                    Account Credentials
-                  </h3>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {isCreate && (
                       <div className="space-y-2">
@@ -354,10 +350,6 @@ export default function ModalUser({
                 </div>
 
                 <div className="space-y-5">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                    Personal Information
-                  </h3>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="fullName" className="text-sm font-medium">
@@ -400,10 +392,6 @@ export default function ModalUser({
                 </div>
 
                 <div className="space-y-5">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                    Permissions & Access
-                  </h3>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label

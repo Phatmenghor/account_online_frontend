@@ -1,13 +1,13 @@
 export interface CreateMaritalReq {
-  nameEn: string
-  nameKh: string
-  status: string
+  nameEn: string;
+  nameKh: string;
+  status: string;
 }
 
 export interface UpdateMaritalReq {
-  nameEn?: string
-  nameKh?: string
-  status?: string
+  nameEn?: string;
+  nameKh?: string;
+  status?: string;
 }
 
 export interface AllMaritalReq {
@@ -16,4 +16,8 @@ export interface AllMaritalReq {
   language?: string;
   search?: string;
   status?: string;
+}
+
+export interface AllPublicMaritalReq {
+  search?: string;
 }

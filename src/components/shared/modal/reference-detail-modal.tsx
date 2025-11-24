@@ -123,13 +123,6 @@ export default function ReferenceViewModal({
               <div className="space-y-6">
                 {/* Basic Information */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-                    <h3 className="text-lg font-semibold">
-                      Basic Information
-                    </h3>
-                  </div>
-
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <Label className="text-sm font-medium text-muted-foreground">
@@ -148,19 +141,7 @@ export default function ReferenceViewModal({
                         {reference?.nameKh || "N/A"}
                       </span>
                     </div>
-                  </div>
-                </div>
 
-                {/* Status Information */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-                    <h3 className="text-lg font-semibold">
-                      Status Information
-                    </h3>
-                  </div>
-
-                  <div className="space-y-3">
                     <div className="flex justify-between">
                       <Label className="text-sm font-medium text-muted-foreground">
                         Status:
