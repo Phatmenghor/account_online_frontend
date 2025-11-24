@@ -12,6 +12,7 @@ export const ROUTES = {
       MARITAL: "/marital",
       OCCUPATION: "/occupation",
       REFERENCE: "/reference",
+      LEGAL_TYPE: "/legal-type",
     },
     AML: {
       MANAGEMENT: "/aml-management",

@@ -59,6 +59,10 @@ export function useNavItems() {
           title: "Reference",
           href: ROUTES.DASHBOARD.STATIC.REFERENCE,
         },
+        {
+          title: "Legal Type",
+          href: ROUTES.DASHBOARD.STATIC.LEGAL_TYPE,
+        },
       ],
     },
     {
