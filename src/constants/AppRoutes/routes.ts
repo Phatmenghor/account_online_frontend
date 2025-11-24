@@ -12,6 +12,9 @@ export const ROUTES = {
       MARITAL: "/marital",
       OCCUPATION: "/occupation",
       REFERENCE: "/reference",
+      DISTRICT: "/district",
+      COMMUNE: "/commune",
+      VILLAGE: "/village",
       LEGAL_TYPE: "/legal-type",
     },
     AML: {

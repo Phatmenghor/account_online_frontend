@@ -21,57 +21,58 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  CreateMaritalSchema,
-  UpdateMaritalSchema,
-  CreateMaritalForm,
-  UpdateMaritalForm,
-} from "@/models/static/marital/marital.schema";
+  CreateVillageSchema,
+  UpdateVillageSchema,
+  CreateVillageForm,
+  UpdateVillageForm,
+} from "@/models/static/village/village.schema";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, FilePenLine, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 import {
-  CreateMaritalReq,
-  UpdateMaritalReq,
-} from "@/models/static/marital/marital.request";
-import { MaritalModel } from "@/models/static/marital/marital.response";
-import { Status } from "@/constants/AppResource/display-list/enum/status";
-import { getMaritalByIdService } from "@/services/dashboard/marital/marital.service";
-import { STATUS_USER_OPTIONS } from "@/constants/AppResource/filter/status";
+  CreateVillageReq,
+  UpdateVillageReq,
+} from "@/models/static/village/village.request";
+import { VillageModel } from "@/models/static/village/village.response";
+import { getVillageByIdService } from "@/services/dashboard/village/village.service";
 
-type ModalMaritalProps = {
+type ModalVillageProps = {
   isOpen: boolean;
   onClose: () => void;
   mode: ModalMode;
-  maritalId?: number;
+  villageId?: number;
   isSubmitting?: boolean;
   error?: string | null;
   onSave: (
-    data: CreateMaritalReq | { id: number; updates: UpdateMaritalReq }
+    data: CreateVillageReq | { id: number; updates: UpdateVillageReq }
   ) => void;
+  communes?: Array<{ communeCode: string; communeEn: string; communeKh: string }>;
 };
 
-export default function ModalMarital({
+export default function ModalVillage({
   isOpen,
   onClose,
   mode,
-  maritalId,
+  villageId,
   onSave,
   isSubmitting = false,
   error = null,
-}: ModalMaritalProps) {
+  communes = [],
+}: ModalVillageProps) {
   const isCreate = mode === ModalMode.CREATE_MODE;
 
-  const [maritalDetail, setMaritalDetail] = useState<MaritalModel | null>(null);
+  const [villageDetail, setVillageDetail] = useState<VillageModel | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
 
-  const form = useForm<CreateMaritalForm | UpdateMaritalForm>({
-    resolver: zodResolver(isCreate ? CreateMaritalSchema : UpdateMaritalSchema),
+  const form = useForm<CreateVillageForm | UpdateVillageForm>({
+    resolver: zodResolver(isCreate ? CreateVillageSchema : UpdateVillageSchema),
     defaultValues: isCreate
       ? {
-          nameEn: "",
-          nameKh: "",
-          status: Status.ACTIVE,
+          villageCode: "",
+          villageEn: "",
+          villageKh: "",
+          communeCode: "",
         }
       : undefined,
   });
@@ -83,52 +84,55 @@ export default function ModalMarital({
     formState: { errors, isDirty },
   } = form;
 
-  const loadMaritalById = useCallback(async () => {
-    if (!maritalId || isCreate) return;
+  const loadVillageById = useCallback(async () => {
+    if (!villageId || isCreate) return;
 
     setIsLoadingData(true);
     try {
-      const marital = await getMaritalByIdService(maritalId);
-      setMaritalDetail(marital);
+      const village = await getVillageByIdService(villageId);
+      setVillageDetail(village);
       reset({
-        id: marital.id,
-        nameEn: marital.nameEn || "",
-        nameKh: marital.nameKh || "",
-        status: marital.status || Status.ACTIVE,
+        id: village.id,
+        villageCode: village.villageCode || "",
+        villageEn: village.villageEn || "",
+        villageKh: village.villageKh || "",
+        communeCode: village.commune?.communeCode || "",
       });
     } catch (err) {
-      console.error("Failed to fetch marital:", err);
+      console.error("Failed to fetch village:", err);
     } finally {
       setIsLoadingData(false);
     }
-  }, [maritalId, isCreate, reset]);
+  }, [villageId, isCreate, reset]);
 
   useEffect(() => {
     if (isOpen && !isCreate) {
-      loadMaritalById();
+      loadVillageById();
     }
     if (isOpen && isCreate) {
       reset({
-        nameEn: "",
-        nameKh: "",
-        status: Status.ACTIVE,
+        villageCode: "",
+        villageEn: "",
+        villageKh: "",
+        communeCode: "",
       });
-      setMaritalDetail(null);
+      setVillageDetail(null);
     }
-  }, [isOpen, isCreate, loadMaritalById, reset]);
+  }, [isOpen, isCreate, loadVillageById, reset]);
 
-  const onSubmit = (data: CreateMaritalForm | UpdateMaritalForm) => {
+  const onSubmit = (data: CreateVillageForm | UpdateVillageForm) => {
     if (isCreate) {
-      const payload: CreateMaritalReq = data as CreateMaritalForm;
+      const payload: CreateVillageReq = data as CreateVillageForm;
       onSave(payload);
     } else {
-      const updateData = data as UpdateMaritalForm;
+      const updateData = data as UpdateVillageForm;
       if (!updateData.id) return console.error("Missing ID for update");
 
-      const payload: UpdateMaritalReq = {
-        nameEn: updateData.nameEn?.trim(),
-        nameKh: updateData.nameKh?.trim(),
-        status: updateData.status,
+      const payload: UpdateVillageReq = {
+        villageCode: updateData.villageCode?.trim(),
+        villageEn: updateData.villageEn?.trim(),
+        villageKh: updateData.villageKh?.trim(),
+        communeCode: updateData.communeCode?.trim(),
       };
       onSave({ id: updateData.id, updates: payload });
     }
@@ -136,7 +140,7 @@ export default function ModalMarital({
 
   const handleClose = () => {
     reset();
-    setMaritalDetail(null);
+    setVillageDetail(null);
     onClose();
   };
 
@@ -159,16 +163,16 @@ export default function ModalMarital({
             </div>
             <div className="flex-1">
               <DialogTitle className="text-xl font-semibold">
-                {isCreate ? "Create New Marital Status" : "Edit Marital Status"}
+                {isCreate ? "Create New Village" : "Edit Village"}
               </DialogTitle>
               <DialogDescription className="text-base text-muted-foreground">
                 {isCreate
-                  ? "Fill in the details to create a new marital status"
-                  : maritalDetail
+                  ? "Fill in the details to create a new village"
+                  : villageDetail
                   ? `Update information for "${
-                      maritalDetail.nameEn || maritalDetail.nameKh
+                      villageDetail.villageEn || villageDetail.villageKh
                     }"`
-                  : "Loading marital status information..."}
+                  : "Loading village information..."}
               </DialogDescription>
             </div>
           </div>
@@ -180,10 +184,10 @@ export default function ModalMarital({
             {/* Loading State */}
             {isLoadingData ? (
               <Loading />
-            ) : !isCreate && !maritalDetail ? (
+            ) : !isCreate && !villageDetail ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">
-                  No marital data available
+                  No village data available
                 </p>
               </div>
             ) : (
@@ -209,114 +213,120 @@ export default function ModalMarital({
                 {/* Basic Information Section */}
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Name English */}
+                    {/* Village Code */}
                     <div className="space-y-2">
-                      <Label htmlFor="nameEn" className="text-sm font-medium">
-                        Name (English) <span className="text-red-500">*</span>
+                      <Label htmlFor="villageCode" className="text-sm font-medium">
+                        Village Code <span className="text-red-500">*</span>
                       </Label>
                       <Controller
                         control={control}
-                        name="nameEn"
+                        name="villageCode"
                         render={({ field }) => (
                           <Input
                             {...field}
-                            id="nameEn"
-                            placeholder="Enter your name english"
+                            id="villageCode"
+                            placeholder="Enter village code"
                             disabled={isSubmitting}
                             className={`transition-colors ${
-                              errors.nameEn ? "border-red-500" : ""
+                              errors.villageCode ? "border-red-500" : ""
                             }`}
                           />
                         )}
                       />
-                      {errors.nameEn && (
+                      {errors.villageCode && (
                         <p className="text-sm text-red-600">
-                          {errors.nameEn.message as string}
+                          {errors.villageCode.message as string}
                         </p>
                       )}
                     </div>
 
-                    {/* Name Khmer */}
+                    {/* Commune Code */}
                     <div className="space-y-2">
-                      <Label htmlFor="nameKh" className="text-sm font-medium">
-                        Name (Khmer) <span className="text-red-500">*</span>
+                      <Label htmlFor="communeCode" className="text-sm font-medium">
+                        Commune Code <span className="text-red-500">*</span>
                       </Label>
                       <Controller
                         control={control}
-                        name="nameKh"
+                        name="communeCode"
                         render={({ field }) => (
                           <Input
                             {...field}
-                            id="nameKh"
-                            placeholder="Enter your name khmer"
+                            id="communeCode"
+                            placeholder="Enter commune code"
                             disabled={isSubmitting}
                             className={`transition-colors ${
-                              errors.nameKh ? "border-red-500" : ""
+                              errors.communeCode ? "border-red-500" : ""
                             }`}
                           />
                         )}
                       />
-                      {errors.nameKh && (
+                      {errors.communeCode && (
                         <p className="text-sm text-red-600">
-                          {errors.nameKh.message as string}
+                          {errors.communeCode.message as string}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Village English */}
+                    <div className="space-y-2">
+                      <Label htmlFor="villageEn" className="text-sm font-medium">
+                        Village (English) <span className="text-red-500">*</span>
+                      </Label>
+                      <Controller
+                        control={control}
+                        name="villageEn"
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            id="villageEn"
+                            placeholder="Enter village name in English"
+                            disabled={isSubmitting}
+                            className={`transition-colors ${
+                              errors.villageEn ? "border-red-500" : ""
+                            }`}
+                          />
+                        )}
+                      />
+                      {errors.villageEn && (
+                        <p className="text-sm text-red-600">
+                          {errors.villageEn.message as string}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Village Khmer */}
+                    <div className="space-y-2">
+                      <Label htmlFor="villageKh" className="text-sm font-medium">
+                        Village (Khmer) <span className="text-red-500">*</span>
+                      </Label>
+                      <Controller
+                        control={control}
+                        name="villageKh"
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            id="villageKh"
+                            placeholder="Enter village name in Khmer"
+                            disabled={isSubmitting}
+                            className={`transition-colors ${
+                              errors.villageKh ? "border-red-500" : ""
+                            }`}
+                          />
+                        )}
+                      />
+                      {errors.villageKh && (
+                        <p className="text-sm text-red-600">
+                          {errors.villageKh.message as string}
                         </p>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Status Section - Edit Mode Only */}
-                {!isCreate && (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="status" className="text-sm font-medium">
-                        Status <span className="text-red-500">*</span>
-                      </Label>
-                      <Controller
-                        control={control}
-                        name="status"
-                        render={({ field }) => (
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                            disabled={isSubmitting}
-                          >
-                            <SelectTrigger
-                              id="status"
-                              className="transition-colors"
-                            >
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {STATUS_USER_OPTIONS.map((s) => (
-                                <SelectItem key={s.value} value={s.value}>
-                                  <div className="flex items-center gap-2">
-                                    <div
-                                      className={`w-2 h-2 rounded-full ${
-                                        s.value === Status.ACTIVE
-                                          ? "bg-green-500"
-                                          : "bg-gray-400"
-                                      }`}
-                                    ></div>
-                                    {s.label}
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      />
-                      {errors.status && (
-                        <p className="text-sm text-red-600">
-                          {errors.status.message as string}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Marital Info Card - Read Only (edit mode only) */}
-                {!isCreate && maritalDetail && (
+                {/* Village Info Card - Read Only (edit mode only) */}
+                {!isCreate && villageDetail && (
                   <div className="mt-2 p-4 bg-muted/30 rounded-lg border border-border">
                     <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                       <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -325,16 +335,16 @@ export default function ModalMarital({
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="text-muted-foreground">
-                          Marital ID:
+                          Village ID:
                         </span>
-                        <p className="font-medium">{maritalDetail.id}</p>
+                        <p className="font-medium">{villageDetail.id}</p>
                       </div>
                       <div>
                         <span className="text-muted-foreground">
-                          Current Status:
+                          Commune:
                         </span>
                         <p className="font-medium">
-                          {maritalDetail.status || "Unknown"}
+                          {villageDetail.commune?.communeEn || "Unknown"}
                         </p>
                       </div>
                     </div>
@@ -352,8 +362,8 @@ export default function ModalMarital({
               <>
                 <Loader2 className="h-3 w-3 animate-spin" />
                 {isCreate
-                  ? "Creating marital status..."
-                  : "Updating marital status..."}
+                  ? "Creating village..."
+                  : "Updating village..."}
               </>
             ) : isDirty ? (
               <>
@@ -387,9 +397,9 @@ export default function ModalMarital({
                   {isCreate ? "Creating..." : "Updating..."}
                 </>
               ) : isCreate ? (
-                "Create Marital Status"
+                "Create Village"
               ) : (
-                "Update Marital Status"
+                "Update Village"
               )}
             </Button>
           </div>

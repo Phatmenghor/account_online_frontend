@@ -34,7 +34,7 @@ export const NIDFormSchema = z.object({
   
   // Phone and OTP
   phoneNumber: z.string()
-    .min(9, "Phone number must be at least 9 digits")
+    .min(8, "Phone number must be at least 8 digits")
     .max(15, "Phone number must not exceed 15 digits")
     .regex(/^[0-9]+$/, "Phone number must contain only digits"),
   isPhoneVerified: z.boolean().refine((val) => val === true, {

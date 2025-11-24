@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   User2,
 } from "lucide-react";
+import { title } from "process";
 
 export function useNavItems() {
   return [
@@ -58,6 +59,18 @@ export function useNavItems() {
         {
           title: "Reference",
           href: ROUTES.DASHBOARD.STATIC.REFERENCE,
+        },
+        {
+          title: "District",
+          href: ROUTES.DASHBOARD.STATIC.DISTRICT
+        },
+        {
+          title: "Commune",
+          href: ROUTES.DASHBOARD.STATIC.COMMUNE
+        },
+        {
+          title: "Village",
+          href: ROUTES.DASHBOARD.STATIC.VILLAGE
         },
         {
           title: "Legal Type",
