@@ -144,7 +144,7 @@ export default function ModalMarital({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl w-full max-h-[90vh] p-0 flex flex-col gap-0">
         {/* Header */}
-        <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
+        <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
           <div className="flex items-center gap-4 pr-8">
             <div
               className={`p-2 rounded-full ${
@@ -176,7 +176,7 @@ export default function ModalMarital({
 
         {/* Content */}
         <div className="flex-1 min-h-0 overflow-auto">
-          <div className="p-6 space-y-8">
+          <div className="px-6 pb-6 pt-4 space-y-8">
             {/* Loading State */}
             {isLoadingData ? (
               <Loading />
@@ -208,10 +208,6 @@ export default function ModalMarital({
 
                 {/* Basic Information Section */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                    Basic Information
-                  </h3>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Name English */}
                     <div className="space-y-2">
@@ -272,10 +268,6 @@ export default function ModalMarital({
                 {/* Status Section - Edit Mode Only */}
                 {!isCreate && (
                   <div className="space-y-4">
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      Status
-                    </h3>
-
                     <div className="space-y-2">
                       <Label htmlFor="status" className="text-sm font-medium">
                         Status <span className="text-red-500">*</span>
@@ -354,7 +346,7 @@ export default function ModalMarital({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0 gap-4">
+        <div className="flex justify-between items-center p-6 border-t flex-shrink-0 gap-4">
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             {isSubmitting ? (
               <>
