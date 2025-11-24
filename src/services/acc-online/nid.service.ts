@@ -1,5 +1,8 @@
-import { RequestIdImage, RequestValidModel } from "@/models/acc-online/nid.request.model";
-import { axiosClientWithAuth} from "@/utils/axios";
+import {
+  RequestIdImage,
+  RequestValidModel,
+} from "@/models/acc-online/nid.request.model";
+import { axiosClientWithAuth } from "@/utils/axios";
 import { AxiosError } from "axios";
 
 // export async function extractNIDService(data: RequestIdImage) {
@@ -16,10 +19,12 @@ import { AxiosError } from "axios";
 // }
 export async function extractNIDService(data: RequestIdImage) {
   try {
-    const response = await axiosClientWithAuth.post("/api/v1/public/nid/extract", {
-      applicationName: data.applicationName,
-      idImage: data.idImage,
-    });
+    const response = await axiosClientWithAuth.post(
+      "/api/v1/public/nid/extract",
+      {
+        idImage: data.idImage,
+      }
+    );
 
     return response.data.data.data;
   } catch (error: any) {
@@ -72,7 +77,8 @@ interface CustomError {
 
 export async function validateNIDService(data: RequestValidModel) {
   try {
-    const response = await axiosClientWithAuth.post(`/api/v1/public/nid/validate`,
+    const response = await axiosClientWithAuth.post(
+      `/api/v1/public/nid/validate`,
       data
     );
     return response.data.data;
