@@ -56,7 +56,7 @@ export default function OTPInput({
 
   // Validate phone number format (8-15 digits)
   const isValidPhoneNumber = useCallback((phone: string): boolean => {
-    const phoneRegex = /^[0-9]{8,15}$/;
+    const phoneRegex = /^[0-8]{8,15}$/;
     return phoneRegex.test(phone.replace(/\s/g, ""));
   }, []);
 
@@ -77,7 +77,7 @@ export default function OTPInput({
     if (numericValue.trim() === "") {
       validateField("phoneNumber", numericValue, "Phone number is required");
     } else if (!isValidPhoneNumber(numericValue)) {
-      validateField("phoneNumber", numericValue, "Please enter a valid phone number (9-15 digits)");
+      validateField("phoneNumber", numericValue, "Please enter a valid phone number (8-15 digits)");
     } else {
       validateField("phoneNumber", numericValue);
     }
@@ -106,11 +106,11 @@ export default function OTPInput({
     }
 
     if (!isValidPhoneNumber(phoneNumber)) {
-      validateField("phoneNumber", phoneNumber, "Please enter a valid phone number (9-15 digits)");
+      validateField("phoneNumber", phoneNumber, "Please enter a valid phone number (8-15 digits)");
       AppToast({
         type: "error",
         message: "Invalid Phone Number",
-        description: "Please enter a valid phone number (9-15 digits)",
+        description: "Please enter a valid phone number (8-15 digits)",
       });
       return;
     }
@@ -173,7 +173,7 @@ export default function OTPInput({
     if (isValidPhoneNumber(phoneNumber)) {
       await handleSendOtp();
     } else {
-      validateField("phoneNumber", phoneNumber, "Please enter a valid phone number (9-15 digits)");
+      validateField("phoneNumber", phoneNumber, "Please enter a valid phone number (8-15 digits)");
     }
   };
 
