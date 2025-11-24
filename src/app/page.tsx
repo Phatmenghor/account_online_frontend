@@ -528,7 +528,7 @@ export default function CheckNIDPage() {
     setIsValidating(true);
     try {
       const validationData: RequestValidModel = {
-        applicationName: "DEVELOPMENT",
+        applicationName: "ACCOUNT_ONLINE",
         idNumber: formData.idNumber,
         lastNameKh: formData.lastNameKh,
         firstNameKh: formData.firstNameKh,
