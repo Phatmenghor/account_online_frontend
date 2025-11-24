@@ -26,9 +26,24 @@ import { createLegalTypeTableColumns } from "@/components/shared/table/legal-typ
 import LegalTypeViewModal from "@/components/shared/modal/legal-type-detail-modal";
 import ModalLegalType from "@/components/shared/modal/legal-type-modal";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
-import { AllLegalTypeReq, CreateLegalTypeReq, UpdateLegalTypeReq } from "@/models/static/legal-type/legal-type.request";
-import { createLegalTypeService, deleteLegalTypeService, getAllLegalTypeService, updateLegalTypeService } from "@/services/dashboard/legal-type/legal-type.service";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AllLegalTypeReq,
+  CreateLegalTypeReq,
+  UpdateLegalTypeReq,
+} from "@/models/static/legal-type/legal-type.request";
+import {
+  createLegalTypeService,
+  deleteLegalTypeService,
+  getAllLegalTypeService,
+  updateLegalTypeService,
+} from "@/services/dashboard/legal-type/legal-type.service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { STATUS_USER_OPTIONS } from "@/constants/AppResource/filter/status";
 
 function LegalTypePageContent() {
@@ -37,9 +52,8 @@ function LegalTypePageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [selectedLegalType, setSelectedLegalType] = useState<LegalTypeModel | null>(
-    null
-  );
+  const [selectedLegalType, setSelectedLegalType] =
+    useState<LegalTypeModel | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -108,18 +122,18 @@ function LegalTypePageContent() {
         setLegalTypes((prev: any) =>
           prev
             ? {
-              ...prev,
-              content: [response, ...prev.content],
-              totalElements: prev.totalElements + 1,
-            }
+                ...prev,
+                content: [response, ...prev.content],
+                totalElements: prev.totalElements + 1,
+              }
             : {
-              content: [response],
-              pageNo: 1,
-              pageSize: 10,
-              totalElements: 1,
-              totalPages: 1,
-              last: true,
-            }
+                content: [response],
+                pageNo: 1,
+                pageSize: 10,
+                totalElements: 1,
+                totalPages: 1,
+                last: true,
+              }
         );
 
         startTransition(() => {
@@ -130,7 +144,10 @@ function LegalTypePageContent() {
           });
         });
       } else if (mode === ModalMode.UPDATE_MODE) {
-        const updateData = formData as { id: number; updates: UpdateLegalTypeReq };
+        const updateData = formData as {
+          id: number;
+          updates: UpdateLegalTypeReq;
+        };
 
         if (!updateData.id) {
           console.error("Missing legal type id in update form");
@@ -146,11 +163,11 @@ function LegalTypePageContent() {
         setLegalTypes((prev: any) =>
           prev
             ? {
-              ...prev,
-              content: prev.content.map((legalType: any) =>
-                legalType.id === updateData.id ? response : legalType
-              ),
-            }
+                ...prev,
+                content: prev.content.map((legalType: any) =>
+                  legalType.id === updateData.id ? response : legalType
+                ),
+              }
             : prev
         );
 
@@ -311,7 +328,11 @@ function LegalTypePageContent() {
           onDelete={confirmDeleteLegalType}
           title="Delete Legal Type"
           description={`Are you sure you want to delete this legal type`}
-          itemName={selectedLegalType?.nameEn || selectedLegalType?.nameKh || selectedLegalType?.legalTypeValue}
+          itemName={
+            selectedLegalType?.nameEn ||
+            selectedLegalType?.nameKh ||
+            selectedLegalType?.legalTypeValue
+          }
           isSubmitting={isSubmitting}
         />
 
