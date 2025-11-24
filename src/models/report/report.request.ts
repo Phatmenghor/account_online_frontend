@@ -1,7 +1,12 @@
-export interface AllReportReq {
-  fromDate?: string;
-  toDate?: string;
-  pageNo?: number;
-  pageSize?: number;
-  status?: string;
+export interface AllReportRequestModel {
+  fromDate: string;
+  toDate: string;
+  status: string[];
+  pageNo: number;
+  pageSize: number;
+}
+
+export interface AllReportExcelReq {
+  fromDate: string;
+  toDate: string;
 }
