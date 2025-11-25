@@ -12,4 +12,6 @@ export interface BranchModel {
   id: number;
   branchCode: string;
   branchKh: string;
+  createdAt:string;
+  updatedAt :string;
 }

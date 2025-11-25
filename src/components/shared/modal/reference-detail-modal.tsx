@@ -1,12 +1,7 @@
 "use client";
 
 import type React from "react";
-import {
-  FileText,
-  BookType,
-  Tag,
-  Shield,
-} from "lucide-react";
+import { FileText, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,6 +17,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ReferenceModel } from "@/models/static/reference/reference.response";
 import { useEffect, useState } from "react";
 import { getReferenceByIdService } from "@/services/dashboard/reference/reference.service";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
+import { StatusBadge } from "../badge/status-badge";
 
 interface ReferenceViewModalProps {
   reference?: ReferenceModel;
@@ -148,9 +145,27 @@ export default function ReferenceViewModal({
                       </Label>
                       <div className="flex items-center gap-2">
                         <span className="text-sm">
-                          {reference?.status || "ACTIVE"}
+                          {<StatusBadge status={reference?.status} />}
                         </span>
                       </div>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Created At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(reference?.createdAt) || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Updated At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(reference?.updatedAt) || "N/A"}
+                      </span>
                     </div>
                   </div>
                 </div>

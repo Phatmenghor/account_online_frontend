@@ -1,13 +1,7 @@
 "use client";
 
 import type React from "react";
-import {
-  FileText,
-  Globe,
-  Tag,
-  Shield,
-  BookType,
-} from "lucide-react";
+import { FileText, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import {
@@ -23,6 +17,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MaritalModel } from "@/models/static/marital/marital.response";
 import { useEffect, useState } from "react";
 import { getMaritalByIdService } from "@/services/dashboard/marital/marital.service";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
+import { StatusBadge } from "../badge/status-badge";
 
 interface MaritalViewModalProps {
   marital?: MaritalModel;
@@ -149,16 +145,36 @@ export default function MaritalViewModal({
                       </Label>
                       <div className="flex items-center gap-2">
                         <span className="text-sm">
-                          {marital?.status || "ACTIVE"}
+                          {<StatusBadge status={marital?.status} />}
                         </span>
                       </div>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Created At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(marital?.createdAt) || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Updated At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(marital?.updatedAt) || "N/A"}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No marital data available</p>
+                <p className="text-muted-foreground">
+                  No marital data available
+                </p>
               </div>
             )}
           </div>

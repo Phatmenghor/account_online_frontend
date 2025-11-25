@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
 import { BranchModel } from "@/models/static/branch/branch.response";
 import { getBranchByIdService } from "@/services/dashboard/branch/branch.service";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface BranchViewModalProps {
   branch?: BranchModel;
@@ -129,6 +130,24 @@ export default function BranchViewModal({
                       </Label>
                       <span className="text-sm flex items-center gap-2">
                         {branch?.branchKh || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Created At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(branch?.createdAt) || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Updated At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(branch?.updatedAt) || "N/A"}
                       </span>
                     </div>
                   </div>

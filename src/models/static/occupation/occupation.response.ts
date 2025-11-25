@@ -8,9 +8,11 @@ export interface AllOccupationModel {
 }
 
 export interface OccupationModel {
-  id: number
-  nameEn: string
-  nameKh: string
-  occupationCode: string
-  status: string
+  id: number;
+  nameEn: string;
+  nameKh: string;
+  occupationCode: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }

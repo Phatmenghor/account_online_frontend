@@ -7,12 +7,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 import {
   AllBranchModel,
   BranchModel,
 } from "@/models/static/branch/branch.response";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface BranchTableHandlers {
   handleEditBranch: (branch: BranchModel) => void;
@@ -31,8 +31,6 @@ export const createBranchTableColumns = ({
 }: BranchTableOptions): TableColumn<BranchModel>[] => {
   const { handleEditBranch, handleViewBranchDetail, handleDeleteBranch } =
     handlers;
-
-  const tCommon = useTranslations("common");
 
   return [
     {
@@ -64,6 +62,18 @@ export const createBranchTableColumns = ({
       minWidth: "150px",
       render: (branch) => (
         <span className="font-medium">{branch.branchKh || "---"}</span>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "Created At",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
+      render: (branch) => (
+        <span className="font-medium">
+          {DateTimeFormat(branch.createdAt) || "---"}
+        </span>
       ),
     },
     {
