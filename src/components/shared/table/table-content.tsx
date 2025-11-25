@@ -11,7 +11,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 
 interface userTableHandlers {
@@ -24,11 +23,53 @@ interface userTableHandlers {
 interface userTableOptions {
   data: AllUserModel | null;
   handlers: userTableHandlers;
+  currentUser: UserModel | null;
+}
+
+const ROLE_POWER: Record<string, number> = {
+  ADMIN: 1,
+  SUPER: 2,
+  DEVELOPER: 3
+};
+
+function canDelete(
+  currentUser: UserModel | null,
+  targetUser: UserModel
+): boolean {
+  if (!currentUser) {
+    return false;
+  }
+
+  const curRole = currentUser.userRole.toUpperCase();
+  const tarRole = targetUser.userRole.toUpperCase();
+
+  // cannot delete yourself
+  if (currentUser.email === targetUser.email) return false;
+
+  // ADMIN cannot delete anyone
+  if (curRole === "ADMIN") return false;
+
+  // SUPER user rules
+  if (curRole === "SUPER") {
+    return tarRole === "ADMIN"; // only delete ADMIN
+  }
+
+  // DEVELOPER rules
+  if (curRole === "DEVELOPER") {
+    if (currentUser.email === "phatmenghor19@gmail.com") {
+      return true; // can delete anyone except self
+    }
+    // other developers: can delete only SUPER and ADMIN
+    return ROLE_POWER[tarRole] < ROLE_POWER["DEVELOPER"];
+  }
+
+  return false;
 }
 
 export const createUserTableColumns = ({
   data,
   handlers,
+  currentUser,
 }: userTableOptions): TableColumn<UserModel>[] => {
   const {
     handleEditUser,
@@ -36,9 +77,6 @@ export const createUserTableColumns = ({
     handleDeleteUser,
     handleResetPassword,
   } = handlers;
-
-  const tUser = useTranslations("user.table-header-user");
-  const tCommon = useTranslations("common");
 
   return [
     {
@@ -96,7 +134,6 @@ export const createUserTableColumns = ({
         <span className="font-medium">{user.email || "---"}</span>
       ),
     },
-
     {
       key: "userRole",
       truncate: true,
@@ -165,18 +202,35 @@ export const createUserTableColumns = ({
               <TooltipContent>{"View"}</TooltipContent>
             </Tooltip>
 
-            <Tooltip>
+            {canDelete(currentUser, user) && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteUser(user)}
+                  >
+                    <Trash className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{"Delete"}</TooltipContent>
+              </Tooltip>
+            )}
+
+            {/* condition disable */}
+            {/* <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="destructive"
                   size="sm"
                   onClick={() => handleDeleteUser(user)}
+                  disabled={!canDelete(currentUser, user)}
                 >
                   <Trash className="h-3 w-3" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{"Delete"}</TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
           </TooltipProvider>
         </div>
       ),
