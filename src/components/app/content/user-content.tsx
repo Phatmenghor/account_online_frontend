@@ -32,6 +32,7 @@ import ModalUser from "@/components/shared/modal/user-modal";
 import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 import { UserViewModal } from "@/components/shared/modal/user-detail-modal";
+import { getUserInfo } from "@/utils/local-storage/userInfo";
 
 function UserPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,6 +51,7 @@ function UserPageContent() {
     useState<UserModel | null>(null);
   const [isToggleStatusDialogOpen, setIsToggleStatusDialogOpen] =
     useState(false);
+  const [currentUser, setCurrentUser] = useState<UserModel | null>(null);
 
   const t = useTranslations();
 
@@ -62,6 +64,14 @@ function UserPageContent() {
     baseRoute: ROUTES.DASHBOARD.INDEX,
     defaultPageSize: 10,
   });
+
+  // Get current user info for take permission delete user
+  useEffect(() => {
+    const userInfo = getUserInfo();
+    if (userInfo) {
+      setCurrentUser(userInfo);
+    }
+  }, []);
 
   useEffect(() => {
     const pageParam = searchParams.get("pageNo");
@@ -329,6 +339,7 @@ function UserPageContent() {
                   handleViewUserDetail,
                   handleDeleteUser,
                 },
+                currentUser,
               })}
               loading={isLoading}
               emptyMessage="No user found"
