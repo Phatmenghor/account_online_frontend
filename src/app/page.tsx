@@ -208,7 +208,7 @@ export default function CheckNIDPage() {
   const [selectedReferenceBank, setSelectedReferenceBank] =
     useState<ReferenceModel | null>(null);
 
-  const { data: LegalType, isLoading: isLegalTypeLoading } = useLegalTypes();
+  const { data: legalTypes, isLoading: isLegalTypeLoading } = useLegalTypes();
   const [selectedLegalType, setSelectedLegalType] =
     useState<LegalTypeModel | null>(null);
 
@@ -245,6 +245,10 @@ export default function CheckNIDPage() {
   // Helper function to get reference bank name based on locale
   const getReferenceName = (reference: ReferenceModel) => {
     return currentLocale === "kh" ? reference.nameKh : reference.nameEn;
+  };
+
+  const getLegalTypeName = (legalType: LegalTypeModel) => {
+    return currentLocale === "kh" ? legalType.nameKh : legalType.nameEn;
   };
 
   // Helper function to convert gender to API format
@@ -350,7 +354,7 @@ export default function CheckNIDPage() {
       idNumber: formData.idNumber,
       address: formData.address,
       pob: formData.pob,
-      legalType: selectedLegalType?.legalTypeValue ?? "NATIONAL.ID",
+      legalType: selectedLegalType?.legalTypeValue || "",
       maritalStatus: selectedMaritalStatus?.nameEn || "",
       occupation: selectedOccupation?.occupationCode || "",
       branch: selectedBranch?.branchkh || "",
@@ -498,7 +502,7 @@ export default function CheckNIDPage() {
 
       // Auto-select legal type to "national-id" after successful extraction
       // setLegalType("national-id");
-      validateField("legalType", "national-id");
+      // validateField("legalType", "national-id");
 
       // Validate all extracted fields to clear any validation errors
       validateField("lastNameKh", normalizedData.lastNameKh);
@@ -1131,15 +1135,15 @@ export default function CheckNIDPage() {
                 </div>
 
                 {/* Legal Type new*/}
-                <div className="md:col-span-2 space-y-1">
+                <div className="space-y-1">
                   <Label htmlFor="legalType" className="text-sm sm:text-base">
                     {translate("legalType")}
                   </Label>
                   <Select
                     value={selectedLegalType?.id.toString() || ""}
                     onValueChange={(value) => {
-                      const legalType = LegalType.find(
-                        (m) => m.id.toString() === value
+                      const legalType = legalTypes.find(
+                        (l) => l.id.toString() === value
                       );
                       setSelectedLegalType(legalType || null);
                       validateField("legalType", value);
@@ -1153,19 +1157,19 @@ export default function CheckNIDPage() {
                     >
                       <SelectValue
                         placeholder={
-                          isLoadingOccupations
+                          isLegalTypeLoading
                             ? translate("loading")
                             : translateSelect("selectLegalType")
                         }
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {LegalType.map((legalType) => (
+                      {legalTypes.map((legalType) => (
                         <SelectItem
                           key={legalType.id}
                           value={legalType.id.toString()}
                         >
-                          {legalType.nameEn}
+                          {getLegalTypeName(legalType)}
                         </SelectItem>
                       ))}
                     </SelectContent>
