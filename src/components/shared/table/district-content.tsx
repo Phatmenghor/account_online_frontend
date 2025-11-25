@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface DistrictTableHandlers {
   handleEditDistrict: (district: DistrictModel) => void;
@@ -109,6 +110,18 @@ export const createDistrictTableColumns = ({
       render: (district) => (
         <span className="font-medium">
           {district.province?.provinceKh || "---"}
+        </span>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "CreatedAt",
+      truncate: true,
+      maxWidth: "190px",
+      minWidth: "100px",
+      render: (district) => (
+        <span className="font-medium">
+          {DateTimeFormat(district.createdAt) || "---"}
         </span>
       ),
     },

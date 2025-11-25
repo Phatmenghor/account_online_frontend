@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { DistrictModel } from "@/models/static/district/district.response";
 import { useEffect, useState } from "react";
 import { getDistrictByIdService } from "@/services/dashboard/district/district.service";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface DistrictViewModalProps {
   district?: DistrictModel;
@@ -144,7 +145,7 @@ export default function DistrictViewModal({
                         {district?.province?.provinceEn || "N/A"}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between">
                       <Label className="text-sm font-medium text-muted-foreground">
                         Province (Khmer):
@@ -153,12 +154,32 @@ export default function DistrictViewModal({
                         {district?.province?.provinceKh || "N/A"}
                       </span>
                     </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Created At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(district?.createdAt) || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Updated At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(district?.updatedAt) || "N/A"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No district data available</p>
+                <p className="text-muted-foreground">
+                  No district data available
+                </p>
               </div>
             )}
           </div>

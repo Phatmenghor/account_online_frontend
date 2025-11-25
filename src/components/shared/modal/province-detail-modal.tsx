@@ -14,8 +14,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
-import { ProvinceModel } from "@/models/address/address.response";
 import { getProvinceByIdService } from "@/services/dashboard/province/province.service";
+import { ProvinceModel } from "@/models/static/province/province.response";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface ProvinceViewModalProps {
   province?: ProvinceModel;
@@ -146,6 +147,24 @@ export default function ProvinceViewModal({
                       </Label>
                       <span className="text-sm flex items-center gap-2">
                         {province?.provinceCode || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Created At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(province?.createdAt) || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Updated At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(province?.updatedAt) || "N/A"}
                       </span>
                     </div>
                   </div>

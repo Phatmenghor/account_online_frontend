@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface CommuneTableHandlers {
   handleEditCommune: (commune: CommuneModel) => void;
@@ -121,6 +122,18 @@ export const createCommuneTableColumns = ({
       render: (commune) => (
         <span className="font-medium">
           {commune.district?.province?.provinceEn || "---"}
+        </span>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "CreatedAt",
+      truncate: true,
+      maxWidth: "190px",
+      minWidth: "100px",
+      render: (commune) => (
+        <span className="font-medium">
+          {DateTimeFormat(commune.createdAt) || "---"}
         </span>
       ),
     },

@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { VillageModel } from "@/models/static/village/village.response";
 import { useEffect, useState } from "react";
 import { getVillageByIdService } from "@/services/dashboard/village/village.service";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface VillageViewModalProps {
   village?: VillageModel;
@@ -66,7 +67,7 @@ export default function VillageViewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-2xl h-[90vh] p-0 gap-0 flex flex-col">
         {/* Header */}
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4 pr-8">
@@ -144,7 +145,7 @@ export default function VillageViewModal({
                         {village?.commune?.communeEn || "N/A"}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between">
                       <Label className="text-sm font-medium text-muted-foreground">
                         Commune (Khmer):
@@ -186,7 +187,8 @@ export default function VillageViewModal({
                         Province Code:
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        {village?.commune?.district?.province?.provinceCode || "N/A"}
+                        {village?.commune?.district?.province?.provinceCode ||
+                          "N/A"}
                       </span>
                     </div>
 
@@ -195,7 +197,8 @@ export default function VillageViewModal({
                         Province (English):
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        {village?.commune?.district?.province?.provinceEn || "N/A"}
+                        {village?.commune?.district?.province?.provinceEn ||
+                          "N/A"}
                       </span>
                     </div>
 
@@ -204,7 +207,26 @@ export default function VillageViewModal({
                         Province (Khmer):
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        {village?.commune?.district?.province?.provinceKh || "N/A"}
+                        {village?.commune?.district?.province?.provinceKh ||
+                          "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Created At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(village?.createdAt) || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Updated At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(village?.updatedAt) || "N/A"}
                       </span>
                     </div>
                   </div>
@@ -212,7 +234,9 @@ export default function VillageViewModal({
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No village data available</p>
+                <p className="text-muted-foreground">
+                  No village data available
+                </p>
               </div>
             )}
           </div>

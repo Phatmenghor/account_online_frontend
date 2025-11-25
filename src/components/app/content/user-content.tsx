@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import ConfirmDialog from "@/components/shared/dialog/dialog-confirm";
 import { DeleteConfirmationDialog } from "@/components/shared/dialog/dialog-delete";
 import ResetPasswordModal from "@/components/shared/dialog/dialog-reset-password";
-import UserViewModal from "@/components/shared/modal/user-detail-modal";
 import { CustomPagination } from "@/components/shared/pagination/custom-pagination";
 import { DataTable } from "@/components/shared/table/data-table";
 import { createUserTableColumns } from "@/components/shared/table/table-content";
@@ -32,6 +31,7 @@ import { toast } from "sonner";
 import ModalUser from "@/components/shared/modal/user-modal";
 import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
+import { UserViewModal } from "@/components/shared/modal/user-detail-modal";
 
 function UserPageContent() {
   const [searchQuery, setSearchQuery] = useState("");

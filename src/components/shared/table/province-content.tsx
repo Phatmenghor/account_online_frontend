@@ -13,6 +13,7 @@ import {
   AllProvinceModel,
   ProvinceModel,
 } from "@/models/static/province/province.response";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface ProvinceTableHandlers {
   handleEditProvince: (province: ProvinceModel) => void;
@@ -25,7 +26,7 @@ interface ProvinceTableOptions {
   handlers: ProvinceTableHandlers;
 }
 
-export const createProviceTableColumns = ({
+export const createProvinceTableColumns = ({
   data,
   handlers,
 }: ProvinceTableOptions): TableColumn<ProvinceModel>[] => {
@@ -74,6 +75,18 @@ export const createProviceTableColumns = ({
       minWidth: "100px",
       render: (province) => (
         <span className="font-medium">{province.provinceKh || "---"}</span>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "CreatedAt",
+      truncate: true,
+      maxWidth: "190px",
+      minWidth: "100px",
+      render: (province) => (
+        <span className="font-medium">
+          {DateTimeFormat(province.createdAt) || "---"}
+        </span>
       ),
     },
     {

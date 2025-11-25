@@ -13,4 +13,6 @@ export interface ProvinceModel {
   provinceCode: string;
   provinceEn: string;
   provinceKh: string;
+  createdAt: string;
+  updatedAt: string;
 }

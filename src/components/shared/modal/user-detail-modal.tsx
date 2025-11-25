@@ -1,13 +1,5 @@
 import type React from "react";
-import {
-  User,
-  Mail,
-  Calendar,
-  Shield,
-  Briefcase,
-  Award,
-  Crown,
-} from "lucide-react";
+import { Shield, Briefcase, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
@@ -30,19 +22,6 @@ interface UserViewModalProps {
 }
 
 export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
-  const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case "active":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "inactive":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      case "suspended":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
   const getRoleColor = (role: string) => {
     switch (role?.toLowerCase()) {
       case "developer":
@@ -202,13 +181,9 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                       </Label>
                       <span className="text-sm flex items-center gap-2">
                         {user.userRole === "SUPER" ? (
-                          <>
-                            Full Access
-                          </>
+                          <>Full Access</>
                         ) : (
-                          <>
-                            Limited Access
-                          </>
+                          <>Limited Access</>
                         )}
                       </span>
                     </div>

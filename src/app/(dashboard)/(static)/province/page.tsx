@@ -25,7 +25,7 @@ import {
 } from "@/models/static/province/province.response";
 import ProvinceViewModal from "@/components/shared/modal/province-detail-modal";
 import ModalProvince from "@/components/shared/modal/province-modal";
-import { createProviceTableColumns } from "@/components/shared/table/province-content";
+import { createProvinceTableColumns } from "@/components/shared/table/province-content";
 import {
   createProvinceService,
   deleteProvinceService,
@@ -36,7 +36,7 @@ import {
   CreateProvinceReq,
   UpdateProvinceReq,
 } from "@/models/static/province/province.request";
-import { STATUS_USER_OPTIONS } from "@/constants/AppResource/filter/status";
+
 function ProvincePageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [province, setProvince] = useState<AllProvinceModel | null>(null);
@@ -284,7 +284,7 @@ function ProvincePageContent() {
             <div className="flex-1 overflow-x-auto">
               <DataTable
                 data={province?.content || []}
-                columns={createProviceTableColumns({
+                columns={createProvinceTableColumns({
                   data: province,
                   handlers: {
                     handleEditProvince,

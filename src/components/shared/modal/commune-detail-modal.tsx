@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CommuneModel } from "@/models/static/commune/commune.response";
 import { useEffect, useState } from "react";
 import { getCommuneByIdService } from "@/services/dashboard/commune/commune.service";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface CommuneViewModalProps {
   commune?: CommuneModel;
@@ -144,7 +145,7 @@ export default function CommuneViewModal({
                         {commune?.district?.districtEn || "N/A"}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between">
                       <Label className="text-sm font-medium text-muted-foreground">
                         District (Khmer):
@@ -180,12 +181,32 @@ export default function CommuneViewModal({
                         {commune?.district?.province?.provinceKh || "N/A"}
                       </span>
                     </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Created At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(commune?.createdAt) || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Updated At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(commune?.updatedAt) || "N/A"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No commune data available</p>
+                <p className="text-muted-foreground">
+                  No commune data available
+                </p>
               </div>
             )}
           </div>

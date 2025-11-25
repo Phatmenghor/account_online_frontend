@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface VillageTableHandlers {
   handleEditVillage: (village: VillageModel) => void;
@@ -145,6 +146,18 @@ export const createVillageTableColumns = ({
       render: (village) => (
         <span className="font-medium">
           {village.commune?.district?.province?.provinceEn || "---"}
+        </span>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "CreatedAt",
+      truncate: true,
+      maxWidth: "190px",
+      minWidth: "100px",
+      render: (village) => (
+        <span className="font-medium">
+          {DateTimeFormat(village.createdAt) || "---"}
         </span>
       ),
     },
