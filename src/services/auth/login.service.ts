@@ -14,7 +14,7 @@ export async function loginService(credentials: LoginCredentials) {
     // On success, store token and role (simulate your original behavior)
     storeToken(response.data.data.accessToken);
     storeRole(response.data.data.userRole.userRole);
-    storeUserInfo(response.data.userRole);
+    storeUserInfo(response.data.data.userRole);
     storePermission(response?.data?.userRole?.userPermission);
 
     return response.data.data;
