@@ -8,8 +8,10 @@ export interface AllReferenceModel {
 }
 
 export interface ReferenceModel {
-  id: number
-  nameEn: string
-  nameKh: string
-  status: string
+  id: number;
+  nameEn: string;
+  nameKh: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }

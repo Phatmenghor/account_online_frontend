@@ -69,8 +69,12 @@ function AccountPageContent() {
 
     try {
       // Fetch the image as blob
+      // const response = await fetch(
+      //   `http://192.168.103.106:9393/api/images/${fileName}`
+
+      // );
       const response = await fetch(
-        `http://192.168.103.106:9393/api/images/${fileName}`
+        `${process.env.BACKEND_API_URL}/api/images/${fileName}`
       );
       if (!response.ok) throw new Error("Failed to fetch image");
 

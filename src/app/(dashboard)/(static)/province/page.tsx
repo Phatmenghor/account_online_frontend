@@ -207,13 +207,6 @@ function ProvincePageContent() {
     }
   };
 
-  // Handle status filter change - directly updates the filter value
-  const handleStatusChange = (status: string) => {
-    setStatusFilter(status);
-    // Reset to first page when filter changes
-    updateUrlWithPage(1, true);
-  };
-
   const handleEditProvince = (province: ProvinceModel) => {
     setSelectedProvince(province);
     setMode(ModalMode.UPDATE_MODE);
@@ -254,20 +247,6 @@ function ProvincePageContent() {
                 disabled={isSubmitting}
               />
             </div>
-            {/* Status Filter Dropdown */}
-            {/* <Select value={statusFilter} onValueChange={handleStatusChange}>
-                            <SelectTrigger className="w-[180px] h-9">
-                              <SelectValue placeholder="All Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All Status</SelectItem>
-                              {STATUS_USER_OPTIONS.map((status) => (
-                                <SelectItem key={status.value} value={status.value}>
-                                  {status.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select> */}
           </div>
           <div>
             <Button onClick={handleAddProvince}>New</Button>

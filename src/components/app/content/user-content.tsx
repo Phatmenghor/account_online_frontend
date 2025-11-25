@@ -110,6 +110,7 @@ function UserPageContent() {
     setSelectedUserToggle(user);
     setIsToggleStatusDialogOpen(true);
   };
+
   const handleStatusToggle = async (user: UserModel | null) => {
     if (!user?.id) return;
     setIsLoading(true);

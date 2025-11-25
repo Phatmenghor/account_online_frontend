@@ -13,4 +13,6 @@ export interface LegalTypeModel {
   nameKh: string;
   legalTypeValue: string;
   status: string;
+  createdAt: string;
+  updatedAt: string;
 }
