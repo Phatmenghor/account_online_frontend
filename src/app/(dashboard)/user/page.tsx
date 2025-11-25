@@ -33,6 +33,7 @@ import { CreateUserReq, UpdateUserReq } from "@/models/user/user.request";
 import Loading from "@/components/shared/common/loading";
 import { UserViewModal } from "@/components/shared/modal/user-detail-modal";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
+import { getUserInfo } from "@/utils/local-storage/userInfo";
 
 function UserPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,6 +52,7 @@ function UserPageContent() {
     useState<UserModel | null>(null);
   const [isToggleStatusDialogOpen, setIsToggleStatusDialogOpen] =
     useState(false);
+  const [currentUser, setCurrentUser] = useState<UserModel | null>(null);
 
   const t = useTranslations();
 
@@ -62,6 +64,14 @@ function UserPageContent() {
   const { currentPage, updateUrlWithPage, handlePageChange } = usePagination({
     baseRoute: ROUTES.DASHBOARD.USER,
   });
+
+  // Get current user info for take permission delete user
+  useEffect(() => {
+    const userInfo = getUserInfo();
+    if (userInfo) {
+      setCurrentUser(userInfo);
+    }
+  }, []);
 
   useEffect(() => {
     const pageParam = searchParams.get("pageNo");
@@ -131,6 +141,7 @@ function UserPageContent() {
       setIsLoading(false);
     }
   };
+
   const handleSaveUser = async (
     formData: CreateUserReq | { id: number; updates: UpdateUserReq }
   ) => {
@@ -328,6 +339,7 @@ function UserPageContent() {
                     handleViewUserDetail,
                     handleDeleteUser,
                   },
+                  currentUser,
                 })}
                 loading={isLoading}
                 emptyMessage="No user found"
