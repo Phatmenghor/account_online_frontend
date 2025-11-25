@@ -14,6 +14,7 @@ import {
 import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 import { Badge } from "@/components/ui/badge";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface ReferenceTableHandlers {
   handleEditReference: (reference: ReferenceModel) => void;
@@ -91,6 +92,30 @@ export const createReferenceTableColumns = ({
         <Badge className={getStatusColor(reference?.status ?? "")}>
           <span className="ml-1">{reference?.status || "ACTIVE"}</span>
         </Badge>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "Created At",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
+      render: (reference) => (
+        <span className="font-medium">
+          {DateTimeFormat(reference.createdAt) || "---"}
+        </span>
+      ),
+    },
+    {
+      key: "updatedAt",
+      label: "Updated At",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
+      render: (reference) => (
+        <span className="font-medium">
+          {DateTimeFormat(reference.updatedAt) || "---"}
+        </span>
       ),
     },
     {

@@ -14,6 +14,7 @@ import {
 import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 import { Badge } from "@/components/ui/badge";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface MaritalTableHandlers {
   handleEditMarital: (marital: MaritalModel) => void;
@@ -89,6 +90,30 @@ export const createMaritalTableColumns = ({
         <Badge className={getStatusColor(marital?.status ?? "")}>
           <span className="ml-1">{marital?.status || "ACTIVE"}</span>
         </Badge>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "Created At",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
+      render: (marital) => (
+        <span className="font-medium">
+          {DateTimeFormat(marital.createdAt) || "---"}
+        </span>
+      ),
+    },
+    {
+      key: "updatedAt",
+      label: "Updated At",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
+      render: (marital) => (
+        <span className="font-medium">
+          {DateTimeFormat(marital.updatedAt) || "---"}
+        </span>
       ),
     },
     {

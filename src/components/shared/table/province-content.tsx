@@ -7,7 +7,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 import {
   AllProvinceModel,
@@ -31,8 +30,6 @@ export const createProviceTableColumns = ({
 }: ProvinceTableOptions): TableColumn<ProvinceModel>[] => {
   const { handleEditProvince, handleViewProvinceDetail, handleDeleteProvince } =
     handlers;
-
-  const tCommon = useTranslations("common");
 
   return [
     {

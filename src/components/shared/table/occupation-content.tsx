@@ -14,6 +14,7 @@ import {
 import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 import { Badge } from "@/components/ui/badge";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface OccupationTableHandlers {
   handleEditOccupation: (occupation: OccupationModel) => void;
@@ -104,6 +105,30 @@ export const createOccupationTableColumns = ({
         <Badge className={getStatusColor(occupation?.status ?? "")}>
           <span className="ml-1">{occupation?.status || "ACTIVE"}</span>
         </Badge>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "Created At",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
+      render: (occupation) => (
+        <span className="font-medium">
+          {DateTimeFormat(occupation.createdAt) || "---"}
+        </span>
+      ),
+    },
+    {
+      key: "updatedAt",
+      label: "Updated At",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
+      render: (occupation) => (
+        <span className="font-medium">
+          {DateTimeFormat(occupation.updatedAt) || "---"}
+        </span>
       ),
     },
     {
