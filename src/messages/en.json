@@ -214,7 +214,7 @@
     "err_maritalStatus": "Marital status is required",
     "err_occupation": "Occupation is required",
     "err_branch": "Branch is required",
-    "err_phoneNumber_min": "Phone number must be at least 8 digits",
+    "err_phoneNumber_min": "Phone number must be at least 9 digits",
     "err_phoneNumber_max": "Phone number must not exceed 15 digits",
     "err_phoneNumber_regex": "Phone number must contain only digits",
     "err_isPhoneVerified": "Phone number must be verified. And then input otp 6 digit"
