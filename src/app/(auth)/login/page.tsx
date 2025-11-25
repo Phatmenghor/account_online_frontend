@@ -62,7 +62,7 @@ export default function LoginPage() {
         if (response?.userRole?.userRole == UserRole.DEVELOPER) {
           router.replace(ROUTES.DASHBOARD.INDEX);
         } else if (response?.userRole?.userRole == UserRole.SUPER) {
-          router.replace(ROUTES.DASHBOARD.USER);
+          router.replace(ROUTES.DASHBOARD.INDEX);
         } else {
           router.replace(ROUTES.DASHBOARD.AML.MANAGEMENT);
         }

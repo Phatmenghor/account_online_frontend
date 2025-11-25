@@ -159,7 +159,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
         <div className="flex h-16 items-center justify-between border-b px-3 relative">
           {isOpen ? (
             <Link
-              href={ROUTES.DASHBOARD.PROFILE}
+              href={ROUTES.DASHBOARD.INDEX}
               className="flex items-center gap-2 transition-opacity duration-200"
             >
               <img
