@@ -36,8 +36,8 @@ const kantumruyPro = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Dashboard Template",
-  description: "Dashboard Template application",
+  title: "Account Online",
+  description: "Account Online application",
 };
 
 export default async function RootLayout({
@@ -54,7 +54,7 @@ export default async function RootLayout({
   return (
     <html lang={serverLocale} className={kantumruyPro.variable}>
       <head>
-        <link rel="icon" href="/assets/cp.png" />   
+        <link rel="icon" href="/assets/cp.png" />
       </head>
       <body className="font-kantumruy antialiased">
         <LocaleProvider
