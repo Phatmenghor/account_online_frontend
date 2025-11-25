@@ -105,18 +105,6 @@ export const createMaritalTableColumns = ({
       ),
     },
     {
-      key: "updatedAt",
-      label: "Updated At",
-      truncate: true,
-      maxWidth: "300px",
-      minWidth: "150px",
-      render: (marital) => (
-        <span className="font-medium">
-          {DateTimeFormat(marital.updatedAt) || "---"}
-        </span>
-      ),
-    },
-    {
       key: "actions",
       label: "Actions",
       maxWidth: "180px",

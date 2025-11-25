@@ -1,7 +1,4 @@
-import {
-  LegalTypeModel,
-  AllLegalTypeReq,
-} from "@/models/static/legal-type/legal-type.response";
+import { LegalTypeModel } from "@/models/static/legal-type/legal-type.response";
 import { Button } from "@/components/ui/button";
 import { indexDisplay } from "@/utils/common/common";
 import { Edit, Eye, Trash } from "lucide-react";
@@ -11,10 +8,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useTranslations } from "next-intl";
 import { TableColumn } from "./data-table";
 import { Badge } from "@/components/ui/badge";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
+import { AllLegalTypeReq } from "@/models/static/legal-type/legal-type.request";
 
 interface LegalTypeTableHandlers {
   handleEditLegalType: (legalType: LegalTypeModel) => void;
@@ -112,18 +109,6 @@ export const createLegalTypeTableColumns = ({
       render: (legal) => (
         <span className="font-medium">
           {DateTimeFormat(legal.createdAt) || "---"}
-        </span>
-      ),
-    },
-    {
-      key: "updatedAt",
-      label: "Updated At",
-      truncate: true,
-      maxWidth: "300px",
-      minWidth: "150px",
-      render: (legal) => (
-        <span className="font-medium">
-          {DateTimeFormat(legal.updatedAt) || "---"}
         </span>
       ),
     },

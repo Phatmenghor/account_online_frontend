@@ -1,12 +1,7 @@
 "use client";
 
 import type React from "react";
-import {
-  FileText,
-  BookType,
-  Tag,
-  Shield,
-} from "lucide-react";
+import { FileText, BookType, Tag, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,6 +17,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { OccupationModel } from "@/models/static/occupation/occupation.response";
 import { useEffect, useState } from "react";
 import { getOccupationByIdService } from "@/services/dashboard/occupation/occupation.service";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
+import { StatusBadge } from "../badge/status-badge";
 
 interface OccupationViewModalProps {
   occupation?: OccupationModel;
@@ -148,7 +145,7 @@ export default function OccupationViewModal({
                       </Label>
                       <div className="flex items-center gap-2">
                         <span className="text-sm">
-                          {occupation?.status || "ACTIVE"}
+                          {<StatusBadge status={occupation?.status} />}
                         </span>
                       </div>
                     </div>
@@ -161,12 +158,32 @@ export default function OccupationViewModal({
                         {occupation?.occupationCode || "N/A"}
                       </span>
                     </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Created At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(occupation?.createdAt) || "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Updated At:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {DateTimeFormat(occupation?.updatedAt) || "N/A"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No occupation data available</p>
+                <p className="text-muted-foreground">
+                  No occupation data available
+                </p>
               </div>
             )}
           </div>

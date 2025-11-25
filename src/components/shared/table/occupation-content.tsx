@@ -120,18 +120,6 @@ export const createOccupationTableColumns = ({
       ),
     },
     {
-      key: "updatedAt",
-      label: "Updated At",
-      truncate: true,
-      maxWidth: "300px",
-      minWidth: "150px",
-      render: (occupation) => (
-        <span className="font-medium">
-          {DateTimeFormat(occupation.updatedAt) || "---"}
-        </span>
-      ),
-    },
-    {
       key: "actions",
       label: "Actions",
       maxWidth: "180px",

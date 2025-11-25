@@ -77,18 +77,6 @@ export const createBranchTableColumns = ({
       ),
     },
     {
-      key: "updatedAt",
-      label: "Updated At",
-      truncate: true,
-      maxWidth: "300px",
-      minWidth: "150px",
-      render: (branch) => (
-        <span className="font-medium">
-          {DateTimeFormat(branch.updatedAt) || "---"}
-        </span>
-      ),
-    },
-    {
       key: "actions",
       label: "Actions",
       maxWidth: "180px",

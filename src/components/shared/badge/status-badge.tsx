@@ -4,17 +4,10 @@ interface StatusBadgeProps {
   status: string;
 }
 
-export const UserStatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
       case Status.ACTIVE:
-        if (status) {
-          return {
-            className:
-              "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-            label: "Expiring Soon",
-          };
-        }
         return {
           className:
             "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
@@ -26,6 +19,7 @@ export const UserStatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
             "bg-red-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
           label: "Delete",
         };
+
       default:
         return {
           className:
@@ -39,7 +33,7 @@ export const UserStatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
 
   return (
     <span
-      className={`px-1 py-1 rounded-lg text-center text-xs font-medium ${statusConfig.className}`}
+      className={`px-4 py-1 rounded-lg text-center text-sm font-medium ${statusConfig.className}`}
     >
       {statusConfig.label}
     </span>
