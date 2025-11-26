@@ -5,17 +5,17 @@
 #=============================================================================
 
 # Project Information
-PROJECT_DISPLAY_NAME="Account Online frontend App"
-APP_NAME="account-online-frontend"
-PROJECT_DESCRIPTION="Account Online Frontend Application"
+PROJECT_DISPLAY_NAME="Account Online frontend App test"
+APP_NAME="account-online-frontend-test"
+PROJECT_DESCRIPTION="Account Online Frontend Application test"
 
 # Port Configuration
-EXTERNAL_PORT=8282
-INTERNAL_PORT=3131
+EXTERNAL_PORT=2828
+INTERNAL_PORT=1313
 
 # API Configuration
-FRONTEND_API_URL="http://192.168.103.106:8282"
-BACKEND_API_URL="http://192.168.103.106:9393"
+FRONTEND_API_URL="http://192.168.103.106:2828"
+BACKEND_API_URL="http://192.168.103.106:3939"
 SERVER_IP="192.168.103.106"
 
 # Nginx Performance Settings
