@@ -72,6 +72,18 @@ function Management() {
     }
   }, [searchParams, updateUrlWithPage]);
 
+  useEffect(() => {
+    const legalIdParam = searchParams.get("legalId");
+    if (legalIdParam && amlManagement?.content) {
+      const caseToOpen = amlManagement.content.find(
+        (item) => item.customerInfo.legalId === legalIdParam
+      );
+      if (caseToOpen) {
+        handleViewManagementDetail(caseToOpen);
+      }
+    }
+  }, [amlManagement, searchParams]);
+
   const loadManagement = useCallback(async () => {
     setIsLoading(true);
     try {
