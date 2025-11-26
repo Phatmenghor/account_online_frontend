@@ -17,7 +17,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { useDebounce } from "@/utils/debounce/debounce";
 import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/shared/common/loading";
 import { createManagementTableColumns } from "@/components/shared/table/aml-management-content";
 import {
@@ -60,7 +60,7 @@ function Management() {
   const t = useTranslations();
 
   const debouncedSearchQuery = useDebounce(searchQuery, 400);
-
+  const router = useRouter();
   const { currentPage, updateUrlWithPage, handlePageChange } = usePagination({
     baseRoute: ROUTES.DASHBOARD.AML.MANAGEMENT,
   });
@@ -117,6 +117,16 @@ function Management() {
   const handleViewManagementDetail = (management: AmlManagementModel) => {
     setSelectedAmlManagement(management);
     setIsAmlManagementDetailOpen(true);
+  };
+
+  // VIEW DETAIL HANDLER
+  const handleCloseManagementDetail = () => {
+    setSelectedAmlManagement(null);
+    setIsAmlManagementDetailOpen(false);
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("legalId");
+    router.replace(`${ROUTES.DASHBOARD.AML.MANAGEMENT}?${params.toString()}`);
   };
 
   // CONFIRM DIALOG
@@ -232,7 +242,7 @@ function Management() {
         {/* VIEW DETAIL MODAL */}
         <AmlViewDetailModal
           isOpen={isAmlManagementDetailOpen}
-          onClose={() => setIsAmlManagementDetailOpen(false)}
+          onClose={handleCloseManagementDetail}
           alert={selectedAmlManagement!}
           alertId={selectedAmlManagement?.id}
         />
