@@ -75,6 +75,10 @@ function Management() {
   useEffect(() => {
     const legalIdParam = searchParams.get("legalId");
     if (legalIdParam && amlManagement?.content) {
+      // Set the search box so table filters by this legalId
+      setSearchQuery(legalIdParam);
+
+      // Find the case and open the modal
       const caseToOpen = amlManagement.content.find(
         (item) => item.customerInfo.legalId === legalIdParam
       );
