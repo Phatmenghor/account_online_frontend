@@ -18,6 +18,7 @@ export const ROUTES = {
       COMMUNE: "/commune",
       VILLAGE: "/village",
       LEGAL_TYPE: "/legal-type",
+      ACCOUNT_ONLINE_SUCCESS: "/account-online-success",
     },
     AML: {
       MANAGEMENT: "/aml-management",
