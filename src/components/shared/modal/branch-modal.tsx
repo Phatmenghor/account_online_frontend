@@ -205,7 +205,7 @@ export default function ModalBranch({
                     {/* Name English */}
                     <div className="space-y-2">
                       <Label htmlFor="nameEn" className="text-sm font-medium">
-                        Branchh Code <span className="text-red-500">*</span>
+                        Branch Code <span className="text-red-500">*</span>
                       </Label>
                       <Controller
                         control={control}
@@ -214,7 +214,7 @@ export default function ModalBranch({
                           <Input
                             {...field}
                             id="branchCode"
-                            placeholder="Enter bracnh code"
+                            placeholder="Enter branch code"
                             disabled={isSubmitting}
                             className={`transition-colors ${
                               errors.branchCode ? "border-red-500" : ""

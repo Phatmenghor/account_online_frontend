@@ -14,19 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   CreateCommuneSchema,
   UpdateCommuneSchema,
   CreateCommuneForm,
   UpdateCommuneForm,
 } from "@/models/static/commune/commune.schema";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, FilePenLine, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
@@ -47,7 +39,11 @@ type ModalCommuneProps = {
   onSave: (
     data: CreateCommuneReq | { id: number; updates: UpdateCommuneReq }
   ) => void;
-  districts?: Array<{ districtCode: string; districtEn: string; districtKh: string }>;
+  districts?: Array<{
+    districtCode: string;
+    districtEn: string;
+    districtKh: string;
+  }>;
 };
 
 export default function ModalCommune({
@@ -215,7 +211,10 @@ export default function ModalCommune({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Commune Code */}
                     <div className="space-y-2">
-                      <Label htmlFor="communeCode" className="text-sm font-medium">
+                      <Label
+                        htmlFor="communeCode"
+                        className="text-sm font-medium"
+                      >
                         Commune Code <span className="text-red-500">*</span>
                       </Label>
                       <Controller
@@ -242,7 +241,10 @@ export default function ModalCommune({
 
                     {/* District Code */}
                     <div className="space-y-2">
-                      <Label htmlFor="districtCode" className="text-sm font-medium">
+                      <Label
+                        htmlFor="districtCode"
+                        className="text-sm font-medium"
+                      >
                         District Code <span className="text-red-500">*</span>
                       </Label>
                       <Controller
@@ -271,8 +273,12 @@ export default function ModalCommune({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Commune English */}
                     <div className="space-y-2">
-                      <Label htmlFor="communeEn" className="text-sm font-medium">
-                        Commune (English) <span className="text-red-500">*</span>
+                      <Label
+                        htmlFor="communeEn"
+                        className="text-sm font-medium"
+                      >
+                        Commune (English){" "}
+                        <span className="text-red-500">*</span>
                       </Label>
                       <Controller
                         control={control}
@@ -298,7 +304,10 @@ export default function ModalCommune({
 
                     {/* Commune Khmer */}
                     <div className="space-y-2">
-                      <Label htmlFor="communeKh" className="text-sm font-medium">
+                      <Label
+                        htmlFor="communeKh"
+                        className="text-sm font-medium"
+                      >
                         Commune (Khmer) <span className="text-red-500">*</span>
                       </Label>
                       <Controller
@@ -324,32 +333,6 @@ export default function ModalCommune({
                     </div>
                   </div>
                 </div>
-
-                {/* Commune Info Card - Read Only (edit mode only) */}
-                {!isCreate && communeDetail && (
-                  <div className="mt-2 p-4 bg-muted/30 rounded-lg border border-border">
-                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      System Information (Read Only)
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">
-                          Commune ID:
-                        </span>
-                        <p className="font-medium">{communeDetail.id}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">
-                          District:
-                        </span>
-                        <p className="font-medium">
-                          {communeDetail.district?.districtEn || "Unknown"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -361,9 +344,7 @@ export default function ModalCommune({
             {isSubmitting ? (
               <>
                 <Loader2 className="h-3 w-3 animate-spin" />
-                {isCreate
-                  ? "Creating commune..."
-                  : "Updating commune..."}
+                {isCreate ? "Creating commune..." : "Updating commune..."}
               </>
             ) : isDirty ? (
               <>

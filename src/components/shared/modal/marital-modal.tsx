@@ -26,7 +26,6 @@ import {
   CreateMaritalForm,
   UpdateMaritalForm,
 } from "@/models/static/marital/marital.schema";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, FilePenLine, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
@@ -311,32 +310,6 @@ export default function ModalMarital({
                           {errors.status.message as string}
                         </p>
                       )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Marital Info Card - Read Only (edit mode only) */}
-                {!isCreate && maritalDetail && (
-                  <div className="mt-2 p-4 bg-muted/30 rounded-lg border border-border">
-                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      System Information (Read Only)
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">
-                          Marital ID:
-                        </span>
-                        <p className="font-medium">{maritalDetail.id}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">
-                          Current Status:
-                        </span>
-                        <p className="font-medium">
-                          {maritalDetail.status || "Unknown"}
-                        </p>
-                      </div>
                     </div>
                   </div>
                 )}

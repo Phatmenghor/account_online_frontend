@@ -4,6 +4,6 @@ export enum UserPermission {
 }
 
 export enum Role {
-  ADMIN = "ADMIN",
+  COMPLIANCE = "COMPLIANCE",
   SUPER = "SUPER",
 }
