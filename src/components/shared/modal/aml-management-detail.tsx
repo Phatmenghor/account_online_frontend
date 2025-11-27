@@ -200,6 +200,7 @@ export default function AmlViewDetailModal({
                     value={alert.placeOfBirthName}
                     icon={<MapPin />}
                   />
+                  ``
                   <InfoRow
                     label="Place of Birth Code"
                     value={alert.placeOfBirthCode}

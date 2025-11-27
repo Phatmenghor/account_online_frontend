@@ -29,6 +29,11 @@ export function useNavItems() {
       icon: IdCard,
     },
     {
+      title: "Success Accounts",
+      href: ROUTES.DASHBOARD.STATIC.ACCOUNT_ONLINE_SUCCESS,
+      icon: IdCard,
+    },
+    {
       title: "AML",
       href: "#",
       icon: FolderClosed,

@@ -250,7 +250,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
                             className={cn(
                               "flex h-8 items-center rounded-md px-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
                               pathname === sub.href &&
-                                "bg-accent text-accent-foreground font-medium"
+                              "bg-accent text-accent-foreground font-medium"
                             )}
                           >
                             {sub.title}
@@ -266,7 +266,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
                     className={cn(
                       "flex h-9 w-full items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors group relative",
                       pathname === item.href &&
-                        "bg-accent text-accent-foreground",
+                      "bg-accent text-accent-foreground",
                       !isOpen && "justify-center"
                     )}
                   >
