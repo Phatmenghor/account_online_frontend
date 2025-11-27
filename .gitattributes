@@ -1,0 +1,8 @@
+.env.development merge=ours
+.env.production merge=ours
+.env.stage merge=ours
+auto-commit.sh merge=ours
+git_pull.sh merge=ours
+setup-nginx.sh merge=ours
+
+#to enable this run: git config merge.ours.driver true
