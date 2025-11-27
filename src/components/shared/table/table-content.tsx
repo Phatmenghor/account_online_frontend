@@ -29,7 +29,7 @@ interface userTableOptions {
 const ROLE_POWER: Record<string, number> = {
   ADMIN: 1,
   SUPER: 2,
-  DEVELOPER: 3
+  DEVELOPER: 3,
 };
 
 function canDelete(
@@ -40,8 +40,8 @@ function canDelete(
     return false;
   }
 
-  const curRole = currentUser.userRole.toUpperCase();
-  const tarRole = targetUser.userRole.toUpperCase();
+  const curRole = currentUser?.userRole?.toUpperCase();
+  const tarRole = targetUser?.userRole?.toUpperCase();
 
   // cannot delete yourself
   if (currentUser.email === targetUser.email) return false;

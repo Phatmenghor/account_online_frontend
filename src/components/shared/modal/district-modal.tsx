@@ -14,19 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   CreateDistrictSchema,
   UpdateDistrictSchema,
   CreateDistrictForm,
   UpdateDistrictForm,
 } from "@/models/static/district/district.schema";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, FilePenLine, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
@@ -47,7 +39,11 @@ type ModalDistrictProps = {
   onSave: (
     data: CreateDistrictReq | { id: number; updates: UpdateDistrictReq }
   ) => void;
-  provinces?: Array<{ provinceCode: string; provinceEn: string; provinceKh: string }>;
+  provinces?: Array<{
+    provinceCode: string;
+    provinceEn: string;
+    provinceKh: string;
+  }>;
 };
 
 export default function ModalDistrict({
@@ -62,11 +58,15 @@ export default function ModalDistrict({
 }: ModalDistrictProps) {
   const isCreate = mode === ModalMode.CREATE_MODE;
 
-  const [districtDetail, setDistrictDetail] = useState<DistrictModel | null>(null);
+  const [districtDetail, setDistrictDetail] = useState<DistrictModel | null>(
+    null
+  );
   const [isLoadingData, setIsLoadingData] = useState(false);
 
   const form = useForm<CreateDistrictForm | UpdateDistrictForm>({
-    resolver: zodResolver(isCreate ? CreateDistrictSchema : UpdateDistrictSchema),
+    resolver: zodResolver(
+      isCreate ? CreateDistrictSchema : UpdateDistrictSchema
+    ),
     defaultValues: isCreate
       ? {
           districtCode: "",
@@ -215,7 +215,10 @@ export default function ModalDistrict({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* District Code */}
                     <div className="space-y-2">
-                      <Label htmlFor="districtCode" className="text-sm font-medium">
+                      <Label
+                        htmlFor="districtCode"
+                        className="text-sm font-medium"
+                      >
                         District Code <span className="text-red-500">*</span>
                       </Label>
                       <Controller
@@ -281,7 +284,10 @@ export default function ModalDistrict({
                     </div> */}
                     {/* Province */}
                     <div className="space-y-2">
-                      <Label htmlFor="provinceCode" className="text-sm font-medium">
+                      <Label
+                        htmlFor="provinceCode"
+                        className="text-sm font-medium"
+                      >
                         Province Code <span className="text-red-500">*</span>
                       </Label>
                       <Controller
@@ -310,8 +316,12 @@ export default function ModalDistrict({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* District English */}
                     <div className="space-y-2">
-                      <Label htmlFor="districtEn" className="text-sm font-medium">
-                        District (English) <span className="text-red-500">*</span>
+                      <Label
+                        htmlFor="districtEn"
+                        className="text-sm font-medium"
+                      >
+                        District (English){" "}
+                        <span className="text-red-500">*</span>
                       </Label>
                       <Controller
                         control={control}
@@ -337,7 +347,10 @@ export default function ModalDistrict({
 
                     {/* District Khmer */}
                     <div className="space-y-2">
-                      <Label htmlFor="districtKh" className="text-sm font-medium">
+                      <Label
+                        htmlFor="districtKh"
+                        className="text-sm font-medium"
+                      >
                         District (Khmer) <span className="text-red-500">*</span>
                       </Label>
                       <Controller
@@ -363,32 +376,6 @@ export default function ModalDistrict({
                     </div>
                   </div>
                 </div>
-
-                {/* District Info Card - Read Only (edit mode only) */}
-                {!isCreate && districtDetail && (
-                  <div className="mt-2 p-4 bg-muted/30 rounded-lg border border-border">
-                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      System Information (Read Only)
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">
-                          District ID:
-                        </span>
-                        <p className="font-medium">{districtDetail.id}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">
-                          Province:
-                        </span>
-                        <p className="font-medium">
-                          {districtDetail.province?.provinceEn || "Unknown"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -400,9 +387,7 @@ export default function ModalDistrict({
             {isSubmitting ? (
               <>
                 <Loader2 className="h-3 w-3 animate-spin" />
-                {isCreate
-                  ? "Creating district..."
-                  : "Updating district..."}
+                {isCreate ? "Creating district..." : "Updating district..."}
               </>
             ) : isDirty ? (
               <>

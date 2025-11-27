@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, EyeOff, UserPlus, UserCog, Loader2 } from "lucide-react";
 import { getUserByIdService } from "@/services/dashboard/user/user.service";
 import { UserModel } from "@/models/user/user.response";
@@ -40,6 +39,7 @@ import { STATUS_USER_OPTIONS } from "@/constants/AppResource/filter/status";
 import { Status } from "@/constants/AppResource/display-list/enum/status";
 import { UserPermission } from "@/constants/AppResource/display-list/enum/user";
 import { USER_PERMISSION_OPTIONS } from "@/constants/AppResource/filter/permission";
+import { StatusBadge } from "../badge/status-badge";
 
 type ModalUserProps = {
   isOpen: boolean;
@@ -523,15 +523,11 @@ export default function ModalUser({
                     </h4>
                     <div className="grid grid-cols-2 gap-6 text-sm">
                       <div>
-                        <span className="text-muted-foreground">User ID:</span>
-                        <p className="font-medium">{userDetail.id}</p>
-                      </div>
-                      <div>
                         <span className="text-muted-foreground">
                           Current Status:
                         </span>
-                        <p className="font-medium">
-                          {userDetail.userStatus || "Unknown"}
+                        <p className="font-medium mt-2">
+                          <StatusBadge status={userDetail.userStatus} />
                         </p>
                       </div>
                     </div>

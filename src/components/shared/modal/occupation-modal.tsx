@@ -26,7 +26,6 @@ import {
   CreateOccupationForm,
   UpdateOccupationForm,
 } from "@/models/static/occupation/occupation.schema";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, FilePenLine, Loader2 } from "lucide-react";
 import Loading from "@/components/shared/common/loading";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
@@ -306,7 +305,10 @@ export default function ModalOccupation({
                     {!isCreate && (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="status" className="text-sm font-medium">
+                          <Label
+                            htmlFor="status"
+                            className="text-sm font-medium"
+                          >
                             Status <span className="text-red-500">*</span>
                           </Label>
                           <Controller
@@ -353,32 +355,6 @@ export default function ModalOccupation({
                     )}
                   </div>
                 </div>
-
-                {/* Occupation Info Card - Read Only (edit mode only) */}
-                {!isCreate && occupationDetail && (
-                  <div className="mt-2 p-4 bg-muted/30 rounded-lg border border-border">
-                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      System Information (Read Only)
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">
-                          Occupation ID:
-                        </span>
-                        <p className="font-medium">{occupationDetail.id}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">
-                          Current Status:
-                        </span>
-                        <p className="font-medium">
-                          {occupationDetail.status || "Unknown"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
