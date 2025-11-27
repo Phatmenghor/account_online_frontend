@@ -166,9 +166,8 @@ export default function ProfileTab({
             <CardContent className="relative pt-0">
               <div className="flex flex-col md:flex-row gap-6 -mt-12 items-start">
                 <div
-                  className={`relative group z-10 ${
-                    editMode ? "cursor-pointer" : "cursor-default"
-                  }`}
+                  className={`relative group z-10 ${editMode ? "cursor-pointer" : "cursor-default"
+                    }`}
                   onClick={editMode ? handleAvatarClick : undefined}
                   onMouseEnter={handlePhotoMouseEnter}
                   onMouseLeave={handlePhotoMouseLeave}
@@ -236,6 +235,13 @@ export default function ProfileTab({
                         ? new Date(user.createdAt).toLocaleDateString()
                         : "Recently"}
                     </div>
+                    {user?.lastLogin && (
+                      <div className="flex items-center gap-1.5">
+                        <Info className="h-4 w-4" />
+                        Last Login{" "}
+                        {new Date(user.lastLogin).toLocaleDateString()}
+                      </div>
+                    )}
                   </div>
 
                   {imageData && editMode && (
@@ -290,7 +296,7 @@ export default function ProfileTab({
                               {fieldName === "username"
                                 ? "Username"
                                 : fieldName.charAt(0).toUpperCase() +
-                                  fieldName.slice(1)}
+                                fieldName.slice(1)}
                             </FormLabel>
                             <FormControl>
                               <Input

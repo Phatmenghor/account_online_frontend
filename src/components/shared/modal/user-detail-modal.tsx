@@ -89,8 +89,8 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                 {user?.fullName
                   ? `Profile information for "${user.fullName}"`
                   : user?.email
-                  ? `Profile information for "${user.email}"`
-                  : "User profile information"}
+                    ? `Profile information for "${user.email}"`
+                    : "User profile information"}
               </DialogDescription>
 
               <Badge className={getRoleColor(user?.userRole ?? "")}>
@@ -206,6 +206,15 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                       </Label>
                       <span className="text-sm flex items-center gap-2">
                         {formatDate(user?.createdAt ?? "")}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Last Login:
+                      </Label>
+                      <span className="text-sm flex items-center gap-2">
+                        {formatDate(user?.lastLogin ?? "")}
                       </span>
                     </div>
 
