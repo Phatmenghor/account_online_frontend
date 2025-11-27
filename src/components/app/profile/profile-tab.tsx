@@ -36,6 +36,7 @@ import { UserModel } from "@/models/user/user.response";
 import { UpdateUserProfileForm } from "@/models/auth/profile.schema";
 import { Image } from "@/app/(dashboard)/profile/page";
 import { Status } from "@/constants/AppResource/display-list/enum/status";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface Props {
   tabValue: string;
@@ -236,6 +237,12 @@ export default function ProfileTab({
                         ? new Date(user.createdAt).toLocaleDateString()
                         : "Recently"}
                     </div>
+                    {user?.lastLogin && (
+                      <div className="flex items-center gap-1.5">
+                        <Info className="h-4 w-4" />
+                        Last Login {DateTimeFormat(user.lastLogin)}
+                      </div>
+                    )}
                   </div>
 
                   {imageData && editMode && (

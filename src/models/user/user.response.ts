@@ -19,4 +19,5 @@ export interface UserModel {
   profileUrl: string;
   createdAt: string;
   updatedAt: string;
+  lastLogin: string;
 }

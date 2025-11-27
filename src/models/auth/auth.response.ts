@@ -22,4 +22,5 @@ export interface UserRole {
   profileUrl: string;
   createdAt: string;
   updatedAt: string;
+  lastLogin: string;
 }

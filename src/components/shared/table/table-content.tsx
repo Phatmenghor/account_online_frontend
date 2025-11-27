@@ -143,6 +143,18 @@ export const createUserTableColumns = ({
       render: (user) => <RoleBadge role={user.userRole} />,
     },
     {
+      key: " lastLogin",
+      truncate: true,
+      maxWidth: "300px",
+      minWidth: "150px",
+      label: "Last Login",
+      render: (user) => (
+        <span className="text-muted-foreground">
+          {DateTimeFormat(user.lastLogin)}
+        </span>
+      ),
+    },
+    {
       key: "createdAt",
       truncate: true,
       maxWidth: "300px",
