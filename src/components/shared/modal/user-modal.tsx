@@ -514,25 +514,6 @@ export default function ModalUser({
                     )}
                   </div>
                 </div>
-
-                {!isCreate && userDetail && (
-                  <div className="mt-2 p-4 bg-muted/30 rounded-lg border border-border">
-                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      System Information (Read Only)
-                    </h4>
-                    <div className="grid grid-cols-2 gap-6 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">
-                          Current Status:
-                        </span>
-                        <p className="font-medium mt-2">
-                          <StatusBadge status={userDetail.userStatus} />
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
