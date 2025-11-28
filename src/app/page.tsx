@@ -11,7 +11,13 @@ import { PersonalDetailsFields } from "@/components/acc-online/form-sections/per
 import { MasterDataFields } from "@/components/acc-online/form-sections/master-data-fields";
 import OTPInput from "@/components/acc-online/form-field/form-otp";
 import { PageHeader } from "@/components/acc-online/page-header";
-import { ModalGroup } from "@/components/acc-online/modal-group";
+import ValidationErrorModal from "@/components/acc-online/validateModal";
+import ErrorModal from "@/components/acc-online/errorModal";
+import ConfirmationModal from "@/components/acc-online/confirmModal";
+import LocationModal from "@/components/acc-online/addressModal";
+import LoadingModal from "@/components/shared/modal/extract-modal";
+import SubmitSuccessModal from "@/components/shared/modal/submit-success-modal";
+import SubmitErrorModal from "@/components/shared/modal/submit-error-modal";
 
 // Contexts
 import { FormStateProvider } from "@/contexts/form-state-context";
@@ -373,32 +379,63 @@ export default function OpenAccountPage() {
           <Footer />
         </div>
 
-        <ModalGroup
-          loadingState={loadingState}
-          showConfirmationModal={showConfirmationModal}
-          onConfirmValidation={handleConfirmValidation}
-          onCancelConfirmation={() => setShowConfirmationModal(false)}
-          confirmationTitle={translate("cfTitle")}
-          confirmationMessage={translate("cfMessage")}
-          showLocationModal={showLocationModal}
-          onCloseLocationModal={() => setShowLocationModal(false)}
-          onSubmitLocation={handleLocationSubmitCallback}
-          locationFormData={locationFormData}
-          setLocationFormData={setLocationFormData}
+        <LoadingModal
+          isOpen={loadingState.isLoading}
+          title={loadingState.title}
+          message={loadingState.message}
+        />
+
+        <ConfirmationModal
+          isOpen={showConfirmationModal}
+          onConfirm={handleConfirmValidation}
+          onCancel={() => setShowConfirmationModal(false)}
+          title={translate("cfTitle")}
+          message={translate("cfMessage")}
+        />
+
+        <LocationModal
+          isOpen={showLocationModal}
+          onClose={() => setShowLocationModal(false)}
+          onSubmit={handleLocationSubmitCallback}
+          formData={locationFormData}
+          setFormData={setLocationFormData}
           addressFromForm={formData.address}
           placeOfBirthFromForm={formData.pob}
-          showErrorModal={showErrorModal}
-          onCloseErrorModal={() => setShowErrorModal(false)}
-          validationResult={validationResult}
-          showValidationErrorModal={showValidationErrorModal}
-          onCloseValidationErrorModal={() => setShowValidationErrorModal(false)}
-          validationErrorData={validationErrorData}
-          showSuccessModal={showSuccessModal}
-          onCloseSuccessModal={handleSuccessModalClose}
-          successData={successData}
-          showSubmitErrorModal={showSubmitErrorModal}
-          onCloseSubmitErrorModal={() => setShowSubmitErrorModal(false)}
-          submitErrorData={submitErrorData}
+        />
+
+        <ErrorModal
+          isOpen={showErrorModal}
+          onClose={() => setShowErrorModal(false)}
+          data={
+            validationResult?.data
+              ? {
+                score: validationResult.data.score,
+                incorrectFields: validationResult.data.incorrectFields,
+              }
+              : null
+          }
+        />
+
+        <ValidationErrorModal
+          isOpen={showValidationErrorModal}
+          onClose={() => setShowValidationErrorModal(false)}
+          title={validationErrorData.title}
+          message={validationErrorData.message}
+          description={validationErrorData.description}
+        />
+
+        <SubmitSuccessModal
+          isOpen={showSuccessModal}
+          onClose={handleSuccessModalClose}
+          title={successData.title}
+          message={successData.message}
+        />
+
+        <SubmitErrorModal
+          isOpen={showSubmitErrorModal}
+          onClose={() => setShowSubmitErrorModal(false)}
+          title={submitErrorData.title}
+          message={submitErrorData.message}
         />
       </div>
     </FormStateProvider>
