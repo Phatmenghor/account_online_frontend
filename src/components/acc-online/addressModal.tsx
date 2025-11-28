@@ -18,47 +18,26 @@ import { PosSelectReq } from "@/models/address/select-pos/selectPos.request"
 import { getPosSelectService } from "@/services/address/selectPos.service"
 import { useTranslations } from "next-intl"
 import { LocationFormData, LocationFormSchema } from "./form-field/form-validate-error"
-
-interface LocationData {
-  province: string
-  district: string
-  commune: string
-  village: string
-}
-
-interface LocationSubmitData {
-  currentAddress: {
-    province: ProvinceModel | null
-    district: DistrictModel | null
-    commune: CommuneModel | null
-    village: VillageModel | null
-  }
-  placeOfBirth: {
-    province: ProvinceModel | null
-    district: DistrictModel | null
-    commune: CommuneModel | null
-    village: VillageModel | null
-  }
-}
+import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-address.request.model"
 
 interface LocationModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: LocationSubmitData) => void
-  formData: LocationData
-  setFormData: React.Dispatch<React.SetStateAction<LocationData>>
+  formData: LocationSubmitData
+  setFormData: React.Dispatch<React.SetStateAction<LocationSubmitData>>
   addressFromForm?: string
   placeOfBirthFromForm?: string
 }
 
-const LocationModal = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  formData, 
-  setFormData, 
+const LocationModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  formData,
+  setFormData,
   addressFromForm,
-  placeOfBirthFromForm 
+  placeOfBirthFromForm
 }: LocationModalProps) => {
   const { locale: currentLocale } = useClientLocale()
   const translate = useTranslations("address");
@@ -112,11 +91,11 @@ const LocationModal = ({
   // Validate a single field
   const validateField = (section: 'currentAddress' | 'placeOfBirth', field: string, value: string) => {
     const fieldPath = `${section}.${field}`
-    
+
     try {
       const fieldSchema = LocationFormSchema.shape[section].shape[field as keyof typeof LocationFormSchema.shape.currentAddress.shape]
       fieldSchema.parse(value)
-      
+
       setValidationErrors((prev) => {
         const newErrors = { ...prev }
         delete newErrors[fieldPath]
@@ -174,45 +153,57 @@ const LocationModal = ({
           const request: AddressSelectReq = {
             address: addressFromForm
           }
-          
+
           const addressData = await getAddressSelectService(request)
-          
+
           if (addressData.province) {
             setSelectedProvince(addressData.province)
             setFormData(prev => ({
               ...prev,
-              province: addressData.province.provinceCode
+              currentAddress: {
+                ...prev.currentAddress,
+                province: addressData.province
+              }
             }))
             validateField('currentAddress', 'province', addressData.province.provinceCode)
           }
-          
+
           if (addressData.district) {
             setSelectedDistrict(addressData.district)
             setFormData(prev => ({
               ...prev,
-              district: addressData.district.districtCode
+              currentAddress: {
+                ...prev.currentAddress,
+                district: addressData.district
+              }
             }))
             validateField('currentAddress', 'district', addressData.district.districtCode)
           }
-          
+
           if (addressData.commune) {
             setSelectedCommune(addressData.commune)
             setFormData(prev => ({
               ...prev,
-              commune: addressData.commune.communeCode
+              currentAddress: {
+                ...prev.currentAddress,
+                commune: addressData.commune
+              }
             }))
             validateField('currentAddress', 'commune', addressData.commune.communeCode)
           }
-          
+
           if (addressData.village) {
             setSelectedVillage(addressData.village)
             setFormData(prev => ({
               ...prev,
-              village: addressData.village.villageCode
+              currentAddress: {
+                ...prev.currentAddress,
+                village: addressData.village
+              }
             }))
             validateField('currentAddress', 'village', addressData.village.villageCode)
           }
-          
+
         } catch (error: any) {
           console.error("Error fetching address data:", error)
         } finally {
@@ -233,29 +224,29 @@ const LocationModal = ({
           const request: PosSelectReq = {
             address: placeOfBirthFromForm
           }
-          
+
           const pobData = await getPosSelectService(request)
-          
+
           if (pobData.province) {
             setPobProvince(pobData.province)
             validateField('placeOfBirth', 'province', pobData.province.provinceCode)
           }
-          
+
           if (pobData.district) {
             setPobDistrict(pobData.district)
             validateField('placeOfBirth', 'district', pobData.district.districtCode)
           }
-          
+
           if (pobData.commune) {
             setPobCommune(pobData.commune)
             validateField('placeOfBirth', 'commune', pobData.commune.communeCode)
           }
-          
+
           if (pobData.village) {
             setPobVillage(pobData.village)
             validateField('placeOfBirth', 'village', pobData.village.villageCode)
           }
-          
+
         } catch (error: any) {
           console.error("Error fetching place of birth data:", error)
         } finally {
@@ -274,12 +265,15 @@ const LocationModal = ({
     setSelectedCommune(null)
     setSelectedVillage(null)
 
-    setFormData({
-      province: province?.provinceCode || "",
-      district: "",
-      commune: "",
-      village: "",
-    })
+    setFormData(prev => ({
+      ...prev,
+      currentAddress: {
+        province: province,
+        district: null,
+        commune: null,
+        village: null,
+      }
+    }))
 
     if (province) {
       validateField('currentAddress', 'province', province.provinceCode)
@@ -293,9 +287,12 @@ const LocationModal = ({
 
     setFormData((prev) => ({
       ...prev,
-      district: district?.districtCode || "",
-      commune: "",
-      village: "",
+      currentAddress: {
+        ...prev.currentAddress,
+        district: district,
+        commune: null,
+        village: null,
+      }
     }))
 
     if (district) {
@@ -309,8 +306,11 @@ const LocationModal = ({
 
     setFormData((prev) => ({
       ...prev,
-      commune: commune?.communeCode || "",
-      village: "",
+      currentAddress: {
+        ...prev.currentAddress,
+        commune: commune,
+        village: null,
+      }
     }))
 
     if (commune) {
@@ -323,7 +323,10 @@ const LocationModal = ({
 
     setFormData((prev) => ({
       ...prev,
-      village: village?.villageCode || "",
+      currentAddress: {
+        ...prev.currentAddress,
+        village: village,
+      }
     }))
 
     if (village) {
@@ -390,7 +393,7 @@ const LocationModal = ({
         village: pobVillage
       }
     }
-    
+
     onSubmit(submitData)
   }
 
@@ -550,7 +553,7 @@ const LocationModal = ({
               <div className="lg:col-span-4">
                 <h3 className="text-base font-semibold text-gray-800">
                   <span className="text-red-500">* </span>
-                   {translate("selectPlaceOfBirth")}
+                  {translate("selectPlaceOfBirth")}
                 </h3>
               </div>
 
@@ -629,7 +632,7 @@ const LocationModal = ({
                   <div>
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
-                       {translate("village")}
+                      {translate("village")}
                     </label>
                     <div className={validationErrors['placeOfBirth.village'] ? 'border border-red-500 rounded' : ''}>
                       <ComboboxSelectVillage
