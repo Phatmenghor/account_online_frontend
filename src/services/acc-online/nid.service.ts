@@ -1,7 +1,7 @@
 import {
   RequestIdImage,
   RequestValidModel,
-} from "@/models/acc-online/nid.request.model";
+} from "@/models/open-acc-online/nid.request.model";
 import { axiosClientWithAuth } from "@/utils/axios";
 import { AxiosError } from "axios";
 

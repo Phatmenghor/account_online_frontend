@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { FormInputField } from "@/components/acc-online/form-field/form-field";
 import { getAccountOnlineService } from "@/services/get-account/acc-online.service";
-import { GetAccountModel } from "@/models/account-online/account-online.response";
+import { GetAccountModel } from "@/models/acc-online-get/account-online.response";
 
 function AccountPageContent() {
   const [searchCif, setSearchCif] = useState("");

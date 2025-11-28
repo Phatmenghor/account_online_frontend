@@ -1,12 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import {
   Select,
   SelectContent,
@@ -14,662 +10,131 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  RequestIdImage,
-  RequestValidModel,
-} from "@/models/acc-online/nid.request.model";
-import {
-  ResponseNID,
-  ValidationResponse,
-} from "@/models/acc-online/nid.response.model";
-import {
-  extractNIDService,
-  validateNIDService,
-} from "@/services/acc-online/nid.service";
-import {
-  convertGenderForAPI,
-  formatDate,
-} from "@/constants/AppResource/format-date/format-dd-mm-yyyy";
 import ValidationErrorModal from "@/components/acc-online/validateModal";
 import ErrorModal from "@/components/acc-online/errorModal";
 import LanguageSwitcher from "@/components/shared/common/language-switcher";
 import Footer from "@/components/shared/footer/footer";
-import { MaritalModel } from "@/models/static/marital/marital.response";
-import { useClientLocale } from "@/context/provider/local-provider";
-import { OccupationModel } from "@/models/static/occupation/occupation.response";
-import { ReferenceModel } from "@/models/static/reference/reference.response";
-import { FormInputField } from "@/components/acc-online/form-field/form-field";
 import { CustomDatePicker } from "@/components/shared/common/custom-date-picker";
-import {
-  formatDateForInput,
-  normalizeGender,
-} from "@/utils/format/BranchFormat";
-import {
-  useLegalTypes,
-  useMaritalStatuses,
-  useOccupations,
-  useReferenceBanks,
-} from "@/hooks/fetch-master";
-import { AppToast } from "@/components/shared/toast/app-toast";
 import ConfirmationModal from "@/components/acc-online/confirmModal";
 import LocationModal from "@/components/acc-online/addressModal";
-import {
-  CommuneModel,
-  DistrictModel,
-  ProvinceModel,
-  VillageModel,
-} from "@/models/address/address.response";
 import OTPInput from "@/components/acc-online/form-field/form-otp";
 import { ComboboxSelectBranch } from "@/components/shared/combo-box/combobox-branch";
-import { BranchModel } from "@/models/branch/branch.response";
-import { CreateOpenAccountReq } from "@/models/open-account/openAccount.request";
-import { createOpenAccountService } from "@/services/open-account/openAccount.service";
-import {
-  NIDFormData,
-  NIDFormSchema,
-  NIDVerificationSchema,
-} from "@/components/acc-online/form-field/form-validate-error";
 import { Label } from "@/components/ui/label";
 import LoadingModal from "@/components/shared/modal/extract-modal";
-import SuccessModal from "@/components/acc-online/successModal";
 import SubmitSuccessModal from "@/components/shared/modal/submit-success-modal";
 import SubmitErrorModal from "@/components/shared/modal/submit-error-modal";
-import { LegalTypeModel } from "@/models/static/legal-type/legal-type.response";
+import { useOpenAccount } from "@/hooks/acc-online/use-open-account";
+import { useAccountImages } from "@/hooks/acc-online/use-account-images";
+import { useAccountOtp } from "@/hooks/acc-online/use-account-otp";
+import { useMasterData } from "@/hooks/acc-online/use-master-data";
 
-export interface Image {
-  idImage: string;
-}
+export default function OpenAccountPage() {
+  // Master Data Hook
+  const {
+    maritalStatuses,
+    isLoadingMarital,
+    selectedMaritalStatus,
+    setSelectedMaritalStatus,
+    occupations,
+    isLoadingOccupations,
+    selectedOccupation,
+    setSelectedOccupation,
+    referenceBanks,
+    isLoadingReferenceBanks,
+    selectedReferenceBank,
+    setSelectedReferenceBank,
+    legalTypes,
+    isLegalTypeLoading,
+    selectedLegalType,
+    setSelectedLegalType,
+    getMaritalName,
+    getOccupationName,
+    getReferenceName,
+    getLegalTypeName,
+    getMaritalStatusString,
+    resetMasterData,
+  } = useMasterData();
 
-interface LocationData {
-  province: string;
-  district: string;
-  commune: string;
-  village: string;
-}
-
-interface LocationSubmitData {
-  currentAddress: {
-    province: ProvinceModel | null;
-    district: DistrictModel | null;
-    commune: CommuneModel | null;
-    village: VillageModel | null;
-  };
-  placeOfBirth: {
-    province: ProvinceModel | null;
-    district: DistrictModel | null;
-    commune: CommuneModel | null;
-    village: VillageModel | null;
-  };
-}
-
-export default function CheckNIDPage() {
-  const [imageData, setImageData] = useState<RequestIdImage | null>(null);
-  const [formData, setFormData] = useState<ResponseNID>({
-    idNumber: "",
-    lastNameKh: "",
-    firstNameKh: "",
-    dob: "",
-    gender: "",
-    lastNameEn: "",
-    firstNameEn: "",
-    expiredDate: "",
-    issuedDate: "",
-    address: "",
-    pob: "",
-    MRZ1: "",
-    MRZ2: "",
-    MRZ3: "",
+  // Orchestrate all hooks
+  const {
+    formData,
+    isLoading,
+    isValidating,
+    isSubmitting,
+    showLocationModal,
+    setShowLocationModal,
+    showErrorModal,
+    setShowErrorModal,
+    validationResult,
+    showValidationErrorModal,
+    setShowValidationErrorModal,
+    validationErrorData,
+    showConfirmationModal,
+    setShowConfirmationModal,
+    selectedBranch,
+    showSuccessModal,
+    successData,
+    setSuccessData,
+    showSubmitErrorModal,
+    setShowSubmitErrorModal,
+    setSubmitErrorData,
+    submitErrorData,
+    locationFormData,
+    setLocationFormData,
+    loadingState,
+    setLoadingState,
+    staffCode,
+    setStaffCode,
+    isVerified,
+    datePickerKey,
+    validationErrors,
+    translate,
+    translateSelect,
+    convertGenderToAPI,
+    validateField,
+    handleValidationChange,
+    handleOpenConfirmModal,
+    handleConfirmValidation,
+    handleLocationSubmit,
+    handleInputChange,
+    handleClear,
+    handleSuccessModalClose,
+    onBranchChange,
+    setShowSuccessModal,
+    setFormData,
+    locationData,
+  } = useOpenAccount({
+    selectedMaritalStatus,
+    selectedOccupation,
+    selectedReferenceBank,
+    selectedLegalType,
+    resetMasterData,
   });
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [uploadedImage, setUploadedImage] = useState<Image | null>(null);
-
-  // Separate state for selfie
-  const [selfieImage, setSelfieImage] = useState<string | null>(null);
-  const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [isValidating, setIsValidating] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [validationResult, setValidationResult] =
-    useState<ValidationResponse | null>(null);
-
-  const [showValidationErrorModal, setShowValidationErrorModal] =
-    useState(false);
-  const [validationErrorData, setValidationErrorData] = useState({
-    title: "",
-    message: "",
-    description: "",
+  const {
+    uploadedImage,
+    selfiePreview,
+    selfieImage,
+    handleImageUpload,
+    handleSelfieUpload,
+    clearImages,
+  } = useAccountImages({
+    setFormData,
+    validateField,
+    setLoadingState,
+    translate,
   });
 
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState<BranchModel | null>(
-    null
-  );
-
-  // Success and Error Modal States
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successData, setSuccessData] = useState({
-    title: "",
-    message: "",
-  });
-
-  const [showSubmitErrorModal, setShowSubmitErrorModal] = useState(false);
-  const [submitErrorData, setSubmitErrorData] = useState({
-    title: "",
-    message: "",
-  });
-
-  // Location data state - Store complete objects
-  const [locationData, setLocationData] = useState<LocationSubmitData>({
-    currentAddress: {
-      province: null,
-      district: null,
-      commune: null,
-      village: null,
-    },
-    placeOfBirth: {
-      province: null,
-      district: null,
-      commune: null,
-      village: null,
-    },
-  });
-
-  // Separate state for LocationModal (it expects LocationData type)
-  const [locationFormData, setLocationFormData] = useState<LocationData>({
-    province: "",
-    district: "",
-    commune: "",
-    village: "",
-  });
-
-  const [loadingState, setLoadingState] = useState({
-    isLoading: false,
-    title: "",
-    message: "",
-  });
-
-  // Use custom hooks for data fetching
-  const { data: maritalStatuses, isLoading: isLoadingMaritals } =
-    useMaritalStatuses();
-  const [selectedMaritalStatus, setSelectedMaritalStatus] =
-    useState<MaritalModel | null>(null);
-
-  const { data: occupations, isLoading: isLoadingOccupations } =
-    useOccupations();
-  const [selectedOccupation, setSelectedOccupation] =
-    useState<OccupationModel | null>(null);
-
-  const { data: referenceBanks, isLoading: isLoadingReferenceBanks } =
-    useReferenceBanks();
-  const [selectedReferenceBank, setSelectedReferenceBank] =
-    useState<ReferenceModel | null>(null);
-
-  const { data: legalTypes, isLoading: isLegalTypeLoading } = useLegalTypes();
-  const [selectedLegalType, setSelectedLegalType] =
-    useState<LegalTypeModel | null>(null);
-
-  const [staffCode, setStaffCode] = useState<string>("");
-  // const [legalType, setLegalType] = useState<string>("");
-
-  // phone send otp
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-  const [resetOtp, setResetOtp] = useState(false);
-  const [datePickerKey, setDatePickerKey] = useState(0);
-
-  // Validation errors state
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({});
-
-  // Get current locale language
-  const { locale: currentLocale } = useClientLocale();
-  const translate = useTranslations("NIDPage");
-  const translateSelect = useTranslations("common");
-
-  // Helper function to get marital name based on locale
-  const getMaritalName = (marital: MaritalModel) => {
-    return currentLocale === "kh" ? marital.nameKh : marital.nameEn;
-  };
-
-  // Helper function to get occupation name based on locale
-  const getOccupationName = (occupation: OccupationModel) => {
-    return currentLocale === "kh" ? occupation.nameKh : occupation.nameEn;
-  };
-
-  // Helper function to get reference bank name based on locale
-  const getReferenceName = (reference: ReferenceModel) => {
-    return currentLocale === "kh" ? reference.nameKh : reference.nameEn;
-  };
-
-  const getLegalTypeName = (legalType: LegalTypeModel) => {
-    return currentLocale === "kh" ? legalType.nameKh : legalType.nameEn;
-  };
-
-  // Helper function to convert gender to API format
-  const convertGenderToAPI = (gender: string): string => {
-    if (gender.toLowerCase() === "male" || gender.toLowerCase() === "m") {
-      return "MALE";
-    } else if (
-      gender.toLowerCase() === "female" ||
-      gender.toLowerCase() === "f"
-    ) {
-      return "FEMALE";
-    }
-    return gender.toUpperCase();
-  };
-
-  // Helper function to get marital status string
-  const getMaritalStatusString = (maritalId: string): string => {
-    const marital = maritalStatuses.find((m) => m.id.toString() === maritalId);
-    if (marital) {
-      return marital.nameEn.toUpperCase().replace(/\s+/g, ".");
-    }
-    return "SINGLE";
-  };
-
-  // Validate a single field
-  const validateField = (fieldName: keyof NIDFormData, value: any) => {
-    try {
-      const fieldSchema = NIDFormSchema.shape[fieldName];
-      fieldSchema.parse(value);
-      setValidationErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[fieldName];
-        return newErrors;
-      });
-    } catch (error: any) {
-      if (error.issues?.[0]) {
-        setValidationErrors((prev) => ({
-          ...prev,
-          [fieldName]: error.issues[0].message,
-        }));
-      }
-    }
-  };
-
-  // Validation handler from OTP component
-  const handleValidationChange = useCallback(
-    (field: string, error: string | null) => {
-      setValidationErrors((prev) => {
-        const newErrors = { ...prev };
-        if (error) {
-          newErrors[field] = error;
-        } else {
-          delete newErrors[field];
-        }
-        return newErrors;
-      });
-    },
-    []
-  );
-
-  // Validate entire form for verification
-  const validateVerificationForm = (): boolean => {
-    const verificationData = {
-      idImage: uploadedImage?.idImage || "",
-      selfieImage: selfieImage || "",
-      lastNameKh: formData.lastNameKh,
-      firstNameKh: formData.firstNameKh,
-      lastNameEn: formData.lastNameEn,
-      firstNameEn: formData.firstNameEn,
-      dob: formData.dob,
-      gender: formData.gender,
-      idNumber: formData.idNumber,
-      address: formData.address,
-      pob: formData.pob,
-    };
-
-    const result = NIDVerificationSchema.safeParse(verificationData);
-
-    if (!result.success) {
-      const errors: Record<string, string> = {};
-      result.error.issues.forEach((err) => {
-        const path = err.path.join(".");
-        errors[path] = err.message;
-      });
-      setValidationErrors((prev) => ({ ...prev, ...errors }));
-      return false;
-    }
-
-    return true;
-  };
-
-  // Validate entire form for final submission
-  const validateFullForm = (): boolean => {
-    const fullData: NIDFormData = {
-      idImage: uploadedImage?.idImage || "",
-      selfieImage: selfieImage || "",
-      lastNameKh: formData.lastNameKh,
-      firstNameKh: formData.firstNameKh,
-      lastNameEn: formData.lastNameEn,
-      firstNameEn: formData.firstNameEn,
-      dob: formData.dob,
-      gender: formData.gender,
-      idNumber: formData.idNumber,
-      address: formData.address,
-      pob: formData.pob,
-      legalType: selectedLegalType?.legalTypeValue || "",
-      maritalStatus: selectedMaritalStatus?.nameEn || "",
-      occupation: selectedOccupation?.occupationCode || "",
-      branch: selectedBranch?.branchkh || "",
-      referenceBank: selectedReferenceBank?.nameEn || "",
-      staffCode: staffCode,
-      phoneNumber: phoneNumber,
-      isPhoneVerified: isPhoneVerified,
-    };
-
-    const result = NIDFormSchema.safeParse(fullData);
-
-    if (!result.success) {
-      const errors: Record<string, string> = {};
-      result.error.issues.forEach((err) => {
-        const path = err.path.join(".");
-        errors[path] = err.message;
-      });
-      setValidationErrors((prev) => ({ ...prev, ...errors }));
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        toast.error("File too large", {
-          description: "Image must be less than 5MB.",
-        });
-        return;
-      }
-
-      setLoadingState({
-        isLoading: true,
-        title: translate("extracting_data") || "Extracting Data",
-        message:
-          translate("extracting") || "Extracting information from ID card...",
-      });
-
-      try {
-        const base64WithPrefix = await convertToBase64(file);
-        const base64ForService = base64WithPrefix.split(",")[1];
-
-        const imageRequestData: RequestIdImage = {
-          idImage: base64ForService,
-        };
-
-        setImageData(imageRequestData);
-        setUploadedImage({
-          idImage: base64WithPrefix,
-        });
-        setImagePreview(base64WithPrefix);
-
-        // Validate image field
-        validateField("idImage", base64WithPrefix);
-
-        await handleExtractNID(imageRequestData);
-      } catch (error) {
-        console.error("Error converting image to base64", error);
-        toast.error("Image processing error", {
-          description: "Failed to process the image. Please try again.",
-        });
-      } finally {
-        setLoadingState({
-          isLoading: false,
-          title: "",
-          message: "",
-        });
-      }
-    }
-  };
-
-  const handleSelfieUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        toast.error("File too large", {
-          description: "Image must be less than 5MB.",
-        });
-        return;
-      }
-
-      try {
-        const base64WithPrefix = await convertToBase64(file);
-        const base64ForService = base64WithPrefix.split(",")[1];
-        setSelfieImage(base64ForService);
-        setSelfiePreview(base64WithPrefix);
-
-        // Validate selfie field
-        validateField("selfieImage", base64WithPrefix);
-
-        toast.success("Selfie uploaded successfully!");
-      } catch (error) {
-        console.error("Error uploading selfie", error);
-        toast.error("Failed to upload selfie");
-      }
-    }
-  };
-
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          resolve(reader.result);
-        } else {
-          reject(new Error("Failed to convert file to base64"));
-        }
-      };
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
-  const handleExtractNID = async (imageRequestData?: RequestIdImage) => {
-    const dataToProcess = imageRequestData || imageData;
-
-    if (!dataToProcess) {
-      toast.error("No image data", {
-        description: "Please upload an image first.",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await extractNIDService(dataToProcess);
-
-      const normalizedData = {
-        ...response,
-        dob: formatDateForInput(response.dob),
-        gender: normalizeGender(response.gender),
-      };
-
-      console.log("Normalized data:", normalizedData);
-      setFormData(normalizedData);
-
-      // Auto-select legal type to "national-id" after successful extraction
-      // setLegalType("national-id");
-      // validateField("legalType", "national-id");
-
-      // Validate all extracted fields to clear any validation errors
-      validateField("lastNameKh", normalizedData.lastNameKh);
-      validateField("firstNameKh", normalizedData.firstNameKh);
-      validateField("lastNameEn", normalizedData.lastNameEn);
-      validateField("firstNameEn", normalizedData.firstNameEn);
-      validateField("dob", normalizedData.dob);
-      validateField("gender", normalizedData.gender);
-      validateField("idNumber", normalizedData.idNumber);
-      validateField("address", normalizedData.address);
-      validateField("pob", normalizedData.pob);
-
-      AppToast({
-        type: "success",
-        message: "NID extracted successfully!",
-        description: "Extract NID Card",
-      });
-    } catch (error: any) {
-      console.error("Error response:", error.response?.data);
-
-      toast.error("Extraction error", {
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "Failed to extract NID information.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleValidateNID = async () => {
-    setIsValidating(true);
-    try {
-      const validationData: RequestValidModel = {
-        applicationName: "ACCOUNT_ONLINE",
-        idNumber: formData.idNumber,
-        lastNameKh: formData.lastNameKh,
-        firstNameKh: formData.firstNameKh,
-        lastNameEn: formData.lastNameEn,
-        firstNameEn: formData.firstNameEn,
-        dob: formatDate(formData.dob),
-        gender: convertGenderForAPI(formData.gender),
-        expiredDate: formatDate(formData.expiredDate),
-        issuedDate: formatDate(formData.issuedDate),
-        address: formData.address,
-        pob: formData.pob,
-        MRZ1: formData.MRZ1,
-        MRZ2: formData.MRZ2,
-        MRZ3: formData.MRZ3,
-      };
-
-      const response = await validateNIDService(validationData);
-
-      setValidationResult(response);
-
-      const criticalFields = ["lastNameEn", "firstNameEn", "dob", "gender"];
-      const hasCriticalErrors = response.data.incorrectFields.some(
-        (field: string) => criticalFields.includes(field)
-      );
-
-      if (hasCriticalErrors) {
-        setShowErrorModal(true);
-      } else {
-        setShowLocationModal(true);
-      }
-    } catch (error: any) {
-      setValidationErrorData({
-        title: translate("valid_fail"),
-        message: error.apiMessage || "Failed to validate NID information.",
-        description: error.uiMessage || "",
-      });
-      setShowValidationErrorModal(true);
-    } finally {
-      setIsValidating(false);
-    }
-  };
-
-  const handleOpenConfirmModal = () => {
-    // Validate both forms simultaneously
-    const isVerificationValid = validateVerificationForm();
-    const isFullFormValid = validateFullForm();
-
-    // Only show confirmation modal if both validations pass
-    if (isVerificationValid && isFullFormValid) {
-      setShowConfirmationModal(true);
-    } else {
-      // Show toast with first error
-      const firstErrorKey = Object.keys(validationErrors)[0];
-      if (firstErrorKey) {
-        AppToast({
-          type: "error",
-          message: "Validation Error",
-          description: validationErrors[firstErrorKey],
-        });
-      }
-    }
-  };
-
-  const handleConfirmValidation = async () => {
-    setShowConfirmationModal(false);
-    await handleValidateNID();
-  };
-
-  const handleLocationSubmit = (data: LocationSubmitData) => {
-    console.log("### Location data submitted:", data);
-
-    setLocationData(data);
-
-    const addressParts = [
-      data.currentAddress.village?.villageKh,
-      data.currentAddress.commune?.communeKh,
-      data.currentAddress.district?.districtKh,
-      data.currentAddress.province?.provinceKh,
-    ].filter(Boolean);
-
-    const currentAddressString = addressParts.join(" ");
-
-    const pobParts = [
-      data.placeOfBirth.village?.villageKh,
-      data.placeOfBirth.commune?.communeKh,
-      data.placeOfBirth.district?.districtKh,
-      data.placeOfBirth.province?.provinceKh,
-    ].filter(Boolean);
-
-    const placeOfBirthString = pobParts.join(" ");
-
-    setFormData((prev) => ({
-      ...prev,
-      address: currentAddressString,
-      pob: placeOfBirthString,
-    }));
-
-    // Validate updated fields
-    validateField("address", currentAddressString);
-    validateField("pob", placeOfBirthString);
-
-    console.log("Updated Address:", currentAddressString);
-    console.log("Updated Place of Birth:", placeOfBirthString);
-
-    // Set isVerified to true ONLY after successful location submission
-    setIsVerified(true);
-
-    AppToast({
-      type: "success",
-      message:
-        currentLocale === "kh"
-          ? "ព័ត៌មានទីតាំងត្រូវបានរក្សាទុកដោយជោគជ័យ!"
-          : "Location information saved successfully!",
-      description:
-        currentLocale === "kh"
-          ? "ទិន្នន័យទីតាំងត្រូវបានកត់ត្រា។"
-          : "Location data has been recorded.",
-    });
-
-    setShowLocationModal(false);
-  };
-
-  const handleInputChange = (field: keyof ResponseNID, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-    validateField(field as keyof NIDFormData, value);
-  };
-
-  // Handle Submit Account Opening
+  const {
+    phoneNumber,
+    setPhoneNumber,
+    isPhoneVerified,
+    setIsPhoneVerified,
+    resetOtp,
+    clearOtp,
+  } = useAccountOtp();
+
+  // Handle Submit Account Opening - orchestrated in parent
   const handleSubmitAccount = async () => {
     setLoadingState({
       isLoading: true,
@@ -681,12 +146,15 @@ export default function CheckNIDPage() {
       const nidImageBase64 =
         uploadedImage!.idImage.split(",")[1] || uploadedImage!.idImage;
 
-      const accountData: CreateOpenAccountReq = {
+      const accountData = {
         familyName: formData.lastNameEn,
         givenName: formData.firstNameEn,
         firstNameKh: formData.firstNameKh,
         lastNameKh: formData.lastNameKh,
-        dateOfBirth: formatDate(formData.dob),
+        dateOfBirth:
+          require("@/constants/AppResource/format-date/format-dd-mm-yyyy").formatDate(
+            formData.dob
+          ),
         gender: convertGenderToAPI(formData.gender),
         placeOfBirth: formData.pob,
         companyName: selectedReferenceBank?.nameEn || "",
@@ -713,8 +181,14 @@ export default function CheckNIDPage() {
         customerPobVillage:
           locationData.placeOfBirth.village?.villageCode || "",
         legalId: formData.idNumber,
-        legalIssueDate: formatDate(formData.issuedDate),
-        legalExpireDate: formatDate(formData.expiredDate),
+        legalIssueDate:
+          require("@/constants/AppResource/format-date/format-dd-mm-yyyy").formatDate(
+            formData.issuedDate
+          ),
+        legalExpireDate:
+          require("@/constants/AppResource/format-date/format-dd-mm-yyyy").formatDate(
+            formData.expiredDate
+          ),
         legalAddress: formData.address,
         legalDocType: selectedLegalType?.legalTypeValue || "",
         legalMrz1: formData.MRZ1,
@@ -729,7 +203,9 @@ export default function CheckNIDPage() {
       console.log(JSON.stringify(accountData, null, 2));
       console.log("=======================================");
 
-      // TODO: Replace with your actual API call
+      const {
+        createOpenAccountService,
+      } = require("@/services/open-account/openAccount.service");
       const response = await createOpenAccountService(accountData);
 
       console.log("API Response:", response);
@@ -741,9 +217,6 @@ export default function CheckNIDPage() {
           response?.message || "Your account has been created successfully!",
       });
       setShowSuccessModal(true);
-
-      // Optional: Clear form after successful submission
-      // handleClear();
     } catch (error: any) {
       console.error("Account opening error:", error);
 
@@ -767,98 +240,6 @@ export default function CheckNIDPage() {
     }
   };
 
-  const clearInput: ResponseNID = {
-    idNumber: "",
-    lastNameKh: "",
-    firstNameKh: "",
-    dob: "",
-    gender: "",
-    lastNameEn: "",
-    firstNameEn: "",
-    expiredDate: "",
-    issuedDate: "",
-    address: "",
-    pob: "",
-    MRZ1: "",
-    MRZ2: "",
-    MRZ3: "",
-  };
-
-  const handleClear = () => {
-    setFormData(clearInput);
-    setUploadedImage(null);
-    setImagePreview(null);
-    setImageData(null);
-    setSelfieImage(null);
-    setSelfiePreview(null);
-    setValidationResult(null);
-    setIsVerified(false);
-    setIsPhoneVerified(false);
-    setSelectedMaritalStatus(null);
-    setSelectedOccupation(null);
-    setSelectedReferenceBank(null);
-    setSelectedBranch(null);
-    setSelectedLegalType(null);
-    setStaffCode("");
-    setPhoneNumber("");
-    setValidationErrors({});
-    setLocationData({
-      currentAddress: {
-        province: null,
-        district: null,
-        commune: null,
-        village: null,
-      },
-      placeOfBirth: {
-        province: null,
-        district: null,
-        commune: null,
-        village: null,
-      },
-    });
-    setLocationFormData({
-      province: "",
-      district: "",
-      commune: "",
-      village: "",
-    });
-
-    // Force date picker to reset by changing its key
-    setDatePickerKey((prev) => prev + 1);
-
-    // Trigger OTP reset
-    setResetOtp(true);
-    setTimeout(() => setResetOtp(false), 100);
-
-    const fileInput = document.getElementById(
-      "image-upload"
-    ) as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = "";
-    }
-
-    const selfieInput = document.getElementById(
-      "image-upload-user"
-    ) as HTMLInputElement;
-    if (selfieInput) {
-      selfieInput.value = "";
-    }
-  };
-
-  const handleSuccessModalClose = () => {
-    setShowSuccessModal(false);
-    // Optional: Clear form after closing success modal
-    handleClear();
-  };
-
-  const onBranchChange = useCallback(
-    (branch: BranchModel) => {
-      setSelectedBranch(branch);
-      validateField("branch", branch.branchkh);
-    },
-    [selectedBranch]
-  );
-
   return (
     <div className="flex flex-col h-screen">
       {/* Sticky Header */}
@@ -880,7 +261,9 @@ export default function CheckNIDPage() {
                 <h1 className="text-lg md:text-3xl text-gray-800 mb-2">
                   {translate("header_acc")}
                 </h1>
-                <Button onClick={handleClear}>{translate("clear")}</Button>
+                <Button onClick={() => handleClear(clearImages, clearOtp)}>
+                  {translate("clear")}
+                </Button>
               </div>
 
               {/* Add the Loading Modal when extract */}
@@ -1268,7 +651,7 @@ export default function CheckNIDPage() {
                       setSelectedMaritalStatus(marital || null);
                       validateField("maritalStatus", value);
                     }}
-                    disabled={isLoading || isValidating || isLoadingMaritals}
+                    disabled={isLoading || isValidating || isLoadingMarital}
                   >
                     <SelectTrigger
                       className={`w-full h-10 text-sm ${
@@ -1277,7 +660,7 @@ export default function CheckNIDPage() {
                     >
                       <SelectValue
                         placeholder={
-                          isLoadingMaritals
+                          isLoadingMarital
                             ? translate("loading")
                             : translateSelect("selectMarital")
                         }
@@ -1462,7 +845,14 @@ export default function CheckNIDPage() {
               <div className="flex justify-end gap-4 mt-8">
                 <Button
                   className="px-8 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-md"
-                  onClick={handleOpenConfirmModal}
+                  onClick={() =>
+                    handleOpenConfirmModal(
+                      uploadedImage?.idImage || "",
+                      selfieImage || "",
+                      phoneNumber,
+                      isPhoneVerified
+                    )
+                  }
                   disabled={isLoading || isValidating || isVerified}
                 >
                   {isValidating
@@ -1471,7 +861,7 @@ export default function CheckNIDPage() {
                 </Button>
                 <Button
                   className="px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md"
-                  onClick={handleSubmitAccount}
+                  onClick={() => handleSubmitAccount()}
                   disabled={isLoading || isValidating || !isVerified}
                 >
                   {translate("submit")}
@@ -1530,7 +920,7 @@ export default function CheckNIDPage() {
       {/* Success Modal - NEW */}
       <SubmitSuccessModal
         isOpen={showSuccessModal}
-        onClose={handleSuccessModalClose}
+        onClose={() => handleSuccessModalClose(clearImages, clearOtp)}
         title={successData.title}
         message={successData.message}
       />

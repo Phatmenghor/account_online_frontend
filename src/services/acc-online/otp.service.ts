@@ -1,10 +1,7 @@
-import {
-  OtpSendReq,
-  OtpVerifyReq,
-} from "@/models/acc-online/otp/otp.request.model";
+import { SendOtpReq, VerifyOtpReq } from "@/models/otp/otp.request";
 import { axiosClientWithAuth } from "@/utils/axios";
 
-export async function sendOtpService(data: OtpSendReq) {
+export async function sendOtpService(data: SendOtpReq) {
   try {
     const response = await axiosClientWithAuth.post(
       "/api/v1/public/otp/send",
@@ -18,7 +15,7 @@ export async function sendOtpService(data: OtpSendReq) {
   }
 }
 
-export async function verifiedOtpService(data: OtpVerifyReq) {
+export async function verifiedOtpService(data: VerifyOtpReq) {
   try {
     const response = await axiosClientWithAuth.post(
       "/api/v1/public/otp/verify",
