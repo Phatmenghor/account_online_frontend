@@ -162,16 +162,16 @@ export default function ModalReference({
             </div>
             <div className="flex-1">
               <DialogTitle className="text-xl font-semibold">
-                {isCreate ? "Create New Bank" : "Edit Bank"}
+                {isCreate ? "Create New Reference" : "Edit Reference"}
               </DialogTitle>
               <DialogDescription className="text-base text-muted-foreground">
                 {isCreate
-                  ? "Fill in the details to create a new bank"
+                  ? "Fill in the details to create a new reference"
                   : referenceDetail
                   ? `Update information for "${
                       referenceDetail.nameEn || referenceDetail.nameKh
                     }"`
-                  : "Loading bank information..."}
+                  : "Loading reference information..."}
               </DialogDescription>
             </div>
           </div>
@@ -185,7 +185,9 @@ export default function ModalReference({
               <Loading />
             ) : !isCreate && !referenceDetail ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No bank data available</p>
+                <p className="text-muted-foreground">
+                  No reference data available
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
