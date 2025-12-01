@@ -9,61 +9,36 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { SidebarUserProfile } from "@/components/app/profile/sidebar-profile";
 import { UserModel } from "@/models/user/user.response";
-import { useNavItems } from "@/constants/AppResource/display-list/ui-helper/sidebar-item";
 import { AppIcons } from "@/constants/AppResource/icons/app-icons";
 import { getUserProfileService } from "@/services/dashboard/user/user.service";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
-
-// ✨ Centralized Permission Configuration
-const ROLE_PERMISSIONS = {
-  SUPER: [
-    ROUTES.DASHBOARD.INDEX,
-    ROUTES.DASHBOARD.AML.HISTORY,
-    ROUTES.DASHBOARD.AML.MANAGEMENT,
-    ROUTES.DASHBOARD.STATIC.MARITAL,
-    ROUTES.DASHBOARD.STATIC.OCCUPATION,
-    ROUTES.DASHBOARD.STATIC.REFERENCE,
-    ROUTES.DASHBOARD.STATIC.BRANCH,
-    ROUTES.DASHBOARD.STATIC.LEGAL_TYPE,
-    ROUTES.DASHBOARD.STATIC.PROVINCE,
-    ROUTES.DASHBOARD.STATIC.DISTRICT,
-    ROUTES.DASHBOARD.STATIC.COMMUNE,
-    ROUTES.DASHBOARD.STATIC.VILLAGE,
-    ROUTES.DASHBOARD.USER,
-  ],
-  ADMIN: [
-    ROUTES.DASHBOARD.INDEX,
-    ROUTES.DASHBOARD.AML.HISTORY,
-    ROUTES.DASHBOARD.AML.MANAGEMENT,
-    ROUTES.DASHBOARD.STATIC.MARITAL,
-    ROUTES.DASHBOARD.STATIC.OCCUPATION,
-    ROUTES.DASHBOARD.STATIC.REFERENCE,
-    ROUTES.DASHBOARD.STATIC.BRANCH,
-    ROUTES.DASHBOARD.STATIC.LEGAL_TYPE,
-    ROUTES.DASHBOARD.STATIC.PROVINCE,
-    ROUTES.DASHBOARD.STATIC.DISTRICT,
-    ROUTES.DASHBOARD.STATIC.COMMUNE,
-    ROUTES.DASHBOARD.STATIC.VILLAGE,
-  ],
-  DEVELOPER: "ALL",
-} as const;
+import { menuService } from "@/services/menu/menu.service";
+import { MenuResponseDto } from "@/models/menu/menu.response";
+import * as LucideIcons from "lucide-react";
 
 interface DashboardSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
+// Helper to get icon component from string name
+const getIconComponent = (iconName: string | null) => {
+  if (!iconName) return LucideIcons.Circle; // Default icon
+  // @ts-ignore - Dynamic access to Lucide icons
+  const Icon = LucideIcons[iconName];
+  return Icon || LucideIcons.Circle;
+};
+
 export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [authUser, setAuthUser] = useState<UserModel | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [isLoadingMenu, setIsLoadingMenu] = useState(true);
+  const [menuItems, setMenuItems] = useState<any[]>([]);
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
   const hasInitialized = useRef(false);
-
-  const navItems = useNavItems();
 
   const toggleSubmenu = (title: string) => {
     setOpenSubmenus((prev) => ({
@@ -73,70 +48,74 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
   };
 
   useEffect(() => {
-    const loadUserProfile = async () => {
-      setIsLoading(true);
+    const loadData = async () => {
+      setIsLoadingUser(true);
+      setIsLoadingMenu(true);
       try {
-        const response = await getUserProfileService();
-        setAuthUser(response || null);
+        // Load User Profile
+        const userResponse = await getUserProfileService();
+        setAuthUser(userResponse || null);
+
+        // Load Menus
+        const menuResponse = await menuService.getCurrentUserMenus();
+
+        // Map API response to UI structure
+        const mappedMenus = menuResponse.map((item) => mapMenuItem(item));
+        setMenuItems(mappedMenus);
+
       } catch (error) {
-        console.error("Failed to load user profile", error);
+        console.error("Failed to load data", error);
       } finally {
-        setIsLoading(false);
+        setIsLoadingUser(false);
+        setIsLoadingMenu(false);
       }
     };
 
-    loadUserProfile();
+    loadData();
   }, []);
 
-  // ✨ Initialize all submenus as open by default
+  const mapMenuItem = (item: MenuResponseDto): any => {
+    return {
+      title: item.title,
+      href: item.href || "#",
+      icon: getIconComponent(item.icon),
+      subItems: item.children && item.children.length > 0
+        ? item.children.map(child => mapMenuItem(child))
+        : undefined
+    };
+  };
+
+  // Initialize submenus as open if they contain active route
   useEffect(() => {
-    if (!hasInitialized.current && navItems.length > 0) {
+    if (!hasInitialized.current && menuItems.length > 0) {
       const initialOpenState: Record<string, boolean> = {};
 
-      navItems.forEach((item) => {
-        if (item.subItems && item.subItems.length > 0) {
-          initialOpenState[item.title] = true;
-        }
-      });
+      const checkActive = (items: any[]) => {
+        items.forEach((item) => {
+          if (item.subItems) {
+            // Check if any child is active
+            const isActive = item.subItems.some((sub: any) => sub.href === pathname);
+            if (isActive) {
+              initialOpenState[item.title] = true;
+            }
+            // Recursively check
+            checkActive(item.subItems);
+          }
+        });
+      };
 
+      checkActive(menuItems);
       setOpenSubmenus(initialOpenState);
       hasInitialized.current = true;
     }
-  }, [navItems]);
-
-  // ✨ Simplified Permission Filter
-  const getFilteredNavItems = () => {
-    if (!authUser?.userRole) return [];
-
-    const userRole =
-      authUser.userRole.toUpperCase() as keyof typeof ROLE_PERMISSIONS;
-    const allowedRoutes = ROLE_PERMISSIONS[userRole];
-
-    if (!allowedRoutes) return [];
-    if (allowedRoutes === "ALL") return navItems;
-
-    return navItems
-      .map((item) => {
-        if (item.subItems && item.subItems.length > 0) {
-          const filteredSubItems = item.subItems.filter((subItem) =>
-            allowedRoutes.includes(subItem.href)
-          );
-          return filteredSubItems.length > 0
-            ? { ...item, subItems: filteredSubItems }
-            : null;
-        }
-
-        return item.href && allowedRoutes.includes(item.href) ? item : null;
-      })
-      .filter(Boolean) as any[];
-  };
-
-  const filteredNavItems = getFilteredNavItems();
+  }, [menuItems, pathname]);
 
   // Hide sidebar on mobile
   if (isMobile && !isOpen) {
     return null;
   }
+
+  const isLoading = isLoadingUser || isLoadingMenu;
 
   return (
     <>
@@ -202,93 +181,99 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
 
         {/* Navigation */}
         <ScrollArea className="flex-1 py-2">
-          <nav className={cn("grid gap-0.5", isOpen ? "px-2" : "px-1")}>
-            {filteredNavItems.map((item) => (
-              <div key={item.title} className="flex flex-col">
-                {item.subItems ? (
-                  <>
-                    {/* Parent Item */}
-                    {isOpen ? (
-                      <div
-                        className={cn(
-                          "flex h-9 w-full items-center gap-2 rounded-md px-2 text-sm font-medium",
-                          "hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                        )}
-                        onClick={() => toggleSubmenu(item.title)}
-                      >
-                        <item.icon className="h-5 w-5 flex-shrink-0" />
-                        <span className="flex-1">{item.title}</span>
-                        <ChevronRight
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <nav className={cn("grid gap-0.5", isOpen ? "px-2" : "px-1")}>
+              {menuItems.map((item) => (
+                <div key={item.title} className="flex flex-col">
+                  {item.subItems ? (
+                    <>
+                      {/* Parent Item */}
+                      {isOpen ? (
+                        <div
                           className={cn(
-                            "h-4 w-4 transition-transform duration-200",
-                            openSubmenus[item.title] && "rotate-90"
+                            "flex h-9 w-full items-center gap-2 rounded-md px-2 text-sm font-medium",
+                            "hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                           )}
-                        />
-                      </div>
-                    ) : (
-                      <div
-                        className={cn(
-                          "flex h-9 w-full items-center justify-center rounded-md px-2",
-                          "hover:bg-accent hover:text-accent-foreground transition-colors group relative"
-                        )}
-                      >
-                        <item.icon className="h-5 w-5" />
-                        {/* Tooltip */}
+                          onClick={() => toggleSubmenu(item.title)}
+                        >
+                          <item.icon className="h-5 w-5 flex-shrink-0" />
+                          <span className="flex-1">{item.title}</span>
+                          <ChevronRight
+                            className={cn(
+                              "h-4 w-4 transition-transform duration-200",
+                              openSubmenus[item.title] && "rotate-90"
+                            )}
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className={cn(
+                            "flex h-9 w-full items-center justify-center rounded-md px-2",
+                            "hover:bg-accent hover:text-accent-foreground transition-colors group relative"
+                          )}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {/* Tooltip */}
+                          <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                            {item.title}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Sub Items */}
+                      {isOpen && openSubmenus[item.title] && (
+                        <div className="ml-4 flex flex-col gap-0.5 mt-0.5 animate-in slide-in-from-top-1 duration-200">
+                          {item.subItems.map((sub: any) => (
+                            <Link
+                              key={sub.href}
+                              href={sub.href}
+                              className={cn(
+                                "flex h-8 items-center rounded-md px-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
+                                pathname === sub.href &&
+                                "bg-accent text-accent-foreground font-medium"
+                              )}
+                            >
+                              {sub.title}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    /* Normal item */
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        "flex h-9 w-full items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors group relative",
+                        pathname === item.href &&
+                        "bg-accent text-accent-foreground",
+                        !isOpen && "justify-center"
+                      )}
+                    >
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      {isOpen && <span>{item.title}</span>}
+
+                      {/* Tooltip for collapsed state */}
+                      {!isOpen && (
                         <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
                           {item.title}
                         </div>
-                      </div>
-                    )}
-
-                    {/* Sub Items */}
-                    {isOpen && openSubmenus[item.title] && (
-                      <div className="ml-4 flex flex-col gap-0.5 mt-0.5 animate-in slide-in-from-top-1 duration-200">
-                        {item.subItems.map((sub: any) => (
-                          <Link
-                            key={sub.href}
-                            href={sub.href}
-                            className={cn(
-                              "flex h-8 items-center rounded-md px-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
-                              pathname === sub.href &&
-                              "bg-accent text-accent-foreground font-medium"
-                            )}
-                          >
-                            {sub.title}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  /* Normal item */
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      "flex h-9 w-full items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors group relative",
-                      pathname === item.href &&
-                      "bg-accent text-accent-foreground",
-                      !isOpen && "justify-center"
-                    )}
-                  >
-                    <item.icon className="h-5 w-5 flex-shrink-0" />
-                    {isOpen && <span>{item.title}</span>}
-
-                    {/* Tooltip for collapsed state */}
-                    {!isOpen && (
-                      <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
-                        {item.title}
-                      </div>
-                    )}
-                  </Link>
-                )}
-              </div>
-            ))}
-          </nav>
+                      )}
+                    </Link>
+                  )}
+                </div>
+              ))}
+            </nav>
+          )}
         </ScrollArea>
 
         {/* Footer User Profile */}
         <div className="border-t p-3">
-          {isLoading ? (
+          {isLoadingUser ? (
             <div className="animate-pulse flex flex-col gap-2">
               <div
                 className={cn(
@@ -308,3 +293,4 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
     </>
   );
 }
+
