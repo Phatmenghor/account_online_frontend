@@ -25,7 +25,7 @@ export default function OTPInput({
   disabled = false,
   validationErrors = {},
   onValidationChange,
-  reset 
+  reset,
 }: OTPInputProps) {
   const [otpCode, setOtpCode] = useState<string>("");
   const [isOtpSent, setIsOtpSent] = useState<boolean>(false);
@@ -61,11 +61,14 @@ export default function OTPInput({
   }, []);
 
   // Validate single field
-  const validateField = useCallback((field: string, value: any, errorMessage?: string) => {
-    if (onValidationChange) {
-      onValidationChange(field, errorMessage || null);
-    }
-  }, [onValidationChange]);
+  const validateField = useCallback(
+    (field: string, value: any, errorMessage?: string) => {
+      if (onValidationChange) {
+        onValidationChange(field, errorMessage || null);
+      }
+    },
+    [onValidationChange]
+  );
 
   // Handle phone number change
   const handlePhoneChange = (value: string) => {
@@ -77,7 +80,11 @@ export default function OTPInput({
     if (numericValue.trim() === "") {
       validateField("phoneNumber", numericValue, "Phone number is required");
     } else if (!isValidPhoneNumber(numericValue)) {
-      validateField("phoneNumber", numericValue, "Please enter a valid phone number (9-15 digits)");
+      validateField(
+        "phoneNumber",
+        numericValue,
+        "Please enter a valid phone number (9-15 digits)"
+      );
     } else {
       validateField("phoneNumber", numericValue);
     }
@@ -106,7 +113,11 @@ export default function OTPInput({
     }
 
     if (!isValidPhoneNumber(phoneNumber)) {
-      validateField("phoneNumber", phoneNumber, "Please enter a valid phone number (9-15 digits)");
+      validateField(
+        "phoneNumber",
+        phoneNumber,
+        "Please enter a valid phone number (9-15 digits)"
+      );
       AppToast({
         type: "error",
         message: "Invalid Phone Number",
@@ -147,14 +158,16 @@ export default function OTPInput({
       });
     } catch (error: any) {
       console.error("Failed to send OTP:", error);
-      validateField("phoneNumber", phoneNumber, "Failed to send OTP. Please try again");
+      validateField(
+        "phoneNumber",
+        phoneNumber,
+        "Failed to send OTP. Please try again"
+      );
       AppToast({
         type: "error",
         message: "Failed to Send OTP",
         description:
-          error.response?.data?.message ||
-          error.message ||
-          "Please try again",
+          error.response?.data?.message || error.message || "Please try again",
       });
       setIsOtpSent(false);
     } finally {
@@ -165,15 +178,19 @@ export default function OTPInput({
   // Auto-send OTP when user leaves phone input (blur)
   const handlePhoneBlur = async () => {
     if (!phoneNumber.trim()) return;
-    
+
     if (isOtpVerified) return; // Don't send if already verified
-    
+
     if (countdown > 0) return; // Don't send if countdown is active
 
     if (isValidPhoneNumber(phoneNumber)) {
       await handleSendOtp();
     } else {
-      validateField("phoneNumber", phoneNumber, "Please enter a valid phone number (9-15 digits)");
+      validateField(
+        "phoneNumber",
+        phoneNumber,
+        "Please enter a valid phone number (9-15 digits)"
+      );
     }
   };
 
@@ -181,7 +198,11 @@ export default function OTPInput({
   const handleOtpChange = (value: string) => {
     // Check if phone number is entered first
     if (!phoneNumber.trim()) {
-      validateField("phoneNumber", phoneNumber, "Please enter phone number first");
+      validateField(
+        "phoneNumber",
+        phoneNumber,
+        "Please enter phone number first"
+      );
       AppToast({
         type: "warning",
         message: "Phone Number Required",
@@ -206,115 +227,137 @@ export default function OTPInput({
   };
 
   // Verify OTP
-  const handleVerifyOtp = useCallback(async (currentOtpCode: string) => {
-    // Check phone number first
-    if (!phoneNumber.trim()) {
-      validateField("phoneNumber", phoneNumber, "Please enter phone number first");
-      AppToast({
-        type: "error",
-        message: "Phone Number Required",
-        description: "Please enter your phone number first",
-      });
-      return;
-    }
-
-    if (!currentOtpCode.trim()) {
-      validateField("isPhoneVerified", false, "OTP code is required");
-      AppToast({
-        type: "error",
-        message: "OTP Required",
-        description: "Please enter the OTP code",
-      });
-      return;
-    }
-
-    if (currentOtpCode.length !== 6) {
-      validateField("isPhoneVerified", false, "OTP must be 6 digits");
-      AppToast({
-        type: "error",
-        message: "Invalid OTP",
-        description: "OTP must be 6 digits",
-      });
-      return;
-    }
-
-    if (!isOtpSent) {
-      validateField("isPhoneVerified", false, "Please request an OTP first");
-      AppToast({
-        type: "error",
-        message: "OTP Not Sent",
-        description: "Please request an OTP first",
-      });
-      return;
-    }
-
-    setIsVerifyingOtp(true);
-    try {
-      const requestData: VerifyOtpReq = {
-        phone: phoneNumber.replace(/\s/g, ""),
-        otpCode: currentOtpCode,
-      };
-
-      const response = await VerifyOtpService(requestData);
-
-      if (response.verified) {
-        setIsOtpVerified(true);
-        setCountdown(0); // Stop countdown on success
-        setLastVerifiedOtp(currentOtpCode); // Mark this OTP as verified
-        
-        // Clear validation error on success
-        validateField("isPhoneVerified", true);
-        
+  const handleVerifyOtp = useCallback(
+    async (currentOtpCode: string) => {
+      // Check phone number first
+      if (!phoneNumber.trim()) {
+        validateField(
+          "phoneNumber",
+          phoneNumber,
+          "Please enter phone number first"
+        );
         AppToast({
-          type: "success",
-          message: "OTP Verified Successfully",
-          description: "Your phone number has been verified",
+          type: "error",
+          message: "Phone Number Required",
+          description: "Please enter your phone number first",
         });
+        return;
+      }
 
-        // Call success callback if provided
-        if (onVerificationSuccess) {
-          onVerificationSuccess();
+      if (!currentOtpCode.trim()) {
+        validateField("isPhoneVerified", false, "OTP code is required");
+        AppToast({
+          type: "error",
+          message: "OTP Required",
+          description: "Please enter the OTP code",
+        });
+        return;
+      }
+
+      if (currentOtpCode.length !== 6) {
+        validateField("isPhoneVerified", false, "OTP must be 6 digits");
+        AppToast({
+          type: "error",
+          message: "Invalid OTP",
+          description: "OTP must be 6 digits",
+        });
+        return;
+      }
+
+      if (!isOtpSent) {
+        validateField("isPhoneVerified", false, "Please request an OTP first");
+        AppToast({
+          type: "error",
+          message: "OTP Not Sent",
+          description: "Please request an OTP first",
+        });
+        return;
+      }
+
+      setIsVerifyingOtp(true);
+      try {
+        const requestData: VerifyOtpReq = {
+          phone: phoneNumber.replace(/\s/g, ""),
+          otpCode: currentOtpCode,
+        };
+
+        const response = await VerifyOtpService(requestData);
+
+        if (response.verified) {
+          setIsOtpVerified(true);
+          setCountdown(0); // Stop countdown on success
+          setLastVerifiedOtp(currentOtpCode); // Mark this OTP as verified
+
+          // Clear validation error on success
+          validateField("isPhoneVerified", true);
+
+          AppToast({
+            type: "success",
+            message: "OTP Verified Successfully",
+            description: "Your phone number has been verified",
+          });
+
+          // Call success callback if provided
+          if (onVerificationSuccess) {
+            onVerificationSuccess();
+          }
+        } else {
+          // DON'T clear OTP - let user see what they entered
+          setLastVerifiedOtp(currentOtpCode); // Mark this OTP as already checked
+          validateField(
+            "isPhoneVerified",
+            false,
+            "Invalid OTP code. Please delete and try again"
+          );
+          AppToast({
+            type: "error",
+            message: "Verification Failed",
+            description:
+              response.message ||
+              "Invalid OTP code. Please delete and try again",
+          });
         }
-      } else {
+      } catch (error: any) {
+        console.error("Failed to verify OTP:", error);
         // DON'T clear OTP - let user see what they entered
         setLastVerifiedOtp(currentOtpCode); // Mark this OTP as already checked
-        validateField("isPhoneVerified", false, "Invalid OTP code. Please delete and try again");
+        const errorMsg =
+          error.response?.data?.message ||
+          "Invalid OTP code. Please delete and try again";
+        validateField("isPhoneVerified", false, errorMsg);
         AppToast({
           type: "error",
           message: "Verification Failed",
-          description: response.message || "Invalid OTP code. Please delete and try again",
+          description: errorMsg,
         });
+        setIsOtpVerified(false);
+      } finally {
+        setIsVerifyingOtp(false);
       }
-    } catch (error: any) {
-      console.error("Failed to verify OTP:", error);
-      // DON'T clear OTP - let user see what they entered
-      setLastVerifiedOtp(currentOtpCode); // Mark this OTP as already checked
-      const errorMsg = error.response?.data?.message || "Invalid OTP code. Please delete and try again";
-      validateField("isPhoneVerified", false, errorMsg);
-      AppToast({
-        type: "error",
-        message: "Verification Failed",
-        description: errorMsg,
-      });
-      setIsOtpVerified(false);
-    } finally {
-      setIsVerifyingOtp(false);
-    }
-  }, [isOtpSent, phoneNumber, onVerificationSuccess, validateField]);
+    },
+    [isOtpSent, phoneNumber, onVerificationSuccess, validateField]
+  );
 
   // Auto-verify when OTP reaches 6 digits - ONLY ONCE per unique OTP
   useEffect(() => {
     if (
-      phoneNumber.trim() && 
-      otpCode.length === 6 && 
-      /^\d{6}$/.test(otpCode) && 
-      !isOtpVerified && 
+      phoneNumber.trim() &&
+      otpCode.length === 6 &&
+      /^\d{6}$/.test(otpCode) &&
+      !isOtpVerified &&
       !isVerifyingOtp &&
-      otpCode !== lastVerifiedOtp  // Only verify if this OTP hasn't been checked yet
+      otpCode !== lastVerifiedOtp // Only verify if this OTP hasn't been checked yet
     ) {
       handleVerifyOtp(otpCode);
     }
-  }, [otpCode, phoneNumber, isOtpVerified, isVerifyingOtp, lastVerifiedOtp, handleVerifyOtp]);
+  }, [
+    otpCode,
+    phoneNumber,
+    isOtpVerified,
+    isVerifyingOtp,
+    lastVerifiedOtp,
+    handleVerifyOtp,
+  ]);
 
   // Reset function (can be called from parent)
   useEffect(() => {
@@ -349,7 +392,9 @@ export default function OTPInput({
             value={phoneNumber}
             onChange={(e) => handlePhoneChange(e.target.value)}
             onBlur={handlePhoneBlur}
-            className={`w-full h-10 text-sm ${validationErrors.phoneNumber ? 'border-red-500' : ''}`}
+            className={`w-full h-10 text-sm ${
+              validationErrors.phoneNumber ? "border-red-500" : ""
+            }`}
             disabled={disabled || isSendingOtp}
             maxLength={15}
           />
@@ -375,18 +420,17 @@ export default function OTPInput({
             type="button"
             onClick={handleSendOtp}
             className={`float-right text-sm border-b-2 transition-colors ${
-              countdown > 0 
+              countdown > 0
                 ? "text-gray-400 border-gray-400 cursor-not-allowed"
                 : "text-blue-600 border-blue-600 hover:text-blue-700 hover:border-blue-700 cursor-pointer"
             }`}
             disabled={countdown > 0}
           >
-            {countdown > 0 
-              ? `${isOtpSent ? "Resend" : translate("sendOtp")} (${countdown}s)` 
-              : isOtpSent 
-                ? translate("reSendOtp") 
-                : translate("sendOtp")
-            }
+            {countdown > 0
+              ? `${isOtpSent ? "Resend" : translate("sendOtp")} (${countdown}s)`
+              : isOtpSent
+              ? translate("reSendOtp")
+              : translate("sendOtp")}
           </button>
         </label>
         <div className="relative">
@@ -395,7 +439,9 @@ export default function OTPInput({
             value={otpCode}
             onChange={(e) => handleOtpChange(e.target.value)}
             maxLength={6}
-            className={`w-full h-10 text-sm ${validationErrors.isPhoneVerified ? 'border-red-500' : ''}`}
+            className={`w-full h-10 text-sm ${
+              validationErrors.isPhoneVerified ? "border-red-500" : ""
+            }`}
           />
           {isVerifyingOtp && (
             <Loader2 className="absolute right-3 top-2.5 h-5 w-5 animate-spin text-blue-600" />

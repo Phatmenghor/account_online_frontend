@@ -3,289 +3,308 @@ import { useTranslations } from "next-intl";
 import { RequestValidModel } from "@/models/open-acc-online/nid.request.model";
 import { ResponseNID } from "@/models/open-acc-online/nid.response.model";
 import { validateNIDService } from "@/services/acc-online/nid.service";
-import { convertGenderForAPI, formatDate } from "@/constants/AppResource/format-date/format-dd-mm-yyyy";
+import {
+  convertGenderForAPI,
+  formatDate,
+} from "@/constants/AppResource/format-date/format-dd-mm-yyyy";
 import { MaritalModel } from "@/models/static/marital/marital.response";
 import { useClientLocale } from "@/context/provider/local-provider";
 import { OccupationModel } from "@/models/static/occupation/occupation.response";
 import { ReferenceModel } from "@/models/static/reference/reference.response";
 import { AppToast } from "@/components/shared/toast/app-toast";
 import { BranchModel } from "@/models/branch/branch.response";
-import { NIDFormData, NIDFormSchema, NIDVerificationSchema } from "@/components/acc-online/form-field/form-validate-error";
+import {
+  NIDFormData,
+  NIDFormSchema,
+  NIDVerificationSchema,
+} from "@/components/acc-online/form-field/form-validate-error";
 import { LegalTypeModel } from "@/models/static/legal-type/legal-type.response";
 import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-address.request.model";
 
 interface UseVerificationFlowProps {
-    formData: ResponseNID;
-    setFormData: (data: ResponseNID) => void;
-    validationErrors: Record<string, string>;
-    setValidationErrors: (errors: Record<string, string> | ((prev: Record<string, string>) => Record<string, string>)) => void;
-    validateField: (field: keyof NIDFormData, value: any) => void;
-    selectedMaritalStatus: MaritalModel | null;
-    selectedOccupation: OccupationModel | null;
-    selectedReferenceBank: ReferenceModel | null;
-    selectedLegalType: LegalTypeModel | null;
+  formData: ResponseNID;
+  setFormData: (data: ResponseNID) => void;
+  validationErrors: Record<string, string>;
+  setValidationErrors: (
+    errors:
+      | Record<string, string>
+      | ((prev: Record<string, string>) => Record<string, string>)
+  ) => void;
+  validateField: (field: keyof NIDFormData, value: any) => void;
+  selectedMaritalStatus: MaritalModel | null;
+  selectedOccupation: OccupationModel | null;
+  selectedReferenceBank: ReferenceModel | null;
+  selectedLegalType: LegalTypeModel | null;
 }
 
 export const useVerificationFlow = ({
-    formData,
-    setFormData,
-    validationErrors,
-    setValidationErrors,
-    validateField,
-    selectedMaritalStatus,
-    selectedOccupation,
-    selectedReferenceBank,
-    selectedLegalType,
+  formData,
+  setFormData,
+  validationErrors,
+  setValidationErrors,
+  validateField,
+  selectedMaritalStatus,
+  selectedOccupation,
+  selectedReferenceBank,
+  selectedLegalType,
 }: UseVerificationFlowProps) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [isValidating, setIsValidating] = useState(false);
-    const [selectedBranch, setSelectedBranch] = useState<BranchModel | null>(null);
-    const [staffCode, setStaffCode] = useState<string>("");
-    const [isVerified, setIsVerified] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState<BranchModel | null>(
+    null
+  );
+  const [staffCode, setStaffCode] = useState<string>("");
+  const [isVerified, setIsVerified] = useState(false);
 
-    const { locale: currentLocale } = useClientLocale();
-    const translate = useTranslations("NIDPage");
+  const { locale: currentLocale } = useClientLocale();
+  const translate = useTranslations("NIDPage");
 
-    // Validate entire form for verification - accepts images as parameters
-    const validateVerificationForm = (
-        uploadedImageData: string,
-        selfieImageData: string
-    ): boolean => {
-        const verificationData = {
-            idImage: uploadedImageData || "",
-            selfieImage: selfieImageData || "",
-            lastNameKh: formData.lastNameKh,
-            firstNameKh: formData.firstNameKh,
-            lastNameEn: formData.lastNameEn,
-            firstNameEn: formData.firstNameEn,
-            dob: formData.dob,
-            gender: formData.gender,
-            idNumber: formData.idNumber,
-            address: formData.address,
-            pob: formData.pob,
-        };
-
-        const result = NIDVerificationSchema.safeParse(verificationData);
-
-        if (!result.success) {
-            const errors: Record<string, string> = {};
-            result.error.issues.forEach((err) => {
-                const path = err.path.join(".");
-                errors[path] = err.message;
-            });
-            setValidationErrors((prev) => ({ ...prev, ...errors }));
-            return false;
-        }
-
-        return true;
+  // Validate entire form for verification - accepts images as parameters
+  const validateVerificationForm = (
+    uploadedImageData: string,
+    selfieImageData: string
+  ): boolean => {
+    const verificationData = {
+      idImage: uploadedImageData || "",
+      selfieImage: selfieImageData || "",
+      lastNameKh: formData.lastNameKh,
+      firstNameKh: formData.firstNameKh,
+      lastNameEn: formData.lastNameEn,
+      firstNameEn: formData.firstNameEn,
+      dob: formData.dob,
+      gender: formData.gender,
+      idNumber: formData.idNumber,
+      address: formData.address,
+      pob: formData.pob,
     };
 
-    // Validate entire form for final submission
-    const validateFullForm = (
-        uploadedImageData: string,
-        selfieImageData: string,
-        phoneNumberData: string,
-        isPhoneVerifiedData: boolean
-    ): boolean => {
-        const fullData: NIDFormData = {
-            idImage: uploadedImageData || "",
-            selfieImage: selfieImageData || "",
-            lastNameKh: formData.lastNameKh,
-            firstNameKh: formData.firstNameKh,
-            lastNameEn: formData.lastNameEn,
-            firstNameEn: formData.firstNameEn,
-            dob: formData.dob,
-            gender: formData.gender,
-            idNumber: formData.idNumber,
-            address: formData.address,
-            pob: formData.pob,
-            legalType: selectedLegalType?.legalTypeValue || "",
-            maritalStatus: selectedMaritalStatus?.nameEn || "",
-            occupation: selectedOccupation?.occupationCode || "",
-            branch: selectedBranch?.branchkh || "",
-            referenceBank: selectedReferenceBank?.nameEn || "",
-            staffCode: staffCode,
-            phoneNumber: phoneNumberData,
-            isPhoneVerified: isPhoneVerifiedData,
-        };
+    const result = NIDVerificationSchema.safeParse(verificationData);
 
-        const result = NIDFormSchema.safeParse(fullData);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const path = err.path.join(".");
+        errors[path] = err.message;
+      });
+      setValidationErrors((prev) => ({ ...prev, ...errors }));
+      return false;
+    }
 
-        if (!result.success) {
-            const errors: Record<string, string> = {};
-            result.error.issues.forEach((err) => {
-                const path = err.path.join(".");
-                errors[path] = err.message;
-            });
-            setValidationErrors((prev) => ({ ...prev, ...errors }));
-            return false;
-        }
+    return true;
+  };
 
-        return true;
+  // Validate entire form for final submission
+  const validateFullForm = (
+    uploadedImageData: string,
+    selfieImageData: string,
+    phoneNumberData: string,
+    isPhoneVerifiedData: boolean
+  ): boolean => {
+    const fullData: NIDFormData = {
+      idImage: uploadedImageData || "",
+      selfieImage: selfieImageData || "",
+      lastNameKh: formData.lastNameKh,
+      firstNameKh: formData.firstNameKh,
+      lastNameEn: formData.lastNameEn,
+      firstNameEn: formData.firstNameEn,
+      dob: formData.dob,
+      gender: formData.gender,
+      idNumber: formData.idNumber,
+      address: formData.address,
+      pob: formData.pob,
+      legalType: selectedLegalType?.legalTypeValue || "",
+      maritalStatus: selectedMaritalStatus?.nameEn || "",
+      occupation: selectedOccupation?.occupationCode || "",
+      branch: selectedBranch?.branchkh || "",
+      referenceBank: selectedReferenceBank?.nameEn || "",
+      staffCode: staffCode,
+      phoneNumber: phoneNumberData,
+      isPhoneVerified: isPhoneVerifiedData,
     };
 
-    const handleValidateNID = async (
-        setShowLocationModal: (show: boolean) => void,
-        setShowErrorModal: (show: boolean) => void,
-        setValidationResult: (result: any) => void,
-        setShowValidationErrorModal: (show: boolean) => void,
-        setValidationErrorData: (data: any) => void
-    ) => {
-        setIsValidating(true);
-        try {
-            const validationData: RequestValidModel = {
-                applicationName: "ACCOUNT_ONLINE",
-                idNumber: formData.idNumber,
-                lastNameKh: formData.lastNameKh,
-                firstNameKh: formData.firstNameKh,
-                lastNameEn: formData.lastNameEn,
-                firstNameEn: formData.firstNameEn,
-                dob: formatDate(formData.dob),
-                gender: convertGenderForAPI(formData.gender),
-                expiredDate: formatDate(formData.expiredDate),
-                issuedDate: formatDate(formData.issuedDate),
-                address: formData.address,
-                pob: formData.pob,
-                MRZ1: formData.MRZ1,
-                MRZ2: formData.MRZ2,
-                MRZ3: formData.MRZ3,
-            };
+    const result = NIDFormSchema.safeParse(fullData);
 
-            const response = await validateNIDService(validationData);
-            setValidationResult(response);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const path = err.path.join(".");
+        errors[path] = err.message;
+      });
+      setValidationErrors((prev) => ({ ...prev, ...errors }));
+      return false;
+    }
 
-            const criticalFields = ["lastNameEn", "firstNameEn", "dob", "gender"];
-            const hasCriticalErrors = response.data.incorrectFields.some(
-                (field: string) => criticalFields.includes(field)
-            );
+    return true;
+  };
 
-            if (hasCriticalErrors) {
-                setShowErrorModal(true);
-            } else {
-                setShowLocationModal(true);
-            }
-        } catch (error: any) {
-            setValidationErrorData({
-                title: translate("valid_fail"),
-                message: error.apiMessage || "Failed to validate NID information.",
-                description: error.uiMessage || "",
-            });
-            setShowValidationErrorModal(true);
-        } finally {
-            setIsValidating(false);
-        }
-    };
+  const handleValidateNID = async (
+    setShowLocationModal: (show: boolean) => void,
+    setShowErrorModal: (show: boolean) => void,
+    setValidationResult: (result: any) => void,
+    setShowValidationErrorModal: (show: boolean) => void,
+    setValidationErrorData: (data: any) => void
+  ) => {
+    setIsValidating(true);
+    try {
+      const validationData: RequestValidModel = {
+        applicationName: "ACCOUNT_ONLINE",
+        idNumber: formData.idNumber,
+        lastNameKh: formData.lastNameKh,
+        firstNameKh: formData.firstNameKh,
+        lastNameEn: formData.lastNameEn,
+        firstNameEn: formData.firstNameEn,
+        dob: formatDate(formData.dob),
+        gender: convertGenderForAPI(formData.gender),
+        expiredDate: formatDate(formData.expiredDate),
+        issuedDate: formatDate(formData.issuedDate),
+        address: formData.address,
+        pob: formData.pob,
+        MRZ1: formData.MRZ1,
+        MRZ2: formData.MRZ2,
+        MRZ3: formData.MRZ3,
+      };
 
-    const handleOpenConfirmModal = (
-        uploadedImageData: string,
-        selfieImageData: string,
-        phoneNumberData: string,
-        isPhoneVerifiedData: boolean,
-        setShowConfirmationModal: (show: boolean) => void
-    ) => {
-        const isVerificationValid = validateVerificationForm(uploadedImageData, selfieImageData);
-        const isFullFormValid = validateFullForm(
-            uploadedImageData,
-            selfieImageData,
-            phoneNumberData,
-            isPhoneVerifiedData
-        );
+      const response = await validateNIDService(validationData);
+      setValidationResult(response);
 
-        if (isVerificationValid && isFullFormValid) {
-            setShowConfirmationModal(true);
-        } else {
-            const firstErrorKey = Object.keys(validationErrors)[0];
-            if (firstErrorKey) {
-                AppToast({
-                    type: "error",
-                    message: "Validation Error",
-                    description: validationErrors[firstErrorKey],
-                });
-            }
-        }
-    };
+      const criticalFields = ["lastNameEn", "firstNameEn", "dob", "gender"];
+      const hasCriticalErrors = response.data.incorrectFields.some(
+        (field: string) => criticalFields.includes(field)
+      );
 
-    const handleLocationSubmit = (
-        data: LocationSubmitData,
-        setLocationData: (data: LocationSubmitData) => void,
-        setShowLocationModal: (show: boolean) => void
-    ) => {
-        setLocationData(data);
+      if (hasCriticalErrors) {
+        setShowErrorModal(true);
+      } else {
+        setShowLocationModal(true);
+      }
+    } catch (error: any) {
+      setValidationErrorData({
+        title: translate("valid_fail"),
+        message: error.apiMessage || "Failed to validate NID information.",
+        description: error.uiMessage || "",
+      });
+      setShowValidationErrorModal(true);
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
-        const addressParts = [
-            data.currentAddress.village?.villageKh,
-            data.currentAddress.commune?.communeKh,
-            data.currentAddress.district?.districtKh,
-            data.currentAddress.province?.provinceKh,
-        ].filter(Boolean);
-
-        const currentAddressString = addressParts.join(" ");
-
-        const pobParts = [
-            data.placeOfBirth.village?.villageKh,
-            data.placeOfBirth.commune?.communeKh,
-            data.placeOfBirth.district?.districtKh,
-            data.placeOfBirth.province?.provinceKh,
-        ].filter(Boolean);
-
-        const placeOfBirthString = pobParts.join(" ");
-
-        setFormData((prev) => ({
-            ...prev,
-            address: currentAddressString,
-            pob: placeOfBirthString,
-        }));
-
-        validateField("address", currentAddressString);
-        validateField("pob", placeOfBirthString);
-
-        setIsVerified(true);
-
-        AppToast({
-            type: "success",
-            message:
-                currentLocale === "kh"
-                    ? "ព័ត៌មានទីតាំងត្រូវបានរក្សាទុកដោយជោគជ័យ!"
-                    : "Location information saved successfully!",
-            description:
-                currentLocale === "kh"
-                    ? "ទិន្នន័យទីតាំងត្រូវបានកត់ត្រា។"
-                    : "Location data has been recorded.",
-        });
-
-        setShowLocationModal(false);
-    };
-
-    const onBranchChange = useCallback(
-        (branch: BranchModel) => {
-            setSelectedBranch(branch);
-            validateField("branch", branch.branchkh);
-        },
-        [validateField]
+  const handleOpenConfirmModal = (
+    uploadedImageData: string,
+    selfieImageData: string,
+    phoneNumberData: string,
+    isPhoneVerifiedData: boolean,
+    setShowConfirmationModal: (show: boolean) => void
+  ) => {
+    const isVerificationValid = validateVerificationForm(
+      uploadedImageData,
+      selfieImageData
+    );
+    const isFullFormValid = validateFullForm(
+      uploadedImageData,
+      selfieImageData,
+      phoneNumberData,
+      isPhoneVerifiedData
     );
 
-    // Helper function to convert gender to API format
-    const convertGenderToAPI = (gender: string): string => {
-        if (gender.toLowerCase() === "male" || gender.toLowerCase() === "m") {
-            return "MALE";
-        } else if (gender.toLowerCase() === "female" || gender.toLowerCase() === "f") {
-            return "FEMALE";
-        }
-        return gender.toUpperCase();
-    };
+    if (isVerificationValid && isFullFormValid) {
+      setShowConfirmationModal(true);
+    } else {
+      const firstErrorKey = Object.keys(validationErrors)[0];
+      if (firstErrorKey) {
+        AppToast({
+          type: "error",
+          message: "Validation Error",
+          description: validationErrors[firstErrorKey],
+        });
+      }
+    }
+  };
 
-    return {
-        isLoading,
-        isValidating,
-        selectedBranch,
-        staffCode,
-        setStaffCode,
-        isVerified,
-        setIsVerified,
-        convertGenderToAPI,
-        handleValidateNID,
-        handleOpenConfirmModal,
-        handleLocationSubmit,
-        onBranchChange,
-    };
+  const handleLocationSubmit = (
+    data: LocationSubmitData,
+    setLocationData: (data: LocationSubmitData) => void,
+    setShowLocationModal: (show: boolean) => void
+  ) => {
+    setLocationData(data);
+
+    const addressParts = [
+      data.currentAddress.village?.villageKh,
+      data.currentAddress.commune?.communeKh,
+      data.currentAddress.district?.districtKh,
+      data.currentAddress.province?.provinceKh,
+    ].filter(Boolean);
+
+    const currentAddressString = addressParts.join(" ");
+
+    const pobParts = [
+      data.placeOfBirth.village?.villageKh,
+      data.placeOfBirth.commune?.communeKh,
+      data.placeOfBirth.district?.districtKh,
+      data.placeOfBirth.province?.provinceKh,
+    ].filter(Boolean);
+
+    const placeOfBirthString = pobParts.join(" ");
+
+    setFormData((prev) => ({
+      ...prev,
+      address: currentAddressString,
+      pob: placeOfBirthString,
+    }));
+
+    validateField("address", currentAddressString);
+    validateField("pob", placeOfBirthString);
+
+    setIsVerified(true);
+
+    AppToast({
+      type: "success",
+      message:
+        currentLocale === "kh"
+          ? "ព័ត៌មានទីតាំងត្រូវបានរក្សាទុកដោយជោគជ័យ!"
+          : "Location information saved successfully!",
+      description:
+        currentLocale === "kh"
+          ? "ទិន្នន័យទីតាំងត្រូវបានកត់ត្រា។"
+          : "Location data has been recorded.",
+    });
+
+    setShowLocationModal(false);
+  };
+
+  const onBranchChange = useCallback(
+    (branch: BranchModel) => {
+      setSelectedBranch(branch);
+      validateField("branch", branch.branchkh);
+    },
+    [validateField]
+  );
+
+  // Helper function to convert gender to API format
+  const convertGenderToAPI = (gender: string): string => {
+    if (gender.toLowerCase() === "male" || gender.toLowerCase() === "m") {
+      return "MALE";
+    } else if (
+      gender.toLowerCase() === "female" ||
+      gender.toLowerCase() === "f"
+    ) {
+      return "FEMALE";
+    }
+    return gender.toUpperCase();
+  };
+
+  return {
+    isLoading,
+    isValidating,
+    selectedBranch,
+    staffCode,
+    setStaffCode,
+    isVerified,
+    setIsVerified,
+    convertGenderToAPI,
+    handleValidateNID,
+    handleOpenConfirmModal,
+    handleLocationSubmit,
+    onBranchChange,
+  };
 };

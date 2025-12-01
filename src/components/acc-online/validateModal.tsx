@@ -17,7 +17,6 @@ const ValidationErrorModal = ({
   message,
   description,
 }: ValidationErrorModalProps) => {
-    
   // change language
   const translate = useTranslations("NIDPage");
 

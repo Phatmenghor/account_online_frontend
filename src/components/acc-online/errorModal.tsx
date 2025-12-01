@@ -9,7 +9,6 @@ interface ErrorModalProps {
 }
 
 const ErrorModal = ({ isOpen, onClose, data }: ErrorModalProps) => {
-
   // change language
   const translate = useTranslations("NIDPage");
 

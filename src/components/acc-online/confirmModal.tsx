@@ -1,13 +1,13 @@
-"use client"
-import { Button } from "@/components/ui/button"
-import { useTranslations } from "next-intl"
+"use client";
+import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface ConfirmationModalProps {
-  isOpen: boolean
-  onConfirm: () => void
-  onCancel: () => void
-  title?: string
-  message?: string
+  isOpen: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+  title?: string;
+  message?: string;
 }
 
 const ConfirmationModal = ({
@@ -17,7 +17,7 @@ const ConfirmationModal = ({
   title = "Confirm Information",
   message = "Please confirm that you have reviewed your personal information.",
 }: ConfirmationModalProps) => {
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   // change language
   const translate = useTranslations("common");
@@ -33,10 +33,14 @@ const ConfirmationModal = ({
         </div>
 
         {/* Title */}
-        <h2 className="text-xl font-semibold text-gray-800 text-center mb-4">{title}</h2>
+        <h2 className="text-xl font-semibold text-gray-800 text-center mb-4">
+          {title}
+        </h2>
 
         {/* Message */}
-        <p className="text-gray-600 text-center mb-8 leading-relaxed">{message}</p>
+        <p className="text-gray-600 text-center mb-8 leading-relaxed">
+          {message}
+        </p>
 
         {/* Action Buttons */}
         <div className="flex justify-center gap-3 max-[375px]:flex-col">
@@ -50,12 +54,12 @@ const ConfirmationModal = ({
             onClick={onCancel}
             className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium md:px-4 px-3 py-3 rounded-md transition-colors"
           >
-           {translate("noIneed")}
+            {translate("noIneed")}
           </Button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ConfirmationModal
+export default ConfirmationModal;

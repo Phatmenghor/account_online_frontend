@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { XCircle, AlertCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -51,11 +57,7 @@ export default function SubmitErrorModal({
             </div>
           )} */}
           <div className="flex gap-3">
-            <Button
-              onClick={onClose}
-              variant="outline"
-              className="flex-1"
-            >
+            <Button onClick={onClose} variant="outline" className="flex-1">
               {translate("close") || "Close"}
             </Button>
             <Button

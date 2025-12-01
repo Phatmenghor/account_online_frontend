@@ -1,33 +1,46 @@
-"use client"
-import { MapPin, X, Loader2 } from "lucide-react"
-import type React from "react"
-import { useState, useEffect } from "react"
+"use client";
+import { MapPin, X, Loader2 } from "lucide-react";
+import type React from "react";
+import { useState, useEffect } from "react";
 
-import { Button } from "@/components/ui/button"
-import { useClientLocale } from "@/context/provider/local-provider"
-import { useCommunes, useDistricts, useProvinces, useVillages } from "@/hooks/fetch-address"
-import type { CommuneModel, DistrictModel, ProvinceModel, VillageModel } from "@/models/address/address.response"
-import { ComboboxSelectProvince } from "../shared/combo-box/combobox-province"
-import { ComboboxSelectDistrict } from "../shared/combo-box/combobox-district"
-import { ComboboxSelectCommune } from "../shared/combo-box/combobox-commune"
-import { ComboboxSelectVillage } from "../shared/combo-box/combobox-village"
-import { toast } from "sonner"
-import { getAddressSelectService } from "@/services/address/selectAddress.service"
-import { AddressSelectReq } from "@/models/address/select-address/selectAddress.request"
-import { PosSelectReq } from "@/models/address/select-pos/selectPos.request"
-import { getPosSelectService } from "@/services/address/selectPos.service"
-import { useTranslations } from "next-intl"
-import { LocationFormData, LocationFormSchema } from "./form-field/form-validate-error"
-import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-address.request.model"
+import { Button } from "@/components/ui/button";
+import { useClientLocale } from "@/context/provider/local-provider";
+import {
+  useCommunes,
+  useDistricts,
+  useProvinces,
+  useVillages,
+} from "@/hooks/fetch-address";
+import type {
+  CommuneModel,
+  DistrictModel,
+  ProvinceModel,
+  VillageModel,
+} from "@/models/address/address.response";
+import { ComboboxSelectProvince } from "../shared/combo-box/combobox-province";
+import { ComboboxSelectDistrict } from "../shared/combo-box/combobox-district";
+import { ComboboxSelectCommune } from "../shared/combo-box/combobox-commune";
+import { ComboboxSelectVillage } from "../shared/combo-box/combobox-village";
+import { toast } from "sonner";
+import { getAddressSelectService } from "@/services/address/selectAddress.service";
+import { AddressSelectReq } from "@/models/address/select-address/selectAddress.request";
+import { PosSelectReq } from "@/models/address/select-pos/selectPos.request";
+import { getPosSelectService } from "@/services/address/selectPos.service";
+import { useTranslations } from "next-intl";
+import {
+  LocationFormData,
+  LocationFormSchema,
+} from "./form-field/form-validate-error";
+import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-address.request.model";
 
 interface LocationModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: LocationSubmitData) => void
-  formData: LocationSubmitData
-  setFormData: React.Dispatch<React.SetStateAction<LocationSubmitData>>
-  addressFromForm?: string
-  placeOfBirthFromForm?: string
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: LocationSubmitData) => void;
+  formData: LocationSubmitData;
+  setFormData: React.Dispatch<React.SetStateAction<LocationSubmitData>>;
+  addressFromForm?: string;
+  placeOfBirthFromForm?: string;
 }
 
 const LocationModal = ({
@@ -37,79 +50,106 @@ const LocationModal = ({
   formData,
   setFormData,
   addressFromForm,
-  placeOfBirthFromForm
+  placeOfBirthFromForm,
 }: LocationModalProps) => {
-  const { locale: currentLocale } = useClientLocale()
+  const { locale: currentLocale } = useClientLocale();
   const translate = useTranslations("address");
 
   // Validation state
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   // First section (Current Address)
-  const [selectedProvince, setSelectedProvince] = useState<ProvinceModel | null>(null)
-  const [selectedDistrict, setSelectedDistrict] = useState<DistrictModel | null>(null)
-  const [selectedCommune, setSelectedCommune] = useState<CommuneModel | null>(null)
-  const [selectedVillage, setSelectedVillage] = useState<VillageModel | null>(null)
+  const [selectedProvince, setSelectedProvince] =
+    useState<ProvinceModel | null>(null);
+  const [selectedDistrict, setSelectedDistrict] =
+    useState<DistrictModel | null>(null);
+  const [selectedCommune, setSelectedCommune] = useState<CommuneModel | null>(
+    null
+  );
+  const [selectedVillage, setSelectedVillage] = useState<VillageModel | null>(
+    null
+  );
 
   // Second section (Place of Birth)
-  const [pobProvince, setPobProvince] = useState<ProvinceModel | null>(null)
-  const [pobDistrict, setPobDistrict] = useState<DistrictModel | null>(null)
-  const [pobCommune, setPobCommune] = useState<CommuneModel | null>(null)
-  const [pobVillage, setPobVillage] = useState<VillageModel | null>(null)
+  const [pobProvince, setPobProvince] = useState<ProvinceModel | null>(null);
+  const [pobDistrict, setPobDistrict] = useState<DistrictModel | null>(null);
+  const [pobCommune, setPobCommune] = useState<CommuneModel | null>(null);
+  const [pobVillage, setPobVillage] = useState<VillageModel | null>(null);
 
   // Loading states for auto-fill
-  const [isLoadingAddress, setIsLoadingAddress] = useState(false)
-  const [isLoadingPob, setIsLoadingPob] = useState(false)
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
+  const [isLoadingPob, setIsLoadingPob] = useState(false);
 
   // Fetch data for FIRST SECTION (Current Address)
-  const { data: provinces, isLoading: isLoadingProvinces } = useProvinces()
-  const { data: districts, isLoading: isLoadingDistricts } = useDistricts(selectedProvince?.provinceCode || "")
-  const { data: communes, isLoading: isLoadingCommunes } = useCommunes(selectedDistrict?.districtCode || "")
-  const { data: villages, isLoading: isLoadingVillages } = useVillages(selectedCommune?.communeCode || "")
+  const { data: provinces, isLoading: isLoadingProvinces } = useProvinces();
+  const { data: districts, isLoading: isLoadingDistricts } = useDistricts(
+    selectedProvince?.provinceCode || ""
+  );
+  const { data: communes, isLoading: isLoadingCommunes } = useCommunes(
+    selectedDistrict?.districtCode || ""
+  );
+  const { data: villages, isLoading: isLoadingVillages } = useVillages(
+    selectedCommune?.communeCode || ""
+  );
 
   // Fetch data for SECOND SECTION (Place of Birth)
-  const { data: pobDistricts, isLoading: isLoadingPobDistricts } = useDistricts(pobProvince?.provinceCode || "")
-  const { data: pobCommunes, isLoading: isLoadingPobCommunes } = useCommunes(pobDistrict?.districtCode || "")
-  const { data: pobVillages, isLoading: isLoadingPobVillages } = useVillages(pobCommune?.communeCode || "")
+  const { data: pobDistricts, isLoading: isLoadingPobDistricts } = useDistricts(
+    pobProvince?.provinceCode || ""
+  );
+  const { data: pobCommunes, isLoading: isLoadingPobCommunes } = useCommunes(
+    pobDistrict?.districtCode || ""
+  );
+  const { data: pobVillages, isLoading: isLoadingPobVillages } = useVillages(
+    pobCommune?.communeCode || ""
+  );
 
   // Reset all state when modal opens
   useEffect(() => {
     if (isOpen) {
       // Clear all selections
-      setSelectedProvince(null)
-      setSelectedDistrict(null)
-      setSelectedCommune(null)
-      setSelectedVillage(null)
-      setPobProvince(null)
-      setPobDistrict(null)
-      setPobCommune(null)
-      setPobVillage(null)
-      setValidationErrors({})
+      setSelectedProvince(null);
+      setSelectedDistrict(null);
+      setSelectedCommune(null);
+      setSelectedVillage(null);
+      setPobProvince(null);
+      setPobDistrict(null);
+      setPobCommune(null);
+      setPobVillage(null);
+      setValidationErrors({});
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Validate a single field
-  const validateField = (section: 'currentAddress' | 'placeOfBirth', field: string, value: string) => {
-    const fieldPath = `${section}.${field}`
+  const validateField = (
+    section: "currentAddress" | "placeOfBirth",
+    field: string,
+    value: string
+  ) => {
+    const fieldPath = `${section}.${field}`;
 
     try {
-      const fieldSchema = LocationFormSchema.shape[section].shape[field as keyof typeof LocationFormSchema.shape.currentAddress.shape]
-      fieldSchema.parse(value)
+      const fieldSchema =
+        LocationFormSchema.shape[section].shape[
+          field as keyof typeof LocationFormSchema.shape.currentAddress.shape
+        ];
+      fieldSchema.parse(value);
 
       setValidationErrors((prev) => {
-        const newErrors = { ...prev }
-        delete newErrors[fieldPath]
-        return newErrors
-      })
+        const newErrors = { ...prev };
+        delete newErrors[fieldPath];
+        return newErrors;
+      });
     } catch (error: any) {
       if (error.issues?.[0]) {
         setValidationErrors((prev) => ({
           ...prev,
           [fieldPath]: error.issues[0].message,
-        }))
+        }));
       }
     }
-  }
+  };
 
   // Validate entire form before submission
   const validateFullForm = (): boolean => {
@@ -126,164 +166,198 @@ const LocationModal = ({
         commune: pobCommune?.communeCode || "",
         village: pobVillage?.villageCode || "",
       },
-    }
+    };
 
-    const result = LocationFormSchema.safeParse(locationData)
+    const result = LocationFormSchema.safeParse(locationData);
 
     if (!result.success) {
-      const errors: Record<string, string> = {}
+      const errors: Record<string, string> = {};
       result.error.issues.forEach((err) => {
-        const path = err.path.join(".")
-        errors[path] = err.message
-      })
-      setValidationErrors(errors)
-      return false
+        const path = err.path.join(".");
+        errors[path] = err.message;
+      });
+      setValidationErrors(errors);
+      return false;
     }
 
-    setValidationErrors({})
-    return true
-  }
+    setValidationErrors({});
+    return true;
+  };
 
   // Auto-fill current address when modal opens
   useEffect(() => {
     const fetchAddressData = async () => {
       if (isOpen && addressFromForm && addressFromForm.trim() !== "") {
-        setIsLoadingAddress(true)
+        setIsLoadingAddress(true);
         try {
           const request: AddressSelectReq = {
-            address: addressFromForm
-          }
+            address: addressFromForm,
+          };
 
-          const addressData = await getAddressSelectService(request)
+          const addressData = await getAddressSelectService(request);
 
           if (addressData.province) {
-            setSelectedProvince(addressData.province)
-            setFormData(prev => ({
+            setSelectedProvince(addressData.province);
+            setFormData((prev) => ({
               ...prev,
               currentAddress: {
                 ...prev.currentAddress,
-                province: addressData.province
-              }
-            }))
-            validateField('currentAddress', 'province', addressData.province.provinceCode)
+                province: addressData.province,
+              },
+            }));
+            validateField(
+              "currentAddress",
+              "province",
+              addressData.province.provinceCode
+            );
           }
 
           if (addressData.district) {
-            setSelectedDistrict(addressData.district)
-            setFormData(prev => ({
+            setSelectedDistrict(addressData.district);
+            setFormData((prev) => ({
               ...prev,
               currentAddress: {
                 ...prev.currentAddress,
-                district: addressData.district
-              }
-            }))
-            validateField('currentAddress', 'district', addressData.district.districtCode)
+                district: addressData.district,
+              },
+            }));
+            validateField(
+              "currentAddress",
+              "district",
+              addressData.district.districtCode
+            );
           }
 
           if (addressData.commune) {
-            setSelectedCommune(addressData.commune)
-            setFormData(prev => ({
+            setSelectedCommune(addressData.commune);
+            setFormData((prev) => ({
               ...prev,
               currentAddress: {
                 ...prev.currentAddress,
-                commune: addressData.commune
-              }
-            }))
-            validateField('currentAddress', 'commune', addressData.commune.communeCode)
+                commune: addressData.commune,
+              },
+            }));
+            validateField(
+              "currentAddress",
+              "commune",
+              addressData.commune.communeCode
+            );
           }
 
           if (addressData.village) {
-            setSelectedVillage(addressData.village)
-            setFormData(prev => ({
+            setSelectedVillage(addressData.village);
+            setFormData((prev) => ({
               ...prev,
               currentAddress: {
                 ...prev.currentAddress,
-                village: addressData.village
-              }
-            }))
-            validateField('currentAddress', 'village', addressData.village.villageCode)
+                village: addressData.village,
+              },
+            }));
+            validateField(
+              "currentAddress",
+              "village",
+              addressData.village.villageCode
+            );
           }
-
         } catch (error: any) {
-          console.error("Error fetching address data:", error)
+          console.error("Error fetching address data:", error);
         } finally {
-          setIsLoadingAddress(false)
+          setIsLoadingAddress(false);
         }
       }
-    }
+    };
 
-    fetchAddressData()
-  }, [isOpen, addressFromForm])
+    fetchAddressData();
+  }, [isOpen, addressFromForm]);
 
   // Auto-fill place of birth when modal opens
   useEffect(() => {
     const fetchPobData = async () => {
-      if (isOpen && placeOfBirthFromForm && placeOfBirthFromForm.trim() !== "") {
-        setIsLoadingPob(true)
+      if (
+        isOpen &&
+        placeOfBirthFromForm &&
+        placeOfBirthFromForm.trim() !== ""
+      ) {
+        setIsLoadingPob(true);
         try {
           const request: PosSelectReq = {
-            address: placeOfBirthFromForm
-          }
+            address: placeOfBirthFromForm,
+          };
 
-          const pobData = await getPosSelectService(request)
+          const pobData = await getPosSelectService(request);
 
           if (pobData.province) {
-            setPobProvince(pobData.province)
-            validateField('placeOfBirth', 'province', pobData.province.provinceCode)
+            setPobProvince(pobData.province);
+            validateField(
+              "placeOfBirth",
+              "province",
+              pobData.province.provinceCode
+            );
           }
 
           if (pobData.district) {
-            setPobDistrict(pobData.district)
-            validateField('placeOfBirth', 'district', pobData.district.districtCode)
+            setPobDistrict(pobData.district);
+            validateField(
+              "placeOfBirth",
+              "district",
+              pobData.district.districtCode
+            );
           }
 
           if (pobData.commune) {
-            setPobCommune(pobData.commune)
-            validateField('placeOfBirth', 'commune', pobData.commune.communeCode)
+            setPobCommune(pobData.commune);
+            validateField(
+              "placeOfBirth",
+              "commune",
+              pobData.commune.communeCode
+            );
           }
 
           if (pobData.village) {
-            setPobVillage(pobData.village)
-            validateField('placeOfBirth', 'village', pobData.village.villageCode)
+            setPobVillage(pobData.village);
+            validateField(
+              "placeOfBirth",
+              "village",
+              pobData.village.villageCode
+            );
           }
-
         } catch (error: any) {
-          console.error("Error fetching place of birth data:", error)
+          console.error("Error fetching place of birth data:", error);
         } finally {
-          setIsLoadingPob(false)
+          setIsLoadingPob(false);
         }
       }
-    }
+    };
 
-    fetchPobData()
-  }, [isOpen, placeOfBirthFromForm])
+    fetchPobData();
+  }, [isOpen, placeOfBirthFromForm]);
 
   // Handlers for cascading dropdowns (FIRST SECTION: Current Address)
   const handleProvinceChange = (province: ProvinceModel | null) => {
-    setSelectedProvince(province)
-    setSelectedDistrict(null)
-    setSelectedCommune(null)
-    setSelectedVillage(null)
+    setSelectedProvince(province);
+    setSelectedDistrict(null);
+    setSelectedCommune(null);
+    setSelectedVillage(null);
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       currentAddress: {
         province: province,
         district: null,
         commune: null,
         village: null,
-      }
-    }))
+      },
+    }));
 
     if (province) {
-      validateField('currentAddress', 'province', province.provinceCode)
+      validateField("currentAddress", "province", province.provinceCode);
     }
-  }
+  };
 
   const handleDistrictChange = (district: DistrictModel | null) => {
-    setSelectedDistrict(district)
-    setSelectedCommune(null)
-    setSelectedVillage(null)
+    setSelectedDistrict(district);
+    setSelectedCommune(null);
+    setSelectedVillage(null);
 
     setFormData((prev) => ({
       ...prev,
@@ -292,17 +366,17 @@ const LocationModal = ({
         district: district,
         commune: null,
         village: null,
-      }
-    }))
+      },
+    }));
 
     if (district) {
-      validateField('currentAddress', 'district', district.districtCode)
+      validateField("currentAddress", "district", district.districtCode);
     }
-  }
+  };
 
   const handleCommuneChange = (commune: CommuneModel | null) => {
-    setSelectedCommune(commune)
-    setSelectedVillage(null)
+    setSelectedCommune(commune);
+    setSelectedVillage(null);
 
     setFormData((prev) => ({
       ...prev,
@@ -310,73 +384,73 @@ const LocationModal = ({
         ...prev.currentAddress,
         commune: commune,
         village: null,
-      }
-    }))
+      },
+    }));
 
     if (commune) {
-      validateField('currentAddress', 'commune', commune.communeCode)
+      validateField("currentAddress", "commune", commune.communeCode);
     }
-  }
+  };
 
   const handleVillageChange = (village: VillageModel | null) => {
-    setSelectedVillage(village)
+    setSelectedVillage(village);
 
     setFormData((prev) => ({
       ...prev,
       currentAddress: {
         ...prev.currentAddress,
         village: village,
-      }
-    }))
+      },
+    }));
 
     if (village) {
-      validateField('currentAddress', 'village', village.villageCode)
+      validateField("currentAddress", "village", village.villageCode);
     }
-  }
+  };
 
   // Handlers for cascading dropdowns (SECOND SECTION: Place of Birth)
   const handlePobProvinceChange = (province: ProvinceModel | null) => {
-    setPobProvince(province)
-    setPobDistrict(null)
-    setPobCommune(null)
-    setPobVillage(null)
+    setPobProvince(province);
+    setPobDistrict(null);
+    setPobCommune(null);
+    setPobVillage(null);
 
     if (province) {
-      validateField('placeOfBirth', 'province', province.provinceCode)
+      validateField("placeOfBirth", "province", province.provinceCode);
     }
-  }
+  };
 
   const handlePobDistrictChange = (district: DistrictModel | null) => {
-    setPobDistrict(district)
-    setPobCommune(null)
-    setPobVillage(null)
+    setPobDistrict(district);
+    setPobCommune(null);
+    setPobVillage(null);
 
     if (district) {
-      validateField('placeOfBirth', 'district', district.districtCode)
+      validateField("placeOfBirth", "district", district.districtCode);
     }
-  }
+  };
 
   const handlePobCommuneChange = (commune: CommuneModel | null) => {
-    setPobCommune(commune)
-    setPobVillage(null)
+    setPobCommune(commune);
+    setPobVillage(null);
 
     if (commune) {
-      validateField('placeOfBirth', 'commune', commune.communeCode)
+      validateField("placeOfBirth", "commune", commune.communeCode);
     }
-  }
+  };
 
   const handlePobVillageChange = (village: VillageModel | null) => {
-    setPobVillage(village)
+    setPobVillage(village);
 
     if (village) {
-      validateField('placeOfBirth', 'village', village.villageCode)
+      validateField("placeOfBirth", "village", village.villageCode);
     }
-  }
+  };
 
   // Handle submit with validation
   const handleSubmit = () => {
     if (!validateFullForm()) {
-      return
+      return;
     }
 
     const submitData: LocationSubmitData = {
@@ -384,24 +458,27 @@ const LocationModal = ({
         province: selectedProvince,
         district: selectedDistrict,
         commune: selectedCommune,
-        village: selectedVillage
+        village: selectedVillage,
       },
       placeOfBirth: {
         province: pobProvince,
         district: pobDistrict,
         commune: pobCommune,
-        village: pobVillage
-      }
-    }
+        village: pobVillage,
+      },
+    };
 
-    onSubmit(submitData)
-  }
+    onSubmit(submitData);
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black bg-opacity-50">
-      <div className="bg-white rounded-2xl w-full max-w-3xl flex flex-col shadow-2xl" style={{ maxHeight: '90vh' }}>
+      <div
+        className="bg-white rounded-2xl w-full max-w-3xl flex flex-col shadow-2xl"
+        style={{ maxHeight: "90vh" }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-white rounded-t-2xl flex-shrink-0">
           <div className="flex items-center gap-4">
@@ -449,9 +526,17 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {translate("province")}
-                      {isLoadingProvinces && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+                      {isLoadingProvinces && (
+                        <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                      )}
                     </label>
-                    <div className={validationErrors['currentAddress.province'] ? 'border border-red-500 rounded' : ''}>
+                    <div
+                      className={
+                        validationErrors["currentAddress.province"]
+                          ? "border border-red-500 rounded"
+                          : ""
+                      }
+                    >
                       <ComboboxSelectProvince
                         dataSelect={selectedProvince}
                         onChangeSelected={handleProvinceChange}
@@ -461,7 +546,7 @@ const LocationModal = ({
                         locale={currentLocale}
                       />
                     </div>
-                    {validationErrors['currentAddress.province'] && (
+                    {validationErrors["currentAddress.province"] && (
                       <p className="text-xs text-red-500 mt-1">
                         {translate("err_province")}
                       </p>
@@ -473,9 +558,17 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {currentLocale === "kh" ? "ស្រុក/ខណ្ឌ" : "District"}
-                      {isLoadingDistricts && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+                      {isLoadingDistricts && (
+                        <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                      )}
                     </label>
-                    <div className={validationErrors['currentAddress.district'] ? 'border border-red-500 rounded' : ''}>
+                    <div
+                      className={
+                        validationErrors["currentAddress.district"]
+                          ? "border border-red-500 rounded"
+                          : ""
+                      }
+                    >
                       <ComboboxSelectDistrict
                         dataSelect={selectedDistrict}
                         onChangeSelected={handleDistrictChange}
@@ -485,7 +578,7 @@ const LocationModal = ({
                         locale={currentLocale}
                       />
                     </div>
-                    {validationErrors['currentAddress.district'] && (
+                    {validationErrors["currentAddress.district"] && (
                       <p className="text-xs text-red-500 mt-1">
                         {translate("err_district")}
                       </p>
@@ -497,9 +590,17 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {translate("commune")}
-                      {isLoadingCommunes && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+                      {isLoadingCommunes && (
+                        <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                      )}
                     </label>
-                    <div className={validationErrors['currentAddress.commune'] ? 'border border-red-500 rounded' : ''}>
+                    <div
+                      className={
+                        validationErrors["currentAddress.commune"]
+                          ? "border border-red-500 rounded"
+                          : ""
+                      }
+                    >
                       <ComboboxSelectCommune
                         dataSelect={selectedCommune}
                         onChangeSelected={handleCommuneChange}
@@ -509,7 +610,7 @@ const LocationModal = ({
                         locale={currentLocale}
                       />
                     </div>
-                    {validationErrors['currentAddress.commune'] && (
+                    {validationErrors["currentAddress.commune"] && (
                       <p className="text-xs text-red-500 mt-1">
                         {translate("err_commune")}
                       </p>
@@ -521,9 +622,17 @@ const LocationModal = ({
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <span className="text-red-500">* </span>
                       {translate("village")}
-                      {isLoadingVillages && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+                      {isLoadingVillages && (
+                        <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                      )}
                     </label>
-                    <div className={validationErrors['currentAddress.village'] ? 'border border-red-500 rounded' : ''}>
+                    <div
+                      className={
+                        validationErrors["currentAddress.village"]
+                          ? "border border-red-500 rounded"
+                          : ""
+                      }
+                    >
                       <ComboboxSelectVillage
                         dataSelect={selectedVillage}
                         onChangeSelected={handleVillageChange}
@@ -533,7 +642,7 @@ const LocationModal = ({
                         locale={currentLocale}
                       />
                     </div>
-                    {validationErrors['currentAddress.village'] && (
+                    {validationErrors["currentAddress.village"] && (
                       <p className="text-xs text-red-500 mt-1">
                         {translate("err_village")}
                       </p>
@@ -565,7 +674,13 @@ const LocationModal = ({
                       <span className="text-red-500">* </span>
                       {translate("province")}
                     </label>
-                    <div className={validationErrors['placeOfBirth.province'] ? 'border border-red-500 rounded' : ''}>
+                    <div
+                      className={
+                        validationErrors["placeOfBirth.province"]
+                          ? "border border-red-500 rounded"
+                          : ""
+                      }
+                    >
                       <ComboboxSelectProvince
                         dataSelect={pobProvince}
                         onChangeSelected={handlePobProvinceChange}
@@ -575,7 +690,7 @@ const LocationModal = ({
                         locale={currentLocale}
                       />
                     </div>
-                    {validationErrors['placeOfBirth.province'] && (
+                    {validationErrors["placeOfBirth.province"] && (
                       <p className="text-xs text-red-500 mt-1">
                         {translate("err_province")}
                       </p>
@@ -588,7 +703,13 @@ const LocationModal = ({
                       <span className="text-red-500">* </span>
                       {translate("district")}
                     </label>
-                    <div className={validationErrors['placeOfBirth.district'] ? 'border border-red-500 rounded' : ''}>
+                    <div
+                      className={
+                        validationErrors["placeOfBirth.district"]
+                          ? "border border-red-500 rounded"
+                          : ""
+                      }
+                    >
                       <ComboboxSelectDistrict
                         dataSelect={pobDistrict}
                         onChangeSelected={handlePobDistrictChange}
@@ -598,7 +719,7 @@ const LocationModal = ({
                         locale={currentLocale}
                       />
                     </div>
-                    {validationErrors['placeOfBirth.district'] && (
+                    {validationErrors["placeOfBirth.district"] && (
                       <p className="text-xs text-red-500 mt-1">
                         {translate("err_district")}
                       </p>
@@ -611,7 +732,13 @@ const LocationModal = ({
                       <span className="text-red-500">* </span>
                       {translate("commune")}
                     </label>
-                    <div className={validationErrors['placeOfBirth.commune'] ? 'border border-red-500 rounded' : ''}>
+                    <div
+                      className={
+                        validationErrors["placeOfBirth.commune"]
+                          ? "border border-red-500 rounded"
+                          : ""
+                      }
+                    >
                       <ComboboxSelectCommune
                         dataSelect={pobCommune}
                         onChangeSelected={handlePobCommuneChange}
@@ -621,7 +748,7 @@ const LocationModal = ({
                         locale={currentLocale}
                       />
                     </div>
-                    {validationErrors['placeOfBirth.commune'] && (
+                    {validationErrors["placeOfBirth.commune"] && (
                       <p className="text-xs text-red-500 mt-1">
                         {translate("err_commune")}
                       </p>
@@ -634,7 +761,13 @@ const LocationModal = ({
                       <span className="text-red-500">* </span>
                       {translate("village")}
                     </label>
-                    <div className={validationErrors['placeOfBirth.village'] ? 'border border-red-500 rounded' : ''}>
+                    <div
+                      className={
+                        validationErrors["placeOfBirth.village"]
+                          ? "border border-red-500 rounded"
+                          : ""
+                      }
+                    >
                       <ComboboxSelectVillage
                         dataSelect={pobVillage}
                         onChangeSelected={handlePobVillageChange}
@@ -644,7 +777,7 @@ const LocationModal = ({
                         locale={currentLocale}
                       />
                     </div>
-                    {validationErrors['placeOfBirth.village'] && (
+                    {validationErrors["placeOfBirth.village"] && (
                       <p className="text-xs text-red-500 mt-1">
                         {translate("err_village")}
                       </p>
@@ -673,7 +806,7 @@ const LocationModal = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LocationModal
+export default LocationModal;
