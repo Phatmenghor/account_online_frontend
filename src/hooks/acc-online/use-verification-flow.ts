@@ -23,7 +23,9 @@ import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-ad
 
 interface UseVerificationFlowProps {
   formData: ResponseNID;
-  setFormData: (data: ResponseNID) => void;
+  setFormData: (
+    data: ResponseNID | ((prev: ResponseNID) => ResponseNID)
+  ) => void;
   validationErrors: Record<string, string>;
   setValidationErrors: (
     errors:
