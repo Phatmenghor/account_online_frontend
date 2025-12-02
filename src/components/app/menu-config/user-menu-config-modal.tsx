@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -14,12 +14,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { MenuItemDto, RoleEnum } from "@/models/menu/menu.types";
 import { UserCombobox } from "./user-combobox";
 import { UserModel } from "@/models/user/user.response";
+import { getRoles } from "@/utils/local-storage/roles";
 
 interface UserMenuConfigModalProps {
   isOpen: boolean;
   onClose: () => void;
   allMenus: MenuItemDto[];
-  onFetchUserMenus: (userId: number) => Promise<number[]>;
+  onFetchUserMenus: (userId: number) => Promise<MenuItemDto[]>; // returns full objects
   onSaveUserMenus: (userId: number, menuIds: number[]) => Promise<void>;
 }
 
@@ -35,12 +36,30 @@ export function UserMenuConfigModal({
   const [loadingUserMenus, setLoadingUserMenus] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const currentUserRole = getRoles();
+
+  // Flatten nested menu objects to IDs
+  const flattenMenuIds = (menus: MenuItemDto[]): number[] => {
+    const ids: number[] = [];
+    const helper = (items: MenuItemDto[]) => {
+      items.forEach((item) => {
+        ids.push(item.id);
+        if (item.children && item.children.length > 0) {
+          helper(item.children);
+        }
+      });
+    };
+    helper(menus);
+    return ids;
+  };
+
   const handleFetchUserMenus = async () => {
     if (!selectedUser) return;
 
     setLoadingUserMenus(true);
     try {
-      const menuIds = await onFetchUserMenus(selectedUser.id);
+      const menus = await onFetchUserMenus(selectedUser.id);
+      const menuIds = flattenMenuIds(menus);
       setUserMenus(menuIds);
     } catch (error) {
       console.error("Failed to fetch user menus:", error);
@@ -66,8 +85,14 @@ export function UserMenuConfigModal({
     }
   };
 
+  useEffect(() => {
+    if (selectedUser) {
+      handleFetchUserMenus();
+    }
+  }, [selectedUser]);
+
   // Reset state when modal closes
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isOpen) {
       setSelectedUser(null);
       setUserMenus([]);
@@ -119,22 +144,31 @@ export function UserMenuConfigModal({
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {allMenus.map((menu) => {
-                    const hasRoleAccess = selectedUser ? menu.roles.includes(selectedUser.userRole as RoleEnum) : false;
-                    const isChecked = userMenus.includes(menu.id) || hasRoleAccess;
+                    const isDeveloperEditing =
+                      currentUserRole === RoleEnum.DEVELOPER;
+
+                    const hasRoleAccess = selectedUser
+                      ? menu.roles.includes(selectedUser.userRole as RoleEnum)
+                      : false;
+
+                    const isChecked = isDeveloperEditing
+                      ? userMenus.includes(menu.id)
+                      : userMenus.includes(menu.id) || hasRoleAccess;
 
                     return (
                       <div key={menu.id} className="flex items-start space-x-2">
                         <Checkbox
                           id={`menu-${menu.id}`}
                           checked={isChecked}
-                          disabled={!!hasRoleAccess}
+                          disabled={!isDeveloperEditing}
                           onCheckedChange={(checked) => {
-                            if (hasRoleAccess) return;
+                            if (!isDeveloperEditing) return;
+
                             if (checked) {
-                              setUserMenus([...userMenus, menu.id]);
+                              setUserMenus((prev) => [...prev, menu.id]);
                             } else {
-                              setUserMenus(
-                                userMenus.filter((id) => id !== menu.id)
+                              setUserMenus((prev) =>
+                                prev.filter((id) => id !== menu.id)
                               );
                             }
                           }}
@@ -145,7 +179,7 @@ export function UserMenuConfigModal({
                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                           >
                             {menu.title}
-                            {hasRoleAccess && (
+                            {hasRoleAccess && !isDeveloperEditing && (
                               <span className="ml-2 text-xs text-muted-foreground font-normal">
                                 (Role Access)
                               </span>
