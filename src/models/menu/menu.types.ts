@@ -12,5 +12,7 @@ export interface MenuItemDto {
     parentId: number | null;
     displayOrder: number;
     roles: RoleEnum[];
+    allowedUserIds: number[];
     isActive: boolean;
+    children?: MenuItemDto[];
 }

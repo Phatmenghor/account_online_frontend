@@ -1,5 +1,10 @@
 {
-  "cSpell.words": ["exceljs", "makara", "sonner", "vaul"],
+  "cSpell.words": [
+    "exceljs",
+    "makara",
+    "sonner",
+    "vaul"
+  ],
   "workbench.colorCustomizations": {
     "activityBar.background": "#183322",
     "titleBar.activeBackground": "#214730",

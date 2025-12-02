@@ -19,6 +19,7 @@ import { debounce } from "@/utils/debounce/debounce";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
+import { getUsersService } from "@/services/dashboard/user/user.service";
 
 interface ComboboxSelectedProps {
   dataSelect: any | null;
@@ -43,32 +44,30 @@ export function ComboboxSelectUser({
 
   // Fetch data from API
   const fetchData = async (search = "", newPage = 1) => {
-    // if (loading || (lastPage && newPage > 1)) return;
-    // setLoading(true);
-    // try {
-    //   const result = await getAllStaffService({
-    //     search,
-    //     pageSize: 10,
-    //     roles: [RoleEnum.STAFF, RoleEnum.TEACHER],
-    //     pageNo: newPage,
-    //     status: StatusEnum.ACTIVE,
-    //   });
-    //   if (!result) {
-    //     console.error("No data returned from getAllStaffService");
-    //     return;
-    //   }
-    //   if (newPage === 1) {
-    //     setData(result.content);
-    //   } else {
-    //     setData((prev) => [...prev, ...result.content]);
-    //   }
-    //   setPage(result.pageNo);
-    //   setLastPage(result.last);
-    // } catch (error) {
-    //   console.error("Error fetching users:", error);
-    // } finally {
-    //   setLoading(false);
-    // }
+    if (loading || (lastPage && newPage > 1)) return;
+    setLoading(true);
+    try {
+      const result = await getUsersService({
+        search,
+        pageSize: 10,
+        pageNo: newPage,
+      });
+      if (!result) {
+        console.error("No data returned from getUsersService");
+        return;
+      }
+      if (newPage === 1) {
+        setData(result.content);
+      } else {
+        setData((prev) => [...prev, ...result.content]);
+      }
+      setPage(result.pageNo);
+      setLastPage(result.last);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Fetch data on mount

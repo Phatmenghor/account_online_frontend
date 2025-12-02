@@ -6,6 +6,7 @@ import {
 } from "@/models/menu/menu.response";
 import {
     AssignMenuToUserRequestDto,
+    AssignMenusToUserRequestDto,
     GetAllMenuRequestDto,
     MenuCreateRequestDto,
     MenuUpdateRequestDto,
@@ -17,6 +18,13 @@ export const menuService = {
     getCurrentUserMenus: async (): Promise<MenuResponseDto[]> => {
         const response = await axiosClientWithAuth.post<ApiResponse<MenuResponseDto[]>>(
             `${BASE_URL}/current`
+        );
+        return response.data.data;
+    },
+
+    getUserMenus: async (userId: number): Promise<MenuResponseDto[]> => {
+        const response = await axiosClientWithAuth.post<ApiResponse<MenuResponseDto[]>>(
+            `${BASE_URL}/user/${userId}`
         );
         return response.data.data;
     },
@@ -84,6 +92,16 @@ export const menuService = {
         const response = await axiosClientWithAuth.post<ApiResponse<MenuResponseDto>>(
             `${BASE_URL}/${menuId}/remove-users`,
             userIds
+        );
+        return response.data.data;
+    },
+
+    assignMenusToUser: async (
+        request: AssignMenusToUserRequestDto
+    ): Promise<MenuResponseDto[]> => {
+        const response = await axiosClientWithAuth.post<ApiResponse<MenuResponseDto[]>>(
+            `${BASE_URL}/user/assign-menus`,
+            request
         );
         return response.data.data;
     },
