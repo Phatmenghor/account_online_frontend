@@ -18,14 +18,9 @@ export async function loginService(credentials: LoginCredentials) {
     storePermission(response?.data?.userRole?.userPermission);
 
     return response.data.data;
-  } catch (error) {
-    console.error("Login service error:", error);
-
-    // Re-throw or transform error if needed
-    throw {
-      errorMessage: "An unexpected error occurred during login.",
-      rawError: error,
-    };
+  } catch (error: any) {
+    console.error("### Login service error:", error);
+    throw error;
   }
 }
 

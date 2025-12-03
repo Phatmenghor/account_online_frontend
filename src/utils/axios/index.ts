@@ -265,7 +265,7 @@ const formatRequestData = (data: unknown): unknown => {
 const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
   const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    timeout: 300000,
+    timeout: 30000,
     headers: {
       "Content-Type": "application/json",
     },
@@ -442,10 +442,10 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
     (error: unknown) => {
       const err = error as AxiosError;
 
-      if (err.response?.status === 401) {
-        toast.message(err.message);
-        window.location.href = "/login";
-      }
+      // if (err.response?.status === 401) {
+      //   toast.message(err.message);
+      //   window.location.href = "/login";
+      // }
       // Get request ID from metadata
       const requestId = err.config?.metadata?.requestId || "unknown";
 

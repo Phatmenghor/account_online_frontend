@@ -76,14 +76,14 @@ export default function LoginPage() {
       }
     } catch (error: any) {
       const errorMsg =
-        error?.errorMessage === "An unexpected error occurred: Bad credentials"
-          ? "Incorrect email or password."
-          : error?.errorMessage ||
-            error?.rawError?.message ||
-            error?.message ||
-            "Something went wrong. Please try again.";
+    error?.response?.data?.message ||
+    error?.message ||
+    "Invalid username or password";
 
-      toast.error(errorMsg);
+      AppToast({
+        type: "error",
+        message: errorMsg,
+      });
     } finally {
       setIsLoading(false);
     }
