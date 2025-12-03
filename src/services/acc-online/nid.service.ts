@@ -67,7 +67,7 @@ export async function extractNIDService(data: RequestIdImage) {
 // Interfaces for Validate NID
 interface SuccessResponse {
   status: string;
-  message: string;
+  errorMessage: string;
   data: ValidationResponse;
 }
 
