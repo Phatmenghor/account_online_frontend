@@ -47,9 +47,12 @@ import {
 import { MenuFormModal } from "@/components/app/menu-config/menu-form-modal";
 import { AssignUsersModal } from "@/components/app/menu-config/assign-users-modal";
 import { UserMenuConfigModal } from "@/components/app/menu-config/user-menu-config-modal";
+import ConfirmDialog from "@/components/shared/dialog/dialog-confirm";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 export default function MenuConfigPage() {
   const [menus, setMenus] = useState<MenuItemDto[]>([]);
+  const [allMenusForModal, setAllMenusForModal] = useState<MenuItemDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [pageNo, setPageNo] = useState(1);
   const [pageSize] = useState(10);
@@ -57,13 +60,16 @@ export default function MenuConfigPage() {
   const [search, setSearch] = useState("");
 
   // Modals state
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isMenuFormModalOpen, setIsMenuFormModalOpen] = useState(false);
   const [isAssignUsersModalOpen, setIsAssignUsersModalOpen] = useState(false);
   const [isUserMenuConfigModalOpen, setIsUserMenuConfigModalOpen] =
     useState(false);
 
   const [selectedMenu, setSelectedMenu] = useState<MenuItemDto | null>(null);
+
+  // Delete confirmation state
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [menuToDelete, setMenuToDelete] = useState<number | null>(null);
 
   const fetchMenus = async () => {
     setLoading(true);
@@ -72,6 +78,7 @@ export default function MenuConfigPage() {
         pageNo,
         pageSize,
         search,
+        isActive: true,
       });
       setMenus(response.content);
       setTotalPages(response.totalPages);
@@ -80,6 +87,21 @@ export default function MenuConfigPage() {
       AppToast({ type: "error", message: "Failed to fetch menus" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAllMenusForModal = async () => {
+    try {
+      const response = await menuService.getAllMenus({
+        pageNo: 1,
+        pageSize: 1000, // Large number to get all menus
+        search: "",
+        isActive: true,
+      });
+      setAllMenusForModal(response.content);
+    } catch (error) {
+      console.error("Failed to fetch all menus:", error);
+      AppToast({ type: "error", message: "Failed to fetch all menus" });
     }
   };
 
@@ -96,7 +118,8 @@ export default function MenuConfigPage() {
       };
       await menuService.createMenu(payload);
       AppToast({ type: "success", message: "Menu created successfully" });
-      setIsCreateModalOpen(false);
+      setIsMenuFormModalOpen(false);
+      setSelectedMenu(null);
       fetchMenus();
     } catch (error) {
       console.error("Failed to create menu:", error);
@@ -114,7 +137,7 @@ export default function MenuConfigPage() {
       };
       await menuService.updateMenu(selectedMenu.id, payload);
       AppToast({ type: "success", message: "Menu updated successfully" });
-      setIsEditModalOpen(false);
+      setIsMenuFormModalOpen(false);
       setSelectedMenu(null);
       fetchMenus();
     } catch (error) {
@@ -123,35 +146,23 @@ export default function MenuConfigPage() {
     }
   };
 
-  const handleDeleteMenu = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this menu?")) return;
+  const handleDeleteMenu = (id: number) => {
+    setMenuToDelete(id);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteMenu = async () => {
+    if (!menuToDelete) return;
     try {
-      await menuService.deleteMenu(id);
+      await menuService.deleteMenu(menuToDelete);
       AppToast({ type: "success", message: "Menu deleted successfully" });
       fetchMenus();
     } catch (error) {
       console.error("Failed to delete menu:", error);
       AppToast({ type: "error", message: "Failed to delete menu" });
-    }
-  };
-
-  // Assign Users to specific Menu
-  const handleAddUserToMenu = async (userId: number) => {
-    if (!selectedMenu) return;
-    try {
-      await menuService.assignUsersToMenu(selectedMenu.id, {
-        userIds: [userId],
-      });
-      AppToast({ type: "success", message: "User assigned successfully" });
-      // Refresh menu to update list
-      const updatedMenu = await menuService.getMenuById(selectedMenu.id);
-      setSelectedMenu(updatedMenu);
-      // Also update in list
-      setMenus(menus.map((m) => (m.id === updatedMenu.id ? updatedMenu : m)));
-    } catch (error) {
-      console.error("Failed to assign user:", error);
-      AppToast({ type: "error", message: "Failed to assign user" });
-      throw error; // Re-throw to let modal handle loading state
+    } finally {
+      setIsDeleteConfirmOpen(false);
+      setMenuToDelete(null);
     }
   };
 
@@ -210,7 +221,7 @@ export default function MenuConfigPage() {
 
   const openEditModal = (menu: MenuItemDto) => {
     setSelectedMenu(menu);
-    setIsEditModalOpen(true);
+    setIsMenuFormModalOpen(true);
   };
 
   const openAssignUsersModal = (menu: MenuItemDto) => {
@@ -238,7 +249,10 @@ export default function MenuConfigPage() {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => setIsUserMenuConfigModalOpen(true)}
+                onClick={async () => {
+                  await fetchAllMenusForModal();
+                  setIsUserMenuConfigModalOpen(true);
+                }}
                 className="gap-2"
               >
                 <UserCog className="h-4 w-4" /> User Menus
@@ -246,7 +260,7 @@ export default function MenuConfigPage() {
               <Button
                 onClick={() => {
                   setSelectedMenu(null);
-                  setIsCreateModalOpen(true);
+                  setIsMenuFormModalOpen(true);
                 }}
                 className="gap-2"
               >
@@ -340,11 +354,6 @@ export default function MenuConfigPage() {
                             >
                               <Pencil className="mr-2 h-4 w-4" /> Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => openAssignUsersModal(menu)}
-                            >
-                              <Users className="mr-2 h-4 w-4" /> Assign Users
-                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               className="text-red-600"
@@ -387,42 +396,36 @@ export default function MenuConfigPage() {
       </Card>
 
       <MenuFormModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        mode="create"
-        allMenus={menus}
-        onSubmit={handleCreateMenu}
-      />
-
-      <MenuFormModal
-        isOpen={isEditModalOpen}
+        isOpen={isMenuFormModalOpen}
         onClose={() => {
-          setIsEditModalOpen(false);
+          setIsMenuFormModalOpen(false);
           setSelectedMenu(null);
         }}
-        mode="edit"
+        mode={selectedMenu ? ModalMode.UPDATE_MODE : ModalMode.CREATE_MODE}
         menuData={selectedMenu}
         allMenus={menus}
-        onSubmit={handleUpdateMenu}
-      />
-
-      <AssignUsersModal
-        isOpen={isAssignUsersModalOpen}
-        onClose={() => {
-          setIsAssignUsersModalOpen(false);
-          setSelectedMenu(null);
-        }}
-        menu={selectedMenu}
-        onAssignUser={handleAddUserToMenu}
-        onRemoveUser={handleRemoveUserFromMenu}
+        onSubmit={selectedMenu ? handleUpdateMenu : handleCreateMenu}
       />
 
       <UserMenuConfigModal
         isOpen={isUserMenuConfigModalOpen}
         onClose={() => setIsUserMenuConfigModalOpen(false)}
-        allMenus={menus}
+        allMenus={allMenusForModal}
         onFetchUserMenus={handleFetchUserMenus}
         onSaveUserMenus={handleSaveUserMenus}
+      />
+
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setMenuToDelete(null);
+        }}
+        onConfirm={confirmDeleteMenu}
+        title="Delete Menu"
+        description="Are you sure you want to delete this menu? This action cannot be undone."
+        variant="danger"
+        confirmLabel="Delete"
       />
     </div>
   );

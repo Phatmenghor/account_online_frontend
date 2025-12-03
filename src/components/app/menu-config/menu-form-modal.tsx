@@ -35,11 +35,12 @@ import { Label } from "@/components/ui/label";
 import { MenuItemDto, RoleEnum } from "@/models/menu/menu.types";
 import { menuSchema, MenuFormValues } from "@/models/menu/menu-form-schema";
 import { ParentMode } from "@/models/menu/mode";
+import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
 
 interface MenuFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  mode: "create" | "edit";
+  mode: ModalMode;
   menuData?: MenuItemDto | null;
   allMenus: MenuItemDto[];
   onSubmit: (values: MenuFormValues) => Promise<void>;
@@ -139,10 +140,10 @@ export function MenuFormModal({
       <DialogContent className="max-w-2xl w-full max-h-[90vh] p-0 flex flex-col gap-0">
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <DialogTitle>
-            {mode === "edit" ? "Edit Menu" : "Create Menu"}
+            {mode === ModalMode.UPDATE_MODE ? "Edit Menu" : "Create Menu"}
           </DialogTitle>
           <DialogDescription>
-            {mode === "edit"
+            {mode === ModalMode.UPDATE_MODE
               ? "Update the menu details below."
               : "Enter the details for the new menu."}
           </DialogDescription>
@@ -467,7 +468,7 @@ export function MenuFormModal({
 
             <div className="flex justify-between items-center p-6 border-t bg-muted/30 flex-shrink-0 gap-4">
               <Button type="submit">
-                {mode === "edit" ? "Update" : "Create"}
+                {mode === ModalMode.UPDATE_MODE ? "Update" : "Create"}
               </Button>
             </div>
           </form>
