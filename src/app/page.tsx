@@ -114,11 +114,11 @@ export default function OpenAccountPage() {
     selfieImage,
     handleImageUpload,
     handleSelfieUpload,
+    loadingImageState,
     clearImages,
   } = useAccountImages({
     setFormData,
     validateField,
-    setLoadingState: () => {},
     translate,
   });
 
@@ -379,10 +379,18 @@ export default function OpenAccountPage() {
           <Footer />
         </div>
 
+        {/* For submit laoding */}
         <LoadingModal
           isOpen={loadingState.isLoading}
           title={loadingState.title}
           message={loadingState.message}
+        />
+
+        {/* For image loading */}
+        <LoadingModal
+          isOpen={loadingImageState.isLoading}
+          title={loadingImageState.title}
+          message={loadingImageState.message}
         />
 
         <ConfirmationModal

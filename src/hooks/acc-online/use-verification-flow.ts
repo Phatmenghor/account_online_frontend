@@ -169,9 +169,15 @@ export const useVerificationFlow = ({
       const response = await validateNIDService(validationData);
       setValidationResult(response);
 
-      const criticalFields = ["lastNameEn", "firstNameEn", "dob", "gender"];
-      const hasCriticalErrors = response.data.incorrectFields.some(
-        (field: string) => criticalFields.includes(field)
+      const incorrectFields = response.data.incorrectFields || [];
+      
+      // Check if any critical fields are in the incorrectFields array
+      const hasCriticalErrors = incorrectFields.some(
+        (field: string) => 
+          field === "lastNameEn" || 
+          field === "firstNameEn" || 
+          field === "dob" || 
+          field === "gender"
       );
 
       if (hasCriticalErrors) {
@@ -180,10 +186,18 @@ export const useVerificationFlow = ({
         setShowLocationModal(true);
       }
     } catch (error: any) {
+      // setValidationErrorData({
+      //   title: translate("valid_fail"),
+      //   message: error.apiMessage || "Failed to validate NID information.",
+      //   description: error.uiMessage || "",
+      // });
+
+       const errorMessage = error.message || "Failed to validate NID information.";
+      
       setValidationErrorData({
         title: translate("valid_fail"),
-        message: error.apiMessage || "Failed to validate NID information.",
-        description: error.uiMessage || "",
+        message: errorMessage,
+        description: errorMessage,
       });
       setShowValidationErrorModal(true);
     } finally {

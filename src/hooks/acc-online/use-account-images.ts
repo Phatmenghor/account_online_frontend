@@ -14,18 +14,18 @@ import { Image } from "@/models/open-acc-online/address/open-acc-address.request
 interface UseAccountImagesProps {
   setFormData: (data: ResponseNID) => void;
   validateField: (fieldName: keyof NIDFormData, value: any) => void;
-  setLoadingState: (state: {
-    isLoading: boolean;
-    title: string;
-    message: string;
-  }) => void;
   translate: (key: string) => string;
+}
+
+interface LoadingImageState {
+  isLoading: boolean;
+  title: string;
+  message: string;
 }
 
 export const useAccountImages = ({
   setFormData,
   validateField,
-  setLoadingState,
   translate,
 }: UseAccountImagesProps) => {
   const [imageData, setImageData] = useState<RequestIdImage | null>(null);
@@ -33,6 +33,12 @@ export const useAccountImages = ({
   const [uploadedImage, setUploadedImage] = useState<Image | null>(null);
   const [selfieImage, setSelfieImage] = useState<string | null>(null);
   const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
+
+    const [loadingImageState, setLoadingImageState] = useState<LoadingImageState>({
+      isLoading: false,
+      title: "",
+      message: "",
+    });
 
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -117,7 +123,7 @@ export const useAccountImages = ({
         return;
       }
 
-      setLoadingState({
+      setLoadingImageState({
         isLoading: true,
         title: translate("extracting_data") || "Extracting Data",
         message:
@@ -148,7 +154,7 @@ export const useAccountImages = ({
           description: "Failed to process the image. Please try again.",
         });
       } finally {
-        setLoadingState({
+        setLoadingImageState({
           isLoading: false,
           title: "",
           message: "",
@@ -222,6 +228,8 @@ export const useAccountImages = ({
     setSelfiePreview,
     handleImageUpload,
     handleSelfieUpload,
+    loadingImageState,
+    setLoadingImageState,
     clearImages,
   };
 };
