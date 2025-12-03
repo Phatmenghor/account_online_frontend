@@ -169,21 +169,43 @@ export const useVerificationFlow = ({
       const response = await validateNIDService(validationData);
       setValidationResult(response);
 
-      const criticalFields = ["lastNameEn", "firstNameEn", "dob", "gender"];
-      const hasCriticalErrors = response.data.incorrectFields.some(
-        (field: string) => criticalFields.includes(field)
-      );
+      const incorrectFields = response.data.incorrectFields || [];
+      
+      // Check if any critical fields are in the incorrectFields array
+      // const hasCriticalErrors = incorrectFields.some(
+      //   (field: string) => 
+      //     field === "lastNameEn" || 
+      //     field === "firstNameEn" || 
+      //     field === "dob" || 
+      //     field === "gender"
+      // );
 
-      if (hasCriticalErrors) {
+      if (incorrectFields) {
         setShowErrorModal(true);
       } else {
         setShowLocationModal(true);
       }
     } catch (error: any) {
+      // setValidationErrorData({
+      //   title: translate("valid_fail"),
+      //   message: error.apiMessage || "Failed to validate NID information.",
+      //   description: error.uiMessage || "",
+      // });
+
+      //  const errorMessage = error.message || "Failed to validate NID information.";
+      //  console.log("##", errorMessage);
+
+      const errorMessage = error.response?.data?.message || error.message || "Failed to validate NID information.";
+      // const errorStatus = error.message || "";
+      
+      console.log("## Error response:", error.response);
+      console.log("## Error message:", errorMessage);
+       
+      
       setValidationErrorData({
         title: translate("valid_fail"),
-        message: error.apiMessage || "Failed to validate NID information.",
-        description: error.uiMessage || "",
+        // message: errorStatus,
+        description: errorMessage,
       });
       setShowValidationErrorModal(true);
     } finally {

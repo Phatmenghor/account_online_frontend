@@ -2,6 +2,7 @@ import {
   RequestIdImage,
   RequestValidModel,
 } from "@/models/open-acc-online/nid.request.model";
+import { ValidationResponse } from "@/models/open-acc-online/nid.response.model";
 import { axiosClientWithAuth } from "@/utils/axios";
 import { AxiosError } from "axios";
 
@@ -63,61 +64,31 @@ export async function extractNIDService(data: RequestIdImage) {
 //   }
 // }
 
+// Interfaces for Validate NID
+interface SuccessResponse {
+  status: string;
+  errorMessage: string;
+  data: ValidationResponse;
+}
+
 interface ErrorResponse {
-  error: number;
+  timestamp: string;
+  status: number;
   message: string;
 }
 
-interface CustomError {
-  error: number;
-  apiMessage: string;
-  uiMessage: string;
-  statusCode: string;
-}
-
+// Validate NID Service
 export async function validateNIDService(data: RequestValidModel) {
   try {
     const response = await axiosClientWithAuth.post(
       `/api/v1/public/nid/validate`,
       data
     );
+    // Return full response: { status: "success", message: "NID validated successfully", data: { error, message, data } }
     return response.data.data;
   } catch (err) {
     const error = err as AxiosError<ErrorResponse>;
-    const statusCode = error.response?.status ?? 500;
-    const apiMessage =
-      error.response?.data?.message ?? error.message ?? "Unknown error";
-    let uiMessage = apiMessage;
-
-    switch (statusCode) {
-      case 400:
-        uiMessage = `ID card not recognized by our system. Please contact management for alternative verification solution.`;
-        break;
-      case 420:
-        uiMessage = `Request limit exceeded. Please contact technical team for assistance.`;
-        break;
-      case 500:
-        uiMessage = `No face detected in your photo. Please take a clear photo and try again.`;
-        break;
-      case 501:
-        uiMessage = `Unable to detect face on ID card. Please upload a clearer image of your ID.`;
-        break;
-      case 502:
-        uiMessage = `System error occurred. Please check your NID and try again in a few minutes or contact support.`;
-        break;
-      case 503:
-        uiMessage = `Connection issue with verification service. Please try again.`;
-        break;
-      case 504:
-        uiMessage = `NID verification failed with CAMDX provider. Please try again later.`;
-        break;
-    }
-
-    throw {
-      error: error.response?.data?.error ?? 1,
-      apiMessage,
-      uiMessage,
-      statusCode: statusCode.toString(),
-    } as CustomError;
+    // Throw the backend error directly
+    throw error;
   }
 }

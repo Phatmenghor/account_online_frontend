@@ -69,7 +69,7 @@ export const MasterDataFields: React.FC<MasterDataFieldsProps> = ({
     validateField,
   } = useFormState();
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
       {/* Marital Status */}
       <div className="md:col-span-2 space-y-1">
         <Label htmlFor="maritalStatus" className="text-sm sm:text-base">
