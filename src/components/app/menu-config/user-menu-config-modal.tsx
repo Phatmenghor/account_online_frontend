@@ -133,7 +133,7 @@ export function UserMenuConfigModal({
               </Button>
             </div>
 
-            <div className="border rounded-md p-4 max-h-[400px] overflow-y-auto">
+            <div className="border rounded-md p-4 max-h-[400px]">
               <h4 className="mb-4 text-sm font-medium leading-none">
                 Select Menus
               </h4>

@@ -58,27 +58,27 @@ export function MenuFormModal({
     resolver: zodResolver(menuSchema) as Resolver<MenuFormValues>,
     defaultValues: menuData
       ? {
-        title: menuData.title,
-        icon: menuData.icon || "",
-        href: menuData.href || "",
-        parentMode: menuData.parentId ? "existing" : "none",
-        parentId: menuData.parentId ?? undefined,
-        parentMenu: undefined,
-        displayOrder: menuData.displayOrder,
-        roles: menuData.roles,
-        isActive: menuData.isActive,
-      }
+          title: menuData.title,
+          icon: menuData.icon || "",
+          href: menuData.href || "",
+          parentMode: menuData.parentId ? "existing" : "none",
+          parentId: menuData.parentId ?? undefined,
+          parentMenu: undefined,
+          displayOrder: menuData.displayOrder,
+          roles: menuData.roles,
+          isActive: menuData.isActive,
+        }
       : {
-        title: "",
-        icon: "",
-        href: "",
-        parentMode: "none" as ParentMode,
-        parentId: undefined,
-        parentMenu: undefined,
-        displayOrder: 1,
-        roles: [],
-        isActive: true,
-      },
+          title: "",
+          icon: "",
+          href: "",
+          parentMode: "none" as ParentMode,
+          parentId: undefined,
+          parentMenu: undefined,
+          displayOrder: 1,
+          roles: [],
+          isActive: true,
+        },
   });
 
   const parentMode = form.watch("parentMode");
@@ -157,7 +157,7 @@ export function MenuFormModal({
             }
             className="flex flex-col flex-1 min-h-0"
           >
-            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {/* Menu Title */}
               <FormField
                 control={form.control}
