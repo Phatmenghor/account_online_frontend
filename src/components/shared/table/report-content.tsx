@@ -62,7 +62,7 @@ export const Report = (data: AllReportModel): TableColumn<ReportModel>[] => {
       minWidth: "100px",
       render: (report) => (
         <Badge className={getStatusColor(report?.status)}>
-          <span className="ml-1">{report?.status || "ACTIVE"}</span>
+          <span className="ml-1">{report?.status || "---"}</span>
         </Badge>
       ),
     },

@@ -140,7 +140,7 @@ export const createUserTableColumns = ({
       maxWidth: "300px",
       minWidth: "150px",
       label: "Role",
-      render: (user) => <RoleBadge role={user.userRole} />,
+      render: (user) => <RoleBadge role={user.userRole || "---"} />,
     },
     {
       key: " lastLogin",
@@ -150,7 +150,7 @@ export const createUserTableColumns = ({
       label: "Last Login",
       render: (user) => (
         <span className="text-muted-foreground">
-          {DateTimeFormat(user.lastLogin)}
+          {DateTimeFormat(user.lastLogin) || "---"}
         </span>
       ),
     },
@@ -162,7 +162,7 @@ export const createUserTableColumns = ({
       label: "Created At",
       render: (user) => (
         <span className="text-muted-foreground">
-          {DateTimeFormat(user.createdAt)}
+          {DateTimeFormat(user.createdAt) || "---"}
         </span>
       ),
     },
@@ -176,7 +176,7 @@ export const createUserTableColumns = ({
         <div className="flex items-center gap-2">
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger asChild> 
                 <Button
                   variant="outline"
                   size="sm"

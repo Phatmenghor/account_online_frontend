@@ -16,6 +16,7 @@ import {
 import RiskBadge from "../badge/risk-level-badge";
 import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
 import AmlStatusBadge from "../badge/aml-badge";
+import { Span } from "next/dist/trace";
 
 interface ManagementTableHandlers {
   handleViewManagementDetail: (management: AmlManagementModel) => void;
@@ -69,7 +70,7 @@ export const createManagementTableColumns = ({
       minWidth: "180px",
       render: (m) => (
         <span className="font-medium">
-          {m.customerInfo?.givenName} {m.customerInfo?.familyName}
+          {m.customerInfo?.givenName} {m.customerInfo?.familyName || "---"}
         </span>
       ),
     },
@@ -81,7 +82,7 @@ export const createManagementTableColumns = ({
       truncate: true,
       maxWidth: "120px",
       minWidth: "120px",
-      render: (m) => <RiskBadge riskLevel={m.riskLevel} />,
+      render: (m) => <RiskBadge riskLevel={m.riskLevel || "---"} />,
     },
 
     // Total Score
@@ -104,7 +105,7 @@ export const createManagementTableColumns = ({
       minWidth: "150px",
       render: (m) => (
         <span className="font-medium">
-          {new Date(m.createdAt).toLocaleString()}
+          {new Date(m.createdAt).toLocaleString() || "---"}
         </span>
       ),
     },
@@ -116,7 +117,8 @@ export const createManagementTableColumns = ({
       truncate: true,
       maxWidth: "120px",
       minWidth: "120px",
-      render: (m) => <AmlStatusBadge status={m.status} />,
+      render: (m) => <AmlStatusBadge status={m.status || "---"} />,
+     
     },
 
     // Actions

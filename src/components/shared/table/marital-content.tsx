@@ -88,7 +88,7 @@ export const createMaritalTableColumns = ({
       render: (marital) => (
         // <span className="font-medium">{marital.status || "---"}</span>
         <Badge className={getStatusColor(marital?.status ?? "")}>
-          <span className="ml-1">{marital?.status || "ACTIVE"}</span>
+          <span className="ml-1">{marital?.status || "---"}</span>
         </Badge>
       ),
     },

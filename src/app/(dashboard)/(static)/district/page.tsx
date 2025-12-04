@@ -278,7 +278,7 @@ function DistrictPageContent() {
 
         <DeleteConfirmationDialog
           isOpen={isDeleteDialogOpen}
-          onClose={() => {
+          onClose={() => { 
             setIsDeleteDialogOpen(false);
             setSelectedDistrict(null);
           }}

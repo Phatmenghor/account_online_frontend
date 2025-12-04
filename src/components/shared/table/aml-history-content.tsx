@@ -46,7 +46,7 @@ export const createHistoryTableColumns = ({
       label: "ID Number",
       minWidth: "150px",
       truncate: true,
-      render: (h) => <span>{h.customerInfo?.legalId || "-"}</span>,
+      render: (h) => <span>{h.customerInfo?.legalId || "---"}</span>,
     },
 
     /** Full Name */
@@ -57,7 +57,7 @@ export const createHistoryTableColumns = ({
       truncate: true,
       render: (h) => (
         <span>
-          {h.customerInfo?.familyName} {h.customerInfo?.givenName}
+          {h.customerInfo?.familyName} {h.customerInfo?.givenName || "---"}
         </span>
       ),
     },
@@ -67,7 +67,7 @@ export const createHistoryTableColumns = ({
       key: "riskLevel",
       label: "Risk Level",
       minWidth: "150px",
-      render: (h) => <RiskBadge riskLevel={h.riskLevel} />,
+      render: (h) => <RiskBadge riskLevel={h.riskLevel ||"---"} />,
     },
 
     /** Status */
@@ -75,7 +75,7 @@ export const createHistoryTableColumns = ({
       key: "status",
       label: "Status",
       minWidth: "150px",
-      render: (h) => <AmlStatusBadge status={h.status} />,
+      render: (h) => <AmlStatusBadge status={h.status || "---"} />,
     },
 
     /** Service Name */
@@ -84,7 +84,7 @@ export const createHistoryTableColumns = ({
       label: "Service Name",
       minWidth: "180px",
       truncate: true,
-      render: (h) => <span>{h.serviceName || "-"}</span>,
+      render: (h) => <span>{h.serviceName || "---"}</span>,
     },
 
     /** Total Rules Score */
@@ -93,7 +93,7 @@ export const createHistoryTableColumns = ({
       label: "Score",
       minWidth: "120px",
       render: (h) => (
-        <span className="font-semibold text-gray-700">{h.totalRulesScore}</span>
+        <span className="font-semibold text-gray-700">{h.totalRulesScore || "---"}</span>
       ),
     },
 
@@ -104,7 +104,7 @@ export const createHistoryTableColumns = ({
       minWidth: "180px",
       truncate: true,
       render: (h) =>
-        h.createdAt ? <span>{DateTimeFormat(h.createdAt)}</span> : "-",
+        h.createdAt ? <span>{DateTimeFormat(h.createdAt) || "---"}</span> : "-",
     },
 
     /** Actions */

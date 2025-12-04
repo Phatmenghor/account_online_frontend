@@ -90,7 +90,7 @@ export const createReferenceTableColumns = ({
       minWidth: "100px",
       render: (reference) => (
         <Badge className={getStatusColor(reference?.status ?? "")}>
-          <span className="ml-1">{reference?.status || "ACTIVE"}</span>
+          <span className="ml-1">{reference?.status || "---"}</span>
         </Badge>
       ),
     },

@@ -96,7 +96,7 @@ export const createLegalTypeTableColumns = ({
       minWidth: "100px",
       render: (legalType) => (
         <Badge className={getStatusColor(legalType?.status ?? "")}>
-          <span className="ml-1">{legalType?.status || "ACTIVE"}</span>
+          <span className="ml-1">{legalType?.status || "---"}</span>
         </Badge>
       ),
     },

@@ -103,7 +103,7 @@ export const createOccupationTableColumns = ({
       minWidth: "100px",
       render: (occupation) => (
         <Badge className={getStatusColor(occupation?.status ?? "")}>
-          <span className="ml-1">{occupation?.status || "ACTIVE"}</span>
+          <span className="ml-1">{occupation?.status || "---"}</span>
         </Badge>
       ),
     },

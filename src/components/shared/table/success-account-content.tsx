@@ -98,7 +98,7 @@ export const createSuccessAccountTableColumns = ({
       truncate: true,
       maxWidth: "150px",
       minWidth: "120px",
-      render: (account) => <AmlStatusBadge status={account.amlStatus} />,
+      render: (account) => <AmlStatusBadge status={account.amlStatus || "---"} />,
     },
     {
       key: "createdAt",
