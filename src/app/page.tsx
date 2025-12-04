@@ -291,7 +291,7 @@ export default function OpenAccountPage() {
       <div className="flex flex-col h-screen">
         <PageHeader />
 
-        <div className="flex-1 overflow-y-auto pt-16 md:pt-20 pb-0">
+        <div className="flex-1 pt-16 md:pt-20 pb-0">
           <div className="lg:px-16 md:px-4 py-8">
             <Card className="p-8 mb-6 shadow-lg">
               <div className="mx-auto">

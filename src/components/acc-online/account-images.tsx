@@ -29,7 +29,7 @@ export const AccountImages: React.FC<AccountImagesProps> = ({
           <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
           <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
           <div
-            className={`relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity ${
+            className={`relative lg:w-96 w-80 h-60 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity ${
               validationErrors.idImage ? "border-2 border-red-500" : ""
             }`}
           >
@@ -44,7 +44,7 @@ export const AccountImages: React.FC<AccountImagesProps> = ({
             <img
               src={
                 uploadedImage?.idImage ||
-                "/app/identity-card.png?height=192&width=320"
+                "/app/identity-card-4k.png?height=192&width=320"
               }
               alt="ID Card"
               className="w-full h-full"
@@ -68,7 +68,7 @@ export const AccountImages: React.FC<AccountImagesProps> = ({
           <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
           <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
           <div
-            className={`relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity ${
+            className={`relative lg:w-96 w-80 h-60 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity ${
               validationErrors.selfieImage ? "border-2 border-red-500" : ""
             }`}
           >
@@ -82,7 +82,7 @@ export const AccountImages: React.FC<AccountImagesProps> = ({
             />
             <img
               src={
-                selfiePreview || "/app/image_selfie.jpg?height=192&width=320"
+                selfiePreview || "/app/image_selfie_4K.png?height=192&width=320"
               }
               alt="Selfie"
               className="w-full h-full"
