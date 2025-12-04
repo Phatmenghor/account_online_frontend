@@ -118,7 +118,7 @@ export default function OpenAccountPage() {
   } = useAccountImages({
     setFormData,
     validateField,
-    setLoadingState: () => { },
+    setLoadingState: () => {},
     translate,
   });
 
@@ -409,9 +409,9 @@ export default function OpenAccountPage() {
           data={
             validationResult?.data
               ? {
-                score: validationResult.data.score,
-                incorrectFields: validationResult.data.incorrectFields,
-              }
+                  score: validationResult.data.score,
+                  incorrectFields: validationResult.data.incorrectFields,
+                }
               : null
           }
         />
