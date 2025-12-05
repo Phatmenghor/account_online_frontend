@@ -172,29 +172,14 @@ export const useVerificationFlow = ({
       const incorrectFields = response.data.incorrectFields || [];
       
       // Check if any critical fields are in the incorrectFields array
-      // const hasCriticalErrors = incorrectFields.some(
-      //   (field: string) => 
-      //     field === "lastNameEn" || 
-      //     field === "firstNameEn" || 
-      //     field === "dob" || 
-      //     field === "gender"
-      // );
-
-      if (incorrectFields) {
+      if (incorrectFields.length > 0) {
         setShowErrorModal(true);
       } else {
         setShowLocationModal(true);
       }
     } catch (error: any) {
-      // setValidationErrorData({
-      //   title: translate("valid_fail"),
-      //   message: error.apiMessage || "Failed to validate NID information.",
-      //   description: error.uiMessage || "",
-      // });
-
-      //  const errorMessage = error.message || "Failed to validate NID information.";
-      //  console.log("##", errorMessage);
-
+      
+      // Check error on "Number Id,..."
       const errorMessage = error.response?.data?.message || error.message || "Failed to validate NID information.";
       // const errorStatus = error.message || "";
       
