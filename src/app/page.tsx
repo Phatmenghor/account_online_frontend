@@ -37,8 +37,6 @@ import { useVerificationFlow } from "@/hooks/acc-online/use-verification-flow";
 // Types
 import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-address.request.model";
 
-
-
 export default function OpenAccountPage() {
   // ========================================
   // Hooks Setup
@@ -364,9 +362,9 @@ export default function OpenAccountPage() {
                   />
                 </div>
 
-                <div className="flex justify-end gap-4 mt-8">
+                <div className="flex justify-center md:justify-end gap-4 mt-8">
                   <Button
-                    className="px-8 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-md"
+                    className="w-full md:w-auto px-5 py-2.5 bg-orange-400 hover:bg-orange-500 text-white rounded-sm shadow-md transition-shadow duration-200"
                     onClick={handleVerificationClick}
                     disabled={isLoading || isValidating || isVerified}
                   >
@@ -374,8 +372,9 @@ export default function OpenAccountPage() {
                       ? translate("processing")
                       : translate("verification")}
                   </Button>
+
                   <Button
-                    className="px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md"
+                    className="w-full md:w-auto px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-sm shadow-md transition-shadow duration-200"
                     onClick={handleSubmitAccount}
                     disabled={isLoading || isValidating || !isVerified}
                   >
@@ -389,7 +388,6 @@ export default function OpenAccountPage() {
           <Footer />
         </div>
 
-        {/* Clear Confirmation Modal */}
         {/* Clear Confirmation Modal */}
         <ConfirmClearModal
           isOpen={showClearConfirm}
@@ -437,9 +435,9 @@ export default function OpenAccountPage() {
           data={
             validationResult?.data
               ? {
-                score: validationResult.data.score,
-                incorrectFields: validationResult.data.incorrectFields,
-              }
+                  score: validationResult.data.score,
+                  incorrectFields: validationResult.data.incorrectFields,
+                }
               : null
           }
         />

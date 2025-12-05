@@ -158,6 +158,8 @@
     "req_des": "Please fill in the following required",
 
     "header_acc": "Account Online Register",
+    "sub_header_acc": "Ensure all information is accurate before submission",
+    "cpbank_acc": "CPBank Account",
     "img_card": "Please upload the front side of your ID card.",
     "img_selfie": "Please upload a selfie image.",
 
