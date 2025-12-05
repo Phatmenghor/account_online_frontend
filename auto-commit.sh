@@ -10,6 +10,6 @@ git add .
 git commit -m "Push on $CURRENT_TIME"
 
 # Push to main branch
-git push origin test
+git push origin development
 
-echo "✅ Code pushed to 'test' branch at $CURRENT_TIME"
+echo "✅ Code pushed to 'development' branch at $CURRENT_TIME"

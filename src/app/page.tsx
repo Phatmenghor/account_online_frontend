@@ -18,12 +18,14 @@ import LocationModal from "@/components/acc-online/addressModal";
 import LoadingModal from "@/components/shared/modal/extract-modal";
 import SubmitSuccessModal from "@/components/shared/modal/submit-success-modal";
 import SubmitErrorModal from "@/components/shared/modal/submit-error-modal";
+import { HeaderSection } from "@/components/acc-online/header-section";
+import { ConfirmClearModal } from "@/components/acc-online/confirm-clear-modal";
 
 // Contexts
 import { FormStateProvider } from "@/contexts/form-state-context";
 
 // Hooks
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { useAccountImages } from "@/hooks/acc-online/use-account-images";
 import { useAccountOtp } from "@/hooks/acc-online/use-account-otp";
 import { useMasterData } from "@/hooks/acc-online/use-master-data";
@@ -34,6 +36,8 @@ import { useVerificationFlow } from "@/hooks/acc-online/use-verification-flow";
 
 // Types
 import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-address.request.model";
+
+
 
 export default function OpenAccountPage() {
   // ========================================
@@ -174,6 +178,11 @@ export default function OpenAccountPage() {
   });
 
   // ========================================
+  // Additional State for Clear Confirmation
+  // ========================================
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  // ========================================
   // Event Handlers
   // ========================================
 
@@ -241,6 +250,7 @@ export default function OpenAccountPage() {
     resetMasterData();
     setStaffCode("");
     setIsVerified(false);
+    setShowClearConfirm(false);
   }, [
     clearValidation,
     clearImages,
@@ -295,12 +305,12 @@ export default function OpenAccountPage() {
           <div className="lg:px-16 md:px-4 py-8">
             <Card className="p-8 mb-6 shadow-lg">
               <div className="mx-auto">
-                <div className="mb-8 flex justify-between">
-                  <h1 className="text-lg md:text-3xl text-gray-800 mb-2">
-                    {translate("header_acc")}
-                  </h1>
-                  <Button onClick={handleClear}>{translate("clear")}</Button>
-                </div>
+                {/* Modern Header Section - Option 2 Style (Minimalist with Left Accent) */}
+                <HeaderSection
+                  title={translate("header_acc")}
+                  onClear={() => setShowClearConfirm(true)}
+                  translate={translate}
+                />
 
                 <AccountImages
                   uploadedImage={uploadedImage}
@@ -379,7 +389,17 @@ export default function OpenAccountPage() {
           <Footer />
         </div>
 
-        {/* For submit laoding */}
+        {/* Clear Confirmation Modal */}
+        {/* Clear Confirmation Modal */}
+        <ConfirmClearModal
+          isOpen={showClearConfirm}
+          onClose={() => setShowClearConfirm(false)}
+          onConfirm={handleClear}
+          title={translate("cfTitle")}
+          message="Are you sure you want to clear all fields? This action cannot be undone."
+        />
+
+        {/* For submit loading */}
         <LoadingModal
           isOpen={loadingState.isLoading}
           title={loadingState.title}
@@ -417,9 +437,9 @@ export default function OpenAccountPage() {
           data={
             validationResult?.data
               ? {
-                  score: validationResult.data.score,
-                  incorrectFields: validationResult.data.incorrectFields,
-                }
+                score: validationResult.data.score,
+                incorrectFields: validationResult.data.incorrectFields,
+              }
               : null
           }
         />
