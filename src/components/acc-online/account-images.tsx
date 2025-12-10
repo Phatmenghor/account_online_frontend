@@ -1,5 +1,6 @@
 import React from "react";
 import { useFormState } from "@/contexts/form-state-context";
+import { Input } from "../ui/input";
 
 interface AccountImagesProps {
   uploadedImage: any;
@@ -33,9 +34,10 @@ export const AccountImages: React.FC<AccountImagesProps> = ({
               validationErrors.idImage ? "border-2 border-red-500" : ""
             }`}
           >
-            <input
+            <Input
               type="file"
               accept="image/*"
+              name="idImage"
               onChange={handleImageUpload}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               id="image-upload"
@@ -72,9 +74,10 @@ export const AccountImages: React.FC<AccountImagesProps> = ({
               validationErrors.selfieImage ? "border-2 border-red-500" : ""
             }`}
           >
-            <input
+            <Input
               type="file"
               accept="image/*"
+              name="selfieImage"
               onChange={handleSelfieUpload}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               id="image-upload-user"

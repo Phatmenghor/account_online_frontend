@@ -180,7 +180,7 @@ function AccountPageContent() {
                   <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
                   <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
 
-                  <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden group cursor-pointer">
+                  <div className="relative lg:w-96 w-80 h-60 rounded overflow-hidden group cursor-pointer">
                     <a
                       href="#"
                       onClick={(e) => {
@@ -197,7 +197,7 @@ function AccountPageContent() {
                         src={
                           account?.data?.nidImage
                             ? `data:image/jpeg;base64,${account.data.nidImage}`
-                            : "/app/image_selfie.jpg?height=192&width=320"
+                            : "/app/image_selfie_4K.png?height=192&width=320"
                         }
                         alt="NID Image"
                         className="w-full h-full object-cover"
@@ -228,7 +228,7 @@ function AccountPageContent() {
                   <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
                   <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
 
-                  <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden group cursor-pointer">
+                  <div className="relative lg:w-96 w-80 h-60 rounded overflow-hidden group cursor-pointer">
                     <a
                       href="#"
                       onClick={(e) => {
@@ -245,7 +245,7 @@ function AccountPageContent() {
                         src={
                           account?.data?.selfieImage
                             ? `data:image/jpeg;base64,${account.data.selfieImage}`
-                            : "/app/image_selfie.jpg?height=192&width=320"
+                            : "/app/image_selfie_4K.png?height=192&width=320"
                         }
                         alt="Selfie"
                         className="w-full h-full object-cover"
