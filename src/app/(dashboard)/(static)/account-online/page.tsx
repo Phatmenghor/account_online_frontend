@@ -64,34 +64,63 @@ function AccountPageContent() {
     setAccount(null);
     fetchingAccount();
   };
-  const downloadImage = async (fileName: string) => {
-    if (!fileName) return alert("No image to download");
 
+  const downloadImage = async (
+    file: string,
+    legalId: string,
+    imageType: "selfie" | "nid"
+  ) => {
+    if (!file) return alert("No image to download");
+
+    // Detect if this is base64
+    const isBase64 =
+      file.startsWith("data:image") ||
+      /^[A-Za-z0-9+/=]+$/.test(file.replace(/\s/g, ""));
+
+    // Detect extension (jpg/png/webp)
+    const detectExtension = (data: string) => {
+      if (data.startsWith("data:image/png")) return "png";
+      if (data.startsWith("data:image/webp")) return "webp";
+      return "jpg"; // default
+    };
+
+    // Base64 case
+    if (isBase64) {
+      const fullBase64 = file.startsWith("data:image")
+        ? file
+        : `data:image/jpeg;base64,${file}`;
+
+      const extension = detectExtension(fullBase64);
+      const fileName = `${legalId}_${imageType}.${extension}`;
+
+      const link = document.createElement("a");
+      link.href = fullBase64;
+      link.download = fileName;
+      link.click();
+      return;
+    }
+
+    // Filename from server → fetch from backend
     try {
-      // Fetch the image as blob
-      // const response = await fetch(
-      //   `http://192.168.103.106:9393/api/images/${fileName}`
-
-      // );
       const response = await fetch(
-        `${process.env.BACKEND_API_URL}/api/images/${fileName}`
+        `${process.env.BACKEND_API_URL}/api/images/${file}`
       );
       if (!response.ok) throw new Error("Failed to fetch image");
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
 
-      // Create temporary link and click it
+      const extension = blob.type.replace("image/", "") || "jpg";
+      const fileName = `${legalId}_${imageType}.${extension}`;
+
       const link = document.createElement("a");
       link.href = url;
-      link.download = fileName; // Use file name dynamically
-      document.body.appendChild(link);
+      link.download = fileName;
       link.click();
-      document.body.removeChild(link);
 
-      window.URL.revokeObjectURL(url); // Clean up memory
+      window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error(err);
+      console.error("Download failed:", err);
     }
   };
 
@@ -139,6 +168,7 @@ function AccountPageContent() {
 
             {/* ID Card and Selfie Image*/}
             <div className="flex md:flex-row flex-col justify-evenly items-center mb-16 lg:gap-14 gap-8">
+              {/* Card Image */}
               <div>
                 <p className="text-base text-gray-600 mb-4 text-center">
                   Card Image
@@ -153,27 +183,29 @@ function AccountPageContent() {
                   <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden group cursor-pointer">
                     <a
                       href="#"
-                      className="w-full h-full object-cover"
                       onClick={(e) => {
                         e.preventDefault();
                         if (account?.data?.nidImage)
-                          downloadImage(account.data.nidImage);
+                          downloadImage(
+                            account.data.nidImage,
+                            account.data.legalId,
+                            "nid"
+                          );
                       }}
                     >
                       <img
                         src={
                           account?.data?.nidImage
-                            ? `http://192.168.103.106:9393/api/images/${account.data.nidImage}`
+                            ? `data:image/jpeg;base64,${account.data.nidImage}`
                             : "/app/image_selfie.jpg?height=192&width=320"
                         }
-                        alt={account?.data?.selfieImage}
+                        alt="NID Image"
                         className="w-full h-full object-cover"
                       />
 
-                      {/* Hover Text */}
                       <div
                         className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center 
-                        opacity-0 group-hover:opacity-100 transition-opacity"
+          opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <p className="text-white text-lg font-semibold">
                           Download Image
@@ -183,9 +215,11 @@ function AccountPageContent() {
                   </div>
                 </div>
               </div>
+
+              {/* Selfie Image */}
               <div>
                 <p className="text-base text-gray-600 mb-4 text-center">
-                  Selfie image.
+                  Selfie Image
                 </p>
 
                 <div className="relative">
@@ -197,26 +231,29 @@ function AccountPageContent() {
                   <div className="relative lg:w-96 w-80 h-60 bg-gray-100 rounded overflow-hidden group cursor-pointer">
                     <a
                       href="#"
-                      onClick={() =>
-                        downloadImage(
-                          account?.data?.selfieImage ??
-                            "/app/image_selfie.jpg?height=192&width=320"
-                        )
-                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (account?.data?.selfieImage)
+                          downloadImage(
+                            account.data.selfieImage,
+                            account.data.legalId,
+                            "selfie"
+                          );
+                      }}
                     >
                       <img
                         src={
                           account?.data?.selfieImage
-                            ? `http://192.168.103.106:9393/api/images/${account.data.selfieImage}`
+                            ? `data:image/jpeg;base64,${account.data.selfieImage}`
                             : "/app/image_selfie.jpg?height=192&width=320"
                         }
                         alt="Selfie"
-                        className="w-full h-full"
+                        className="w-full h-full object-cover"
                       />
-                      {/* Hover Text */}
+
                       <div
                         className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center 
-                        opacity-0 group-hover:opacity-100 transition-opacity"
+          opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <p className="text-white text-lg font-semibold">
                           Download Image
@@ -227,6 +264,7 @@ function AccountPageContent() {
                 </div>
               </div>
             </div>
+
             {/* Form Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* First Name (KH) */}

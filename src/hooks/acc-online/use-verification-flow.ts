@@ -20,6 +20,7 @@ import {
 } from "@/components/acc-online/form-field/form-validate-error";
 import { LegalTypeModel } from "@/models/static/legal-type/legal-type.response";
 import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-address.request.model";
+import { applicationName } from "@/constants/AppResource/display-list/enum/status";
 
 interface UseVerificationFlowProps {
   formData: ResponseNID;
@@ -149,7 +150,7 @@ export const useVerificationFlow = ({
     setIsValidating(true);
     try {
       const validationData: RequestValidModel = {
-        applicationName: "ACCOUNT_ONLINE",
+        applicationName: applicationName.ACCOUNT_ONLINE,
         idNumber: formData.idNumber,
         lastNameKh: formData.lastNameKh,
         firstNameKh: formData.firstNameKh,
@@ -170,7 +171,7 @@ export const useVerificationFlow = ({
       setValidationResult(response);
 
       const incorrectFields = response.data.incorrectFields || [];
-      
+
       // Check if any critical fields are in the incorrectFields array
       if (incorrectFields.length > 0) {
         setShowErrorModal(true);
@@ -178,15 +179,16 @@ export const useVerificationFlow = ({
         setShowLocationModal(true);
       }
     } catch (error: any) {
-      
       // Check error on "Number Id,..."
-      const errorMessage = error.response?.data?.message || error.message || "Failed to validate NID information.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to validate NID information.";
       // const errorStatus = error.message || "";
-      
+
       console.log("## Error response:", error.response);
       console.log("## Error message:", errorMessage);
-       
-      
+
       setValidationErrorData({
         title: translate("valid_fail"),
         // message: errorStatus,
@@ -197,6 +199,71 @@ export const useVerificationFlow = ({
       setIsValidating(false);
     }
   };
+
+  //Mock validate nid
+
+  // const handleValidateNID = async (
+  //   setShowLocationModal: (show: boolean) => void,
+  //   setShowErrorModal: (show: boolean) => void,
+  //   setValidationResult: (result: any) => void,
+  //   setShowValidationErrorModal: (show: boolean) => void,
+  //   setValidationErrorData: (data: any) => void
+  // ) => {
+  //   setIsValidating(true);
+
+  //   try {
+  //     // Mock request payload (still useful for debugging)
+  //     const validationData: RequestValidModel = {
+  //       applicationName: "ACCOUNT_ONLINE",
+  //       idNumber: formData.idNumber,
+  //       lastNameKh: formData.lastNameKh,
+  //       firstNameKh: formData.firstNameKh,
+  //       lastNameEn: formData.lastNameEn,
+  //       firstNameEn: formData.firstNameEn,
+  //       dob: formatDate(formData.dob),
+  //       gender: convertGenderForAPI(formData.gender),
+  //       expiredDate: formatDate(formData.expiredDate),
+  //       issuedDate: formatDate(formData.issuedDate),
+  //       address: formData.address,
+  //       pob: formData.pob,
+  //       MRZ1: formData.MRZ1,
+  //       MRZ2: formData.MRZ2,
+  //       MRZ3: formData.MRZ3,
+  //     };
+
+  //     console.log("MOCK NID VALIDATION PAYLOAD:", validationData);
+
+  //     // ---- MOCK SERVICE RESPONSE (SIMULATION) ----
+  //     const mockResponse = {
+  //       data: {
+  //         incorrectFields: [], // change to simulate errors: ["idNumber", "dob"]
+  //         status: "SUCCESS",
+  //         message: "Mock NID validation successful",
+  //       },
+  //     };
+
+  //     // Simulate network delay
+  //     await new Promise((resolve) => setTimeout(resolve, 500));
+
+  //     setValidationResult(mockResponse);
+
+  //     const incorrectFields = mockResponse.data.incorrectFields;
+
+  //     if (incorrectFields.length > 0) {
+  //       setShowErrorModal(true);
+  //     } else {
+  //       setShowLocationModal(true);
+  //     }
+  //   } catch (err: any) {
+  //     setValidationErrorData({
+  //       title: translate("valid_fail"),
+  //       description: "Mock service error — validation aborted.",
+  //     });
+  //     setShowValidationErrorModal(true);
+  //   } finally {
+  //     setIsValidating(false);
+  //   }
+  // };
 
   const handleOpenConfirmModal = (
     uploadedImageData: string,

@@ -76,9 +76,9 @@ export default function LoginPage() {
       }
     } catch (error: any) {
       const errorMsg =
-    error?.response?.data?.message ||
-    error?.message ||
-    "Invalid username or password";
+        error?.response?.data?.message ||
+        error?.message ||
+        "Invalid username or password";
 
       AppToast({
         type: "error",
@@ -205,10 +205,36 @@ export default function LoginPage() {
                 <Button
                   type="button"
                   onClick={form.handleSubmit(onSubmit)}
-                  className="w-full h-11 bg-primary hover:bg-primary/90 transition-colors mt-6"
-                  disabled={isLoading}
+                  className="w-full h-11 bg-primary hover:bg-primary/90 transition-colors mt-6 flex items-center justify-center"
+                  disabled={isLoading || isPending}
                 >
-                  {isLoading ? "Signing in..." : "Login"}
+                  {isLoading || isPending ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8H4z"
+                        ></path>
+                      </svg>
+                      Signing in...
+                    </>
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
               </div>
             </Form>

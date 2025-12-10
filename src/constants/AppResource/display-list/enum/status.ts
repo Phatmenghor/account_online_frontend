@@ -13,5 +13,8 @@ export enum AmlStatusEnum {
 export enum StatusReport {
   SUCCESS = "SUCCESS",
   AML = "AML",
-  FAILURE = "FAILURE"
+  FAILURE = "FAILURE",
+}
+export enum applicationName {
+  ACCOUNT_ONLINE = "ACCOUNT_ONLINE",
 }
