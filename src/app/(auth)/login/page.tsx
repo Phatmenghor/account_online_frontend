@@ -24,6 +24,7 @@ import { ROUTES } from "@/constants/AppRoutes/routes";
 import { AppToast } from "@/components/shared/toast/app-toast";
 import { useTranslations } from "next-intl";
 import { UserRole } from "@/utils/authorization/authorization";
+import Spinner from "@/components/shared/common/modern-spinner";
 
 const formSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -205,31 +206,12 @@ export default function LoginPage() {
                 <Button
                   type="button"
                   onClick={form.handleSubmit(onSubmit)}
-                  className="w-full h-11 bg-primary hover:bg-primary/90 transition-colors mt-6 flex items-center justify-center"
-                  disabled={isLoading || isPending}
+                  className="w-full h-11 bg-primary hover:bg-primary/90 transition-colors mt-6 flex items-center justify-center gap-2"
+                  disabled={isLoading}
                 >
-                  {isLoading || isPending ? (
+                  {isLoading ? (
                     <>
-                      <svg
-                        className="animate-spin h-5 w-5 mr-2 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v8H4z"
-                        ></path>
-                      </svg>
+                      <Spinner size={5} color="text-white" />
                       Signing in...
                     </>
                   ) : (
