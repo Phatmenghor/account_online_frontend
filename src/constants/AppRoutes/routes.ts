@@ -26,6 +26,7 @@ export const ROUTES = {
     },
     ACCOUNT_ONLINE: "/account-online",
     REPORT: "/report",
+    MENU_CONFIG: "/menu-config"
   },
 };
 
