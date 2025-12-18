@@ -108,7 +108,7 @@ export const createUserTableColumns = ({
       key: "idCard",
       label: "Username",
       truncate: true,
-      maxWidth: "300px",
+      maxWidth: "400px",
       minWidth: "150px",
       render: (user) => (
         <span className="font-medium">{user.idCard || "---"}</span>
@@ -128,7 +128,7 @@ export const createUserTableColumns = ({
       key: "email",
       label: "Email",
       truncate: true,
-      maxWidth: "300px",
+      maxWidth: "400px",
       minWidth: "150px",
       render: (user) => (
         <span className="font-medium">{user.email || "---"}</span>
