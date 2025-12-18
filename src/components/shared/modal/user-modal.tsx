@@ -39,7 +39,6 @@ import { STATUS_USER_OPTIONS } from "@/constants/AppResource/filter/status";
 import { Status } from "@/constants/AppResource/display-list/enum/status";
 import { UserPermission } from "@/constants/AppResource/display-list/enum/user";
 import { USER_PERMISSION_OPTIONS } from "@/constants/AppResource/filter/permission";
-import { StatusBadge } from "../badge/status-badge";
 
 type ModalUserProps = {
   isOpen: boolean;

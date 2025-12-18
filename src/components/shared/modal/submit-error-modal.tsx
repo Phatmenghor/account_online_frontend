@@ -6,7 +6,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { XCircle, AlertCircle } from "lucide-react";
+import { XCircle, AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface SubmitErrorModalProps {
@@ -15,6 +15,7 @@ interface SubmitErrorModalProps {
   title?: string;
   message?: string;
   description?: string;
+  variant?: "error" | "warning";
 }
 
 export default function SubmitErrorModal({
@@ -23,18 +24,28 @@ export default function SubmitErrorModal({
   title,
   message,
   description,
+  variant = "error",
 }: SubmitErrorModalProps) {
   const translate = useTranslations("NIDPage");
+
+  const isWarning = variant === "warning";
+  const Icon = isWarning ? AlertTriangle : XCircle;
+  const iconColor = isWarning ? "text-amber-500" : "text-red-600";
+  const bgColor = isWarning ? "bg-amber-100" : "bg-red-100";
+  const titleColor = isWarning ? "text-amber-600" : "text-red-600";
+  const buttonColor = isWarning
+    ? "bg-amber-500 hover:bg-amber-600"
+    : "bg-red-600 hover:bg-red-700";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex flex-col items-center justify-center space-y-4 pt-2">
-            <div className="rounded-full bg-red-100 p-3">
-              <XCircle className="h-12 w-12 text-red-600" />
+            <div className={`rounded-full ${bgColor} p-3`}>
+              <Icon className={`h-12 w-12 ${iconColor}`} />
             </div>
-            <DialogTitle className="text-center text-2xl font-bold text-red-600">
+            <DialogTitle className={`text-center text-2xl font-bold ${titleColor}`}>
               {title}
             </DialogTitle>
           </div>
@@ -62,7 +73,7 @@ export default function SubmitErrorModal({
             </Button>
             <Button
               onClick={onClose}
-              className="flex-1 bg-red-600 hover:bg-red-700"
+              className={`flex-1 ${buttonColor}`}
             >
               {translate("try_again") || "Try Again"}
             </Button>

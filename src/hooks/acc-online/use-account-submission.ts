@@ -55,9 +55,14 @@ export const useAccountSubmission = ({
   });
 
   const [showSubmitErrorModal, setShowSubmitErrorModal] = useState(false);
-  const [submitErrorData, setSubmitErrorData] = useState({
+  const [submitErrorData, setSubmitErrorData] = useState<{
+    title: string;
+    message: string;
+    variant?: "error" | "warning";
+  }>({
     title: "",
     message: "",
+    variant: "error",
   });
 
   const [loadingState, setLoadingState] = useState<LoadingState>({
@@ -136,11 +141,22 @@ export const useAccountSubmission = ({
         error?.errorMessage ||
         error?.message ||
         "Failed to create account. Please try again.";
-      // Show error modal
-      setSubmitErrorData({
-        title: translate("error_title") || "Submission Failed",
-        message: errorMessage,
-      });
+
+      // Check for ACCOUNT_ALREADY_EXIST
+      if (errorMessage.includes("ACCOUNT_ALREADY_EXIST")) {
+        setSubmitErrorData({
+          title: translate("account_exists_title") || "Account Already Exists",
+          message: translate("account_exists_message") || "You already have an account with the bank. Please use your existing account.",
+          variant: "warning",
+        });
+      } else {
+        // Show generic error modal
+        setSubmitErrorData({
+          title: translate("error_title") || "Submission Failed",
+          message: errorMessage,
+          variant: "error",
+        });
+      }
       setShowSubmitErrorModal(true);
     } finally {
       setLoadingState({

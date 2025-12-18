@@ -435,9 +435,9 @@ export default function OpenAccountPage() {
           data={
             validationResult?.data
               ? {
-                  score: validationResult.data.score,
-                  incorrectFields: validationResult.data.incorrectFields,
-                }
+                score: validationResult.data.score,
+                incorrectFields: validationResult.data.incorrectFields,
+              }
               : null
           }
         />
@@ -462,6 +462,7 @@ export default function OpenAccountPage() {
           onClose={() => setShowSubmitErrorModal(false)}
           title={submitErrorData.title}
           message={submitErrorData.message}
+          variant={submitErrorData.variant}
         />
       </div>
     </FormStateProvider>
