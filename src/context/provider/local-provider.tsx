@@ -14,7 +14,6 @@ import {
   type Locale,
   normalizeLocale,
 } from "@/i18n/request";
-import { ROUTES } from "@/constants/AppRoutes/routes";
 
 // ---------------- Context ----------------
 interface LocaleContextType {
@@ -31,28 +30,13 @@ function getStoredLocale(): Locale {
   if (typeof window === "undefined") return defaultLocale;
 
   try {
+    // localStorage
     const stored = localStorage.getItem("locale");
-    const expiryStr = localStorage.getItem("locale_expiry");
-    const expiry = expiryStr ? parseInt(expiryStr, 10) : 0;
-
-    if (!stored || Date.now() > expiry) {
-      // Expired → remove localStorage and redirect to login
-      localStorage.removeItem("locale");
-      localStorage.removeItem("locale_expiry");
-
-      // Optionally, remove cookie too
-      document.cookie = "locale=; path=/; max-age=0";
-
-      // Redirect
-      window.location.href = ROUTES.AUTH.LOGIN;
-      return defaultLocale;
-    }
-
-    if (locales.includes(normalizeLocale(stored) as Locale)) {
+    if (stored && locales.includes(normalizeLocale(stored) as Locale)) {
       return normalizeLocale(stored);
     }
 
-    // Fallback to cookie if localStorage missing
+    // cookies
     const cookieMatch = document.cookie.match(/locale=([^;]+)/);
     if (
       cookieMatch &&
