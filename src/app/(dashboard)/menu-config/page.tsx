@@ -1,6 +1,7 @@
 "use client";
+export const dynamic = "force-dynamic";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, Suspense } from "react";
 import {
   Card,
   CardContent,
@@ -57,8 +58,9 @@ import { usePagination } from "@/hooks/use-pagination";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { useSearchParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import Loading from "@/components/shared/common/loading";
 
-export default function MenuConfigPage() {
+function MenuConfigContent() {
   const [menus, setMenus] = useState<AllMenuResponseDto | null>(null);
   const [allMenusForModal, setAllMenusForModal] = useState<MenuItemDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -229,6 +231,7 @@ export default function MenuConfigPage() {
   };
 
   return (
+
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">
@@ -349,7 +352,10 @@ export default function MenuConfigPage() {
                           <TableCell className="text-right">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                <Button
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0"
+                                >
                                   <span className="sr-only">Open menu</span>
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
@@ -425,5 +431,14 @@ export default function MenuConfigPage() {
         confirmLabel="Delete"
       />
     </div>
+
+  );
+}
+
+export default function MenuConfigPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <MenuConfigContent />
+    </Suspense>
   );
 }
