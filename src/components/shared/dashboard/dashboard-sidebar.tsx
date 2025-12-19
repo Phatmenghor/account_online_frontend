@@ -62,7 +62,6 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
         // Map API response to UI structure
         const mappedMenus = menuResponse.map((item) => mapMenuItem(item));
         setMenuItems(mappedMenus);
-
       } catch (error) {
         console.error("Failed to load data", error);
       } finally {
@@ -79,35 +78,35 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
       title: item.title,
       href: item.href || "#",
       icon: getIconComponent(item.icon),
-      subItems: item.children && item.children.length > 0
-        ? item.children.map(child => mapMenuItem(child))
-        : undefined
+      subItems:
+        item.children && item.children.length > 0
+          ? item.children.map((child) => mapMenuItem(child))
+          : undefined,
     };
   };
 
   // Initialize submenus as open if they contain active route
   useEffect(() => {
-    if (!hasInitialized.current && menuItems.length > 0) {
-      const initialOpenState: Record<string, boolean> = {};
+    if (menuItems.length === 0) return;
 
-      const checkActive = (items: any[]) => {
-        items.forEach((item) => {
-          if (item.subItems) {
-            // Check if any child is active
-            const isActive = item.subItems.some((sub: any) => sub.href === pathname);
-            if (isActive) {
-              initialOpenState[item.title] = true;
-            }
-            // Recursively check
-            checkActive(item.subItems);
-          }
-        });
-      };
+    const initialOpenState: Record<string, boolean> = {};
 
-      checkActive(menuItems);
-      setOpenSubmenus(initialOpenState);
-      hasInitialized.current = true;
-    }
+    const checkActive = (items: any[], parentTitle?: string) => {
+      items.forEach((item) => {
+        if (item.subItems) {
+          // Recursively check children
+          checkActive(item.subItems, item.title);
+        }
+
+        // If the current item matches the pathname, open its parent submenu
+        if (item.href && pathname.startsWith(item.href) && parentTitle) {
+          initialOpenState[parentTitle] = true;
+        }
+      });
+    };
+
+    checkActive(menuItems);
+    setOpenSubmenus((prev) => ({ ...prev, ...initialOpenState }));
   }, [menuItems, pathname]);
 
   // Hide sidebar on mobile
@@ -234,7 +233,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
                               className={cn(
                                 "flex h-8 items-center rounded-md px-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
                                 pathname === sub.href &&
-                                "bg-accent text-accent-foreground font-medium"
+                                  "bg-accent text-accent-foreground font-medium"
                               )}
                             >
                               {sub.title}
@@ -250,7 +249,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
                       className={cn(
                         "flex h-9 w-full items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors group relative",
                         pathname === item.href &&
-                        "bg-accent text-accent-foreground",
+                          "bg-accent text-accent-foreground",
                         !isOpen && "justify-center"
                       )}
                     >
@@ -293,4 +292,3 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
     </>
   );
 }
-
