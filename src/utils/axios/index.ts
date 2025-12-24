@@ -4,8 +4,9 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
-import { getToken } from "../local-storage/token";
+import { getToken, logoutToken, storeRefreshToken, storeToken } from "../local-storage/token";
 import { toast } from "sonner";
+import { refreshTokenService } from "@/services/auth/refresh-token.service";
 
 // Define types
 type RequestMetadata = {
@@ -44,9 +45,9 @@ const formatTimestamp = (): string => {
       .getMinutes()
       .toString()
       .padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}.${now
-      .getMilliseconds()
-      .toString()
-      .padStart(3, "0")}]`
+        .getMilliseconds()
+        .toString()
+        .padStart(3, "0")}]`
   );
 };
 
@@ -156,8 +157,8 @@ const logger = {
             const valueType = Array.isArray(value)
               ? `Array[${(value as []).length}]`
               : value && typeof value === "object"
-              ? "Object"
-              : typeof value;
+                ? "Object"
+                : typeof value;
             console.log(`%c${key}: ${valueType}`, colors.cyan, value);
           }
         );
@@ -235,9 +236,8 @@ const formatRequestData = (data: unknown): unknown => {
           if (Array.isArray(value)) {
             propertyTypes[key] = `Array[${value.length}]`;
           } else if (value && typeof value === "object") {
-            propertyTypes[key] = `Object{${
-              Object.keys(value as object).length
-            } props}`;
+            propertyTypes[key] = `Object{${Object.keys(value as object).length
+              } props}`;
           } else {
             propertyTypes[key] = typeof value;
           }
@@ -353,8 +353,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
           ["post", "put", "patch"].includes(config.method.toLowerCase())
         ) {
           logger.warn(
-            `Empty request body for ${config.method.toUpperCase()} ${
-              config.url
+            `Empty request body for ${config.method.toUpperCase()} ${config.url
             }`,
             undefined,
             requestId
@@ -386,8 +385,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
 
       // Log status and duration with request ID
       logger.success(
-        `Response: ${response.config.method?.toUpperCase()} ${
-          response.config.url
+        `Response: ${response.config.method?.toUpperCase()} ${response.config.url
         }`,
         {
           status: response.status,
@@ -425,9 +423,8 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
             });
 
             if (Object.keys(response.data).length > 5) {
-              preview["..."] = `${
-                Object.keys(response.data).length - 5
-              } more properties`;
+              preview["..."] = `${Object.keys(response.data).length - 5
+                } more properties`;
             }
 
             logger.log(`Object data preview:`, preview, requestId);
@@ -439,13 +436,35 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
 
       return response;
     },
-    (error: unknown) => {
+    async (error: unknown) => {
       const err = error as AxiosError;
 
-      // if (err.response?.status === 401) {
-      //   toast.message(err.message);
-      //   window.location.href = "/login";
-      // }
+      const originalRequest = err.config as InternalAxiosRequestConfig & {
+        _retry?: boolean;
+      };
+
+      if (err.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+
+        try {
+          const newData = await refreshTokenService();
+          if (newData) {
+            storeToken(newData.accessToken);
+            storeRefreshToken(newData.refreshToken);
+
+            // Update header for the retry
+            originalRequest.headers[
+              "Authorization"
+            ] = `Bearer ${newData.accessToken}`;
+
+            return axiosInstance(originalRequest);
+          }
+        } catch (refreshError) {
+          logoutToken();
+          window.location.href = "/login";
+          return Promise.reject(refreshError);
+        }
+      }
       // Get request ID from metadata
       const requestId = err.config?.metadata?.requestId || "unknown";
 

@@ -3,7 +3,7 @@ import { UpdateUserReq } from "@/models/user/user.request";
 import { axiosClient } from "@/utils/axios";
 import { storePermission } from "@/utils/local-storage/permission";
 import { storeRole } from "@/utils/local-storage/roles";
-import { getToken, storeToken } from "@/utils/local-storage/token";
+import { getToken, storeRefreshToken, storeToken } from "@/utils/local-storage/token";
 import { storeUserInfo } from "@/utils/local-storage/userInfo";
 
 export async function loginService(credentials: LoginCredentials) {
@@ -13,6 +13,7 @@ export async function loginService(credentials: LoginCredentials) {
 
     // On success, store token and role (simulate your original behavior)
     storeToken(response.data.data.accessToken);
+    storeRefreshToken(response.data.data.refreshToken);
     storeRole(response.data.data.userRole.userRole);
     storeUserInfo(response.data.data.userRole);
     storePermission(response?.data?.userRole?.userPermission);

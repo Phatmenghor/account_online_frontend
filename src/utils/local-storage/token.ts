@@ -21,12 +21,25 @@ export function storeToken(token: string | undefined): void {
   setCookie("auth-token", token);
 }
 
+export function storeRefreshToken(token: string | undefined): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+  setCookie("refresh-token", token);
+}
+
+export function getRefreshToken() {
+  const token = getCookie("refresh-token");
+  return token;
+}
+
 /**
  * Logout the current user
  */
 export function logoutToken(): void {
   // Delete auth cookie
   deleteCookie("auth-token");
+  deleteCookie("refresh-token");
 }
 
 /**

@@ -91,18 +91,52 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
 
     const initialOpenState: Record<string, boolean> = {};
 
-    const checkActive = (items: any[], parentTitle?: string) => {
+    const normalizePath = (path: string) => {
+      if (!path) return "";
+      let p = path;
+      if (!p.startsWith("/")) p = "/" + p;
+      if (p.endsWith("/")) p = p.slice(0, -1);
+      return p.toLowerCase();
+    };
+
+    const checkActive = (items: any[]): boolean => {
+      let anyChildActive = false;
+
       items.forEach((item) => {
-        if (item.subItems) {
-          // Recursively check children
-          checkActive(item.subItems, item.title);
+        let isActivePath = false;
+
+        // 1. Check if Self is Active (Exact or SubRoute)
+        const href = item.href;
+        if (href && href !== "#") {
+          const normalizedPath = normalizePath(pathname);
+          const normalizedHref = normalizePath(href);
+
+          const isExactMatch = normalizedPath === normalizedHref;
+          const isSubRoute = normalizedPath.startsWith(normalizedHref + "/");
+          if (isExactMatch || isSubRoute) {
+            isActivePath = true;
+          }
         }
 
-        // If the current item matches the pathname, open its parent submenu
-        if (item.href && pathname.startsWith(item.href) && parentTitle) {
-          initialOpenState[parentTitle] = true;
+        // 2. Check Children Logic
+        if (item.subItems && item.subItems.length > 0) {
+          const childActive = checkActive(item.subItems);
+          if (childActive) {
+            isActivePath = true;
+          }
+
+          // If I am active (via self OR child), and I have subitems -> OPEN ME
+          if (isActivePath) {
+            initialOpenState[item.title] = true;
+          }
+        }
+
+        if (isActivePath) {
+          anyChildActive = true;
         }
       });
+
+      return anyChildActive;
     };
 
     checkActive(menuItems);
@@ -233,7 +267,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
                               className={cn(
                                 "flex h-8 items-center rounded-md px-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
                                 pathname === sub.href &&
-                                  "bg-accent text-accent-foreground font-medium"
+                                "bg-accent text-accent-foreground font-medium"
                               )}
                             >
                               {sub.title}
@@ -249,7 +283,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
                       className={cn(
                         "flex h-9 w-full items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors group relative",
                         pathname === item.href &&
-                          "bg-accent text-accent-foreground",
+                        "bg-accent text-accent-foreground",
                         !isOpen && "justify-center"
                       )}
                     >

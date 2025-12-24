@@ -16,12 +16,17 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (!token) {
+  // Redirect root to dashboard or login
+  if (pathname === "/") {
+    if (token) {
+      return NextResponse.redirect(new URL(ROUTES.DASHBOARD.INDEX, req.url));
+    }
     return NextResponse.redirect(new URL(ROUTES.AUTH.LOGIN, req.url));
   }
 
-  if (pathname === "/") {
-    return NextResponse.redirect(new URL("/", req.url));
+  // Protect all other routes
+  if (!token) {
+    return NextResponse.redirect(new URL(ROUTES.AUTH.LOGIN, req.url));
   }
 
   console.log("Proceeding normally...");
