@@ -231,8 +231,9 @@ export default function OpenAccountPage() {
     (value: string) => {
       setPhoneNumber(value);
       validateField("phoneNumber", value);
+      setIsVerified(false);
     },
-    [setPhoneNumber, validateField]
+    [setPhoneNumber, validateField, setIsVerified]
   );
 
   const handleVerificationSuccess = useCallback(() => {
@@ -258,6 +259,24 @@ export default function OpenAccountPage() {
     setStaffCode,
     setIsVerified,
   ]);
+
+  // Wrapper for input changes to reset verification
+  const handleInputChangeWrapper = useCallback(
+    (field: any, value: string) => {
+      handleInputChange(field, value);
+      setIsVerified(false);
+    },
+    [handleInputChange, setIsVerified]
+  );
+
+  // Wrapper for master data changes
+  const handleMasterDataChange = useCallback(
+    (setter: any, value: any) => {
+      setter(value);
+      setIsVerified(false);
+    },
+    [setIsVerified]
+  );
 
   const handleSuccessModalClose = useCallback(() => {
     setShowSuccessModal(false);
@@ -319,35 +338,50 @@ export default function OpenAccountPage() {
 
                 <PersonalDetailsFields
                   formData={formData}
-                  handleInputChange={handleInputChange}
+                  handleInputChange={handleInputChangeWrapper}
                   datePickerKey={datePickerKey}
                   legalTypes={legalTypes}
                   selectedLegalType={selectedLegalType}
-                  setSelectedLegalType={setSelectedLegalType}
+                  setSelectedLegalType={(val) =>
+                    handleMasterDataChange(setSelectedLegalType, val)
+                  }
                   isLegalTypeLoading={isLegalTypeLoading}
                   getLegalTypeName={getLegalTypeName}
+                  isVerified={isVerified}
                 />
 
                 <MasterDataFields
                   maritalStatuses={maritalStatuses}
                   selectedMaritalStatus={selectedMaritalStatus}
-                  setSelectedMaritalStatus={setSelectedMaritalStatus}
+                  setSelectedMaritalStatus={(val) =>
+                    handleMasterDataChange(setSelectedMaritalStatus, val)
+                  }
                   isLoadingMarital={isLoadingMarital}
                   getMaritalName={getMaritalName}
                   occupations={occupations}
                   selectedOccupation={selectedOccupation}
-                  setSelectedOccupation={setSelectedOccupation}
+                  setSelectedOccupation={(val) =>
+                    handleMasterDataChange(setSelectedOccupation, val)
+                  }
                   isLoadingOccupations={isLoadingOccupations}
                   getOccupationName={getOccupationName}
                   referenceBanks={referenceBanks}
                   selectedReferenceBank={selectedReferenceBank}
-                  setSelectedReferenceBank={setSelectedReferenceBank}
+                  setSelectedReferenceBank={(val) =>
+                    handleMasterDataChange(setSelectedReferenceBank, val)
+                  }
                   isLoadingReferenceBanks={isLoadingReferenceBanks}
                   getReferenceName={getReferenceName}
                   selectedBranch={selectedBranch}
-                  onBranchChange={onBranchChange}
+                  onBranchChange={(val) => {
+                    onBranchChange(val);
+                    setIsVerified(false);
+                  }}
                   staffCode={staffCode}
-                  setStaffCode={setStaffCode}
+                  setStaffCode={(val) =>
+                    handleMasterDataChange(setStaffCode, val)
+                  }
+                  isVerified={isVerified}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
