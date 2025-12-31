@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -44,6 +45,14 @@ export const PersonalDetailsFields: React.FC<PersonalDetailsFieldsProps> = ({
     translateSelect,
     validateField,
   } = useFormState();
+
+  useEffect(() => {
+    if (!selectedLegalType && legalTypes.length > 0) {
+      setSelectedLegalType(legalTypes[0]);
+      validateField("legalType", legalTypes[0].id.toString());
+    }
+  }, [legalTypes, selectedLegalType]);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* First Name (KH) */}
