@@ -140,10 +140,13 @@ export const useAccountSubmission = ({
       const errorMessage =
         error?.errorMessage ||
         error?.message ||
+        error?.rawError?.message ||
         "Failed to create account. Please try again.";
 
+      const isConflict = error?.rawError?.status === 409 || error?.status === 409;
+
       // Check for ACCOUNT_ALREADY_EXIST
-      if (errorMessage.includes("ACCOUNT_ALREADY_EXIST")) {
+      if (errorMessage.includes("ACCOUNT_ALREADY_EXIST") || isConflict) {
         setSubmitErrorData({
           title: translate("account_exists_title") || "Account Already Exists",
           message: translate("account_exists_message") || "You already have an account with the bank. Please use your existing account.",
