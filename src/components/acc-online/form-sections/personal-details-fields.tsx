@@ -25,6 +25,7 @@ interface PersonalDetailsFieldsProps {
   isLegalTypeLoading: boolean;
   getLegalTypeName: (item: LegalTypeModel) => string;
   isVerified?: boolean;
+  isNidExtracted?: boolean;
 }
 
 export const PersonalDetailsFields: React.FC<PersonalDetailsFieldsProps> = ({
@@ -37,6 +38,7 @@ export const PersonalDetailsFields: React.FC<PersonalDetailsFieldsProps> = ({
   isLegalTypeLoading,
   getLegalTypeName,
   isVerified = false,
+  isNidExtracted = false,
 }) => {
   // Get values from FormStateContext
   const {
@@ -264,7 +266,7 @@ export const PersonalDetailsFields: React.FC<PersonalDetailsFieldsProps> = ({
             onChange={(e) => handleInputChange("idNumber", e.target.value)}
             className={`w-full h-10 text-sm ${validationErrors.idNumber ? "border-red-500" : ""
               }`}
-            disabled={isLoading || isValidating || isSubmitting}
+            disabled={isLoading || isValidating || isSubmitting || isNidExtracted}
           />
           {renderVerifiedIcon()}
         </div>

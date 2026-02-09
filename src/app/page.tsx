@@ -348,6 +348,7 @@ export default function OpenAccountPage() {
                   isLegalTypeLoading={isLegalTypeLoading}
                   getLegalTypeName={getLegalTypeName}
                   isVerified={isVerified}
+                  isNidExtracted={!!uploadedImage}
                 />
 
                 <MasterDataFields
