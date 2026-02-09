@@ -35,6 +35,11 @@ const nextConfig = {
   // Improve performance
   swcMinify: true,
 
+  // Remove console logs in production
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
+
   // Configure headers for better performance
   async headers() {
     return [
