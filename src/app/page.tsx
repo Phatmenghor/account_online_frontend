@@ -399,13 +399,18 @@ export default function OpenAccountPage() {
 
                 <div className="flex justify-center md:justify-end gap-4 mt-8">
                   <Button
-                    className="w-full md:w-auto px-5 py-2.5 bg-orange-400 hover:bg-orange-500 text-white rounded-sm shadow-md transition-shadow duration-200"
+                    className="w-full md:w-auto px-5 py-2.5 bg-orange-400 hover:bg-orange-500 text-white rounded-sm shadow-md flex items-center gap-2"
                     onClick={handleVerificationClick}
                     disabled={isLoading || isValidating || isVerified}
                   >
-                    {isValidating
-                      ? translate("processing")
-                      : translate("verification")}
+                    {isValidating ? (
+                      <>
+                        {translate("processing")}
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      </>
+                    ) : (
+                      translate("verification")
+                    )}
                   </Button>
 
                   <Button

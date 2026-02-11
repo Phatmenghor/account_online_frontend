@@ -171,7 +171,7 @@
     "otp6Digit": "Enter 6-digit OTP",
     "chooseOne": "--- Choose one ---",
     "loading": "Loading...",
-    "processing": "Processing...",
+    "processing": "Processing",
     "verification": "Verification",
     "submit": "Submit",
     "submitting": "Submitting",
