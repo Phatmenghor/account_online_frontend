@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserModel } from "@/models/user/user.response";
+import { getRoleDisplayName } from "@/utils/role-display";
 
 interface UserViewModalProps {
   user?: UserModel;
@@ -95,7 +96,7 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
 
               <Badge className={getRoleColor(user?.userRole ?? "")}>
                 {getRoleIcon(user?.userRole ?? "")}
-                <span className="ml-1">{user?.userRole || "USER"}</span>
+                <span className="ml-1">{getRoleDisplayName(user?.userRole || "USER")}</span>
               </Badge>
             </div>
           </div>
@@ -170,7 +171,7 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                       </Label>
                       <div className="flex items-center gap-2">
                         <span className="text-sm">
-                          {user?.userRole || "USER"}
+                          {getRoleDisplayName(user?.userRole || "USER")}
                         </span>
                       </div>
                     </div>
@@ -180,7 +181,7 @@ export function UserViewModal({ user, isOpen, onClose }: UserViewModalProps) {
                         Access Level:
                       </Label>
                       <span className="text-sm flex items-center gap-2">
-                        {user.userRole === "SUPER" ? (
+                        {user.userRole === "BUSINESS" ? (
                           <>Full Access</>
                         ) : (
                           <>Limited Access</>

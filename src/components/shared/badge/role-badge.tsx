@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Crown, Shield, User } from "lucide-react";
+import { getRoleDisplayName } from "@/utils/role-display";
 
 interface RoleBadgeProps {
   role: string;
@@ -61,7 +62,7 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({ role }) => {
         ${config.hoverBg} ${config.hoverText} ${config.hoverBorder}`}
     >
       <Icon className="h-3 w-3 mr-1" />
-      {role}
+      {getRoleDisplayName(role)}
     </Badge>
   );
 };

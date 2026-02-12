@@ -5,5 +5,5 @@ export enum UserPermission {
 
 export enum Role {
   COMPLIANCE = "COMPLIANCE",
-  SUPER = "SUPER",
+  BUSINESS = "BUSINESS",
 }

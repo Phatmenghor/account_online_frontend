@@ -1,5 +1,5 @@
 export enum RoleEnum {
-    SUPER = "SUPER",
+    BUSINESS = "BUSINESS",
     COMPLIANCE = "COMPLIANCE",
     DEVELOPER = "DEVELOPER",
 }

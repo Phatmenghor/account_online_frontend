@@ -1,13 +1,13 @@
 //EXample Roles
 export enum UserRole {
   DEVELOPER = "DEVELOPER",
-  SUPER = "SUPER",
+  BUSINESS = "BUSINESS",
   ADMIN = "ADMIN",
 }
 
 export const rolePriority: Record<UserRole, number> = {
   [UserRole.DEVELOPER]: 3,
-  [UserRole.SUPER]: 2,
+  [UserRole.BUSINESS]: 2,
   [UserRole.ADMIN]: 1,
 };
 
@@ -16,7 +16,7 @@ export const rolePriority: Record<UserRole, number> = {
  */
 export function canPerformGeneralAction(
   currentRole: UserRole,
-  targetRole: UserRole
+  targetRole: UserRole,
 ): boolean {
   return rolePriority[currentRole] >= rolePriority[targetRole];
 }
@@ -27,7 +27,7 @@ export function canPerformGeneralAction(
  */
 export function canPerformPrivilegedAction(
   currentRole: UserRole,
-  targetRole: UserRole
+  targetRole: UserRole,
 ): boolean {
   if (currentRole === UserRole.DEVELOPER) {
     return rolePriority[currentRole] > rolePriority[targetRole];

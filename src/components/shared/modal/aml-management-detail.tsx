@@ -36,6 +36,7 @@ import { AmlManagementModel } from "@/models/aml/management/response/aml-managem
 import { getAmlManagementByIdService } from "@/services/dashboard/aml/aml-management.service";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
 import AmlStatusBadge from "../badge/aml-badge";
+import { getRoleDisplayName } from "@/utils/role-display";
 
 interface AmlAlertViewModalProps {
   alert?: AmlManagementModel;
@@ -200,7 +201,7 @@ export default function AmlViewDetailModal({
                     value={alert.placeOfBirthName}
                     icon={<MapPin />}
                   />
-                  ``
+
                   <InfoRow
                     label="Place of Birth Code"
                     value={alert.placeOfBirthCode}
@@ -379,7 +380,7 @@ function UserInfoRows({ data }: { data: any }) {
     <>
       <InfoRow label="Full Name" value={data.fullName} icon={<User />} />
       <InfoRow label="Email" value={data.email} icon={<Tag />} />
-      <InfoRow label="Role" value={data.userRole} icon={<Tag />} />
+      <InfoRow label="Role" value={getRoleDisplayName(data.userRole)} icon={<Tag />} />
       <InfoRow label="Position" value={data.position} icon={<Tag />} />
       <InfoRow
         label="Permission"

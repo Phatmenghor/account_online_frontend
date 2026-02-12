@@ -36,6 +36,7 @@ import { HistoryModel } from "@/models/aml/history/response/history-response.mod
 import { getAmlHistoryByIdService } from "@/services/dashboard/aml/aml-history.service";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
 import AmlStatusBadge from "../badge/aml-badge";
+import { getRoleDisplayName } from "@/utils/role-display";
 
 interface HistoryDetailModalProps {
   history?: HistoryModel;
@@ -366,7 +367,7 @@ function UserInfoRows({ data }: { data: any }) {
     <>
       <InfoRow label="Full Name" value={data.fullName} icon={<User />} />
       <InfoRow label="Email" value={data.email} icon={<Tag />} />
-      <InfoRow label="Role" value={data.userRole} icon={<Tag />} />
+      <InfoRow label="Role" value={getRoleDisplayName(data.userRole)} icon={<Tag />} />
       <InfoRow label="Position" value={data.position} icon={<Tag />} />
       <InfoRow
         label="Permission"

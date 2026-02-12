@@ -28,7 +28,7 @@ interface userTableOptions {
 
 const ROLE_POWER: Record<string, number> = {
   ADMIN: 1,
-  SUPER: 2,
+  BUSINESS: 2,
   DEVELOPER: 3,
 };
 
@@ -49,8 +49,8 @@ function canDelete(
   // ADMIN cannot delete anyone
   if (curRole === "ADMIN") return false;
 
-  // SUPER user rules
-  if (curRole === "SUPER") {
+  // BUSINESS user rules
+  if (curRole === "BUSINESS") {
     return tarRole === "ADMIN"; // only delete ADMIN
   }
 
@@ -59,7 +59,7 @@ function canDelete(
     if (currentUser.email === "phatmenghor19@gmail.com") {
       return true; // can delete anyone except self
     }
-    // other developers: can delete only SUPER and ADMIN
+    // other developers: can delete only BUSINESS and ADMIN
     return ROLE_POWER[tarRole] < ROLE_POWER["DEVELOPER"];
   }
 
@@ -176,7 +176,7 @@ export const createUserTableColumns = ({
         <div className="flex items-center gap-2">
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild> 
+              <TooltipTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
