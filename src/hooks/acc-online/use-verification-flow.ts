@@ -38,6 +38,7 @@ interface UseVerificationFlowProps {
   selectedOccupation: OccupationModel | null;
   selectedReferenceBank: ReferenceModel | null;
   selectedLegalType: LegalTypeModel | null;
+  phoneNumber: string;
 }
 
 export const useVerificationFlow = ({
@@ -50,6 +51,7 @@ export const useVerificationFlow = ({
   selectedOccupation,
   selectedReferenceBank,
   selectedLegalType,
+  phoneNumber,
 }: UseVerificationFlowProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
@@ -165,6 +167,7 @@ export const useVerificationFlow = ({
         MRZ1: formData.MRZ1,
         MRZ2: formData.MRZ2,
         MRZ3: formData.MRZ3,
+        phoneNumber: phoneNumber,
       };
 
       const response = await validateNIDService(validationData);
@@ -199,71 +202,6 @@ export const useVerificationFlow = ({
       setIsValidating(false);
     }
   };
-
-  //Mock validate nid
-
-  // const handleValidateNID = async (
-  //   setShowLocationModal: (show: boolean) => void,
-  //   setShowErrorModal: (show: boolean) => void,
-  //   setValidationResult: (result: any) => void,
-  //   setShowValidationErrorModal: (show: boolean) => void,
-  //   setValidationErrorData: (data: any) => void
-  // ) => {
-  //   setIsValidating(true);
-
-  //   try {
-  //     // Mock request payload (still useful for debugging)
-  //     const validationData: RequestValidModel = {
-  //       applicationName: "ACCOUNT_ONLINE",
-  //       idNumber: formData.idNumber,
-  //       lastNameKh: formData.lastNameKh,
-  //       firstNameKh: formData.firstNameKh,
-  //       lastNameEn: formData.lastNameEn,
-  //       firstNameEn: formData.firstNameEn,
-  //       dob: formatDate(formData.dob),
-  //       gender: convertGenderForAPI(formData.gender),
-  //       expiredDate: formatDate(formData.expiredDate),
-  //       issuedDate: formatDate(formData.issuedDate),
-  //       address: formData.address,
-  //       pob: formData.pob,
-  //       MRZ1: formData.MRZ1,
-  //       MRZ2: formData.MRZ2,
-  //       MRZ3: formData.MRZ3,
-  //     };
-
-  //     console.log("MOCK NID VALIDATION PAYLOAD:", validationData);
-
-  //     // ---- MOCK SERVICE RESPONSE (SIMULATION) ----
-  //     const mockResponse = {
-  //       data: {
-  //         incorrectFields: [], // change to simulate errors: ["idNumber", "dob"]
-  //         status: "SUCCESS",
-  //         message: "Mock NID validation successful",
-  //       },
-  //     };
-
-  //     // Simulate network delay
-  //     await new Promise((resolve) => setTimeout(resolve, 500));
-
-  //     setValidationResult(mockResponse);
-
-  //     const incorrectFields = mockResponse.data.incorrectFields;
-
-  //     if (incorrectFields.length > 0) {
-  //       setShowErrorModal(true);
-  //     } else {
-  //       setShowLocationModal(true);
-  //     }
-  //   } catch (err: any) {
-  //     setValidationErrorData({
-  //       title: translate("valid_fail"),
-  //       description: "Mock service error — validation aborted.",
-  //     });
-  //     setShowValidationErrorModal(true);
-  //   } finally {
-  //     setIsValidating(false);
-  //   }
-  // };
 
   const handleOpenConfirmModal = (
     uploadedImageData: string,

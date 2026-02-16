@@ -23,5 +23,7 @@ export interface RequestValidModel {
   pob: string;
   MRZ1: string;
   MRZ2: string;
+
   MRZ3: string;
+  phoneNumber?: string;
 }

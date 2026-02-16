@@ -147,6 +147,7 @@ export default function OpenAccountPage() {
     selectedOccupation,
     selectedReferenceBank,
     selectedLegalType,
+    phoneNumber,
   });
 
   const {
