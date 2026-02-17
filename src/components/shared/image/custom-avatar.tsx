@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { useState, useRef } from "react";
 
 interface CustomerAvatarProps {
-  imageUrl?: string;
+  imageUrl: string;
   name?: string;
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
@@ -82,7 +82,7 @@ export const CustomAvatar: React.FC<CustomerAvatarProps> = ({
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <AvatarImage src={logoUrl || ""} alt={name || "Avatar"} />
+          <AvatarImage src={logoUrl} alt={name || "Avatar"} />
           <AvatarFallback className="bg-primary/10 text-primary font-semibold">
             {fallbackText}
           </AvatarFallback>

@@ -67,10 +67,10 @@ const LocationModal = ({
   const [selectedDistrict, setSelectedDistrict] =
     useState<DistrictModel | null>(null);
   const [selectedCommune, setSelectedCommune] = useState<CommuneModel | null>(
-    null
+    null,
   );
   const [selectedVillage, setSelectedVillage] = useState<VillageModel | null>(
-    null
+    null,
   );
 
   // Second section (Place of Birth)
@@ -86,24 +86,24 @@ const LocationModal = ({
   // Fetch data for FIRST SECTION (Current Address)
   const { data: provinces, isLoading: isLoadingProvinces } = useProvinces();
   const { data: districts, isLoading: isLoadingDistricts } = useDistricts(
-    selectedProvince?.provinceCode || ""
+    selectedProvince?.provinceCode || "",
   );
   const { data: communes, isLoading: isLoadingCommunes } = useCommunes(
-    selectedDistrict?.districtCode || ""
+    selectedDistrict?.districtCode || "",
   );
   const { data: villages, isLoading: isLoadingVillages } = useVillages(
-    selectedCommune?.communeCode || ""
+    selectedCommune?.communeCode || "",
   );
 
   // Fetch data for SECOND SECTION (Place of Birth)
   const { data: pobDistricts, isLoading: isLoadingPobDistricts } = useDistricts(
-    pobProvince?.provinceCode || ""
+    pobProvince?.provinceCode || "",
   );
   const { data: pobCommunes, isLoading: isLoadingPobCommunes } = useCommunes(
-    pobDistrict?.districtCode || ""
+    pobDistrict?.districtCode || "",
   );
   const { data: pobVillages, isLoading: isLoadingPobVillages } = useVillages(
-    pobCommune?.communeCode || ""
+    pobCommune?.communeCode || "",
   );
 
   // Reset state when modal opens + lock body scroll so Radix Popover
@@ -132,7 +132,7 @@ const LocationModal = ({
   const validateField = (
     section: "currentAddress" | "placeOfBirth",
     field: string,
-    value: string
+    value: string,
   ) => {
     const fieldPath = `${section}.${field}`;
 
@@ -215,7 +215,7 @@ const LocationModal = ({
             validateField(
               "currentAddress",
               "province",
-              addressData.province.provinceCode
+              addressData.province.provinceCode,
             );
           }
 
@@ -231,7 +231,7 @@ const LocationModal = ({
             validateField(
               "currentAddress",
               "district",
-              addressData.district.districtCode
+              addressData.district.districtCode,
             );
           }
 
@@ -247,7 +247,7 @@ const LocationModal = ({
             validateField(
               "currentAddress",
               "commune",
-              addressData.commune.communeCode
+              addressData.commune.communeCode,
             );
           }
 
@@ -263,7 +263,7 @@ const LocationModal = ({
             validateField(
               "currentAddress",
               "village",
-              addressData.village.villageCode
+              addressData.village.villageCode,
             );
           }
         } catch (error: any) {
@@ -298,7 +298,7 @@ const LocationModal = ({
             validateField(
               "placeOfBirth",
               "province",
-              pobData.province.provinceCode
+              pobData.province.provinceCode,
             );
           }
 
@@ -307,7 +307,7 @@ const LocationModal = ({
             validateField(
               "placeOfBirth",
               "district",
-              pobData.district.districtCode
+              pobData.district.districtCode,
             );
           }
 
@@ -316,7 +316,7 @@ const LocationModal = ({
             validateField(
               "placeOfBirth",
               "commune",
-              pobData.commune.communeCode
+              pobData.commune.communeCode,
             );
           }
 
@@ -325,7 +325,7 @@ const LocationModal = ({
             validateField(
               "placeOfBirth",
               "village",
-              pobData.village.villageCode
+              pobData.village.villageCode,
             );
           }
         } catch (error: any) {
@@ -506,7 +506,10 @@ const LocationModal = ({
             <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100 flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
-                  <MapPin style={{ width: 18, height: 18 }} className="text-white" />
+                  <MapPin
+                    style={{ width: 18, height: 18 }}
+                    className="text-white"
+                  />
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-bold text-gray-800 leading-tight">
@@ -544,7 +547,6 @@ const LocationModal = ({
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 py-4 space-y-5">
-
               {/* === SECTION 1: Current Address === */}
               <div className="bg-orange-50/50 border border-orange-100 rounded-2xl p-4 sm:p-5">
                 <div className="flex items-center gap-2.5 mb-4">
@@ -821,16 +823,16 @@ const LocationModal = ({
             </div>
 
             {/* Footer Buttons */}
-            <div className="flex gap-3 px-4 sm:px-6 py-4 bg-gray-50/80 border-t border-gray-100 rounded-b-none sm:rounded-b-2xl flex-shrink-0">
+            <div className="flex justify-end gap-3 px-4 sm:px-6 py-4 bg-gray-50/80 border-t border-gray-100 rounded-b-none sm:rounded-b-2xl flex-shrink-0">
               <Button
                 onClick={onClose}
-                className="flex-1 sm:flex-none sm:px-6 py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+                className="sm:px-6 py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
               >
                 {translate("close")}
               </Button>
               <Button
                 onClick={handleSubmit}
-                className="flex-1 sm:flex-none sm:px-8 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-lg transition-all shadow-sm"
+                className="sm:px-8 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-lg transition-all shadow-sm"
               >
                 {translate("submit")}
               </Button>
