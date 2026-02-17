@@ -489,17 +489,17 @@ const LocationModal = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 80 }}
             transition={{ type: "spring", damping: 28, stiffness: 300 }}
-            className="relative bg-white w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-2xl shadow-2xl z-10 flex flex-col"
+            className="relative bg-white w-full sm:max-w-2xl lg:max-w-3xl rounded-t-lg sm:rounded-lg shadow-2xl z-10 flex flex-col"
             style={{ maxHeight: "92vh" }}
           >
-            {/* Blue top accent bar */}
-            <div className="h-1.5 w-full bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 flex-shrink-0 rounded-t-3xl sm:rounded-t-2xl" />
+            {/* Orange top accent bar */}
+            <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500 flex-shrink-0 rounded-t-lg sm:rounded-t-lg" />
 
             {/* Header */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100 flex-shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-200 flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-white" />
+                <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+                  <MapPin style={{ width: 18, height: 18 }} className="text-white" />
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-bold text-gray-800 leading-tight">
@@ -512,7 +512,7 @@ const LocationModal = ({
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all flex-shrink-0"
+                className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-all flex-shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -525,10 +525,10 @@ const LocationModal = ({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="flex items-center gap-2 px-4 sm:px-6 py-2.5 bg-blue-50 border-b border-blue-100 flex-shrink-0"
+                  className="flex items-center gap-2 px-4 sm:px-6 py-2.5 bg-orange-50 border-b border-orange-100 flex-shrink-0"
                 >
-                  <Loader2 className="w-4 h-4 animate-spin text-blue-500 flex-shrink-0" />
-                  <span className="text-xs sm:text-sm text-blue-600 font-medium">
+                  <Loader2 className="w-4 h-4 animate-spin text-orange-500 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm text-orange-600 font-medium">
                     {translate("loading")}
                   </span>
                 </motion.div>
@@ -539,9 +539,9 @@ const LocationModal = ({
             <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-5">
 
               {/* === SECTION 1: Current Address === */}
-              <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 sm:p-5">
+              <div className="bg-orange-50/50 border border-orange-100 rounded-lg p-4 sm:p-5">
                 <div className="flex items-center gap-2.5 mb-4">
-                  <div className="w-7 h-7 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-7 h-7 bg-gradient-to-br from-orange-400 to-orange-600 rounded flex items-center justify-center flex-shrink-0">
                     <Home className="w-3.5 h-3.5 text-white" />
                   </div>
                   <h3 className="text-sm sm:text-base font-bold text-gray-700">
@@ -563,7 +563,7 @@ const LocationModal = ({
                     <div
                       className={
                         validationErrors["currentAddress.province"]
-                          ? "rounded-lg border border-red-400"
+                          ? "rounded border border-red-400"
                           : ""
                       }
                     >
@@ -595,7 +595,7 @@ const LocationModal = ({
                     <div
                       className={
                         validationErrors["currentAddress.district"]
-                          ? "rounded-lg border border-red-400"
+                          ? "rounded border border-red-400"
                           : ""
                       }
                     >
@@ -627,7 +627,7 @@ const LocationModal = ({
                     <div
                       className={
                         validationErrors["currentAddress.commune"]
-                          ? "rounded-lg border border-red-400"
+                          ? "rounded border border-red-400"
                           : ""
                       }
                     >
@@ -659,7 +659,7 @@ const LocationModal = ({
                     <div
                       className={
                         validationErrors["currentAddress.village"]
-                          ? "rounded-lg border border-red-400"
+                          ? "rounded border border-red-400"
                           : ""
                       }
                     >
@@ -682,9 +682,9 @@ const LocationModal = ({
               </div>
 
               {/* === SECTION 2: Place of Birth === */}
-              <div className="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 sm:p-5">
+              <div className="bg-amber-50/50 border border-amber-100 rounded-lg p-4 sm:p-5">
                 <div className="flex items-center gap-2.5 mb-4">
-                  <div className="w-7 h-7 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded flex items-center justify-center flex-shrink-0">
                     <Navigation className="w-3.5 h-3.5 text-white" />
                   </div>
                   <h3 className="text-sm sm:text-base font-bold text-gray-700">
@@ -703,7 +703,7 @@ const LocationModal = ({
                     <div
                       className={
                         validationErrors["placeOfBirth.province"]
-                          ? "rounded-lg border border-red-400"
+                          ? "rounded border border-red-400"
                           : ""
                       }
                     >
@@ -732,7 +732,7 @@ const LocationModal = ({
                     <div
                       className={
                         validationErrors["placeOfBirth.district"]
-                          ? "rounded-lg border border-red-400"
+                          ? "rounded border border-red-400"
                           : ""
                       }
                     >
@@ -761,7 +761,7 @@ const LocationModal = ({
                     <div
                       className={
                         validationErrors["placeOfBirth.commune"]
-                          ? "rounded-lg border border-red-400"
+                          ? "rounded border border-red-400"
                           : ""
                       }
                     >
@@ -790,7 +790,7 @@ const LocationModal = ({
                     <div
                       className={
                         validationErrors["placeOfBirth.village"]
-                          ? "rounded-lg border border-red-400"
+                          ? "rounded border border-red-400"
                           : ""
                       }
                     >
@@ -814,16 +814,16 @@ const LocationModal = ({
             </div>
 
             {/* Footer Buttons */}
-            <div className="flex gap-3 px-4 sm:px-6 py-4 bg-gray-50/80 border-t border-gray-100 rounded-b-none sm:rounded-b-2xl flex-shrink-0">
+            <div className="flex gap-3 px-4 sm:px-6 py-4 bg-gray-50/80 border-t border-gray-100 rounded-b-none sm:rounded-b-lg flex-shrink-0">
               <Button
                 onClick={onClose}
-                className="flex-1 sm:flex-none sm:px-6 py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+                className="flex-1 sm:flex-none sm:px-6 py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-semibold rounded hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
               >
                 {translate("close")}
               </Button>
               <Button
                 onClick={handleSubmit}
-                className="flex-1 sm:flex-none sm:px-8 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-xl transition-all shadow-md shadow-orange-200"
+                className="flex-1 sm:flex-none sm:px-8 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded transition-all shadow-sm"
               >
                 {translate("submit")}
               </Button>

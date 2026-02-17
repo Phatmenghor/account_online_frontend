@@ -26,7 +26,6 @@ const ConfirmationModal = ({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -35,42 +34,37 @@ const ConfirmationModal = ({
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
 
-          {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, y: 60, scale: 0.95 }}
+            initial={{ opacity: 0, y: 60, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 60, scale: 0.95 }}
+            exit={{ opacity: 0, y: 60, scale: 0.97 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden z-10"
+            className="relative bg-white w-full sm:max-w-md rounded-t-lg sm:rounded-lg shadow-2xl overflow-hidden z-10"
           >
-            {/* Orange top accent bar */}
             <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500" />
 
-            {/* Body */}
             <div className="px-6 pt-8 pb-6 flex flex-col items-center text-center">
               {/* Icon */}
               <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
                 transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.1 }}
-                className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 border-4 border-orange-300 flex items-center justify-center mb-5 shadow-lg shadow-orange-100"
+                className="w-16 h-16 rounded-lg bg-gradient-to-br from-orange-100 to-amber-100 border-2 border-orange-200 flex items-center justify-center mb-5 shadow-sm"
               >
-                <ShieldCheck className="w-9 h-9 text-orange-500" />
+                <ShieldCheck className="text-orange-500" style={{ width: 30, height: 30 }} />
               </motion.div>
 
-              {/* Title */}
               <motion.h2
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-xl sm:text-2xl font-bold text-gray-800 mb-3"
+                className="text-lg sm:text-xl font-bold text-gray-800 mb-3"
               >
                 {title}
               </motion.h2>
 
-              {/* Message */}
               <motion.p
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
                 className="text-sm sm:text-base text-gray-500 leading-relaxed mb-7"
@@ -78,23 +72,22 @@ const ConfirmationModal = ({
                 {message}
               </motion.p>
 
-              {/* Action Buttons */}
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 className="flex flex-col sm:flex-row gap-3 w-full"
               >
                 <Button
                   onClick={onCancel}
-                  className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-gray-200 text-gray-600 font-semibold py-3 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+                  className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-gray-200 text-gray-600 font-semibold py-2.5 rounded hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
                 >
                   <XCircle className="w-4 h-4" />
                   {translate("noIneed")}
                 </Button>
                 <Button
                   onClick={onConfirm}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-3 rounded-xl transition-all shadow-md shadow-orange-200"
+                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-2.5 rounded transition-all shadow-sm"
                 >
                   <CheckCircle className="w-4 h-4" />
                   {translate("yesIhave")}
