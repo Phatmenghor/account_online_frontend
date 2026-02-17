@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2 } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 
 interface ConfirmClearModalProps {
     isOpen: boolean;
@@ -21,48 +21,61 @@ export const ConfirmClearModal = ({
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+                    {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                     />
+
+                    {/* Modal */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                        initial={{ opacity: 0, y: 60, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 60, scale: 0.95 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 z-10"
+                        className="relative bg-white w-full sm:max-w-sm rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden z-10"
                     >
-                        <div className="flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mx-auto mb-4">
-                            <Trash2 className="w-8 h-8 text-orange-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-800 text-center mb-2">
-                            {title || "Clear Form?"}
-                        </h3>
-                        <p className="text-gray-600 text-center mb-6">
-                            {message ||
-                                "Are you sure you want to clear all fields? This action cannot be undone."}
-                        </p>
-                        <div className="flex gap-3">
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={onClose}
-                                className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
-                            >
-                                Cancel
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={onConfirm}
-                                className="flex-1 px-4 py-3 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg"
-                            >
-                                Clear All
-                            </motion.button>
+                        {/* Orange top accent */}
+                        <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500" />
+
+                        <div className="px-6 pt-7 pb-6">
+                            {/* Icon */}
+                            <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl mx-auto mb-4 shadow-sm">
+                                <Trash2 className="w-8 h-8 text-orange-500" />
+                            </div>
+
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-800 text-center mb-2">
+                                {title || "Clear Form?"}
+                            </h3>
+                            <p className="text-sm text-gray-500 text-center mb-6 leading-relaxed">
+                                {message ||
+                                    "Are you sure you want to clear all fields? This action cannot be undone."}
+                            </p>
+
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={onClose}
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all text-sm"
+                                >
+                                    <X className="w-4 h-4" />
+                                    Cancel
+                                </motion.button>
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={onConfirm}
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-xl transition-all shadow-md shadow-orange-200 text-sm"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                    Clear All
+                                </motion.button>
+                            </div>
                         </div>
                     </motion.div>
                 </div>

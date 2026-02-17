@@ -1,11 +1,6 @@
-import { Loader2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
 
 interface LoadingModalProps {
   isOpen: boolean;
@@ -19,39 +14,79 @@ export default function LoadingModal({
   message = "Please wait...",
 }: LoadingModalProps) {
   return (
-    <Dialog open={isOpen}>
-      <DialogContent
-        className="
-          w-[90%] max-w-sm
-          sm:max-w-md
-          md:max-w-lg
-          px-4 py-6
-          rounded-xl
-          [&>button]:hidden
-        "
-        // Prevent closing
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
-      >
-        <DialogHeader>
-          <DialogTitle className="text-center text-lg sm:text-xl">
-            {title}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex flex-col items-center justify-center py-6 sm:py-8 space-y-4">
-          <Loader2
-            className="
-              h-12 w-12 sm:h-16 sm:w-16 
-              animate-spin 
-              text-blue-600
-            "
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
-          <DialogDescription className="text-center text-sm sm:text-base">
-            {message}
-          </DialogDescription>
+
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ type: "spring", damping: 20, stiffness: 260 }}
+            className="relative bg-white w-full max-w-xs sm:max-w-sm rounded-2xl shadow-2xl overflow-hidden z-10"
+          >
+            {/* Top accent */}
+            <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500" />
+
+            {/* Content */}
+            <div className="flex flex-col items-center px-6 py-8 text-center">
+              {/* Animated spinner ring */}
+              <div className="relative w-20 h-20 mb-5">
+                {/* Outer ring */}
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 rounded-full border-4 border-orange-200 border-t-orange-500"
+                />
+                {/* Inner ring */}
+                <motion.div
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-2 rounded-full border-4 border-amber-100 border-b-amber-400"
+                />
+                {/* Center dot */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-4 h-4 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full"
+                  />
+                </div>
+              </div>
+
+              {/* Pulsing dots */}
+              <div className="flex gap-1.5 mb-4">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ y: [0, -6, 0], opacity: [0.4, 1, 0.4] }}
+                    transition={{
+                      duration: 0.9,
+                      repeat: Infinity,
+                      delay: i * 0.2,
+                      ease: "easeInOut",
+                    }}
+                    className="w-2 h-2 bg-orange-400 rounded-full"
+                  />
+                ))}
+              </div>
+
+              <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-1.5">
+                {title}
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed">{message}</p>
+            </div>
+          </motion.div>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
+    </AnimatePresence>
   );
 }
