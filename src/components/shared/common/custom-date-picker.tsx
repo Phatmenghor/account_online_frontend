@@ -190,15 +190,13 @@ export function CustomDatePicker({
             {selectedDate ? formatDate(selectedDate) : placeholder}
           </span>
           {selectedDate && !disabled && (
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
               onClick={clearSelection}
-              className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+              className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-6 p-0 flex items-center justify-center rounded hover:bg-destructive/10 hover:text-destructive transition-colors"
             >
               <X className="h-3 w-3" />
-            </Button>
+            </button>
           )}
         </Button>
       </PopoverTrigger>

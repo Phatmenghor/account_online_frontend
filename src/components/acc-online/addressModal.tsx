@@ -106,7 +106,8 @@ const LocationModal = ({
     pobCommune?.communeCode || ""
   );
 
-  // Reset all state when modal opens
+  // Reset state when modal opens + lock body scroll so Radix Popover
+  // scroll-lock doesn't cause a scrollbar flash on the page
   useEffect(() => {
     if (isOpen) {
       setSelectedProvince(null);
@@ -118,6 +119,12 @@ const LocationModal = ({
       setPobCommune(null);
       setPobVillage(null);
       setValidationErrors({});
+
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
     }
   }, [isOpen]);
 
@@ -536,7 +543,7 @@ const LocationModal = ({
             </AnimatePresence>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-5">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 py-4 space-y-5">
 
               {/* === SECTION 1: Current Address === */}
               <div className="bg-orange-50/50 border border-orange-100 rounded-lg p-4 sm:p-5">
