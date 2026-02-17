@@ -39,7 +39,7 @@ const ConfirmationModal = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 60, scale: 0.97 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative bg-white w-full sm:max-w-md rounded-t-lg sm:rounded-lg shadow-2xl overflow-hidden z-10"
+            className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden z-10"
           >
             <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500" />
 
@@ -80,14 +80,14 @@ const ConfirmationModal = ({
               >
                 <Button
                   onClick={onCancel}
-                  className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-gray-200 text-gray-600 font-semibold py-2.5 rounded hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+                  className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-gray-200 text-gray-600 font-semibold py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
                 >
                   <XCircle className="w-4 h-4" />
                   {translate("noIneed")}
                 </Button>
                 <Button
                   onClick={onConfirm}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-2.5 rounded transition-all shadow-sm"
+                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-2.5 rounded-lg transition-all shadow-sm"
                 >
                   <CheckCircle className="w-4 h-4" />
                   {translate("yesIhave")}

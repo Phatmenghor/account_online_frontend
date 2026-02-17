@@ -496,11 +496,11 @@ const LocationModal = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 80 }}
             transition={{ type: "spring", damping: 28, stiffness: 300 }}
-            className="relative bg-white w-full sm:max-w-2xl lg:max-w-3xl rounded-t-lg sm:rounded-lg shadow-2xl z-10 flex flex-col"
+            className="relative bg-white w-full sm:max-w-2xl lg:max-w-3xl rounded-t-2xl sm:rounded-2xl shadow-2xl z-10 flex flex-col"
             style={{ maxHeight: "92vh" }}
           >
             {/* Orange top accent bar */}
-            <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500 flex-shrink-0 rounded-t-lg sm:rounded-t-lg" />
+            <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500 flex-shrink-0 rounded-t-2xl sm:rounded-t-2xl" />
 
             {/* Header */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100 flex-shrink-0">
@@ -519,7 +519,7 @@ const LocationModal = ({
               </div>
               <button
                 onClick={onClose}
-                className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-all flex-shrink-0"
+                className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all flex-shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -546,9 +546,9 @@ const LocationModal = ({
             <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 py-4 space-y-5">
 
               {/* === SECTION 1: Current Address === */}
-              <div className="bg-orange-50/50 border border-orange-100 rounded-lg p-4 sm:p-5">
+              <div className="bg-orange-50/50 border border-orange-100 rounded-2xl p-4 sm:p-5">
                 <div className="flex items-center gap-2.5 mb-4">
-                  <div className="w-7 h-7 bg-gradient-to-br from-orange-400 to-orange-600 rounded flex items-center justify-center flex-shrink-0">
+                  <div className="w-7 h-7 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Home className="w-3.5 h-3.5 text-white" />
                   </div>
                   <h3 className="text-sm sm:text-base font-bold text-gray-700">
@@ -689,9 +689,9 @@ const LocationModal = ({
               </div>
 
               {/* === SECTION 2: Place of Birth === */}
-              <div className="bg-amber-50/50 border border-amber-100 rounded-lg p-4 sm:p-5">
+              <div className="bg-amber-50/50 border border-amber-100 rounded-2xl p-4 sm:p-5">
                 <div className="flex items-center gap-2.5 mb-4">
-                  <div className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded flex items-center justify-center flex-shrink-0">
+                  <div className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Navigation className="w-3.5 h-3.5 text-white" />
                   </div>
                   <h3 className="text-sm sm:text-base font-bold text-gray-700">
@@ -821,16 +821,16 @@ const LocationModal = ({
             </div>
 
             {/* Footer Buttons */}
-            <div className="flex gap-3 px-4 sm:px-6 py-4 bg-gray-50/80 border-t border-gray-100 rounded-b-none sm:rounded-b-lg flex-shrink-0">
+            <div className="flex gap-3 px-4 sm:px-6 py-4 bg-gray-50/80 border-t border-gray-100 rounded-b-none sm:rounded-b-2xl flex-shrink-0">
               <Button
                 onClick={onClose}
-                className="flex-1 sm:flex-none sm:px-6 py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-semibold rounded hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+                className="flex-1 sm:flex-none sm:px-6 py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
               >
                 {translate("close")}
               </Button>
               <Button
                 onClick={handleSubmit}
-                className="flex-1 sm:flex-none sm:px-8 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded transition-all shadow-sm"
+                className="flex-1 sm:flex-none sm:px-8 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-lg transition-all shadow-sm"
               >
                 {translate("submit")}
               </Button>

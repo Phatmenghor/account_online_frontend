@@ -38,7 +38,7 @@ export default function SubmitSuccessModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 60, scale: 0.97 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative bg-white w-full sm:max-w-md rounded-t-lg sm:rounded-lg shadow-2xl overflow-hidden z-10"
+            className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden z-10"
           >
             <div className="h-1.5 w-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500" />
 
@@ -94,7 +94,7 @@ export default function SubmitSuccessModal({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.35 }}
-                  className="w-full bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-lg p-4 mb-5"
+                  className="w-full bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl p-4 mb-5"
                 >
                   <div className="flex items-center justify-center gap-2 mb-1">
                     <CreditCard className="w-4 h-4 text-emerald-600" />
@@ -116,7 +116,7 @@ export default function SubmitSuccessModal({
               >
                 <Button
                   onClick={onClose}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold py-2.5 rounded shadow-sm transition-all"
+                  className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold py-2.5 rounded-lg shadow-sm transition-all"
                 >
                   {translate("close") || "Close"}
                 </Button>

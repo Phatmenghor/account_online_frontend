@@ -32,7 +32,7 @@ export const HeaderSection = ({
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.18, duration: 0.25 }}
-              className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 text-orange-600 text-xs font-semibold rounded border border-orange-200"
+              className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 text-orange-600 text-xs font-semibold rounded-lg border border-orange-200"
             >
               <BadgeCheck className="w-3 h-3" />
               {translate("cpbank_acc")}
@@ -53,7 +53,7 @@ export const HeaderSection = ({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onClear}
-          className="group self-start sm:self-auto flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 border border-gray-200 rounded hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-all duration-200 flex-shrink-0"
+          className="group self-start sm:self-auto flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 border border-gray-200 rounded-lg hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-all duration-200 flex-shrink-0"
         >
           <Trash2 className="w-3.5 h-3.5" />
           <span>{translate("clear")}</span>

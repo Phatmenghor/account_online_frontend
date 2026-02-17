@@ -400,7 +400,7 @@ export default function OpenAccountPage() {
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
                   <Button
-                    className="w-full sm:w-auto order-2 sm:order-1 px-6 py-3 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold rounded-xl shadow-md shadow-orange-200 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto order-2 sm:order-1 px-6 py-3 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold rounded-2xl shadow-md shadow-orange-200 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleVerificationClick}
                     disabled={isLoading || isValidating || isVerified}
                   >
@@ -415,7 +415,7 @@ export default function OpenAccountPage() {
                   </Button>
 
                   <Button
-                    className="w-full sm:w-auto order-1 sm:order-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-xl shadow-md shadow-orange-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto order-1 sm:order-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-2xl shadow-md shadow-orange-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleSubmitAccount}
                     disabled={isLoading || isValidating || !isVerified}
                   >

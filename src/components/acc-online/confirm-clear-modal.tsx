@@ -35,7 +35,7 @@ export const ConfirmClearModal = ({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 60, scale: 0.97 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="relative bg-white w-full sm:max-w-sm rounded-t-lg sm:rounded-lg shadow-2xl overflow-hidden z-10"
+                        className="relative bg-white w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden z-10"
                     >
                         <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500" />
 
@@ -56,7 +56,7 @@ export const ConfirmClearModal = ({
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
                                     onClick={onClose}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-gray-200 text-gray-600 font-semibold rounded hover:bg-gray-50 hover:border-gray-300 transition-all text-sm"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-gray-200 text-gray-600 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all text-sm"
                                 >
                                     <X className="w-4 h-4" />
                                     Cancel
@@ -65,7 +65,7 @@ export const ConfirmClearModal = ({
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
                                     onClick={onConfirm}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded transition-all shadow-sm text-sm"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-lg transition-all shadow-sm text-sm"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                     Clear All
