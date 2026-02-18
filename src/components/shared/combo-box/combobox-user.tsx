@@ -100,7 +100,7 @@ export function ComboboxSelectUser({
     debounce(async (value: string) => {
       fetchData(value);
     }),
-    [searchTerm]
+    [searchTerm],
   );
 
   return (
@@ -113,7 +113,7 @@ export function ComboboxSelectUser({
           className={cn(
             "w-full h-10 flex-1 justify-between",
             !dataSelect && "text-muted-foreground",
-            disabled && "opacity-50 cursor-not-allowed"
+            disabled && "opacity-50 cursor-not-allowed",
           )}
           disabled={disabled}
         >
@@ -125,6 +125,7 @@ export function ComboboxSelectUser({
       <PopoverContent
         className="w-[var(--radix-popover-trigger-width)] p-0"
         align="start"
+        onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command>
           <CommandInput
@@ -155,7 +156,7 @@ export function ComboboxSelectUser({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      dataSelect?.id === item.id ? "opacity-100" : "opacity-0"
+                      dataSelect?.id === item.id ? "opacity-100" : "opacity-0",
                     )}
                   />
                   {item.username}
