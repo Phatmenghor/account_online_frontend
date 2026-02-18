@@ -31,7 +31,7 @@ interface ComboboxSelectBranchProps {
 }
 
 export function ComboboxSelectBranch({
-   dataSelect,
+  dataSelect,
   onChangeSelected,
   disabled = false,
 }: ComboboxSelectBranchProps) {
@@ -136,6 +136,7 @@ export function ComboboxSelectBranch({
             placeholder={translate("searchBranch")}
             value={searchTerm}
             onValueChange={onChangeSearch}
+            autoFocus={false}
           />
           <CommandList
             className="max-h-60 overflow-y-auto"
