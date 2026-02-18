@@ -23,7 +23,6 @@ import { useTranslations } from "next-intl";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useInView } from "react-intersection-observer";
 
-
 interface ComboboxSelectBranchProps {
   dataSelect: BranchModel | null;
   onChangeSelected: (item: BranchModel) => void; // Callback to notify parent about the selection change
@@ -105,7 +104,7 @@ export function ComboboxSelectBranch({
     debounce(async (value: string) => {
       fetchData(value);
     }),
-    [searchTerm]
+    [searchTerm],
   );
 
   return (
@@ -118,7 +117,7 @@ export function ComboboxSelectBranch({
           className={cn(
             "w-full h-10 flex-1 justify-between",
             !dataSelect && "text-muted-foreground",
-            disabled && "opacity-50 cursor-not-allowed"
+            disabled && "opacity-50 cursor-not-allowed",
           )}
           disabled={disabled}
         >
@@ -153,7 +152,7 @@ export function ComboboxSelectBranch({
                   key={item.branchID}
                   value={item.branchkh}
                   onSelect={() => {
-                    onChangeSelected(item); // Notify parent about the change
+                    onChangeSelected(item); // Notify parent about the changee
                     setOpen(false);
                   }}
                   ref={index === data.length - 1 ? ref : null} // Attach observer to last item
@@ -161,7 +160,9 @@ export function ComboboxSelectBranch({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      dataSelect?.branchID === item.branchID ? "opacity-100" : "opacity-0"
+                      dataSelect?.branchID === item.branchID
+                        ? "opacity-100"
+                        : "opacity-0",
                     )}
                   />
                   {item.branchkh}
