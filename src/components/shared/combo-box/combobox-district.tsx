@@ -49,7 +49,7 @@ export function ComboboxSelectDistrict({
 
   const filteredData = useMemo(() => {
     if (!searchTerm) return districts;
-    
+
     const lowerSearch = searchTerm.toLowerCase();
     return districts.filter((district) =>
       getName(district).toLowerCase().includes(lowerSearch)
@@ -73,20 +73,22 @@ export function ComboboxSelectDistrict({
           {isLoading
             ? translate("loading")
             : dataSelect
-            ? getName(dataSelect)
-            : translate("selectDistrict")}
+              ? getName(dataSelect)
+              : translate("selectDistrict")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
         className="w-[var(--radix-popover-trigger-width)] p-0"
         align="start"
+        onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command>
           <CommandInput
             placeholder={translate("searchDistrict")}
             value={searchTerm}
             onValueChange={setSearchTerm}
+            autoFocus={false}
           />
           <CommandList
             className="max-h-60 overflow-y-auto"

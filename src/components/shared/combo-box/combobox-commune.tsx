@@ -49,7 +49,7 @@ export function ComboboxSelectCommune({
 
   const filteredData = useMemo(() => {
     if (!searchTerm) return communes;
-    
+
     const lowerSearch = searchTerm.toLowerCase();
     return communes.filter((commune) =>
       getName(commune).toLowerCase().includes(lowerSearch)
@@ -73,20 +73,22 @@ export function ComboboxSelectCommune({
           {isLoading
             ? translate("loading")
             : dataSelect
-            ? getName(dataSelect)
-            : translate("selectCommune")}
+              ? getName(dataSelect)
+              : translate("selectCommune")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
         className="w-[var(--radix-popover-trigger-width)] p-0"
         align="start"
+        onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command>
           <CommandInput
             placeholder={translate("searchCommune")}
             value={searchTerm}
             onValueChange={setSearchTerm}
+            autoFocus={false}
           />
           <CommandList
             className="max-h-60 overflow-y-auto"
