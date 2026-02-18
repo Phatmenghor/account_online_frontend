@@ -320,10 +320,9 @@ export default function OpenAccountPage() {
         <PageHeader />
 
         <div className="flex-1 pt-16 md:pt-20 pb-0">
-          <div className="lg:px-16 md:px-4 py-8">
-            <Card className="p-8 mb-6 shadow-lg">
+          <div className="px-3 sm:px-4 md:px-6 lg:px-16 py-4 sm:py-6 md:py-8">
+            <Card className="p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 shadow-lg rounded-2xl border-0">
               <div className="mx-auto">
-                {/* Modern Header Section - Option 2 Style (Minimalist with Left Accent) */}
                 <HeaderSection
                   title={translate("header_acc")}
                   onClear={() => setShowClearConfirm(true)}
@@ -386,7 +385,7 @@ export default function OpenAccountPage() {
                   isVerified={isVerified}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
                   <OTPInput
                     phoneNumber={phoneNumber}
                     onPhoneChange={handlePhoneChange}
@@ -398,16 +397,17 @@ export default function OpenAccountPage() {
                   />
                 </div>
 
-                <div className="flex justify-center md:justify-end gap-4 mt-8">
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
                   <Button
-                    className="w-full md:w-auto px-5 py-2.5 bg-orange-400 hover:bg-orange-500 text-white rounded-sm shadow-md flex items-center gap-2"
+                    className="w-full sm:w-auto order-2 sm:order-1 px-6 py-3 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold rounded-2xl shadow-md shadow-orange-200 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleVerificationClick}
                     disabled={isLoading || isValidating || isVerified}
                   >
                     {isValidating ? (
                       <>
                         {translate("processing")}
-                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin flex-shrink-0"></span>
                       </>
                     ) : (
                       translate("verification")
@@ -415,7 +415,7 @@ export default function OpenAccountPage() {
                   </Button>
 
                   <Button
-                    className="w-full md:w-auto px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-sm shadow-md transition-shadow duration-200"
+                    className="w-full sm:w-auto order-1 sm:order-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-2xl shadow-md shadow-orange-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleSubmitAccount}
                     disabled={isLoading || isValidating || !isVerified}
                   >

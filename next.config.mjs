@@ -1,9 +1,8 @@
 import createNextIntlPlugin from "next-intl/plugin";
 
-// Configure next-intl without locale routing
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-/** @type {import('next').NextConfig} */
+/ @type {import('next').NextConfig} */;
 const nextConfig = {
   output: "standalone",
 
@@ -29,18 +28,13 @@ const nextConfig = {
     ],
   },
 
-  // Remove trailing slashes
   trailingSlash: false,
-
-  // Improve performance
   swcMinify: true,
 
-  // Remove console logs in production
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  // Configure headers for better performance
   async headers() {
     return [
       {
@@ -63,8 +57,27 @@ const nextConfig = {
     ];
   },
 
-  // Server Actions are available by default in Next.js 14+
-  // experimental.serverActions is no longer needed
+  webpack: (config, { dev, isServer }) => {
+    config.stats = "errors-only";
+
+    // Suppress infrastructure-level <w> warnings
+    config.infrastructureLogging = {
+      ...config.infrastructureLogging,
+      level: "error",
+    };
+
+    config.ignoreWarnings = [
+      /Module not found/,
+      /Can't resolve/,
+      /Critical dependency/,
+      /the request of a dependency is an expression/,
+      /Parsing of.*for build dependencies failed/,
+      /PackFileCacheStrategy/,
+    ];
+
+    config.bail = false;
+    return config;
+  },
 };
 
 export default withNextIntl(nextConfig);

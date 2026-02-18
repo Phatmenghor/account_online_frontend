@@ -34,7 +34,7 @@ const ROLE_POWER: Record<string, number> = {
 
 function canDelete(
   currentUser: UserModel | null,
-  targetUser: UserModel
+  targetUser: UserModel,
 ): boolean {
   if (!currentUser) {
     return false;

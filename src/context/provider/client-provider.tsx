@@ -14,7 +14,16 @@ export function ClientProviders({ children }: ClientProvidersProps) {
   return (
     <Provider store={store}>
       {children}
-      <Toaster />
+      <Toaster
+        position="top-center"
+        richColors
+        closeButton
+        expand={false}
+        visibleToasts={3}
+        toastOptions={{
+          style: { fontSize: "14px" },
+        }}
+      />
     </Provider>
   );
 }

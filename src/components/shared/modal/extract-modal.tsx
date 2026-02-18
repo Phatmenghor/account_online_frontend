@@ -1,11 +1,6 @@
-import { Loader2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
 
 interface LoadingModalProps {
   isOpen: boolean;
@@ -19,39 +14,67 @@ export default function LoadingModal({
   message = "Please wait...",
 }: LoadingModalProps) {
   return (
-    <Dialog open={isOpen}>
-      <DialogContent
-        className="
-          w-[90%] max-w-sm
-          sm:max-w-md
-          md:max-w-lg
-          px-4 py-6
-          rounded-xl
-          [&>button]:hidden
-        "
-        // Prevent closing
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
-      >
-        <DialogHeader>
-          <DialogTitle className="text-center text-lg sm:text-xl">
-            {title}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex flex-col items-center justify-center py-6 sm:py-8 space-y-4">
-          <Loader2
-            className="
-              h-12 w-12 sm:h-16 sm:w-16 
-              animate-spin 
-              text-blue-600
-            "
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
-          <DialogDescription className="text-center text-sm sm:text-base">
-            {message}
-          </DialogDescription>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.88 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.88 }}
+            transition={{ type: "spring", damping: 22, stiffness: 260 }}
+            className="relative bg-white w-full max-w-xs sm:max-w-sm rounded-2xl shadow-2xl overflow-hidden z-10"
+          >
+            <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500" />
+
+            <div className="flex flex-col items-center px-6 py-8 text-center">
+              {/* Spinner rings */}
+              <div className="relative w-16 h-16 mb-5">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 rounded-lg border-4 border-orange-200 border-t-orange-500"
+                  style={{ borderRadius: 8 }}
+                />
+                <motion.div
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 1.9, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-2 rounded border-4 border-amber-100 border-b-amber-400"
+                  style={{ borderRadius: 4 }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-3 h-3 bg-gradient-to-br from-orange-400 to-amber-500 rounded"
+                  />
+                </div>
+              </div>
+
+              {/* Bouncing dots */}
+              <div className="flex gap-1.5 mb-4">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ y: [0, -5, 0], opacity: [0.4, 1, 0.4] }}
+                    transition={{ duration: 0.85, repeat: Infinity, delay: i * 0.18, ease: "easeInOut" }}
+                    className="w-2 h-2 bg-orange-400 rounded"
+                  />
+                ))}
+              </div>
+
+              <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-1.5">{title}</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">{message}</p>
+            </div>
+          </motion.div>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
+    </AnimatePresence>
   );
 }

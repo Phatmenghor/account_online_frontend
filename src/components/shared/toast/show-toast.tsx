@@ -1,23 +1,17 @@
-// src/hooks/useToast.ts
-
 import { toast } from "sonner";
 
 const showToast = (
   message: string,
   type: "success" | "error" | "info" | "warning" = "info"
 ) => {
-  // Set autoClose based on type
-  const autoClose = type == "error" || type == "warning" ? 8000 : 4000;
+  const duration = type === "error" || type === "warning" ? 8000 : 4000;
 
-  // Define options with proper typing for position
-  const options: ToastOptions = {
-    autoClose: autoClose,
-    closeOnClick: true,
-    draggable: true,
-    position: "top-right" as ToastPosition,
+  const options = {
+    duration,
+    position: "top-center" as const,
+    closeButton: true,
   };
 
-  // Call the toast with type-specific styling
   switch (type) {
     case "success":
       toast.success(message, options);
@@ -29,7 +23,7 @@ const showToast = (
       toast.info(message, options);
       break;
     case "warning":
-      toast.warn(message, options);
+      toast.warning(message, options);
       break;
     default:
       toast.info(message, options);
