@@ -74,10 +74,7 @@ export function ComboboxSelectBranch({
     }
   };
 
-  // Fetch data on mount
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // Fetch data handled by searchTerm useEffect below
 
   // Handle search input with debounce
   useEffect(() => {
@@ -97,15 +94,7 @@ export function ComboboxSelectBranch({
 
   async function onChangeSearch(value: string) {
     setSearchTerm(value);
-    onSearchClick(value);
   }
-
-  const onSearchClick = useCallback(
-    debounce(async (value: string) => {
-      fetchData(value);
-    }),
-    [searchTerm],
-  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
