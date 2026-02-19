@@ -26,7 +26,9 @@ export default function middleware(req: NextRequest) {
 
   // Protect all other routes
   if (!token) {
-    return NextResponse.redirect(new URL(ROUTES.AUTH.LOGIN, req.url));
+    const loginUrl = new URL(ROUTES.AUTH.LOGIN, req.url);
+    loginUrl.searchParams.set("callbackUrl", pathname + req.nextUrl.search);
+    return NextResponse.redirect(loginUrl);
   }
 
   console.log("Proceeding normally...");

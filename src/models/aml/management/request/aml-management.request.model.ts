@@ -1,5 +1,6 @@
 export interface UpdateAmlModel {
   status: string;
+  remark?: string;
 }
 
 export interface AllManagementRequest {

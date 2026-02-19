@@ -34,11 +34,11 @@ export const useAccountImages = ({
   const [selfieImage, setSelfieImage] = useState<string | null>(null);
   const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
 
-    const [loadingImageState, setLoadingImageState] = useState<LoadingImageState>({
-      isLoading: false,
-      title: "",
-      message: "",
-    });
+  const [loadingImageState, setLoadingImageState] = useState<LoadingImageState>({
+    isLoading: false,
+    title: "",
+    message: "",
+  });
 
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {

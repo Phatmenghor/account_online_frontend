@@ -2,14 +2,15 @@
 
 import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
 import { CheckCircle, XCircle, Clock, Loader2 } from "lucide-react";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Textarea } from "@/components/ui/textarea";
 
 interface AmlConfirmDialogProps {
   isOpen: boolean;
   onClose: () => void;
   status: AmlStatusEnum;
-  onConfirm: () => Promise<void> | void;
+  onConfirm: (comment?: string) => Promise<void> | void;
   title?: string;
   description?: string;
   isLoading: boolean;
@@ -44,6 +45,15 @@ const AmlConfirmDialog = ({
   description,
   amlDetails,
 }: AmlConfirmDialogProps) => {
+  const [comment, setComment] = useState("");
+
+  // Reset comment when dialog opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setComment("");
+    }
+  }, [isOpen]);
+
   const getDialogProps = (): DialogProps => {
     switch (status) {
       case AmlStatusEnum.APPROVE:
@@ -169,24 +179,37 @@ const AmlConfirmDialog = ({
               </div>
             )}
 
+            {/* Comment Section (New) */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Comment (Optional)
+              </label>
+              <Textarea
+                placeholder="Add a comment..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                className="w-full resize-none"
+                rows={3}
+                disabled={isLoading}
+              />
+            </div>
+
             {/* Buttons */}
             <div className="flex justify-end gap-3">
               <button
                 onClick={onClose}
                 disabled={isLoading}
-                className={`px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors ${
-                  isLoading && "opacity-50 cursor-not-allowed"
-                }`}
+                className={`px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors ${isLoading && "opacity-50 cursor-not-allowed"
+                  }`}
               >
                 Cancel
               </button>
 
               <button
-                onClick={onConfirm}
+                onClick={() => onConfirm(comment)}
                 disabled={isLoading}
-                className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 ${getButtonColor()} transition-colors ${
-                  isLoading && "opacity-70 cursor-not-allowed"
-                }`}
+                className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 ${getButtonColor()} transition-colors ${isLoading && "opacity-70 cursor-not-allowed"
+                  }`}
               >
                 {isLoading ? (
                   <>

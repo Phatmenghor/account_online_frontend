@@ -139,12 +139,13 @@ function Management() {
     setIsConfirmAmlDialogOpen(true);
   };
 
-  const handleConfirmAmlStatus = async () => {
+  const handleConfirmAmlStatus = async (comment?: string) => {
     if (!selectedManagementId) return;
     setIsConfirmLoading(true);
     try {
       const response = await updateManagementService(selectedManagementId, {
         status: selectedStatus,
+        remark: comment,
       });
 
       // Optimistic update + remove approved/rejected items

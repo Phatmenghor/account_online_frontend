@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { AppToast } from "@/components/shared/toast/app-toast";
 import { useTranslations } from "next-intl";
@@ -41,6 +41,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations("auth");
 
   const form = useForm<formData>({
@@ -60,7 +61,11 @@ export default function LoginPage() {
       });
 
       if (response) {
-        if (response?.userRole?.userRole == UserRole.DEVELOPER) {
+        const callbackUrl = searchParams.get("callbackUrl");
+
+        if (callbackUrl) {
+          router.replace(callbackUrl);
+        } else if (response?.userRole?.userRole == UserRole.DEVELOPER) {
           router.replace(ROUTES.DASHBOARD.INDEX);
         } else if (response?.userRole?.userRole == UserRole.BUSINESS) {
           router.replace(ROUTES.DASHBOARD.INDEX);

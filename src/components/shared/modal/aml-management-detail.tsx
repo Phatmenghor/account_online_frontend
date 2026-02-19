@@ -16,7 +16,11 @@ import {
   ClipboardCheck,
   FileText,
   FileClock,
+  Image as ImageIcon,
+  Loader2,
 } from "lucide-react";
+import Image from "next/image";
+import { axiosClientWithAuth } from "@/utils/axios";
 
 import { useEffect, useState } from "react";
 import {
@@ -26,7 +30,9 @@ import {
   DialogDescription,
   DialogContent,
   DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -299,6 +305,22 @@ export default function AmlViewDetailModal({
                     icon={<Calendar />}
                   />
                 </Section>
+
+                {/* 7. Customer Documents */}
+                <Section title="Customer Documents" color="purple">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <DocumentCard
+                      title="National ID"
+                      type="nid"
+                      legalId={alert.customerInfo.legalId}
+                    />
+                    <DocumentCard
+                      title="Selfie"
+                      type="selfie"
+                      legalId={alert.customerInfo.legalId}
+                    />
+                  </div>
+                </Section>
               </>
             )}
           </div>
@@ -409,6 +431,106 @@ function InfoRow({
         {label}:
       </Label>
       <span className="text-sm flex items-center gap-2">{value ?? "N/A"}</span>
+    </div>
+  );
+}
+
+/* ---------------------------------------------
+ * DOCUMENT CARD
+ * -------------------------------------------*/
+function DocumentCard({
+  title,
+  type,
+  legalId,
+}: {
+  title: string;
+  type: string;
+  legalId?: string;
+}) {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!legalId) return;
+
+    const fetchImage = async () => {
+      setLoading(true);
+      setError(false);
+      try {
+        const response = await axiosClientWithAuth.get(
+          `/api/v1/customer-images/${type}/${legalId}`,
+          { responseType: "blob" }
+        );
+        const url = URL.createObjectURL(response.data);
+        setImageUrl(url);
+      } catch (err) {
+        console.error(`Failed to load ${type} image:`, err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImage();
+
+    return () => {
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    };
+  }, [legalId, type]);
+
+  return (
+    <div className="border rounded-lg p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <h4 className="font-semibold text-sm">{title}</h4>
+      </div>
+
+      <Dialog>
+        <div className="aspect-video bg-muted rounded-md relative overflow-hidden flex items-center justify-center group">
+          {loading ? (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground animate-pulse">
+              <Loader2 className="w-8 h-8 animate-spin" />
+              <span className="text-xs">Loading...</span>
+            </div>
+          ) : imageUrl ? (
+            <div className="relative w-full h-full cursor-pointer">
+              <Image
+                src={imageUrl}
+                alt={title}
+                fill
+                className="object-cover transition-transform hover:scale-105"
+              />
+              {/* Trigger for the preview dialog */}
+              <DialogTrigger asChild>
+                <div className="absolute inset-0 z-10 bg-black/0 hover:bg-black/10 transition-colors flex items-center justify-center cursor-pointer">
+                  <span className="sr-only">View full image</span>
+                </div>
+              </DialogTrigger>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <ImageIcon className="w-8 h-8 opacity-50" />
+              <span className="text-xs">{error ? "Failed to load" : "No Image"}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Preview Content */}
+        {imageUrl && (
+          <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-none bg-transparent shadow-none flex items-center justify-center">
+            <div className="relative w-auto h-auto max-w-full max-h-full">
+              <DialogTitle className="sr-only">Preview {title}</DialogTitle>
+              <DialogDescription className="sr-only">Full size view of {title}</DialogDescription>
+              {/* Close button is provided by DialogContent usually, but we can style the image directly */}
+              <img
+                src={imageUrl}
+                alt={`Preview ${title}`}
+                className="max-w-[90vw] max-h-[90vh] object-contain rounded-md shadow-2xl"
+              />
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
     </div>
   );
 }

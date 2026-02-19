@@ -8,6 +8,7 @@ import { BranchModel } from "@/models/branch/branch.response";
 import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-address.request.model";
 import { formatDate } from "@/constants/AppResource/format-date/format-dd-mm-yyyy";
 import { createOpenAccountService } from "@/services/open-account/openAccount.service";
+import { uploadDocument } from "@/services/document/document.service";
 
 interface UseAccountSubmissionProps {
   formData: ResponseNID;
@@ -30,6 +31,18 @@ interface LoadingState {
   isLoading: boolean;
   title: string;
   message: string;
+}
+
+const base64ToFile = (dataurl: string, filename: string): File => {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const bstr = atob(arr[arr.length - 1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
 }
 
 export const useAccountSubmission = ({
@@ -79,8 +92,17 @@ export const useAccountSubmission = ({
     });
 
     try {
-      const nidImageBase64 =
-        uploadedImage!.idImage.split(",")[1] || uploadedImage!.idImage;
+      // 1. Prepare images
+      // Ensure we have the base64 string with prefix for conversion, or safely handle it
+      const nidBase64Full = uploadedImage?.idImage || "";
+      const selfieBase64Full = selfieImage || "";
+
+      const nidFile = base64ToFile(nidBase64Full, `nid_${formData.idNumber}.jpg`);
+      const selfieFile = base64ToFile(selfieBase64Full, `selfie_${formData.idNumber}.jpg`);
+
+      // 2. Upload images
+      const nidFileName = await uploadDocument(nidFile, "nid", formData.idNumber);
+      const selfieFileName = await uploadDocument(selfieFile, "selfie", formData.idNumber);
 
       const accountData = {
         familyName: formData.lastNameEn,
@@ -122,8 +144,10 @@ export const useAccountSubmission = ({
         legalMrz2: formData.MRZ2,
         legalMrz3: formData.MRZ3,
         phoneNumber: phoneNumber,
-        nidImage: nidImageBase64,
-        selfieImage: selfieImage || "",
+        nidImage: "", // Sending empty as we use nidImageName
+        selfieImage: "", // Sending empty as we use selfieImageName
+        nidImageName: nidFileName,
+        selfieImageName: selfieFileName,
       };
 
       const response = await createOpenAccountService(accountData);
@@ -136,6 +160,7 @@ export const useAccountSubmission = ({
       });
       setShowSuccessModal(true);
     } catch (error: any) {
+      console.error("Submission error:", error);
       // Extract error message from the service open acc online
       const errorMessage =
         error?.errorMessage ||
