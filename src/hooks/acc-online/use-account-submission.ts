@@ -199,8 +199,6 @@ export const useAccountSubmission = ({
         legalMrz2: formData.MRZ2,
         legalMrz3: formData.MRZ3,
         phoneNumber: phoneNumber,
-        nidImage: "",
-        selfieImage: "",
         nidImageName: nidFileName,
         selfieImageName: selfieFileName,
       };
