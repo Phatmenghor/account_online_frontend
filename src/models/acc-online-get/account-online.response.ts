@@ -1,7 +1,7 @@
 export interface GetAccountModel {
- status : string,
- message: string ,
- data : AccountModel ;
+  status: string;
+  message: string;
+  data: AccountModel;
 }
 
 interface AccountModel {
@@ -12,7 +12,7 @@ interface AccountModel {
   legalLastNameEn: string;
   legalFirstNameKh: string;
   legalLastNameKh: string;
-  legalDateOfBirth: string;          // or Date if you want
+  legalDateOfBirth: string;
   legalGender: string;
   legalAddress: string;
   legalPlaceOfBirth: string;
@@ -21,9 +21,9 @@ interface AccountModel {
   companyName: string;
   occupation: string;
   phoneNumber: string;
-  nidImage: string;                  // base64 string
-  selfieImage: string;               // base64 string
-  createdAt: string;                 // ISO date string
+  nidImageName: string;
+  selfieImageName: string;
+  createdAt: string;
   updatedAt: string;
   createdBy: string;
   updatedBy: string;

@@ -145,9 +145,9 @@ function AccountPageContent() {
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        if (account?.data?.nidImage)
+                        if (account?.data?.nidImageName)
                           downloadImage(
-                            account.data.nidImage,
+                            account.data.nidImageName,
                             account.data.legalId,
                             "nid",
                           );
@@ -155,7 +155,7 @@ function AccountPageContent() {
                     >
                       <img
                         src={
-                          getImageUrl(account?.data?.nidImage) ??
+                          getImageUrl(account?.data?.nidImageName) ??
                           "/app/image_selfie_4K.png?height=192&width=320"
                         }
                         alt="NID Image"
@@ -189,9 +189,9 @@ function AccountPageContent() {
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        if (account?.data?.selfieImage)
+                        if (account?.data?.selfieImageName)
                           downloadImage(
-                            account.data.selfieImage,
+                            account.data.selfieImageName,
                             account.data.legalId,
                             "selfie",
                           );
@@ -199,7 +199,7 @@ function AccountPageContent() {
                     >
                       <img
                         src={
-                          getImageUrl(account?.data?.selfieImage) ??
+                          getImageUrl(account?.data?.selfieImageName) ??
                           "/app/image_selfie_4K.png?height=192&width=320"
                         }
                         alt="Selfie"
