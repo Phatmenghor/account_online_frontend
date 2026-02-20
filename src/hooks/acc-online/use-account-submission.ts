@@ -33,9 +33,47 @@ interface LoadingState {
   message: string;
 }
 
+// Compress a base64 image to max 1024px wide at 80% JPEG quality.
+// Camera photos are typically 10–20 MB; this reduces them to ~200–500 KB
+// before upload, preventing connection drops on slow mobile networks.
+const compressImage = (
+  dataurl: string,
+  maxWidth = 1024,
+  quality = 0.8,
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const scale = Math.min(1, maxWidth / img.width);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          // Canvas not supported — return original without compression
+          resolve(dataurl);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      } catch (err) {
+        // If compression fails, fall back to original image
+        resolve(dataurl);
+      }
+    };
+    img.onerror = () => {
+      // If image fails to load, fall back to original
+      console.warn("Image load failed during compression, using original");
+      resolve(dataurl);
+    };
+    img.src = dataurl;
+  });
+};
+
 const base64ToFile = (dataurl: string, filename: string): File => {
-  const arr = dataurl.split(',');
-  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const arr = dataurl.split(",");
+  const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg";
   const bstr = atob(arr[arr.length - 1]);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
@@ -43,7 +81,7 @@ const base64ToFile = (dataurl: string, filename: string): File => {
     u8arr[n] = bstr.charCodeAt(n);
   }
   return new File([u8arr], filename, { type: mime });
-}
+};
 
 export const useAccountSubmission = ({
   formData,
@@ -66,7 +104,6 @@ export const useAccountSubmission = ({
     title: "",
     message: "",
   });
-
   const [showSubmitErrorModal, setShowSubmitErrorModal] = useState(false);
   const [submitErrorData, setSubmitErrorData] = useState<{
     title: string;
@@ -77,7 +114,6 @@ export const useAccountSubmission = ({
     message: "",
     variant: "error",
   });
-
   const [loadingState, setLoadingState] = useState<LoadingState>({
     isLoading: false,
     title: "",
@@ -92,17 +128,36 @@ export const useAccountSubmission = ({
     });
 
     try {
-      // 1. Prepare images
-      // Ensure we have the base64 string with prefix for conversion, or safely handle it
       const nidBase64Full = uploadedImage?.idImage || "";
       const selfieBase64Full = selfieImage || "";
 
-      const nidFile = base64ToFile(nidBase64Full, `nid_${formData.idNumber}.jpg`);
-      const selfieFile = base64ToFile(selfieBase64Full, `selfie_${formData.idNumber}.jpg`);
+      // Compress images before converting to File — reduces upload size
+      // from 10–20 MB (raw camera) down to ~200–500 KB
+      const [nidCompressed, selfieCompressed] = await Promise.all([
+        compressImage(nidBase64Full),
+        compressImage(selfieBase64Full),
+      ]);
 
-      // 2. Upload images
-      const nidFileName = await uploadDocument(nidFile, "nid", formData.idNumber);
-      const selfieFileName = await uploadDocument(selfieFile, "selfie", formData.idNumber);
+      const nidFile = base64ToFile(
+        nidCompressed,
+        `nid_${formData.idNumber}.jpg`,
+      );
+      const selfieFile = base64ToFile(
+        selfieCompressed,
+        `selfie_${formData.idNumber}.jpg`,
+      );
+
+      // Upload images sequentially
+      const nidFileName = await uploadDocument(
+        nidFile,
+        "nid",
+        formData.idNumber,
+      );
+      const selfieFileName = await uploadDocument(
+        selfieFile,
+        "selfie",
+        formData.idNumber,
+      );
 
       const accountData = {
         familyName: formData.lastNameEn,
@@ -144,15 +199,14 @@ export const useAccountSubmission = ({
         legalMrz2: formData.MRZ2,
         legalMrz3: formData.MRZ3,
         phoneNumber: phoneNumber,
-        nidImage: "", // Sending empty as we use nidImageName
-        selfieImage: "", // Sending empty as we use selfieImageName
+        nidImage: "",
+        selfieImage: "",
         nidImageName: nidFileName,
         selfieImageName: selfieFileName,
       };
 
       const response = await createOpenAccountService(accountData);
 
-      // Show success modal with response data
       setSuccessData({
         title: translate("success_title") || "Account Created Success",
         message:
@@ -161,24 +215,25 @@ export const useAccountSubmission = ({
       setShowSuccessModal(true);
     } catch (error: any) {
       console.error("Submission error:", error);
-      // Extract error message from the service open acc online
+
       const errorMessage =
         error?.errorMessage ||
         error?.message ||
         error?.rawError?.message ||
         "Failed to create account. Please try again.";
 
-      const isConflict = error?.rawError?.status === 409 || error?.status === 409;
+      const isConflict =
+        error?.rawError?.status === 409 || error?.status === 409;
 
-      // Check for ACCOUNT_ALREADY_EXIST
       if (errorMessage.includes("ACCOUNT_ALREADY_EXIST") || isConflict) {
         setSubmitErrorData({
           title: translate("account_exists_title") || "Account Already Exists",
-          message: translate("account_exists_message") || "You already have an account with the bank. Please use your existing account.",
+          message:
+            translate("account_exists_message") ||
+            "You already have an account with the bank. Please use your existing account.",
           variant: "warning",
         });
       } else {
-        // Show generic error modal
         setSubmitErrorData({
           title: translate("error_title") || "Submission Failed",
           message: errorMessage,

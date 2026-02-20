@@ -1,10 +1,8 @@
 "use client";
-
 // UI Components
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Footer from "@/components/shared/footer/footer";
-
 // Feature Components
 import { AccountImages } from "@/components/acc-online/account-images";
 import { PersonalDetailsFields } from "@/components/acc-online/form-sections/personal-details-fields";
@@ -20,10 +18,8 @@ import SubmitSuccessModal from "@/components/shared/modal/submit-success-modal";
 import SubmitErrorModal from "@/components/shared/modal/submit-error-modal";
 import { HeaderSection } from "@/components/acc-online/header-section";
 import { ConfirmClearModal } from "@/components/acc-online/confirm-clear-modal";
-
 // Contexts
 import { FormStateProvider } from "@/contexts/form-state-context";
-
 // Hooks
 import { useMemo, useCallback, useState } from "react";
 import { useAccountImages } from "@/hooks/acc-online/use-account-images";
@@ -33,7 +29,6 @@ import { useFormValidation } from "@/hooks/acc-online/use-form-validation";
 import { useModalState } from "@/hooks/acc-online/use-modal-state";
 import { useAccountSubmission } from "@/hooks/acc-online/use-account-submission";
 import { useVerificationFlow } from "@/hooks/acc-online/use-verification-flow";
-
 // Types
 import { LocationSubmitData } from "@/models/open-acc-online/address/open-acc-address.request.model";
 
@@ -41,7 +36,6 @@ export default function OpenAccountPage() {
   // ========================================
   // Hooks Setup
   // ========================================
-
   const {
     formData,
     setFormData,
@@ -181,10 +175,12 @@ export default function OpenAccountPage() {
   // ========================================
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
+  // Combine all busy states into one flag to disable buttons consistently
+  const isBusy = isLoading || isValidating || loadingState.isLoading;
+
   // ========================================
   // Event Handlers
   // ========================================
-
   const handleConfirmValidation = useCallback(async () => {
     setShowConfirmationModal(false);
     await handleValidateNID(
@@ -192,7 +188,7 @@ export default function OpenAccountPage() {
       setShowErrorModal,
       setValidationResult,
       setShowValidationErrorModal,
-      setValidationErrorData
+      setValidationErrorData,
     );
   }, [
     handleValidateNID,
@@ -208,7 +204,7 @@ export default function OpenAccountPage() {
     (data: LocationSubmitData) => {
       handleLocationSubmit(data, setLocationData, setShowLocationModal);
     },
-    [handleLocationSubmit, setLocationData, setShowLocationModal]
+    [handleLocationSubmit, setLocationData, setShowLocationModal],
   );
 
   const handleVerificationClick = useCallback(() => {
@@ -217,7 +213,7 @@ export default function OpenAccountPage() {
       selfieImage || "",
       phoneNumber,
       isPhoneVerified,
-      setShowConfirmationModal
+      setShowConfirmationModal,
     );
   }, [
     handleOpenConfirmModal,
@@ -234,7 +230,7 @@ export default function OpenAccountPage() {
       validateField("phoneNumber", value);
       setIsVerified(false);
     },
-    [setPhoneNumber, validateField, setIsVerified]
+    [setPhoneNumber, validateField, setIsVerified],
   );
 
   const handleVerificationSuccess = useCallback(() => {
@@ -259,24 +255,23 @@ export default function OpenAccountPage() {
     resetMasterData,
     setStaffCode,
     setIsVerified,
+    setShowClearConfirm, // FIX: was missing from deps
   ]);
 
-  // Wrapper for input changes to reset verification
   const handleInputChangeWrapper = useCallback(
     (field: any, value: string) => {
       handleInputChange(field, value);
       setIsVerified(false);
     },
-    [handleInputChange, setIsVerified]
+    [handleInputChange, setIsVerified],
   );
 
-  // Wrapper for master data changes
   const handleMasterDataChange = useCallback(
     (setter: any, value: any) => {
       setter(value);
       setIsVerified(false);
     },
-    [setIsVerified]
+    [setIsVerified],
   );
 
   const handleSuccessModalClose = useCallback(() => {
@@ -287,12 +282,11 @@ export default function OpenAccountPage() {
   // ========================================
   // Context Setup
   // ========================================
-
   const formStateContextValue = useMemo(
     () => ({
       isLoading,
       isValidating,
-      isSubmitting: false,
+      isSubmitting: loadingState.isLoading, // FIX: expose submission loading to context
       translate,
       translateSelect,
       validationErrors,
@@ -302,23 +296,22 @@ export default function OpenAccountPage() {
     [
       isLoading,
       isValidating,
+      loadingState.isLoading,
       translate,
       translateSelect,
       validationErrors,
       validateField,
       handleValidationChange,
-    ]
+    ],
   );
 
   // ========================================
   // Render
   // ========================================
-
   return (
     <FormStateProvider value={formStateContextValue}>
       <div className="flex flex-col h-screen">
         <PageHeader />
-
         <div className="flex-1 pt-16 md:pt-20 pb-0">
           <div className="px-3 sm:px-4 md:px-6 lg:px-16 py-4 sm:py-6 md:py-8">
             <Card className="p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 shadow-lg rounded-2xl border-0">
@@ -328,14 +321,12 @@ export default function OpenAccountPage() {
                   onClear={() => setShowClearConfirm(true)}
                   translate={translate}
                 />
-
                 <AccountImages
                   uploadedImage={uploadedImage}
                   selfiePreview={selfiePreview}
                   handleImageUpload={handleImageUpload}
                   handleSelfieUpload={handleSelfieUpload}
                 />
-
                 <PersonalDetailsFields
                   formData={formData}
                   handleInputChange={handleInputChangeWrapper}
@@ -350,7 +341,6 @@ export default function OpenAccountPage() {
                   isVerified={isVerified}
                   isNidExtracted={!!uploadedImage}
                 />
-
                 <MasterDataFields
                   maritalStatuses={maritalStatuses}
                   selectedMaritalStatus={selectedMaritalStatus}
@@ -384,13 +374,12 @@ export default function OpenAccountPage() {
                   }
                   isVerified={isVerified}
                 />
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
                   <OTPInput
                     phoneNumber={phoneNumber}
                     onPhoneChange={handlePhoneChange}
                     onVerificationSuccess={handleVerificationSuccess}
-                    disabled={isLoading || isValidating}
+                    disabled={isBusy}
                     validationErrors={validationErrors}
                     onValidationChange={handleValidationChange}
                     reset={resetOtp}
@@ -399,10 +388,11 @@ export default function OpenAccountPage() {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
+                  {/* Verify button — disabled while any operation is running or already verified */}
                   <Button
                     className="w-full sm:w-auto order-2 sm:order-1 px-6 py-3 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold rounded-2xl shadow-md shadow-orange-200 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleVerificationClick}
-                    disabled={isLoading || isValidating || isVerified}
+                    disabled={isBusy || isVerified} // FIX: added loadingState.isLoading via isBusy
                   >
                     {isValidating ? (
                       <>
@@ -414,18 +404,25 @@ export default function OpenAccountPage() {
                     )}
                   </Button>
 
+                  {/* Submit button — disabled while any operation is running or not yet verified */}
                   <Button
                     className="w-full sm:w-auto order-1 sm:order-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-2xl shadow-md shadow-orange-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleSubmitAccount}
-                    disabled={isLoading || isValidating || !isVerified}
+                    disabled={isBusy || !isVerified}
                   >
-                    {translate("submit")}
+                    {loadingState.isLoading ? (
+                      <>
+                        {translate("submitting") || "Submitting"}
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin flex-shrink-0 ml-2"></span>
+                      </>
+                    ) : (
+                      translate("submit")
+                    )}
                   </Button>
                 </div>
               </div>
             </Card>
           </div>
-
           <Footer />
         </div>
 
@@ -438,14 +435,14 @@ export default function OpenAccountPage() {
           message="Are you sure you want to clear all fields? This action cannot be undone."
         />
 
-        {/* For submit loading */}
+        {/* Submission loading */}
         <LoadingModal
           isOpen={loadingState.isLoading}
           title={loadingState.title}
           message={loadingState.message}
         />
 
-        {/* For image loading */}
+        {/* Image extraction loading */}
         <LoadingModal
           isOpen={loadingImageState.isLoading}
           title={loadingImageState.title}
@@ -459,7 +456,6 @@ export default function OpenAccountPage() {
           title={translate("cfTitle")}
           message={translate("cfMessage")}
         />
-
         <LocationModal
           isOpen={showLocationModal}
           onClose={() => setShowLocationModal(false)}
@@ -469,20 +465,18 @@ export default function OpenAccountPage() {
           addressFromForm={formData.address}
           placeOfBirthFromForm={formData.pob}
         />
-
         <ErrorModal
           isOpen={showErrorModal}
           onClose={() => setShowErrorModal(false)}
           data={
             validationResult?.data
               ? {
-                score: validationResult.data.score,
-                incorrectFields: validationResult.data.incorrectFields,
-              }
+                  score: validationResult.data.score,
+                  incorrectFields: validationResult.data.incorrectFields,
+                }
               : null
           }
         />
-
         <ValidationErrorModal
           isOpen={showValidationErrorModal}
           onClose={() => setShowValidationErrorModal(false)}
@@ -490,14 +484,12 @@ export default function OpenAccountPage() {
           message={validationErrorData.message}
           description={validationErrorData.description}
         />
-
         <SubmitSuccessModal
           isOpen={showSuccessModal}
           onClose={handleSuccessModalClose}
           title={successData.title}
           message={successData.message}
         />
-
         <SubmitErrorModal
           isOpen={showSubmitErrorModal}
           onClose={() => setShowSubmitErrorModal(false)}
