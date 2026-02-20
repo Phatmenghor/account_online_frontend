@@ -35,7 +35,6 @@ function AccountPageContent() {
         cif: searchCif,
         legalId: searchLegalId,
       });
-      console.log("this is response account", response);
       if (response) {
         toast.success(response?.message);
         setAccount(response);
