@@ -30,6 +30,8 @@ export interface HistoryModel {
   occupationCode: string;
   occupationStatus: string;
   remarks: string;
+  nidImageName?: string;
+  selfieImageName?: string;
 }
 
 export interface CustomerInfo {

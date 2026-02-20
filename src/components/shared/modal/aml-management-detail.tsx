@@ -311,13 +311,13 @@ export default function AmlViewDetailModal({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <DocumentCard
                       title="National ID"
-                      type="nid"
-                      legalId={alert.customerInfo.legalId}
+                      imageName={alert.nidImageName}
+                      imageType="nid"
                     />
                     <DocumentCard
                       title="Selfie"
-                      type="selfie"
-                      legalId={alert.customerInfo.legalId}
+                      imageName={alert.selfieImageName}
+                      imageType="selfie"
                     />
                   </div>
                 </Section>
@@ -438,34 +438,37 @@ function InfoRow({
 /* ---------------------------------------------
  * DOCUMENT CARD
  * -------------------------------------------*/
+/* ---------------------------------------------
+ * DOCUMENT CARD
+ * -------------------------------------------*/
 function DocumentCard({
   title,
-  type,
-  legalId,
+  imageName,
+  imageType,
 }: {
   title: string;
-  type: string;
-  legalId?: string;
+  imageName?: string;
+  imageType: string;
 }) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!legalId) return;
+    if (!imageName) return;
 
     const fetchImage = async () => {
       setLoading(true);
       setError(false);
       try {
         const response = await axiosClientWithAuth.get(
-          `/api/v1/customer-images/${type}/${legalId}`,
+          `/api/images/download?filename=${imageName}&type=${imageType}`,
           { responseType: "blob" }
         );
         const url = URL.createObjectURL(response.data);
         setImageUrl(url);
       } catch (err) {
-        console.error(`Failed to load ${type} image:`, err);
+        console.error(`Failed to load ${title} image:`, err);
         setError(true);
       } finally {
         setLoading(false);
@@ -477,7 +480,7 @@ function DocumentCard({
     return () => {
       if (imageUrl) URL.revokeObjectURL(imageUrl);
     };
-  }, [legalId, type]);
+  }, [imageName, imageType, title]);
 
   return (
     <div className="border rounded-lg p-4 space-y-3">
