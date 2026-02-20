@@ -26,10 +26,21 @@ export const CustomAvatar: React.FC<CustomerAvatarProps> = ({
     xl: "h-16 w-16",
   };
 
-  const logoUrl =
-    imageUrl && process.env.NEXT_PUBLIC_API_BASE_URL
-      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${imageUrl}`
-      : undefined;
+  const getLogoUrl = () => {
+    if (!imageUrl) return undefined;
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+    // If no base URL, use relative path
+    if (!baseUrl) return imageUrl;
+
+    // If base URL exists, join them safely to avoid double slashes
+    const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+    const cleanImageUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+
+    return `${cleanBaseUrl}${cleanImageUrl}`;
+  };
+
+  const logoUrl = getLogoUrl();
 
   const fallbackText = name?.charAt(0)?.toUpperCase() || "B";
 
