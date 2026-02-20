@@ -308,16 +308,18 @@ export default function AmlViewDetailModal({
 
                 {/* 7. Customer Documents */}
                 <Section title="Customer Documents" color="purple">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-wrap gap-10 justify-center p-4">
                     <DocumentCard
                       title="National ID"
                       imageName={alert.nidImageName}
                       imageType="nid"
+                      legalId={alert.customerInfo.legalId}
                     />
                     <DocumentCard
                       title="Selfie"
                       imageName={alert.selfieImageName}
                       imageType="selfie"
+                      legalId={alert.customerInfo.legalId}
                     />
                   </div>
                 </Section>
@@ -441,99 +443,77 @@ function InfoRow({
 /* ---------------------------------------------
  * DOCUMENT CARD
  * -------------------------------------------*/
+/* ---------------------------------------------
+ * DOCUMENT CARD
+ * -------------------------------------------*/
 function DocumentCard({
   title,
   imageName,
   imageType,
+  legalId,
 }: {
   title: string;
   imageName?: string;
-  imageType: string;
+  imageType: "nid" | "selfie";
+  legalId?: string;
 }) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const IMAGE_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL_IMAGE ?? "";
 
-  useEffect(() => {
-    if (!imageName) return;
+  const getImageUrl = (filename: string | undefined | null): string | null => {
+    if (!filename) return null;
+    return `${IMAGE_BASE_URL}/api/v1/public/customer-images/${filename}`;
+  };
 
-    const fetchImage = async () => {
-      setLoading(true);
-      setError(false);
-      try {
-        const response = await axiosClientWithAuth.get(
-          `/api/images/download?filename=${imageName}&type=${imageType}`,
-          { responseType: "blob" }
-        );
-        const url = URL.createObjectURL(response.data);
-        setImageUrl(url);
-      } catch (err) {
-        console.error(`Failed to load ${title} image:`, err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchImage();
-
-    return () => {
-      if (imageUrl) URL.revokeObjectURL(imageUrl);
-    };
-  }, [imageName, imageType, title]);
+  const downloadImage = async () => {
+    if (!imageName || !legalId) return alert("No image to download");
+    try {
+      const url = `${IMAGE_BASE_URL}/api/v1/public/customer-images/${imageName}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch image");
+      const blob = await response.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+      const extension = blob.type.replace("image/", "") || "jpg";
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = `${legalId}_${imageType}.${extension}`;
+      link.click();
+      window.URL.revokeObjectURL(objectUrl);
+    } catch (err) {
+      console.error("Download failed:", err);
+      // alert("Failed to download image");
+    }
+  };
 
   return (
-    <div className="border rounded-lg p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <h4 className="font-semibold text-sm">{title}</h4>
-      </div>
-
-      <Dialog>
-        <div className="aspect-video bg-muted rounded-md relative overflow-hidden flex items-center justify-center group">
-          {loading ? (
-            <div className="flex flex-col items-center gap-2 text-muted-foreground animate-pulse">
-              <Loader2 className="w-8 h-8 animate-spin" />
-              <span className="text-xs">Loading...</span>
+    <div>
+      <p className="text-base text-gray-600 mb-4 text-center">{title}</p>
+      <div className="relative">
+        <div className="absolute lg:-top-5 -top-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
+        <div className="absolute lg:-top-5 -top-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
+        <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
+        <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
+        <div className="relative lg:w-96 w-80 h-60 rounded overflow-hidden group cursor-pointer bg-gray-100">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              downloadImage();
+            }}
+          >
+            <img
+              src={
+                getImageUrl(imageName) ??
+                "/app/image_selfie_4K.png?height=192&width=320"
+              }
+              alt={title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <p className="text-white text-lg font-semibold">Download Image</p>
             </div>
-          ) : imageUrl ? (
-            <div className="relative w-full h-full cursor-pointer">
-              <Image
-                src={imageUrl}
-                alt={title}
-                fill
-                className="object-cover transition-transform hover:scale-105"
-              />
-              {/* Trigger for the preview dialog */}
-              <DialogTrigger asChild>
-                <div className="absolute inset-0 z-10 bg-black/0 hover:bg-black/10 transition-colors flex items-center justify-center cursor-pointer">
-                  <span className="sr-only">View full image</span>
-                </div>
-              </DialogTrigger>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-2 text-muted-foreground">
-              <ImageIcon className="w-8 h-8 opacity-50" />
-              <span className="text-xs">{error ? "Failed to load" : "No Image"}</span>
-            </div>
-          )}
+          </a>
         </div>
-
-        {/* Preview Content */}
-        {imageUrl && (
-          <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-none bg-transparent shadow-none flex items-center justify-center">
-            <div className="relative w-auto h-auto max-w-full max-h-full">
-              <DialogTitle className="sr-only">Preview {title}</DialogTitle>
-              <DialogDescription className="sr-only">Full size view of {title}</DialogDescription>
-              {/* Close button is provided by DialogContent usually, but we can style the image directly */}
-              <img
-                src={imageUrl}
-                alt={`Preview ${title}`}
-                className="max-w-[90vw] max-h-[90vh] object-contain rounded-md shadow-2xl"
-              />
-            </div>
-          </DialogContent>
-        )}
-      </Dialog>
+      </div>
     </div>
   );
 }
