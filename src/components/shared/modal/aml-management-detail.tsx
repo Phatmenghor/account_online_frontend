@@ -233,21 +233,34 @@ export default function AmlViewDetailModal({
 
                 <Section title="Rules Triggered" icon={<Layers className="h-5 w-5" />}>
                   <div className="md:col-span-2 space-y-2">
-                    {alert.rulesTriggered ? (
-                      alert.rulesTriggered.split(",").map((rule, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center justify-between p-3 rounded-lg border bg-muted/30"
-                        >
-                          <span className="text-sm font-medium">{rule.trim()}</span>
-                          <Badge variant="destructive">Triggered</Badge>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-muted-foreground italic text-sm">
-                        No rules triggered
-                      </p>
-                    )}
+                    {(() => {
+                      try {
+                        let raw = alert.rulesTriggered ?? "";
+                        if (raw.startsWith('"')) raw = JSON.parse(raw);
+                        const rules: { RuleName: string }[] = JSON.parse(raw);
+                        if (Array.isArray(rules) && rules.length > 0) {
+                          return rules.map((rule, i) => (
+                            <div
+                              key={i}
+                              className="flex items-center justify-between p-3 rounded-lg border bg-muted/30"
+                            >
+                              <span className="text-sm font-medium">{rule.RuleName}</span>
+                              <Badge variant="destructive">Triggered</Badge>
+                            </div>
+                          ));
+                        }
+                      } catch {
+                        if (alert.rulesTriggered) {
+                          return (
+                            <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                              <span className="text-sm font-medium">{alert.rulesTriggered}</span>
+                              <Badge variant="destructive">Triggered</Badge>
+                            </div>
+                          );
+                        }
+                      }
+                      return <p className="text-muted-foreground italic text-sm">No rules triggered</p>;
+                    })()}
                   </div>
                 </Section>
 
