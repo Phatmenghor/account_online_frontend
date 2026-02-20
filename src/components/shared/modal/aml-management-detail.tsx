@@ -91,7 +91,7 @@ export default function AmlViewDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-5xl h-[90vh] p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-3xl h-[90vh] p-0 gap-0 flex flex-col">
         {/* Header */}
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4">
@@ -132,195 +132,174 @@ export default function AmlViewDetailModal({
             ) : (
               <>
                 {/* 1. Customer Information */}
-                <Section title="Customer Information" color="blue">
-                  <InfoRow
-                    label="Legal ID"
-                    value={alert.customerInfo.legalId}
-                    icon={<User />}
-                  />
-                  <InfoRow
-                    label="Given Name"
-                    value={alert.customerInfo.givenName}
-                    icon={<User />}
-                  />
-                  <InfoRow
-                    label="Family Name"
-                    value={alert.customerInfo.familyName}
-                    icon={<User />}
-                  />
+                <Section title="Customer Profile" icon={<User className="h-5 w-5" />}>
+                  <InfoRow label="Legal ID" value={alert.customerInfo.legalId} />
+                  <InfoRow label="Given Name" value={alert.customerInfo.givenName} />
+                  <InfoRow label="Family Name" value={alert.customerInfo.familyName} />
                   <InfoRow
                     label="Khmer Name"
                     value={`${alert.customerInfo.firstNameKh} ${alert.customerInfo.lastNameKh}`}
-                    icon={<User />}
                   />
-                  <InfoRow
-                    label="Phone"
-                    value={alert.customerInfo.phoneNumber}
-                    icon={<Phone />}
-                  />
-                  <InfoRow
-                    label="Gender"
-                    value={alert.customerInfo.gender}
-                    icon={<Tag />}
-                  />
+                  <InfoRow label="Phone" value={alert.customerInfo.phoneNumber} />
+                  <InfoRow label="Gender" value={alert.customerInfo.gender} />
                   <InfoRow
                     label="Date of Birth"
                     value={alert.customerInfo.dateOfBirth}
-                    icon={<Calendar />}
                   />
                   <InfoRow
                     label="Nationality"
                     value={alert.customerInfo.nationality}
-                    icon={<Globe />}
                   />
                   <InfoRow
                     label="Legal Address"
                     value={alert.customerInfo.legalAddress}
-                    icon={<MapPin />}
+                    className="md:col-span-2"
                   />
                   <InfoRow
                     label="Issued Date"
                     value={alert.customerInfo.issuedDate}
-                    icon={<FileClock />}
                   />
                   <InfoRow
                     label="Expired Date"
                     value={alert.customerInfo.expiredDate}
-                    icon={<FileClock />}
                   />
                 </Section>
 
-                {/* 2. KYC & Personal */}
-                <Section title="KYC & Personal Info" color="orange">
+                <Section title="Personal & KYC" icon={<Briefcase className="h-5 w-5" />}>
                   <InfoRow
-                    label="Current Address Name"
+                    label="Current Address"
                     value={alert.currentAddressName}
-                    icon={<Home />}
+                    className="md:col-span-2"
                   />
                   <InfoRow
-                    label="Current Address Code"
-                    value={alert.currentAddressCode}
-                    icon={<Tag />}
+                    label="Address Code"
+                    value={
+                      alert.currentAddressCode && (
+                        <Badge variant="secondary" className="font-mono">
+                          {alert.currentAddressCode}
+                        </Badge>
+                      )
+                    }
                   />
                   <InfoRow
-                    label="Place of Birth Name"
+                    label="Place of Birth"
                     value={alert.placeOfBirthName}
-                    icon={<MapPin />}
-                  />
-
-                  <InfoRow
-                    label="Place of Birth Code"
-                    value={alert.placeOfBirthCode}
-                    icon={<Tag />}
+                    className="md:col-span-2"
                   />
                   <InfoRow
-                    label="Marital Status"
-                    value={alert.maritalStatus}
-                    icon={<Tag />}
+                    label="POB Code"
+                    value={
+                      alert.placeOfBirthCode && (
+                        <Badge variant="secondary" className="font-mono">
+                          {alert.placeOfBirthCode}
+                        </Badge>
+                      )
+                    }
                   />
-                  <InfoRow
-                    label="Occupation Code"
-                    value={alert.occupationCode}
-                    icon={<Briefcase />}
-                  />
-                  <InfoRow
-                    label="Occupation Status"
-                    value={alert.occupationStatus}
-                    icon={<ClipboardCheck />}
-                  />
+                  <InfoRow label="Marital Status" value={alert.maritalStatus} />
+                  <InfoRow label="Occupation Code" value={alert.occupationCode} />
+                  <InfoRow label="Occupation Status" value={alert.occupationStatus} />
                   <InfoRow
                     label="Remarks"
-                    value={alert.remarks}
-                    icon={<FileText />}
+                    value={alert.remarks || "No remarks"}
+                    className="md:col-span-2 text-muted-foreground"
                   />
                 </Section>
 
-                {/* 3. Screening & Risk */}
-                <Section title="Screening Information" color="red">
+                <Section title="Alert Information" icon={<Activity className="h-5 w-5" />}>
                   <InfoRow
                     label="Risk Level"
-                    value={alert.riskLevel}
-                    icon={<Activity />}
+                    value={
+                      <Badge
+                        variant={
+                          alert.riskLevel === "HIGH" ? "destructive" : "default"
+                        }
+                      >
+                        {alert.riskLevel}
+                      </Badge>
+                    }
                   />
-                  <InfoRow
-                    label="Action Taken"
-                    value={alert.actionTaken}
-                    icon={<ClipboardList />}
-                  />
-                  <InfoRow
-                    label="Service Name"
-                    value={alert.serviceName}
-                    icon={<Tag />}
-                  />
+                  <InfoRow label="Action Taken" value={alert.actionTaken} />
+                  <InfoRow label="Service Name" value={alert.serviceName} />
                   <InfoRow
                     label="Total Rule Score"
-                    value={alert.totalRulesScore}
-                    icon={<Layers />}
+                    value={
+                      <span className="font-bold text-lg">
+                        {alert.totalRulesScore}
+                      </span>
+                    }
                   />
                 </Section>
 
-                {/* 4. Rules Triggered */}
-                <Section title="Rules Triggered" color="purple">
-                  {alert.rulesTriggered ? (
-                    alert.rulesTriggered.split(",").map((rule, i) => (
-                      <div key={i} className="flex justify-between text-sm">
-                        <span>{rule.trim()}</span>
-                        <Badge variant="secondary">Triggered</Badge>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground">No rules triggered</p>
-                  )}
+                <Section title="Rules Triggered" icon={<Layers className="h-5 w-5" />}>
+                  <div className="md:col-span-2 space-y-2">
+                    {alert.rulesTriggered ? (
+                      alert.rulesTriggered.split(",").map((rule, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between p-3 rounded-lg border bg-muted/30"
+                        >
+                          <span className="text-sm font-medium">{rule.trim()}</span>
+                          <Badge variant="destructive">Triggered</Badge>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground italic text-sm">
+                        No rules triggered
+                      </p>
+                    )}
+                  </div>
                 </Section>
 
-                {/* 5. Change History */}
-                <Section title="Changed By" color="green">
-                  {alert.approvedBy && (
-                    <ChangeCard title="Approved By" color="green">
-                      <UserInfoRows data={alert.approvedBy} />
-                    </ChangeCard>
-                  )}
-
-                  {alert.rejectedBy && (
-                    <ChangeCard title="Rejected By" color="red">
-                      <UserInfoRows data={alert.rejectedBy} />
-                    </ChangeCard>
-                  )}
-
-                  {!alert.approvedBy && !alert.rejectedBy && (
-                    <p className="text-muted-foreground">No change history</p>
-                  )}
-                </Section>
-
-                {/* 6. Audit */}
-                <Section title="Audit Information" color="gray">
+                <Section title="Audit Trail" icon={<FileClock className="h-5 w-5" />}>
                   <InfoRow
                     label="Created At"
                     value={DateTimeFormat(alert.createdAt)}
-                    icon={<Calendar />}
                   />
                   <InfoRow
                     label="Updated At"
                     value={DateTimeFormat(alert.updatedAt)}
-                    icon={<Calendar />}
                   />
+
+                  {alert.approvedBy && (
+                    <div className="md:col-span-2 mt-4 pt-4 border-t">
+                      <h4 className="text-sm font-semibold mb-3 text-green-600 flex items-center gap-2">
+                        <ClipboardCheck className="h-4 w-4" /> Approved By
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <UserInfoRows data={alert.approvedBy} />
+                      </div>
+                    </div>
+                  )}
+
+                  {alert.rejectedBy && (
+                    <div className="md:col-span-2 mt-4 pt-4 border-t">
+                      <h4 className="text-sm font-semibold mb-3 text-destructive flex items-center gap-2">
+                        <Shield className="h-4 w-4" /> Rejected By
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <UserInfoRows data={alert.rejectedBy} />
+                      </div>
+                    </div>
+                  )}
                 </Section>
 
-                {/* 7. Customer Documents */}
-                <Section title="Customer Documents" color="purple">
-                  <div className="flex md:flex-row flex-col justify-evenly items-center gap-8 p-4">
-                    <DocumentCard
-                      title="National ID"
-                      imageName={alert.nidImageName}
-                      imageType="nid"
-                      legalId={alert.customerInfo.legalId}
-                    />
-                    <DocumentCard
-                      title="Selfie"
-                      imageName={alert.selfieImageName}
-                      imageType="selfie"
-                      legalId={alert.customerInfo.legalId}
-                    />
+                <Section title="Customer Documents" icon={<FileText className="h-5 w-5" />}>
+                  <div className="md:col-span-2">
+                    <div className="flex md:flex-row flex-col justify-evenly items-center gap-4 p-2">
+                      <DocumentCard
+                        title="National ID"
+                        imageName={alert.nidImageName}
+                        imageType="nid"
+                        legalId={alert.customerInfo.legalId}
+                      />
+                      <DocumentCard
+                        title="Selfie"
+                        imageName={alert.selfieImageName}
+                        imageType="selfie"
+                        legalId={alert.customerInfo.legalId}
+                      />
+                    </div>
                   </div>
                 </Section>
               </>
@@ -339,103 +318,57 @@ export default function AmlViewDetailModal({
   );
 }
 
-/* ---------------------------------------------
- * SECTION WRAPPER
- * -------------------------------------------*/
-function Section({
+const Section = ({
   title,
-  color,
-  children,
-}: {
-  title: string;
-  color: string;
-  children: React.ReactNode;
-}) {
-  const colorMap: any = {
-    blue: "bg-blue-600",
-    red: "bg-red-600",
-    green: "bg-green-600",
-    purple: "bg-purple-600",
-    orange: "bg-orange-600",
-    gray: "bg-gray-600",
-  };
-
-  return (
-    <section className="space-y-4">
-      <div className="flex items-center gap-2">
-        <div className={`w-1 h-6 rounded-full ${colorMap[color]}`}></div>
-        <h3 className="text-lg font-semibold">{title}</h3>
-      </div>
-      <div className="space-y-3">{children}</div>
-    </section>
-  );
-}
-
-/* ---------------------------------------------
- * CHANGE CARD
- * -------------------------------------------*/
-function ChangeCard({
-  title,
-  color,
-  children,
-}: {
-  title: string;
-  color: string;
-  children: React.ReactNode;
-}) {
-  const colorMap: any = {
-    green: "text-green-700",
-    red: "text-red-700",
-  };
-
-  return (
-    <div className="space-y-3 border p-4 rounded-lg">
-      <h4 className={`font-semibold ${colorMap[color]}`}>{title}</h4>
-      {children}
-    </div>
-  );
-}
-
-/* ---------------------------------------------
- * USER INFO ROW GROUP
- * -------------------------------------------*/
-function UserInfoRows({ data }: { data: any }) {
-  return (
-    <>
-      <InfoRow label="Full Name" value={data.fullName} icon={<User />} />
-      <InfoRow label="Email" value={data.email} icon={<Tag />} />
-      <InfoRow label="Role" value={getRoleDisplayName(data.userRole)} icon={<Tag />} />
-      <InfoRow label="Position" value={data.position} icon={<Tag />} />
-      <InfoRow
-        label="Permission"
-        value={data.userPermission}
-        icon={<Shield />}
-      />
-    </>
-  );
-}
-
-/* ---------------------------------------------
- * REUSABLE ROW COMPONENT
- * -------------------------------------------*/
-function InfoRow({
-  label,
   icon,
+  children,
+  className,
+}: {
+  title: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <div className={`space-y-4 rounded-xl border bg-card text-card-foreground shadow-sm p-6 ${className}`}>
+    <div className="flex items-center gap-2 pb-2 border-b">
+      {icon && <div className="text-primary">{icon}</div>}
+      <h3 className="text-lg font-semibold leading-none tracking-tight">{title}</h3>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pt-2">{children}</div>
+  </div>
+);
+
+const InfoRow = ({
+  label,
   value,
+  className,
 }: {
   label: string;
-  icon?: React.ReactNode;
-  value: string | number | undefined;
-}) {
-  return (
-    <div className="flex justify-between">
-      <Label className="text-sm font-medium text-muted-foreground">
-        {label}:
-      </Label>
-      <span className="text-sm flex items-center gap-2">{value ?? "N/A"}</span>
+  value: React.ReactNode;
+  className?: string;
+}) => (
+  <div className={`space-y-1.5 ${className}`}>
+    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+      {label}
+    </Label>
+    <div className="text-sm font-medium break-words text-foreground">
+      {value ?? <span className="text-muted-foreground/40 italic">N/A</span>}
     </div>
-  );
-}
+  </div>
+);
+
+const UserInfoRows = ({ data }: { data: any }) => (
+  <>
+    <InfoRow label="Full Name" value={data.fullName} />
+    <InfoRow label="Email" value={data.email} />
+    <InfoRow
+      label="Role"
+      value={<Badge variant="outline">{getRoleDisplayName(data.userRole)}</Badge>}
+    />
+    <InfoRow label="Position" value={data.position} />
+    <InfoRow label="Permission" value={data.userPermission} />
+  </>
+);
 
 /* ---------------------------------------------
  * DOCUMENT CARD
@@ -464,7 +397,35 @@ function DocumentCard({
     return `${IMAGE_BASE_URL}/api/v1/public/customer-images/${filename}`;
   };
 
-  const downloadImage = async () => {
+  /* ---------------------------------------------
+   * STATE & EFFECT FOR IMAGE
+   * -------------------------------------------*/
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!imageName) {
+      setLoadedSrc(null);
+      return;
+    }
+
+    const fetchImage = async () => {
+      try {
+        const url = getImageUrl(imageName);
+        if (url) {
+          setLoadedSrc(url);
+        } else {
+          setLoadedSrc(null);
+        }
+      } catch (error) {
+        console.error("Error loading image:", error);
+        setLoadedSrc(null);
+      }
+    };
+
+    fetchImage();
+  }, [imageName]);
+
+  const handleDownload = async () => {
     if (!imageName || !legalId) return alert("No image to download");
     try {
       const url = `${IMAGE_BASE_URL}/api/v1/public/customer-images/${imageName}`;
@@ -480,40 +441,43 @@ function DocumentCard({
       window.URL.revokeObjectURL(objectUrl);
     } catch (err) {
       console.error("Download failed:", err);
-      // alert("Failed to download image");
     }
   };
 
   return (
-    <div>
-      <p className="text-base text-gray-600 mb-6 text-center">{title}</p>
-      <div className="relative">
-        <div className="absolute lg:-top-5 -top-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
-        <div className="absolute lg:-top-5 -top-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
-        <div className="absolute lg:-bottom-5 -bottom-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-b-2 border-gray-400"></div>
-        <div className="absolute lg:-bottom-5 -bottom-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-b-2 border-gray-400"></div>
-        <div className="relative lg:w-96 w-80 h-60 rounded overflow-hidden group cursor-pointer bg-gray-100">
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              downloadImage();
-            }}
-          >
-            <img
-              src={
-                getImageUrl(imageName) ??
-                "/app/image_selfie_4K.png?height=192&width=320"
-              }
-              alt={title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <p className="text-white text-lg font-semibold">Download Image</p>
-            </div>
-          </a>
-        </div>
+    <div className="w-full group relative rounded-lg border bg-background shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/80 to-transparent p-4 pointer-events-none">
+        <p className="text-white font-medium text-sm drop-shadow-sm">{title}</p>
       </div>
+
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          handleDownload();
+        }}
+        className="block aspect-video relative"
+      >
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          {loadedSrc ? (
+            <img
+              src={loadedSrc}
+              alt={title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <span className="text-xs">Loading...</span>
+            </div>
+          )}
+        </div>
+
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 backdrop-blur-[2px]">
+          <div className="bg-background/90 text-foreground px-4 py-2 rounded-full text-sm font-medium shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
+            Download Image
+          </div>
+        </div>
+      </a>
     </div>
   );
 }
