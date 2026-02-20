@@ -220,24 +220,14 @@ export const useAccountSubmission = ({
         error?.rawError?.message ||
         "Failed to create account. Please try again.";
 
-      const isConflict =
-        error?.rawError?.status === 409 || error?.status === 409;
+      const httpStatus = error?.rawError?.status ?? error?.status ?? 0;
+      const isConflict = httpStatus === 409;
 
-      if (errorMessage.includes("ACCOUNT_ALREADY_EXIST") || isConflict) {
-        setSubmitErrorData({
-          title: translate("account_exists_title") || "Account Already Exists",
-          message:
-            translate("account_exists_message") ||
-            "You already have an account with the bank. Please use your existing account.",
-          variant: "warning",
-        });
-      } else {
-        setSubmitErrorData({
-          title: translate("error_title") || "Submission Failed",
-          message: errorMessage,
-          variant: "error",
-        });
-      }
+      setSubmitErrorData({
+        title: "ការស្នើសុំបរាជ័យ",
+        message: errorMessage,
+        variant: isConflict ? "warning" : "error",
+      });
       setShowSubmitErrorModal(true);
     } finally {
       setLoadingState({

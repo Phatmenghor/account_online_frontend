@@ -3,25 +3,14 @@
 import {
   User,
   Shield,
-  Globe,
-  Tag,
-  Phone,
-  Calendar,
-  MapPin,
   Activity,
   Layers,
-  ClipboardList,
-  Home,
   Briefcase,
   ClipboardCheck,
   FileText,
   FileClock,
   Image as ImageIcon,
-  Loader2,
 } from "lucide-react";
-import Image from "next/image";
-import { axiosClientWithAuth } from "@/utils/axios";
-
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -30,14 +19,11 @@ import {
   DialogDescription,
   DialogContent,
   DialogFooter,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-
 import { AmlManagementModel } from "@/models/aml/management/response/aml-management.response";
 import { getAmlManagementByIdService } from "@/services/dashboard/aml/aml-management.service";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
@@ -58,7 +44,7 @@ export default function AmlViewDetailModal({
   onClose,
 }: AmlAlertViewModalProps) {
   const [alert, setAlert] = useState<AmlManagementModel | undefined>(
-    initialAlert
+    initialAlert,
   );
   const [loading, setLoading] = useState(false);
 
@@ -132,15 +118,30 @@ export default function AmlViewDetailModal({
             ) : (
               <>
                 {/* 1. Customer Information */}
-                <Section title="Customer Profile" icon={<User className="h-5 w-5" />}>
-                  <InfoRow label="Legal ID" value={alert.customerInfo.legalId} />
-                  <InfoRow label="Given Name" value={alert.customerInfo.givenName} />
-                  <InfoRow label="Family Name" value={alert.customerInfo.familyName} />
+                <Section
+                  title="Customer Profile"
+                  icon={<User className="h-5 w-5" />}
+                >
+                  <InfoRow
+                    label="Legal ID"
+                    value={alert.customerInfo.legalId}
+                  />
+                  <InfoRow
+                    label="Given Name"
+                    value={alert.customerInfo.givenName}
+                  />
+                  <InfoRow
+                    label="Family Name"
+                    value={alert.customerInfo.familyName}
+                  />
                   <InfoRow
                     label="Khmer Name"
                     value={`${alert.customerInfo.firstNameKh} ${alert.customerInfo.lastNameKh}`}
                   />
-                  <InfoRow label="Phone" value={alert.customerInfo.phoneNumber} />
+                  <InfoRow
+                    label="Phone"
+                    value={alert.customerInfo.phoneNumber}
+                  />
                   <InfoRow label="Gender" value={alert.customerInfo.gender} />
                   <InfoRow
                     label="Date of Birth"
@@ -165,7 +166,10 @@ export default function AmlViewDetailModal({
                   />
                 </Section>
 
-                <Section title="Personal & KYC" icon={<Briefcase className="h-5 w-5" />}>
+                <Section
+                  title="Personal & KYC"
+                  icon={<Briefcase className="h-5 w-5" />}
+                >
                   <InfoRow
                     label="Current Address"
                     value={alert.currentAddressName}
@@ -197,8 +201,14 @@ export default function AmlViewDetailModal({
                     }
                   />
                   <InfoRow label="Marital Status" value={alert.maritalStatus} />
-                  <InfoRow label="Occupation Code" value={alert.occupationCode} />
-                  <InfoRow label="Occupation Status" value={alert.occupationStatus} />
+                  <InfoRow
+                    label="Occupation Code"
+                    value={alert.occupationCode}
+                  />
+                  <InfoRow
+                    label="Occupation Status"
+                    value={alert.occupationStatus}
+                  />
                   <InfoRow
                     label="Remarks"
                     value={alert.remarks || "No remarks"}
@@ -206,7 +216,10 @@ export default function AmlViewDetailModal({
                   />
                 </Section>
 
-                <Section title="Alert Information" icon={<Activity className="h-5 w-5" />}>
+                <Section
+                  title="Alert Information"
+                  icon={<Activity className="h-5 w-5" />}
+                >
                   <InfoRow
                     label="Risk Level"
                     value={
@@ -231,7 +244,10 @@ export default function AmlViewDetailModal({
                   />
                 </Section>
 
-                <Section title="Rules Triggered" icon={<Layers className="h-5 w-5" />}>
+                <Section
+                  title="Rules Triggered"
+                  icon={<Layers className="h-5 w-5" />}
+                >
                   <div className="md:col-span-2 space-y-2">
                     {(() => {
                       try {
@@ -244,7 +260,9 @@ export default function AmlViewDetailModal({
                               key={i}
                               className="flex items-center justify-between p-3 rounded-lg border bg-muted/30"
                             >
-                              <span className="text-sm font-medium">{rule.RuleName}</span>
+                              <span className="text-sm font-medium">
+                                {rule.RuleName}
+                              </span>
                               <Badge variant="destructive">Triggered</Badge>
                             </div>
                           ));
@@ -253,18 +271,27 @@ export default function AmlViewDetailModal({
                         if (alert.rulesTriggered) {
                           return (
                             <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm font-medium">{alert.rulesTriggered}</span>
+                              <span className="text-sm font-medium">
+                                {alert.rulesTriggered}
+                              </span>
                               <Badge variant="destructive">Triggered</Badge>
                             </div>
                           );
                         }
                       }
-                      return <p className="text-muted-foreground italic text-sm">No rules triggered</p>;
+                      return (
+                        <p className="text-muted-foreground italic text-sm">
+                          No rules triggered
+                        </p>
+                      );
                     })()}
                   </div>
                 </Section>
 
-                <Section title="Audit Trail" icon={<FileClock className="h-5 w-5" />}>
+                <Section
+                  title="Audit Trail"
+                  icon={<FileClock className="h-5 w-5" />}
+                >
                   <InfoRow
                     label="Created At"
                     value={DateTimeFormat(alert.createdAt)}
@@ -297,7 +324,10 @@ export default function AmlViewDetailModal({
                   )}
                 </Section>
 
-                <Section title="Customer Documents" icon={<FileText className="h-5 w-5" />}>
+                <Section
+                  title="Customer Documents"
+                  icon={<FileText className="h-5 w-5" />}
+                >
                   <div className="md:col-span-2">
                     <div className="flex md:flex-row flex-col justify-evenly items-center gap-4 p-2">
                       <DocumentCard
@@ -342,12 +372,18 @@ const Section = ({
   children: React.ReactNode;
   className?: string;
 }) => (
-  <div className={`space-y-4 rounded-xl border bg-card text-card-foreground shadow-sm p-6 ${className}`}>
+  <div
+    className={`space-y-4 rounded-xl border bg-card text-card-foreground shadow-sm p-6 ${className}`}
+  >
     <div className="flex items-center gap-2 pb-2 border-b">
       {icon && <div className="text-primary">{icon}</div>}
-      <h3 className="text-lg font-semibold leading-none tracking-tight">{title}</h3>
+      <h3 className="text-lg font-semibold leading-none tracking-tight">
+        {title}
+      </h3>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pt-2">{children}</div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pt-2">
+      {children}
+    </div>
   </div>
 );
 
@@ -376,7 +412,9 @@ const UserInfoRows = ({ data }: { data: any }) => (
     <InfoRow label="Email" value={data.email} />
     <InfoRow
       label="Role"
-      value={<Badge variant="outline">{getRoleDisplayName(data.userRole)}</Badge>}
+      value={
+        <Badge variant="outline">{getRoleDisplayName(data.userRole)}</Badge>
+      }
     />
     <InfoRow label="Position" value={data.position} />
     <InfoRow label="Permission" value={data.userPermission} />

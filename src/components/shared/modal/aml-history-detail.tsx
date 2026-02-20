@@ -3,26 +3,14 @@
 import {
   User,
   Shield,
-  Globe,
-  Tag,
-  Phone,
-  Calendar,
-  MapPin,
   Activity,
   Layers,
-  ClipboardList,
-  Home,
   Briefcase,
   ClipboardCheck,
   FileText,
   FileClock,
   Image as ImageIcon,
-  Loader2,
 } from "lucide-react";
-import Image from "next/image";
-import { axiosClientWithAuth } from "@/utils/axios";
-import { DialogTrigger } from "@/components/ui/dialog";
-
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -36,7 +24,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-
 import { HistoryModel } from "@/models/aml/history/response/history-response.model";
 import { getAmlHistoryByIdService } from "@/services/dashboard/aml/aml-history.service";
 import { DateTimeFormat } from "@/utils/date/date-time-format";
@@ -129,13 +116,22 @@ export default function AmlHistoryDetailModal({
             ) : (
               <>
                 {/* 1. Customer Info */}
-                <Section title="Customer Profile" icon={<User className="h-5 w-5" />}>
-                  <InfoRow label="Legal ID" value={history.customerInfo.legalId} />
+                <Section
+                  title="Customer Profile"
+                  icon={<User className="h-5 w-5" />}
+                >
+                  <InfoRow
+                    label="Legal ID"
+                    value={history.customerInfo.legalId}
+                  />
                   <InfoRow
                     label="Full Name"
                     value={`${history.customerInfo.givenName} ${history.customerInfo.familyName}`}
                   />
-                  <InfoRow label="Phone" value={history.customerInfo.phoneNumber} />
+                  <InfoRow
+                    label="Phone"
+                    value={history.customerInfo.phoneNumber}
+                  />
                   <InfoRow label="Gender" value={history.customerInfo.gender} />
                   <InfoRow
                     label="Date of Birth"
@@ -160,7 +156,10 @@ export default function AmlHistoryDetailModal({
                   />
                 </Section>
 
-                <Section title="Personal & KYC" icon={<Briefcase className="h-5 w-5" />}>
+                <Section
+                  title="Personal & KYC"
+                  icon={<Briefcase className="h-5 w-5" />}
+                >
                   <InfoRow
                     label="Current Address"
                     value={history.currentAddressName}
@@ -210,13 +209,18 @@ export default function AmlHistoryDetailModal({
                   />
                 </Section>
 
-                <Section title="Screening Results" icon={<Activity className="h-5 w-5" />}>
+                <Section
+                  title="Screening Results"
+                  icon={<Activity className="h-5 w-5" />}
+                >
                   <InfoRow
                     label="Risk Level"
                     value={
                       <Badge
                         variant={
-                          history.riskLevel === "HIGH" ? "destructive" : "default"
+                          history.riskLevel === "HIGH"
+                            ? "destructive"
+                            : "default"
                         }
                       >
                         {history.riskLevel}
@@ -235,7 +239,10 @@ export default function AmlHistoryDetailModal({
                   />
                 </Section>
 
-                <Section title="Rules Triggered" icon={<Layers className="h-5 w-5" />}>
+                <Section
+                  title="Rules Triggered"
+                  icon={<Layers className="h-5 w-5" />}
+                >
                   <div className="md:col-span-2 space-y-2">
                     {(() => {
                       try {
@@ -250,7 +257,9 @@ export default function AmlHistoryDetailModal({
                               key={i}
                               className="flex items-center justify-between p-3 rounded-lg border bg-muted/30"
                             >
-                              <span className="text-sm font-medium">{rule.RuleName}</span>
+                              <span className="text-sm font-medium">
+                                {rule.RuleName}
+                              </span>
                               <Badge variant="destructive">Triggered</Badge>
                             </div>
                           ));
@@ -260,18 +269,27 @@ export default function AmlHistoryDetailModal({
                         if (history.rulesTriggered) {
                           return (
                             <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm font-medium">{history.rulesTriggered}</span>
+                              <span className="text-sm font-medium">
+                                {history.rulesTriggered}
+                              </span>
                               <Badge variant="destructive">Triggered</Badge>
                             </div>
                           );
                         }
                       }
-                      return <p className="text-muted-foreground italic text-sm">No rules triggered</p>;
+                      return (
+                        <p className="text-muted-foreground italic text-sm">
+                          No rules triggered
+                        </p>
+                      );
                     })()}
                   </div>
                 </Section>
 
-                <Section title="Audit Trail" icon={<FileClock className="h-5 w-5" />}>
+                <Section
+                  title="Audit Trail"
+                  icon={<FileClock className="h-5 w-5" />}
+                >
                   <InfoRow
                     label="Created At"
                     value={DateTimeFormat(history.createdAt)}
@@ -304,7 +322,10 @@ export default function AmlHistoryDetailModal({
                   )}
                 </Section>
 
-                <Section title="Customer Documents" icon={<FileText className="h-5 w-5" />}>
+                <Section
+                  title="Customer Documents"
+                  icon={<FileText className="h-5 w-5" />}
+                >
                   <div className="md:col-span-2">
                     <div className="flex md:flex-row flex-col justify-evenly items-center gap-4 p-2">
                       <DocumentCard
@@ -349,12 +370,18 @@ const Section = ({
   children: React.ReactNode;
   className?: string;
 }) => (
-  <div className={`space-y-4 rounded-xl border bg-card text-card-foreground shadow-sm p-6 ${className}`}>
+  <div
+    className={`space-y-4 rounded-xl border bg-card text-card-foreground shadow-sm p-6 ${className}`}
+  >
     <div className="flex items-center gap-2 pb-2 border-b">
       {icon && <div className="text-primary">{icon}</div>}
-      <h3 className="text-lg font-semibold leading-none tracking-tight">{title}</h3>
+      <h3 className="text-lg font-semibold leading-none tracking-tight">
+        {title}
+      </h3>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pt-2">{children}</div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pt-2">
+      {children}
+    </div>
   </div>
 );
 
@@ -383,7 +410,9 @@ const UserInfoRows = ({ data }: { data: any }) => (
     <InfoRow label="Email" value={data.email} />
     <InfoRow
       label="Role"
-      value={<Badge variant="outline">{getRoleDisplayName(data.userRole)}</Badge>}
+      value={
+        <Badge variant="outline">{getRoleDisplayName(data.userRole)}</Badge>
+      }
     />
     <InfoRow label="Position" value={data.position} />
     <InfoRow label="Permission" value={data.userPermission} />
