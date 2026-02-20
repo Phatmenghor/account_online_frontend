@@ -57,7 +57,7 @@ export default function AmlHistoryDetailModal({
   onClose,
 }: HistoryDetailModalProps) {
   const [history, setHistory] = useState<HistoryModel | undefined>(
-    initialHistory
+    initialHistory,
   );
   const [loading, setLoading] = useState(false);
 
@@ -89,7 +89,7 @@ export default function AmlHistoryDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl h-[90vh] p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-5xl h-[90vh] p-0 gap-0 flex flex-col">
         {/* Header */}
         <DialogHeader className="px-6 py-4 border-b bg-muted/30 flex-shrink-0">
           <div className="flex items-center gap-4">
@@ -103,7 +103,7 @@ export default function AmlHistoryDetailModal({
               </DialogTitle>
 
               <DialogDescription className="text-base text-muted-foreground">
-                Record ID: {historyId ?? "Unknown"}
+                Transaction ID: {history?.trxnID ?? "NA"}
               </DialogDescription>
 
               {history && (
@@ -294,7 +294,7 @@ export default function AmlHistoryDetailModal({
 
                 {/* 7. Customer Documents */}
                 <Section title="Customer Documents" color="purple">
-                  <div className="flex flex-wrap gap-10 justify-center p-4">
+                  <div className="flex md:flex-row flex-col justify-evenly items-center gap-8 p-4">
                     <DocumentCard
                       title="National ID"
                       imageName={history.nidImageName}
@@ -390,7 +390,11 @@ function UserInfoRows({ data }: { data: any }) {
     <>
       <InfoRow label="Full Name" value={data.fullName} icon={<User />} />
       <InfoRow label="Email" value={data.email} icon={<Tag />} />
-      <InfoRow label="Role" value={getRoleDisplayName(data.userRole)} icon={<Tag />} />
+      <InfoRow
+        label="Role"
+        value={getRoleDisplayName(data.userRole)}
+        icon={<Tag />}
+      />
       <InfoRow label="Position" value={data.position} icon={<Tag />} />
       <InfoRow
         label="Permission"
@@ -472,7 +476,7 @@ function DocumentCard({
 
   return (
     <div>
-      <p className="text-base text-gray-600 mb-4 text-center">{title}</p>
+      <p className="text-base text-gray-600 mb-6 text-center">{title}</p>
       <div className="relative">
         <div className="absolute lg:-top-5 -top-3 lg:-left-6 -left-3 w-9 h-6 border-l-2 border-t-2 border-gray-400"></div>
         <div className="absolute lg:-top-5 -top-3 lg:-right-6 -right-3 w-9 h-6 border-r-2 border-t-2 border-gray-400"></div>
