@@ -16,7 +16,7 @@ const IMAGE_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL_IMAGE ?? "";
 
 function getImageUrl(filename: string | undefined | null): string | null {
   if (!filename) return null;
-  return `${IMAGE_BASE_URL}/api/v1/public/customer-images/${filename}`;
+  return `${IMAGE_BASE_URL}/api/customer-images/${filename}`;
 }
 
 function AccountPageContent() {
@@ -71,7 +71,7 @@ function AccountPageContent() {
   ) => {
     if (!filename) return alert("No image to download");
     try {
-      const url = `${IMAGE_BASE_URL}/api/v1/public/customer-images/${filename}`;
+      const url = `${IMAGE_BASE_URL}/api/customer-images/${filename}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch image");
       const blob = await response.blob();

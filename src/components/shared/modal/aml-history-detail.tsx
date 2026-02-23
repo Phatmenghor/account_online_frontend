@@ -437,7 +437,7 @@ function DocumentCard({
 
   const getImageUrl = (filename: string | undefined | null): string | null => {
     if (!filename) return null;
-    return `${IMAGE_BASE_URL}/api/v1/public/customer-images/${filename}`;
+    return `${IMAGE_BASE_URL}/api/customer-images/${filename}`;
   };
 
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
@@ -454,7 +454,7 @@ function DocumentCard({
   const handleDownload = async () => {
     if (!imageName || !legalId) return alert("No image to download");
     try {
-      const url = `${IMAGE_BASE_URL}/api/v1/public/customer-images/${imageName}`;
+      const url = `${IMAGE_BASE_URL}/api/customer-images/${imageName}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch image");
       const blob = await response.blob();
