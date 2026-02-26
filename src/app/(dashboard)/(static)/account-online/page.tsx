@@ -42,7 +42,7 @@ function AccountPageContent() {
         toast.error("No data found.");
       }
     } catch (error: any) {
-      console.log("Failed to fetch account : ", error);
+      console.error("Failed to fetch account : ", error);
       toast.error(error.errorMessage || "Failed to fetch account.");
     } finally {
       setIsLoading(false);

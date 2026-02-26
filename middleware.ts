@@ -6,12 +6,6 @@ export default function middleware(req: NextRequest) {
   const token = req.cookies.get("auth-token")?.value;
   const pathname = req.nextUrl.pathname;
 
-  console.log("=== MIDDLEWARE DEBUG ===");
-  console.log("pathname:", pathname);
-  console.log("token exists:", !!token);
-  console.log("ROUTES.AUTH.LOGIN:", ROUTES.AUTH.LOGIN);
-  console.log("========================");
-
   if (pathname === "/login") {
     return NextResponse.next();
   }
@@ -31,7 +25,6 @@ export default function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  console.log("Proceeding normally...");
   return NextResponse.next();
 }
 

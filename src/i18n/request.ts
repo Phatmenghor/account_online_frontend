@@ -1,7 +1,7 @@
 import { getRequestConfig } from "next-intl/server";
 
 export const locales = ["en", "kh"] as const;
-export const defaultLocale = "en" as const;
+export const defaultLocale = "kh" as const;
 export type Locale = (typeof locales)[number];
 
 /**
@@ -18,13 +18,8 @@ export default getRequestConfig(async () => {
   const rawLocale: string = defaultLocale;
   const locale = normalizeLocale(rawLocale);
 
-  console.log("=== i18n getRequestConfig (Server-side) ===");
-  console.log("Server using locale:", locale);
-
   try {
     const messages = (await import(`../messages/${locale}.json`)).default;
-    console.log("Messages loaded successfully for:", locale);
-
     return {
       messages,
       locale,

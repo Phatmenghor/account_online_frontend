@@ -26,8 +26,16 @@ import { createVillageTableColumns } from "@/components/shared/table/village-con
 import VillageViewModal from "@/components/shared/modal/village-detail-modal";
 import ModalVillage from "@/components/shared/modal/village-modal";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
-import { CreateVillageReq, UpdateVillageReq } from "@/models/static/village/village.request";
-import { createVillageService, deleteVillageService, getAllVillageService, updateVillageService } from "@/services/dashboard/village/village.service";
+import {
+  CreateVillageReq,
+  UpdateVillageReq,
+} from "@/models/static/village/village.request";
+import {
+  createVillageService,
+  deleteVillageService,
+  getAllVillageService,
+  updateVillageService,
+} from "@/services/dashboard/village/village.service";
 
 function VillagePageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,7 +43,7 @@ function VillagePageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedVillage, setSelectedVillage] = useState<VillageModel | null>(
-    null
+    null,
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
@@ -70,7 +78,7 @@ function VillagePageContent() {
       });
       setVillages(response);
     } catch (error: any) {
-      console.log("Failed to fetch villages: ", error);
+      console.error("Failed to fetch villages: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +94,7 @@ function VillagePageContent() {
   };
 
   const handleSaveVillage = async (
-    formData: CreateVillageReq | { id: number; updates: UpdateVillageReq }
+    formData: CreateVillageReq | { id: number; updates: UpdateVillageReq },
   ) => {
     setIsSubmitting(true);
     try {
@@ -115,7 +123,7 @@ function VillagePageContent() {
                 totalElements: 1,
                 totalPages: 1,
                 last: true,
-              }
+              },
         );
 
         startTransition(() => {
@@ -126,7 +134,10 @@ function VillagePageContent() {
           });
         });
       } else if (mode === ModalMode.UPDATE_MODE) {
-        const updateData = formData as { id: number; updates: UpdateVillageReq };
+        const updateData = formData as {
+          id: number;
+          updates: UpdateVillageReq;
+        };
 
         if (!updateData.id) {
           console.error("Missing village id in update form");
@@ -136,7 +147,7 @@ function VillagePageContent() {
 
         const response = await updateVillageService(
           updateData.id,
-          updateData.updates
+          updateData.updates,
         );
 
         setVillages((prev) =>
@@ -144,10 +155,10 @@ function VillagePageContent() {
             ? {
                 ...prev,
                 content: prev.content.map((village) =>
-                  village.id === updateData.id ? response : village
+                  village.id === updateData.id ? response : village,
                 ),
               }
-            : prev
+            : prev,
         );
 
         startTransition(() => {

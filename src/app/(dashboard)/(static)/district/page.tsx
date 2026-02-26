@@ -26,17 +26,24 @@ import { createDistrictTableColumns } from "@/components/shared/table/district-c
 import DistrictViewModal from "@/components/shared/modal/district-detail-modal";
 import ModalDistrict from "@/components/shared/modal/district-modal";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
-import { CreateDistrictReq, UpdateDistrictReq } from "@/models/static/district/district.request";
-import { createDistrictService, deleteDistrictService, getAllDistrictService, updateDistrictService } from "@/services/dashboard/district/district.service";
+import {
+  CreateDistrictReq,
+  UpdateDistrictReq,
+} from "@/models/static/district/district.request";
+import {
+  createDistrictService,
+  deleteDistrictService,
+  getAllDistrictService,
+  updateDistrictService,
+} from "@/services/dashboard/district/district.service";
 
 function DistrictPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [districts, setDistricts] = useState<AllDistrictModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedDistrict, setSelectedDistrict] = useState<DistrictModel | null>(
-    null
-  );
+  const [selectedDistrict, setSelectedDistrict] =
+    useState<DistrictModel | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,7 +77,7 @@ function DistrictPageContent() {
       });
       setDistricts(response);
     } catch (error: any) {
-      console.log("Failed to fetch districts: ", error);
+      console.error("Failed to fetch districts: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +93,7 @@ function DistrictPageContent() {
   };
 
   const handleSaveDistrict = async (
-    formData: CreateDistrictReq | { id: number; updates: UpdateDistrictReq }
+    formData: CreateDistrictReq | { id: number; updates: UpdateDistrictReq },
   ) => {
     setIsSubmitting(true);
     try {
@@ -115,7 +122,7 @@ function DistrictPageContent() {
                 totalElements: 1,
                 totalPages: 1,
                 last: true,
-              }
+              },
         );
 
         startTransition(() => {
@@ -126,7 +133,10 @@ function DistrictPageContent() {
           });
         });
       } else if (mode === ModalMode.UPDATE_MODE) {
-        const updateData = formData as { id: number; updates: UpdateDistrictReq };
+        const updateData = formData as {
+          id: number;
+          updates: UpdateDistrictReq;
+        };
 
         if (!updateData.id) {
           console.error("Missing district id in update form");
@@ -136,7 +146,7 @@ function DistrictPageContent() {
 
         const response = await updateDistrictService(
           updateData.id,
-          updateData.updates
+          updateData.updates,
         );
 
         setDistricts((prev) =>
@@ -144,10 +154,10 @@ function DistrictPageContent() {
             ? {
                 ...prev,
                 content: prev.content.map((district) =>
-                  district.id === updateData.id ? response : district
+                  district.id === updateData.id ? response : district,
                 ),
               }
-            : prev
+            : prev,
         );
 
         startTransition(() => {
@@ -278,14 +288,16 @@ function DistrictPageContent() {
 
         <DeleteConfirmationDialog
           isOpen={isDeleteDialogOpen}
-          onClose={() => { 
+          onClose={() => {
             setIsDeleteDialogOpen(false);
             setSelectedDistrict(null);
           }}
           onDelete={confirmDeleteDistrict}
           title="Delete District"
           description={`Are you sure you want to delete this district`}
-          itemName={selectedDistrict?.districtEn || selectedDistrict?.districtKh}
+          itemName={
+            selectedDistrict?.districtEn || selectedDistrict?.districtKh
+          }
           isSubmitting={isSubmitting}
         />
 

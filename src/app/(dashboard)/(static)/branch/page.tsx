@@ -43,7 +43,7 @@ function BranchPageContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedBranch, setSelectedBranch] = useState<BranchModel | null>(
-    null
+    null,
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
@@ -77,7 +77,7 @@ function BranchPageContent() {
       });
       setBranch(response);
     } catch (error: any) {
-      console.log("Failed to fetch branch: ", error);
+      console.error("Failed to fetch branch: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +93,7 @@ function BranchPageContent() {
   };
 
   const handleSaveBranch = async (
-    formData: CreateBranchReq | { id: number; updates: UpdateBranchReq }
+    formData: CreateBranchReq | { id: number; updates: UpdateBranchReq },
   ) => {
     setIsSubmitting(true);
     try {
@@ -120,7 +120,7 @@ function BranchPageContent() {
                 totalElements: 1,
                 totalPages: 1,
                 last: true,
-              }
+              },
         );
 
         startTransition(() => {
@@ -141,7 +141,7 @@ function BranchPageContent() {
 
         const response = await updateBranchService(
           updateData.id,
-          updateData.updates
+          updateData.updates,
         );
 
         setBranch((prev) =>
@@ -149,10 +149,10 @@ function BranchPageContent() {
             ? {
                 ...prev,
                 content: prev.content.map((branch) =>
-                  branch.id === updateData.id ? response : branch
+                  branch.id === updateData.id ? response : branch,
                 ),
               }
-            : prev
+            : prev,
         );
 
         startTransition(() => {

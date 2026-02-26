@@ -26,20 +26,35 @@ import { createOccupationTableColumns } from "@/components/shared/table/occupati
 import OccupationViewModal from "@/components/shared/modal/occupation-detail-modal";
 import ModalOccupation from "@/components/shared/modal/occupation-modal";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
-import { CreateOccupationReq, UpdateOccupationReq } from "@/models/static/occupation/occupation.request";
-import { createOccupationService, deleteOccupationService, getAllOccupationService, updateOccupationService } from "@/services/dashboard/occupation/occupation.service";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  CreateOccupationReq,
+  UpdateOccupationReq,
+} from "@/models/static/occupation/occupation.request";
+import {
+  createOccupationService,
+  deleteOccupationService,
+  getAllOccupationService,
+  updateOccupationService,
+} from "@/services/dashboard/occupation/occupation.service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { STATUS_USER_OPTIONS } from "@/constants/AppResource/filter/status";
 
 function OccupationPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [occupations, setOccupations] = useState<AllOccupationModel | null>(null);
+  const [occupations, setOccupations] = useState<AllOccupationModel | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [selectedOccupation, setSelectedOccupation] = useState<OccupationModel | null>(
-    null
-  );
+  const [selectedOccupation, setSelectedOccupation] =
+    useState<OccupationModel | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,7 +89,7 @@ function OccupationPageContent() {
       });
       setOccupations(response);
     } catch (error: any) {
-      console.log("Failed to fetch occupations: ", error);
+      console.error("Failed to fetch occupations: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +105,9 @@ function OccupationPageContent() {
   };
 
   const handleSaveOccupation = async (
-    formData: CreateOccupationReq | { id: number; updates: UpdateOccupationReq }
+    formData:
+      | CreateOccupationReq
+      | { id: number; updates: UpdateOccupationReq },
   ) => {
     setIsSubmitting(true);
     try {
@@ -119,7 +136,7 @@ function OccupationPageContent() {
                 totalElements: 1,
                 totalPages: 1,
                 last: true,
-              }
+              },
         );
 
         startTransition(() => {
@@ -130,7 +147,10 @@ function OccupationPageContent() {
           });
         });
       } else if (mode === ModalMode.UPDATE_MODE) {
-        const updateData = formData as { id: number; updates: UpdateOccupationReq };
+        const updateData = formData as {
+          id: number;
+          updates: UpdateOccupationReq;
+        };
 
         if (!updateData.id) {
           console.error("Missing occupation id in update form");
@@ -140,7 +160,7 @@ function OccupationPageContent() {
 
         const response = await updateOccupationService(
           updateData.id,
-          updateData.updates
+          updateData.updates,
         );
 
         setOccupations((prev) =>
@@ -148,10 +168,10 @@ function OccupationPageContent() {
             ? {
                 ...prev,
                 content: prev.content.map((occupation) =>
-                  occupation.id === updateData.id ? response : occupation
+                  occupation.id === updateData.id ? response : occupation,
                 ),
               }
-            : prev
+            : prev,
         );
 
         startTransition(() => {
@@ -246,7 +266,7 @@ function OccupationPageContent() {
                 disabled={isSubmitting}
               />
             </div>
-            
+
             {/* Status Filter Dropdown */}
             <Select value={statusFilter} onValueChange={handleStatusChange}>
               <SelectTrigger className="w-[180px] h-9">
@@ -311,7 +331,11 @@ function OccupationPageContent() {
           onDelete={confirmDeleteOccupation}
           title="Delete Occupation"
           description={`Are you sure you want to delete this occupation`}
-          itemName={selectedOccupation?.nameEn || selectedOccupation?.nameKh || selectedOccupation?.occupationCode}
+          itemName={
+            selectedOccupation?.nameEn ||
+            selectedOccupation?.nameKh ||
+            selectedOccupation?.occupationCode
+          }
           isSubmitting={isSubmitting}
         />
 

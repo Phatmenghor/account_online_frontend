@@ -88,7 +88,7 @@ function LegalTypePageContent() {
       });
       setLegalTypes(response);
     } catch (error: any) {
-      console.log("Failed to fetch legal types: ", error);
+      console.error("Failed to fetch legal types: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +104,7 @@ function LegalTypePageContent() {
   };
 
   const handleSaveLegalType = async (
-    formData: CreateLegalTypeReq | { id: number; updates: UpdateLegalTypeReq }
+    formData: CreateLegalTypeReq | { id: number; updates: UpdateLegalTypeReq },
   ) => {
     setIsSubmitting(true);
     try {
@@ -133,7 +133,7 @@ function LegalTypePageContent() {
                 totalElements: 1,
                 totalPages: 1,
                 last: true,
-              }
+              },
         );
 
         startTransition(() => {
@@ -157,7 +157,7 @@ function LegalTypePageContent() {
 
         const response = await updateLegalTypeService(
           updateData.id,
-          updateData.updates
+          updateData.updates,
         );
 
         setLegalTypes((prev: any) =>
@@ -165,10 +165,10 @@ function LegalTypePageContent() {
             ? {
                 ...prev,
                 content: prev.content.map((legalType: any) =>
-                  legalType.id === updateData.id ? response : legalType
+                  legalType.id === updateData.id ? response : legalType,
                 ),
               }
-            : prev
+            : prev,
         );
 
         startTransition(() => {

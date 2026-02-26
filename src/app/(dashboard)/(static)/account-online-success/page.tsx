@@ -24,7 +24,7 @@ import SuccessAccountViewModal from "@/components/shared/modal/success-account-d
 function SuccessAccountPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [accounts, setAccounts] = useState<AllSuccessAccountOnlineModel | null>(
-    null
+    null,
   );
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAccount, setSelectedAccount] =
@@ -57,7 +57,7 @@ function SuccessAccountPageContent() {
       });
       setAccounts(response);
     } catch (error: any) {
-      console.log("Failed to fetch success accounts: ", error);
+      console.error("Failed to fetch success accounts: ", error);
     } finally {
       setIsLoading(false);
     }

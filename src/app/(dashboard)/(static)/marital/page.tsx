@@ -74,7 +74,7 @@ function MaritalPageContent() {
       });
       setMaritals(response);
     } catch (error: any) {
-      console.log("Failed to fetch maritals: ", error);
+      console.error("Failed to fetch maritals: ", error);
     } finally {
       setIsLoading(false);
     }

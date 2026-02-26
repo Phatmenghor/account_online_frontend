@@ -77,10 +77,9 @@ function ProvincePageContent() {
         pageSize: 15,
         status: statusFilter !== "all" ? statusFilter : undefined,
       });
-      console.log("this is dataa", response);
       setProvince(response);
     } catch (error: any) {
-      console.log("Failed to fetch references: ", error);
+      console.error("Failed to fetch references: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +95,7 @@ function ProvincePageContent() {
   };
 
   const handleSaveProvince = async (
-    formData: CreateProvinceReq | { id: number; updates: UpdateProvinceReq }
+    formData: CreateProvinceReq | { id: number; updates: UpdateProvinceReq },
   ) => {
     setIsSubmitting(true);
     try {
@@ -124,7 +123,7 @@ function ProvincePageContent() {
                 totalElements: 1,
                 totalPages: 1,
                 last: true,
-              }
+              },
         );
 
         startTransition(() => {
@@ -148,7 +147,7 @@ function ProvincePageContent() {
 
         const response = await updateProvinceService(
           updateData.id,
-          updateData.updates
+          updateData.updates,
         );
 
         setProvince((prev) =>
@@ -156,10 +155,10 @@ function ProvincePageContent() {
             ? {
                 ...prev,
                 content: prev.content.map((province) =>
-                  province.id === updateData.id ? response : province
+                  province.id === updateData.id ? response : province,
                 ),
               }
-            : prev
+            : prev,
         );
 
         startTransition(() => {

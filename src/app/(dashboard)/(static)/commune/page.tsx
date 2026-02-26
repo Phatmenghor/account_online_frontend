@@ -70,7 +70,7 @@ function CommunePageContent() {
       });
       setCommunes(response);
     } catch (error: any) {
-      console.log("Failed to fetch communes: ", error);
+      console.error("Failed to fetch communes: ", error);
     } finally {
       setIsLoading(false);
     }

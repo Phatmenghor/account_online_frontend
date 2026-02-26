@@ -49,8 +49,6 @@ export default async function RootLayout({
   const serverLocale = (await getLocale()) as Locale;
   const serverMessages = await getMessages();
 
-  console.log("Layout - Server locale:", serverLocale);
-
   return (
     <html lang={serverLocale} className={kantumruyPro.variable}>
       <head>

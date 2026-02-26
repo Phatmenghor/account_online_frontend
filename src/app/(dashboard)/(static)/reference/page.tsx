@@ -26,9 +26,23 @@ import { createReferenceTableColumns } from "@/components/shared/table/reference
 import ReferenceViewModal from "@/components/shared/modal/reference-detail-modal";
 import ModalReference from "@/components/shared/modal/reference-modal";
 import { ModalMode } from "@/constants/AppResource/display-list/enum/mode";
-import { CreateReferenceReq, UpdateReferenceReq } from "@/models/static/reference/reference.request";
-import { createReferenceService, deleteReferenceService, getAllReferenceService, updateReferenceService } from "@/services/dashboard/reference/reference.service";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  CreateReferenceReq,
+  UpdateReferenceReq,
+} from "@/models/static/reference/reference.request";
+import {
+  createReferenceService,
+  deleteReferenceService,
+  getAllReferenceService,
+  updateReferenceService,
+} from "@/services/dashboard/reference/reference.service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { STATUS_USER_OPTIONS } from "@/constants/AppResource/filter/status";
 
 function ReferencePageContent() {
@@ -37,9 +51,8 @@ function ReferencePageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [selectedReference, setSelectedReference] = useState<ReferenceModel | null>(
-    null
-  );
+  const [selectedReference, setSelectedReference] =
+    useState<ReferenceModel | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>(ModalMode.CREATE_MODE);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,7 +87,7 @@ function ReferencePageContent() {
       });
       setReferences(response);
     } catch (error: any) {
-      console.log("Failed to fetch references: ", error);
+      console.error("Failed to fetch references: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +103,7 @@ function ReferencePageContent() {
   };
 
   const handleSaveReference = async (
-    formData: CreateReferenceReq | { id: number; updates: UpdateReferenceReq }
+    formData: CreateReferenceReq | { id: number; updates: UpdateReferenceReq },
   ) => {
     setIsSubmitting(true);
     try {
@@ -118,7 +131,7 @@ function ReferencePageContent() {
                 totalElements: 1,
                 totalPages: 1,
                 last: true,
-              }
+              },
         );
 
         startTransition(() => {
@@ -129,7 +142,10 @@ function ReferencePageContent() {
           });
         });
       } else if (mode === ModalMode.UPDATE_MODE) {
-        const updateData = formData as { id: number; updates: UpdateReferenceReq };
+        const updateData = formData as {
+          id: number;
+          updates: UpdateReferenceReq;
+        };
 
         if (!updateData.id) {
           console.error("Missing reference id in update form");
@@ -139,7 +155,7 @@ function ReferencePageContent() {
 
         const response = await updateReferenceService(
           updateData.id,
-          updateData.updates
+          updateData.updates,
         );
 
         setReferences((prev) =>
@@ -147,10 +163,10 @@ function ReferencePageContent() {
             ? {
                 ...prev,
                 content: prev.content.map((reference) =>
-                  reference.id === updateData.id ? response : reference
+                  reference.id === updateData.id ? response : reference,
                 ),
               }
-            : prev
+            : prev,
         );
 
         startTransition(() => {
@@ -245,7 +261,7 @@ function ReferencePageContent() {
                 disabled={isSubmitting}
               />
             </div>
-            
+
             {/* Status Filter Dropdown */}
             <Select value={statusFilter} onValueChange={handleStatusChange}>
               <SelectTrigger className="w-[180px] h-9">

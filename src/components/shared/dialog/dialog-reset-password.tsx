@@ -31,7 +31,7 @@ export default function ResetPasswordModal({
   const DEFAULT_PASSWORD = "88889999";
   const onReset = async () => {
     if (!userId) {
-      console.log("Missing userId found!");
+      console.error("Missing userId found!");
       return;
     }
     setIsSubmitting(true);
