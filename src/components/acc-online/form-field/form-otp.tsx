@@ -144,7 +144,7 @@ export default function OTPInput({
       const response = await SendOtpService(requestData);
 
       setIsOtpSent(true);
-      setOtpExpiresAt(response.expiresAt);
+      setOtpExpiresAt(response?.expiresAt ?? "");
       setCountdown(60); // Set countdown to 60 seconds
       setOtpCode(""); // Clear previous OTP
 
@@ -283,7 +283,7 @@ export default function OTPInput({
 
         const response = await VerifyOtpService(requestData);
 
-        if (response.verified) {
+        if (response?.verified) {
           setIsOtpVerified(true);
           setCountdown(0); // Stop countdown on success
           setLastVerifiedOtp(currentOtpCode); // Mark this OTP as verified

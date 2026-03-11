@@ -220,7 +220,7 @@ export const useAccountSubmission = ({
         error?.rawError?.message ||
         "Failed to create account. Please try again.";
 
-      const httpStatus = error?.rawError?.status ?? error?.status ?? 0;
+      const httpStatus = error?.status ?? error?.rawError?.status ?? 0;
       const isConflict = httpStatus === 409;
 
       setSubmitErrorData({

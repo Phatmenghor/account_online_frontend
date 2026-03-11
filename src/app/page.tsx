@@ -122,6 +122,7 @@ export default function OpenAccountPage() {
     isLoading,
     isValidating,
     selectedBranch,
+    setSelectedBranch,
     staffCode,
     setStaffCode,
     isVerified,
@@ -244,6 +245,7 @@ export default function OpenAccountPage() {
     clearOtp();
     clearModalState();
     resetMasterData();
+    setSelectedBranch(null);
     setStaffCode("");
     setIsVerified(false);
     setShowClearConfirm(false);
@@ -253,9 +255,10 @@ export default function OpenAccountPage() {
     clearOtp,
     clearModalState,
     resetMasterData,
+    setSelectedBranch,
     setStaffCode,
     setIsVerified,
-    setShowClearConfirm, // FIX: was missing from deps
+    setShowClearConfirm,
   ]);
 
   const handleInputChangeWrapper = useCallback(
@@ -431,8 +434,8 @@ export default function OpenAccountPage() {
           isOpen={showClearConfirm}
           onClose={() => setShowClearConfirm(false)}
           onConfirm={handleClear}
-          title={translate("cfTitle")}
-          message="Are you sure you want to clear all fields? This action cannot be undone."
+          title={translate("clearTitle")}
+          message={translate("clearConfirmMessage")}
         />
 
         {/* Submission loading */}

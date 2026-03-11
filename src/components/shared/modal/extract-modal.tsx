@@ -40,13 +40,11 @@ export default function LoadingModal({
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
                   className="absolute inset-0 rounded-lg border-4 border-orange-200 border-t-orange-500"
-                  style={{ borderRadius: 8 }}
                 />
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 1.9, repeat: Infinity, ease: "linear" }}
                   className="absolute inset-2 rounded border-4 border-amber-100 border-b-amber-400"
-                  style={{ borderRadius: 4 }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <motion.div

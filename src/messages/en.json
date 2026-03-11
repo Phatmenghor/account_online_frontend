@@ -179,6 +179,8 @@
     "try_again": "Try Again",
     "cfTitle": "Confirm Information",
     "cfMessage": "Please confirm that you have reviewed your personal information.",
+    "clearTitle": "Clear Form",
+    "clearConfirmMessage": "Are you sure you want to clear all fields? This action cannot be undone.",
     "cifNumber": "CIF",
     "phoneNumber": "Phone Number",
     "nationality": "Nationality",

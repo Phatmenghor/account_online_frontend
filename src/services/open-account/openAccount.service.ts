@@ -12,7 +12,7 @@ export async function createOpenAccountService(request: CreateOpenAccountReq) {
       const message = raw?.message || "Failed to create open account.";
       console.error("Axios error:", message);
 
-      throw { errorMessage: message, rawError: raw };
+      throw { errorMessage: message, rawError: raw, status: error.response?.status };
     } else {
       console.error("Unexpected error:", error);
       throw {

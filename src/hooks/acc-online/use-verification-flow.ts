@@ -194,7 +194,7 @@ export const useVerificationFlow = ({
 
       setValidationErrorData({
         title: translate("valid_fail"),
-        // message: errorStatus,
+        message: "",
         description: errorMessage,
       });
       setShowValidationErrorModal(true);
@@ -311,6 +311,7 @@ export const useVerificationFlow = ({
     isLoading,
     isValidating,
     selectedBranch,
+    setSelectedBranch,
     staffCode,
     setStaffCode,
     isVerified,
