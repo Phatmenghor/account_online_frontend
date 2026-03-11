@@ -17,12 +17,13 @@ import RiskBadge from "../badge/risk-level-badge";
 import { AmlStatusEnum } from "@/constants/AppResource/display-list/enum/status";
 import AmlStatusBadge from "../badge/aml-badge";
 import { Span } from "next/dist/trace";
+import { DateTimeFormat } from "@/utils/date/date-time-format";
 
 interface ManagementTableHandlers {
   handleViewManagementDetail: (management: AmlManagementModel) => void;
   openConfirmAmlDialog: (
     management: AmlManagementModel,
-    status: AmlStatusEnum
+    status: AmlStatusEnum,
   ) => void;
 }
 
@@ -103,11 +104,8 @@ export const createManagementTableColumns = ({
       truncate: true,
       maxWidth: "160px",
       minWidth: "150px",
-      render: (m) => (
-        <span className="font-medium">
-          {new Date(m.createdAt).toLocaleString() || "---"}
-        </span>
-      ),
+      render: (m) =>
+        m.createdAt ? <span>{DateTimeFormat(m.createdAt) || "---"}</span> : "-",
     },
 
     // Status
@@ -118,7 +116,6 @@ export const createManagementTableColumns = ({
       maxWidth: "120px",
       minWidth: "120px",
       render: (m) => <AmlStatusBadge status={m.status || "---"} />,
-     
     },
 
     // Actions
