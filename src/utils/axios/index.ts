@@ -4,7 +4,12 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
-import { getToken, logoutToken, storeRefreshToken, storeToken } from "../local-storage/token";
+import {
+  getToken,
+  logoutToken,
+  storeRefreshToken,
+  storeToken,
+} from "../local-storage/token";
 import { toast } from "sonner";
 import { refreshTokenService } from "@/services/auth/refresh-token.service";
 
@@ -23,7 +28,8 @@ declare module "axios" {
 
 // Environment detection
 const isBrowser = typeof window !== "undefined";
-const isDevelopment = process.env.NEXT_PUBLIC_NODE_ENV === "development";
+const isDevelopment =
+  isBrowser && process.env.NEXT_PUBLIC_NODE_ENV === "development";
 
 // Colors for console output
 const colors = {
@@ -45,9 +51,9 @@ const formatTimestamp = (): string => {
       .getMinutes()
       .toString()
       .padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}.${now
-        .getMilliseconds()
-        .toString()
-        .padStart(3, "0")}]`
+      .getMilliseconds()
+      .toString()
+      .padStart(3, "0")}]`
   );
 };
 
@@ -59,47 +65,39 @@ const generateRequestId = (): string => {
 // Simple logger with request ID and improved timestamp
 const logger = {
   log: (message: string, data?: unknown, requestId?: string): void => {
-    // Only use development check for normal logs
-    if (isDevelopment) {
-      const timestamp = formatTimestamp();
-      const logId = requestId ? `[${requestId}] ` : "";
-      if (isBrowser) {
-        console.log(
-          `%c${timestamp} ${logId}${message}`,
-          colors.blue,
-          data || ""
-        );
-      } else {
-        console.log(
-          `${colors.blue}${timestamp} ${logId}${message}${colors.reset}`,
-          data || ""
-        );
-      }
+    if (!isDevelopment) return;
+    const timestamp = formatTimestamp();
+    const logId = requestId ? `[${requestId}] ` : "";
+    if (isBrowser) {
+      console.log(`%c${timestamp} ${logId}${message}`, colors.blue, data || "");
+    } else {
+      console.log(
+        `${colors.blue}${timestamp} ${logId}${message}${colors.reset}`,
+        data || "",
+      );
     }
   },
 
   success: (message: string, data?: unknown, requestId?: string): void => {
-    // Only use development check for success logs
-    if (isDevelopment) {
-      const timestamp = formatTimestamp();
-      const logId = requestId ? `[${requestId}] ` : "";
-      if (isBrowser) {
-        console.log(
-          `%c${timestamp} ${logId}${message}`,
-          colors.green,
-          data || ""
-        );
-      } else {
-        console.log(
-          `${colors.green}${timestamp} ${logId}${message}${colors.reset}`,
-          data || ""
-        );
-      }
+    if (!isDevelopment) return;
+    const timestamp = formatTimestamp();
+    const logId = requestId ? `[${requestId}] ` : "";
+    if (isBrowser) {
+      console.log(
+        `%c${timestamp} ${logId}${message}`,
+        colors.green,
+        data || "",
+      );
+    } else {
+      console.log(
+        `${colors.green}${timestamp} ${logId}${message}${colors.reset}`,
+        data || "",
+      );
     }
   },
 
   error: (message: string, data?: unknown, requestId?: string): void => {
-    // Always log errors regardless of environment
+    if (!isDevelopment) return;
     const timestamp = formatTimestamp();
     const logId = requestId ? `[${requestId}] ` : "";
     if (isBrowser) {
@@ -107,25 +105,25 @@ const logger = {
     } else {
       console.log(
         `${colors.red}${timestamp} ${logId}${message}${colors.reset}`,
-        data || ""
+        data || "",
       );
     }
   },
 
   warn: (message: string, data?: unknown, requestId?: string): void => {
-    // Always log warnings regardless of environment
+    if (!isDevelopment) return;
     const timestamp = formatTimestamp();
     const logId = requestId ? `[${requestId}] ` : "";
     if (isBrowser) {
       console.warn(
         `%c${timestamp} ${logId}${message}`,
         colors.yellow,
-        data || ""
+        data || "",
       );
     } else {
       console.warn(
         `${colors.yellow}${timestamp} ${logId}${message}${colors.reset}`,
-        data || ""
+        data || "",
       );
     }
   },
@@ -135,9 +133,9 @@ const logger = {
     method: string,
     url: string,
     data: unknown,
-    requestId?: string
+    requestId?: string,
   ): void => {
-    // Always log request body logs regardless of environment
+    if (!isDevelopment) return;
     const timestamp = formatTimestamp();
     const logId = requestId ? `[${requestId}] ` : "";
     const messagePrefix = `REQUEST BODY [${method.toUpperCase()}] ${url}:`;
@@ -160,7 +158,7 @@ const logger = {
                 ? "Object"
                 : typeof value;
             console.log(`%c${key}: ${valueType}`, colors.cyan, value);
-          }
+          },
         );
       }
 
@@ -168,11 +166,11 @@ const logger = {
     } else {
       // For server-side, use a simpler approach
       console.log(
-        `${colors.purple}${timestamp} ${logId}${messagePrefix}${colors.reset}`
+        `${colors.purple}${timestamp} ${logId}${messagePrefix}${colors.reset}`,
       );
       console.log(
         `${colors.cyan}Request payload:${colors.reset}`,
-        formatRequestData(data)
+        formatRequestData(data),
       );
     }
 
@@ -236,8 +234,9 @@ const formatRequestData = (data: unknown): unknown => {
           if (Array.isArray(value)) {
             propertyTypes[key] = `Array[${value.length}]`;
           } else if (value && typeof value === "object") {
-            propertyTypes[key] = `Object{${Object.keys(value as object).length
-              } props}`;
+            propertyTypes[key] = `Object{${
+              Object.keys(value as object).length
+            } props}`;
           } else {
             propertyTypes[key] = typeof value;
           }
@@ -248,7 +247,7 @@ const formatRequestData = (data: unknown): unknown => {
           keys: totalKeys,
           preview,
           propertyTypes: Object.fromEntries(
-            Object.entries(propertyTypes).slice(0, 10)
+            Object.entries(propertyTypes).slice(0, 10),
           ),
           note: `Object truncated (${totalKeys} properties total)`,
         };
@@ -295,7 +294,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
           logger.warn(
             "No authentication token for protected route",
             undefined,
-            requestId
+            requestId,
           );
         }
       }
@@ -304,17 +303,20 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
       logger.log(
         `Request: ${config.method?.toUpperCase()} ${config.url}`,
         {
-          headers: Object.keys(config.headers).reduce((acc, key) => {
-            // Don't log sensitive headers like Authorization
-            if (key !== "Authorization") {
-              acc[key] = config.headers[key];
-            } else {
-              acc[key] = "[REDACTED]";
-            }
-            return acc;
-          }, {} as Record<string, unknown>),
+          headers: Object.keys(config.headers).reduce(
+            (acc, key) => {
+              // Don't log sensitive headers like Authorization
+              if (key !== "Authorization") {
+                acc[key] = config.headers[key];
+              } else {
+                acc[key] = "[REDACTED]";
+              }
+              return acc;
+            },
+            {} as Record<string, unknown>,
+          ),
         },
-        requestId
+        requestId,
       );
 
       // Enhanced request body logging
@@ -324,14 +326,14 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
           config.method || "unknown",
           config.url || "unknown",
           config.data,
-          requestId
+          requestId,
         );
 
         // For mutation operations (POST, PUT, PATCH) log with higher visibility
         if (
           config.method &&
           ["post", "put", "patch", "delete"].includes(
-            config.method.toLowerCase()
+            config.method.toLowerCase(),
           )
         ) {
           // Add additional structured logging for mutation operations
@@ -343,7 +345,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
               contentType: config.headers["Content-Type"],
               requestId,
             },
-            requestId
+            requestId,
           );
         }
       } else {
@@ -353,10 +355,11 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
           ["post", "put", "patch"].includes(config.method.toLowerCase())
         ) {
           logger.warn(
-            `Empty request body for ${config.method.toUpperCase()} ${config.url
+            `Empty request body for ${config.method.toUpperCase()} ${
+              config.url
             }`,
             undefined,
-            requestId
+            requestId,
           );
         }
       }
@@ -367,7 +370,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
       // Log request setup errors
       logger.error("Request Setup Error:", (error as Error).message);
       return Promise.reject(error);
-    }
+    },
   );
 
   // Response interceptor
@@ -385,7 +388,8 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
 
       // Log status and duration with request ID
       logger.success(
-        `Response: ${response.config.method?.toUpperCase()} ${response.config.url
+        `Response: ${response.config.method?.toUpperCase()} ${
+          response.config.url
         }`,
         {
           status: response.status,
@@ -393,7 +397,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
           duration: `${duration}ms`,
           size: JSON.stringify(response.data).length,
         },
-        requestId
+        requestId,
       );
 
       // Log response data if in development mode
@@ -407,7 +411,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
             logger.log(
               `Array with ${response.data.length} items. First 2 items:`,
               response.data.slice(0, 2),
-              requestId
+              requestId,
             );
           }
           // Handle object data
@@ -423,8 +427,9 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
             });
 
             if (Object.keys(response.data).length > 5) {
-              preview["..."] = `${Object.keys(response.data).length - 5
-                } more properties`;
+              preview["..."] = `${
+                Object.keys(response.data).length - 5
+              } more properties`;
             }
 
             logger.log(`Object data preview:`, preview, requestId);
@@ -453,9 +458,8 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
             storeRefreshToken(newData.refreshToken);
 
             // Update header for the retry
-            originalRequest.headers[
-              "Authorization"
-            ] = `Bearer ${newData.accessToken}`;
+            originalRequest.headers["Authorization"] =
+              `Bearer ${newData.accessToken}`;
 
             return axiosInstance(originalRequest);
           }
@@ -485,7 +489,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
         logger.error(
           `Request body for failed request:`,
           formatRequestData(err.config.data),
-          requestId
+          requestId,
         );
 
         // Add additional dedicated request body logging for errors
@@ -493,7 +497,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
           err.config.method || "unknown",
           err.config.url || "unknown",
           err.config.data,
-          `${requestId}-error` // Add error suffix to distinguish in logs
+          `${requestId}-error`, // Add error suffix to distinguish in logs
         );
       }
 
@@ -535,7 +539,7 @@ const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
       }
 
       return Promise.reject(error);
-    }
+    },
   );
 
   return axiosInstance;
@@ -595,11 +599,11 @@ export function viewLogs(filter?: string): void {
         log.data && typeof log.data === "object" && "duration" in log.data
           ? (log.data as { duration?: string }).duration
           : "N/A",
-    }))
+    })),
   );
 
   console.log(
-    `Showing ${logsToDisplay.length} of ${memoryLogs.length} total logs.`
+    `Showing ${logsToDisplay.length} of ${memoryLogs.length} total logs.`,
   );
 }
 
