@@ -218,7 +218,7 @@ export const useAccountSubmission = ({
         error?.errorMessage ||
         error?.message ||
         error?.rawError?.message ||
-        "Failed to create account. Please try again.";
+        translate("fail_create_account");
 
       const httpStatus = error?.status ?? error?.rawError?.status ?? 0;
       const isConflict = httpStatus === 409;

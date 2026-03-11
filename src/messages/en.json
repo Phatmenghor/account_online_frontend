@@ -218,7 +218,8 @@
     "err_phoneNumber_min": "Phone number must be at least 9 digits",
     "err_phoneNumber_max": "Phone number must not exceed 15 digits",
     "err_phoneNumber_regex": "Phone number must contain only digits",
-    "err_isPhoneVerified": "Phone number must be verified. And then input otp 6 digit"
+    "err_isPhoneVerified": "Phone number must be verified. And then input otp 6 digit",
+    "fail_create_account": "Unable to create your account. Please try again later. If the problem persists, please contact customer service."
   },
   "address": {
     "locationInfo": "Location Information",

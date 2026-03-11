@@ -9,14 +9,13 @@ export async function createOpenAccountService(request: CreateOpenAccountReq) {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const raw = error.response?.data;
-      const message = raw?.message || "Failed to create open account.";
+      const message = raw?.message;
       console.error("Axios error:", message);
 
       throw { errorMessage: message, rawError: raw, status: error.response?.status };
     } else {
       console.error("Unexpected error:", error);
       throw {
-        errorMessage: "An unexpected error occurred while creating open account.",
         rawError: error,
       };
     }
