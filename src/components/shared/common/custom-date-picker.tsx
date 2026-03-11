@@ -190,13 +190,15 @@ export function CustomDatePicker({
             {selectedDate ? formatDate(selectedDate) : placeholder}
           </span>
           {selectedDate && !disabled && (
-            <button
-              type="button"
+            <span
+              role="button"
+              tabIndex={0}
               onClick={clearSelection}
+              onKeyDown={(e) => e.key === "Enter" && clearSelection(e as unknown as React.MouseEvent)}
               className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-6 p-0 flex items-center justify-center rounded hover:bg-destructive/10 hover:text-destructive transition-colors"
             >
               <X className="h-3 w-3" />
-            </button>
+            </span>
           )}
         </Button>
       </PopoverTrigger>
