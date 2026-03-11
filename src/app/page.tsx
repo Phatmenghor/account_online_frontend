@@ -112,6 +112,8 @@ export default function OpenAccountPage() {
     handleSelfieUpload,
     loadingImageState,
     clearImages,
+    ocrErrorData,
+    clearOcrError,
   } = useAccountImages({
     setFormData,
     validateField,
@@ -486,6 +488,14 @@ export default function OpenAccountPage() {
           title={validationErrorData.title}
           message={validationErrorData.message}
           description={validationErrorData.description}
+        />
+        {/* OCR Extraction Error Modal */}
+        <ValidationErrorModal
+          isOpen={!!ocrErrorData}
+          onClose={clearOcrError}
+          title={ocrErrorData?.title ?? ""}
+          message={ocrErrorData?.message ?? ""}
+          description={ocrErrorData?.description ?? ""}
         />
         <SubmitSuccessModal
           isOpen={showSuccessModal}

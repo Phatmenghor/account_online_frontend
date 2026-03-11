@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { toast } from "sonner";
 import { RequestIdImage } from "@/models/open-acc-online/nid.request.model";
 import { ResponseNID } from "@/models/open-acc-online/nid.response.model";
 import { extractNIDService } from "@/services/acc-online/nid.service";
@@ -23,6 +22,12 @@ interface LoadingImageState {
   message: string;
 }
 
+interface OcrErrorData {
+  title: string;
+  message: string;
+  description: string;
+}
+
 export const useAccountImages = ({
   setFormData,
   validateField,
@@ -39,6 +44,8 @@ export const useAccountImages = ({
     title: "",
     message: "",
   });
+
+  const [ocrErrorData, setOcrErrorData] = useState<OcrErrorData | null>(null);
 
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -59,15 +66,13 @@ export const useAccountImages = ({
     const dataToProcess = imageRequestData || imageData;
 
     if (!dataToProcess) {
-      toast.error("No image data", {
-        description: "Please upload an image first.",
+      AppToast({
+        type: "error",
+        message: translate("ocr_extract_fail_title"),
+        description: translate("ocr_extract_fail_desc"),
       });
       return;
     }
-
-    // We don't set local loading state here because it's managed by the parent via setLoadingState for the modal
-    // But we might want to ensure the parent knows we are starting if not already set by handleImageUpload
-    // However, handleImageUpload sets it before calling this.
 
     try {
       const response = await extractNIDService(dataToProcess);
@@ -94,20 +99,19 @@ export const useAccountImages = ({
 
       AppToast({
         type: "success",
-        message: "NID extracted successfully!",
-        description: "Extract NID Card",
+        message: translate("nid_extract_success"),
+        description: translate("nid_extract_success_desc"),
       });
     } catch (error: any) {
-      console.error("Error response:", error.response?.data);
+      console.error("OCR extraction error:", error.response?.data);
 
-      toast.error("Extraction error", {
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "Failed to extract NID information.",
+      // Show error modal with translated message
+      setOcrErrorData({
+        title: translate("ocr_extract_fail_title"),
+        message: "",
+        description: translate("ocr_extract_fail_desc"),
       });
     }
-    // We don't turn off loading here because handleImageUpload does it in finally block
   };
 
   const handleImageUpload = async (
@@ -117,8 +121,10 @@ export const useAccountImages = ({
     if (file) {
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        toast.error("File too large", {
-          description: "Image must be less than 5MB.",
+        AppToast({
+          type: "error",
+          message: translate("file_too_large_title"),
+          description: translate("file_too_large_desc"),
         });
         return;
       }
@@ -150,8 +156,10 @@ export const useAccountImages = ({
         await handleExtractNID(imageRequestData);
       } catch (error) {
         console.error("Error converting image to base64", error);
-        toast.error("Image processing error", {
-          description: "Failed to process the image. Please try again.",
+        AppToast({
+          type: "error",
+          message: translate("img_processing_error"),
+          description: translate("img_processing_error_desc"),
         });
       } finally {
         setLoadingImageState({
@@ -170,8 +178,10 @@ export const useAccountImages = ({
     if (file) {
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        toast.error("File too large", {
-          description: "Image must be less than 5MB.",
+        AppToast({
+          type: "error",
+          message: translate("file_too_large_title"),
+          description: translate("file_too_large_desc"),
         });
         return;
       }
@@ -185,10 +195,18 @@ export const useAccountImages = ({
         // Validate selfie field
         validateField("selfieImage", base64WithPrefix);
 
-        toast.success("Selfie uploaded successfully!");
+        AppToast({
+          type: "success",
+          message: translate("selfie_upload_success"),
+          description: translate("selfie_upload_success_desc"),
+        });
       } catch (error) {
         console.error("Error uploading selfie", error);
-        toast.error("Failed to upload selfie");
+        AppToast({
+          type: "error",
+          message: translate("selfie_upload_fail"),
+          description: translate("selfie_upload_fail_desc"),
+        });
       }
     }
   };
@@ -231,5 +249,7 @@ export const useAccountImages = ({
     loadingImageState,
     setLoadingImageState,
     clearImages,
+    ocrErrorData,
+    clearOcrError: () => setOcrErrorData(null),
   };
 };
