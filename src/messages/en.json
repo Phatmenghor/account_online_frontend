@@ -124,7 +124,7 @@
     "ocr_extract_fail_title": "Extraction Failed",
     "ocr_extract_fail_desc": "Cannot read data from the ID card. Please ensure the image is clear, well-lit, and the full card is visible, then try uploading again.",
     "file_too_large_title": "File Too Large",
-    "file_too_large_desc": "Please upload an image less than 5MB.",
+    "file_too_large_desc": "The selected image exceeds the 5MB limit and cannot be processed. Please choose a smaller image and try again.",
     "selfie_upload_success": "Selfie Uploaded",
     "selfie_upload_success_desc": "Your selfie has been uploaded successfully.",
     "selfie_upload_fail": "Selfie Upload Failed",
