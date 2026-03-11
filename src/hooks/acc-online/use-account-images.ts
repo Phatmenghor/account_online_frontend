@@ -119,16 +119,6 @@ export const useAccountImages = ({
   ) => {
     const file = event.target.files?.[0];
     if (file) {
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        AppToast({
-          type: "error",
-          message: translate("file_too_large_title"),
-          description: translate("file_too_large_desc"),
-        });
-        return;
-      }
-
       setLoadingImageState({
         isLoading: true,
         title: translate("extracting_data") || "Extracting Data",
@@ -176,16 +166,6 @@ export const useAccountImages = ({
   ) => {
     const file = event.target.files?.[0];
     if (file) {
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        AppToast({
-          type: "error",
-          message: translate("file_too_large_title"),
-          description: translate("file_too_large_desc"),
-        });
-        return;
-      }
-
       try {
         const base64WithPrefix = await convertToBase64(file);
         const base64ForService = base64WithPrefix.split(",")[1];
