@@ -19,6 +19,7 @@ export const ROUTES = {
       VILLAGE: "/village",
       LEGAL_TYPE: "/legal-type",
       ACCOUNT_ONLINE_SUCCESS: "/account-online-success",
+      ACCOUNT_ONLINE_SUCCESS_REPORT: "/report-account-online-success",
     },
     AML: {
       MANAGEMENT: "/aml-management",

@@ -7,6 +7,26 @@ export interface AllSuccessAccountOnlineModel {
   last: boolean;
 }
 
+export interface AllSuccessAccountOnlineExcelModel {
+  content: SuccessAccountOnlineExcelModel[];
+  countAll: number;
+}
+
+export interface SuccessAccountOnlineExcelModel {
+  id: string;
+  cif: string;
+  khrAccount: string;
+  usdAccount: string;
+  mnemonic: string;
+  legalId: string;
+  branchCode: string;
+  branchNameKh: string;
+  nidImageName: string;
+  selfieImageName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface SuccessAccountOnlineModel {
   id: string;
   cif: string;

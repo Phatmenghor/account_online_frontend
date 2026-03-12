@@ -3,3 +3,9 @@ export interface AllSuccessAccountOnlineReq {
   pageSize?: number;
   search?: string;
 }
+
+export interface AllSuccessAccountOnlineExcelReq {
+  fromDate?: string,
+  toDate?: string,
+  search?: string;
+}
