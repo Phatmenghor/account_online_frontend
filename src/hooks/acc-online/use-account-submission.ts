@@ -33,42 +33,99 @@ interface LoadingState {
   message: string;
 }
 
-// Compress a base64 image to max 1024px wide at 80% JPEG quality.
-// Camera photos are typically 10–20 MB; this reduces them to ~200–500 KB
-// before upload, preventing connection drops on slow mobile networks.
-const compressImage = (
-  dataurl: string,
-  maxWidth = 1024,
-  quality = 0.8,
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      try {
-        const scale = Math.min(1, maxWidth / img.width);
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          // Canvas not supported — return original without compression
-          resolve(dataurl);
-          return;
-        }
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      } catch (err) {
-        // If compression fails, fall back to original image
-        resolve(dataurl);
-      }
-    };
-    img.onerror = () => {
-      // If image fails to load, fall back to original
-      console.warn("Image load failed during compression, using original");
-      resolve(dataurl);
-    };
-    img.src = dataurl;
-  });
+interface ErrorDetail {
+  title: string;
+  message: string;
+  variant: "error" | "warning";
+}
+
+// Maps HTTP status codes to user-friendly Khmer + English messages
+const getErrorDetail = (
+  status: number,
+  fallbackMessage?: string,
+): ErrorDetail => {
+  switch (status) {
+    case 400:
+      return {
+        title: "ទិន្នន័យមិនត្រឹមត្រូវ",
+        message:
+          "The information you entered is invalid. Please check all fields and try again.",
+        variant: "error",
+      };
+    case 401:
+      return {
+        title: "វត្តមានផុតកំណត់",
+        message:
+          "Your session has expired. Please close the app and log in again.",
+        variant: "warning",
+      };
+    case 403:
+      return {
+        title: "គ្មានសិទ្ធិចូលប្រើ",
+        message:
+          "You do not have permission to perform this action. Please contact support or try again later.",
+        variant: "warning",
+      };
+    case 404:
+      return {
+        title: "រកមិនឃើញសេវាកម្ម",
+        message:
+          "The service is currently unavailable. Please try again later.",
+        variant: "error",
+      };
+    case 409:
+      return {
+        title: "គណនីនេះបានមានរួចហើយ",
+        message:
+          "An account with this ID already exists. Please contact our support team for assistance.",
+        variant: "warning",
+      };
+    case 413:
+      return {
+        title: "ឯកសារធំពេក",
+        message:
+          "The photo you uploaded is too large. Please use a smaller image and try again.",
+        variant: "error",
+      };
+    case 422:
+      return {
+        title: "ទិន្នន័យមិនអាចដំណើរការបាន",
+        message:
+          "Some of your information could not be processed. Please review your details and try again.",
+        variant: "error",
+      };
+    case 429:
+      return {
+        title: "សំណើច្រើនពេក",
+        message: "Too many requests. Please wait a moment and try again.",
+        variant: "warning",
+      };
+    case 500:
+      return {
+        title: "កំហុសម៉ាស៊ីនមេ",
+        message:
+          "Our server encountered an error. Please try again in a few minutes.",
+        variant: "error",
+      };
+    case 502:
+    case 503:
+    case 504:
+      return {
+        title: "សេវាកម្មមិនអាចប្រើបាន",
+        message:
+          "The service is temporarily unavailable. Please try again later.",
+        variant: "error",
+      };
+    case 0:
+    default:
+      return {
+        title: "ការស្នើសុំបរាជ័យ",
+        message:
+          fallbackMessage ||
+          "Something went wrong. Please check your internet connection and try again.",
+        variant: "error",
+      };
+  }
 };
 
 const base64ToFile = (dataurl: string, filename: string): File => {
@@ -131,19 +188,13 @@ export const useAccountSubmission = ({
       const nidBase64Full = uploadedImage?.idImage || "";
       const selfieBase64Full = selfieImage || "";
 
-      // Compress images before converting to File — reduces upload size
-      // from 10–20 MB (raw camera) down to ~200–500 KB
-      const [nidCompressed, selfieCompressed] = await Promise.all([
-        compressImage(nidBase64Full),
-        compressImage(selfieBase64Full),
-      ]);
-
+      // Convert directly to File — no compression, full original quality
       const nidFile = base64ToFile(
-        nidCompressed,
+        nidBase64Full,
         `nid_${formData.idNumber}.jpg`,
       );
       const selfieFile = base64ToFile(
-        selfieCompressed,
+        selfieBase64Full,
         `selfie_${formData.idNumber}.jpg`,
       );
 
@@ -214,20 +265,21 @@ export const useAccountSubmission = ({
     } catch (error: any) {
       console.error("Submission error:", error);
 
-      const errorMessage =
+      const httpStatus =
+        error?.status ??
+        error?.response?.status ??
+        error?.rawError?.status ??
+        0;
+
+      const fallbackMessage =
         error?.errorMessage ||
         error?.message ||
         error?.rawError?.message ||
         translate("fail_create_account");
 
-      const httpStatus = error?.status ?? error?.rawError?.status ?? 0;
-      const isConflict = httpStatus === 409;
+      const errorDetail = getErrorDetail(httpStatus, fallbackMessage);
 
-      setSubmitErrorData({
-        title: "ការស្នើសុំបរាជ័យ",
-        message: errorMessage,
-        variant: isConflict ? "warning" : "error",
-      });
+      setSubmitErrorData(errorDetail);
       setShowSubmitErrorModal(true);
     } finally {
       setLoadingState({
