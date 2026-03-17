@@ -1,38 +1,34 @@
 import { axiosServer } from "@/utils/axios";
 
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(",")[1]); // strip data:image/jpeg;base64, prefix
-    };
-    reader.onerror = reject;
-  });
+const stripBase64Prefix = (base64Full: string): string => {
+  if (base64Full.includes(",")) {
+    return base64Full.split(",")[1];
+  }
+  return base64Full;
 };
 
 export const uploadDocument = async (
-  file: File,
+  base64Full: string,
+  filename: string,
   type: string,
   legalId?: string,
 ): Promise<string> => {
-  try {
-    const base64 = await fileToBase64(file);
+  const base64 = stripBase64Prefix(base64Full);
 
-    const response = await axiosServer.post("/api/public/upload", {
-      fileBase64: base64,
-      fileName: file.name,
-      type,
-      legalId,
-    });
-
-    if (response.data && response.data.filename) {
-      return response.data.filename;
-    }
-    throw new Error("Upload failed: No filename returned");
-  } catch (error) {
-    console.error("Error uploading document:", error);
-    throw error;
+  if (!base64 || base64.trim() === "") {
+    throw new Error(`Upload failed: empty base64 data for ${type}`);
   }
+
+  const response = await axiosServer.post("/api/public/upload", {
+    fileBase64: base64,
+    fileName: filename,
+    type,
+    legalId,
+  });
+
+  if (response.data?.filename) {
+    return response.data.filename;
+  }
+
+  throw new Error(`Upload failed: no filename returned for ${type}`);
 };

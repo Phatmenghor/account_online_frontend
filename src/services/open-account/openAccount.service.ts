@@ -4,7 +4,10 @@ import axios from "axios";
 
 export async function createOpenAccountService(request: CreateOpenAccountReq) {
   try {
-    const response = await axiosClientWithAuth.post("/api/v1/public/open-account", request);
+    const response = await axiosClientWithAuth.post(
+      "/api/v1/public/open-account",
+      request,
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -12,7 +15,11 @@ export async function createOpenAccountService(request: CreateOpenAccountReq) {
       const message = raw?.message;
       console.error("Axios error:", message);
 
-      throw { errorMessage: message, rawError: raw, status: error.response?.status };
+      throw {
+        errorMessage: message,
+        rawError: raw,
+        status: error.response?.status,
+      };
     } else {
       console.error("Unexpected error:", error);
       throw {

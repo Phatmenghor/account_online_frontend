@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ResponseNID } from "@/models/open-acc-online/nid.response.model";
 import { MaritalModel } from "@/models/static/marital/marital.response";
 import { OccupationModel } from "@/models/static/occupation/occupation.response";
@@ -33,111 +33,16 @@ interface LoadingState {
   message: string;
 }
 
-interface ErrorDetail {
-  title: string;
-  message: string;
-  variant: "error" | "warning";
+interface UploadCache {
+  nidFileName: string | null;
+  selfieFileName: string | null;
 }
 
-// Maps HTTP status codes to user-friendly Khmer + English messages
-const getErrorDetail = (
-  status: number,
-  fallbackMessage?: string,
-): ErrorDetail => {
-  switch (status) {
-    case 400:
-      return {
-        title: "ទិន្នន័យមិនត្រឹមត្រូវ",
-        message:
-          "The information you entered is invalid. Please check all fields and try again.",
-        variant: "error",
-      };
-    case 401:
-      return {
-        title: "វត្តមានផុតកំណត់",
-        message:
-          "Your session has expired. Please close the app and log in again.",
-        variant: "warning",
-      };
-    case 403:
-      return {
-        title: "គ្មានសិទ្ធិចូលប្រើ",
-        message:
-          "You do not have permission to perform this action. Please contact support or try again later.",
-        variant: "warning",
-      };
-    case 404:
-      return {
-        title: "រកមិនឃើញសេវាកម្ម",
-        message:
-          "The service is currently unavailable. Please try again later.",
-        variant: "error",
-      };
-    case 409:
-      return {
-        title: "គណនីនេះបានមានរួចហើយ",
-        message:
-          "An account with this ID already exists. Please contact our support team for assistance.",
-        variant: "warning",
-      };
-    case 413:
-      return {
-        title: "ឯកសារធំពេក",
-        message:
-          "The photo you uploaded is too large. Please use a smaller image and try again.",
-        variant: "error",
-      };
-    case 422:
-      return {
-        title: "ទិន្នន័យមិនអាចដំណើរការបាន",
-        message:
-          "Some of your information could not be processed. Please review your details and try again.",
-        variant: "error",
-      };
-    case 429:
-      return {
-        title: "សំណើច្រើនពេក",
-        message: "Too many requests. Please wait a moment and try again.",
-        variant: "warning",
-      };
-    case 500:
-      return {
-        title: "កំហុសម៉ាស៊ីនមេ",
-        message:
-          "Our server encountered an error. Please try again in a few minutes.",
-        variant: "error",
-      };
-    case 502:
-    case 503:
-    case 504:
-      return {
-        title: "សេវាកម្មមិនអាចប្រើបាន",
-        message:
-          "The service is temporarily unavailable. Please try again later.",
-        variant: "error",
-      };
-    case 0:
-    default:
-      return {
-        title: "ការស្នើសុំបរាជ័យ",
-        message:
-          fallbackMessage ||
-          "Something went wrong. Please check your internet connection and try again.",
-        variant: "error",
-      };
-  }
-};
-
-const base64ToFile = (dataurl: string, filename: string): File => {
-  const arr = dataurl.split(",");
-  const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg";
-  const bstr = atob(arr[arr.length - 1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new File([u8arr], filename, { type: mime });
+const GENERIC_ERROR = {
+  title: "មានបញ្ហាកើតឡើង",
+  message:
+    "មានបញ្ហាបច្ចេកទេស។ សូមពិនិត្យការតភ្ជាប់អ៊ីនធឺណិតរបស់អ្នក ហើយព្យាយាមម្តងទៀត។",
+  variant: "error" as const,
 };
 
 export const useAccountSubmission = ({
@@ -177,39 +82,87 @@ export const useAccountSubmission = ({
     message: "",
   });
 
+  // ── Cache uploaded filenames to prevent duplicate uploads ──
+  const uploadCache = useRef<UploadCache>({
+    nidFileName: null,
+    selfieFileName: null,
+  });
+
+  const showError = (override?: Partial<typeof GENERIC_ERROR>) => {
+    setSubmitErrorData({ ...GENERIC_ERROR, ...override });
+    setShowSubmitErrorModal(true);
+  };
+
+  // ── Call this when user retakes NID or Selfie photo ──
+  const resetUploadCache = () => {
+    uploadCache.current = { nidFileName: null, selfieFileName: null };
+  };
+
   const handleSubmitAccount = async () => {
+    // ── 1. Guard: validate images exist ──
+    const nidBase64Full: string = uploadedImage?.idImage ?? "";
+    const selfieBase64Full: string = selfieImage ?? "";
+
+    if (!nidBase64Full) {
+      showError({
+        title: "រូបភាព NID បាត់",
+        message: "រូបភាព NID បាត់។ សូមថតរូបម្ដងទៀត រួចព្យាយាមម្ដងទៀត។",
+      });
+      return;
+    }
+
+    if (!selfieBase64Full) {
+      showError({
+        title: "រូបថតខ្លួនបាត់",
+        message: "រូបថតខ្លួនបាត់។ សូមថតរូបម្ដងទៀត រួចព្យាយាមម្ដងទៀត។",
+      });
+      return;
+    }
+
     setLoadingState({
       isLoading: true,
-      title: translate("submitting") || "Submitting",
-      message: translate("submitting_message") || "Creating your account...",
+      title: translate("submitting") || "កំពុងដំណើរការ",
+      message: translate("submitting_message") || "កំពុងផ្ទុករូបភាព...",
     });
 
     try {
-      const nidBase64Full = uploadedImage?.idImage || "";
-      const selfieBase64Full = selfieImage || "";
+      // ── 2. Upload only if not already uploaded this session ──
+      if (
+        !uploadCache.current.nidFileName ||
+        !uploadCache.current.selfieFileName
+      ) {
+        const [nidFileName, selfieFileName] = await Promise.all([
+          uploadCache.current.nidFileName
+            ? Promise.resolve(uploadCache.current.nidFileName)
+            : uploadDocument(
+                nidBase64Full,
+                `nid_${formData.idNumber}.jpg`,
+                "nid",
+                formData.idNumber,
+              ),
+          uploadCache.current.selfieFileName
+            ? Promise.resolve(uploadCache.current.selfieFileName)
+            : uploadDocument(
+                selfieBase64Full,
+                `selfie_${formData.idNumber}.jpg`,
+                "selfie",
+                formData.idNumber,
+              ),
+        ]);
 
-      // Convert directly to File — no compression, full original quality
-      const nidFile = base64ToFile(
-        nidBase64Full,
-        `nid_${formData.idNumber}.jpg`,
-      );
-      const selfieFile = base64ToFile(
-        selfieBase64Full,
-        `selfie_${formData.idNumber}.jpg`,
-      );
+        // Store in cache — retry reuses these, no duplicate upload
+        uploadCache.current = { nidFileName, selfieFileName };
+      }
 
-      // Upload images sequentially
-      const nidFileName = await uploadDocument(
-        nidFile,
-        "nid",
-        formData.idNumber,
-      );
-      const selfieFileName = await uploadDocument(
-        selfieFile,
-        "selfie",
-        formData.idNumber,
-      );
+      const { nidFileName, selfieFileName } = uploadCache.current;
 
+      // ── 3. Update loading message ──
+      setLoadingState((prev) => ({
+        ...prev,
+        message: translate("creating_account") || "កំពុងបង្កើតគណនី...",
+      }));
+
+      // ── 4. Submit account ──
       const accountData = {
         familyName: formData.lastNameEn,
         givenName: formData.firstNameEn,
@@ -256,42 +209,38 @@ export const useAccountSubmission = ({
 
       const response = await createOpenAccountService(accountData);
 
+      // ── 5. Clear cache on success ──
+      uploadCache.current = { nidFileName: null, selfieFileName: null };
+
       setSuccessData({
-        title: translate("success_title") || "Account Created Success",
-        message:
-          response?.message || "Your account has been created successfully!",
+        title: translate("success_title") || "បង្កើតគណនីដោយជោគជ័យ",
+        message: response?.message || "គណនីរបស់អ្នកត្រូវបានបង្កើតដោយជោគជ័យ!",
       });
       setShowSuccessModal(true);
     } catch (error: any) {
       console.error("Submission error:", error);
 
-      const httpStatus =
-        error?.status ??
-        error?.response?.status ??
-        error?.rawError?.status ??
-        0;
+      // Extract actual error message from backend
+      const errorMessage = error?.errorMessage || error?.message;
 
-      const fallbackMessage =
-        error?.errorMessage ||
-        error?.message ||
-        error?.rawError?.message ||
-        translate("fail_create_account");
-
-      const errorDetail = getErrorDetail(httpStatus, fallbackMessage);
-
-      setSubmitErrorData(errorDetail);
-      setShowSubmitErrorModal(true);
+      if (errorMessage) {
+        // Show actual backend error message
+        showError({
+          title: "មានបញ្ហាកើតឡើង",
+          message: errorMessage,
+        });
+      } else {
+        // Fallback to generic error only if no message available
+        showError();
+      }
     } finally {
-      setLoadingState({
-        isLoading: false,
-        title: "",
-        message: "",
-      });
+      setLoadingState({ isLoading: false, title: "", message: "" });
     }
   };
 
   return {
     handleSubmitAccount,
+    resetUploadCache,
     showSuccessModal,
     setShowSuccessModal,
     successData,
