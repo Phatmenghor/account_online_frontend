@@ -358,6 +358,7 @@ function SuccessAccountExcelPageContent() {
                             <span className="text-gray-700">{accounts?.content?.length ?? 0} showing</span>
                         </div>
                     </div>
+                </div>
 
                 <Separator className="bg-gray-200" />
 
