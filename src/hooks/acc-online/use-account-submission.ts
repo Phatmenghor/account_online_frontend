@@ -210,8 +210,8 @@ export const useAccountSubmission = ({
         legalMrz2: formData.MRZ2,
         legalMrz3: formData.MRZ3,
         phoneNumber: phoneNumber,
-        nidImageName: nidFileName,
-        selfieImageName: selfieFileName,
+        nidImageName: nidFileName!,
+        selfieImageName: selfieFileName!,
       };
 
       const response = await createOpenAccountService(accountData);
