@@ -301,92 +301,76 @@ function SuccessAccountExcelPageContent() {
                         />
                     </div>
 
-                    {/* Filters Section */}
-                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 space-y-3">
-                        <div className="flex items-center gap-2 mb-3">
-                            <Filter className="h-4 w-4 text-blue-600" />
-                            <h3 className="text-sm font-semibold text-gray-800">Date Range Filter</h3>
+                    {/* Filters Row - Single Line */}
+                    <div className="flex flex-wrap items-end gap-2 bg-blue-50 rounded-lg p-3">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                            <Filter className="h-3.5 w-3.5 text-blue-600" />
+                            <span className="font-medium">Filter:</span>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                            {/* From Date */}
-                            <div className="flex flex-col gap-2">
-                                <Label className="text-xs font-medium text-gray-700 flex items-center gap-2">
-                                    <Calendar className="h-3.5 w-3.5" />
-                                    From Date
-                                </Label>
-                                <CustomDatePicker
-                                    value={fromDate}
-                                    onChange={(date) => setFromDate(date)}
-                                    placeholder="From Date"
-                                    className="h-9"
-                                />
-                            </div>
-
-                            {/* To Date */}
-                            <div className="flex flex-col gap-2">
-                                <Label className="text-xs font-medium text-gray-700 flex items-center gap-2">
-                                    <Calendar className="h-3.5 w-3.5" />
-                                    To Date
-                                </Label>
-                                <CustomDatePicker
-                                    value={toDate}
-                                    onChange={(date) => setToDate(date)}
-                                    placeholder="To Date"
-                                    className="h-9"
-                                />
-                            </div>
-
-                            {/* Reset Button */}
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleResetFilter}
-                                    className="h-9 flex-1 flex items-center justify-center gap-2 border-blue-300 text-blue-700 hover:bg-blue-50"
-                                >
-                                    <RotateCcw className="h-3.5 w-3.5" />
-                                    <span className="text-xs font-medium">Reset</span>
-                                </Button>
-                            </div>
+                        {/* From Date */}
+                        <div className="flex flex-col gap-1">
+                            <Label className="text-xs font-medium text-gray-700">From</Label>
+                            <CustomDatePicker
+                                value={fromDate}
+                                onChange={(date) => setFromDate(date)}
+                                placeholder="From Date"
+                                className="h-8 text-xs w-[130px]"
+                            />
                         </div>
+
+                        {/* To Date */}
+                        <div className="flex flex-col gap-1">
+                            <Label className="text-xs font-medium text-gray-700">To</Label>
+                            <CustomDatePicker
+                                value={toDate}
+                                onChange={(date) => setToDate(date)}
+                                placeholder="To Date"
+                                className="h-8 text-xs w-[130px]"
+                            />
+                        </div>
+
+                        {/* Reset Button */}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleResetFilter}
+                            className="h-8 px-2 gap-1 text-xs border-blue-300 text-blue-700 hover:bg-blue-100"
+                        >
+                            <RotateCcw className="h-3 w-3" />
+                            Reset
+                        </Button>
                     </div>
 
-                    {/* Action Buttons & Stats */}
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        {/* Export Button - Primary */}
+                    {/* Action & Stats Row */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        {/* Export Button */}
                         <Button
                             onClick={exportToExcel}
                             disabled={isExportingExcel || (accounts?.countAll ?? 0) === 0}
-                            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all h-10 flex items-center gap-2"
+                            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold h-9 px-4 flex items-center gap-2 text-sm"
                         >
                             {isExportingExcel ? (
                                 <>
                                     <div className="animate-spin">
-                                        <FileSpreadsheet className="h-4 w-4" />
+                                        <FileSpreadsheet className="h-3.5 w-3.5" />
                                     </div>
-                                    <span className="text-sm">Exporting...</span>
+                                    <span>Exporting...</span>
                                 </>
                             ) : (
                                 <>
-                                    <FileSpreadsheet className="h-4 w-4" />
-                                    <span className="text-sm">Export to Excel</span>
-                                    <Download className="h-3.5 w-3.5 ml-1" />
+                                    <FileSpreadsheet className="h-3.5 w-3.5" />
+                                    <span>Export Excel</span>
+                                    <Download className="h-3 w-3" />
                                 </>
                             )}
                         </Button>
 
-                        {/* Stats Card */}
-                        <div className="bg-white border border-gray-200 rounded-lg px-4 py-2 flex items-center gap-4">
-                            <div className="text-center">
-                                <p className="text-xs text-gray-600 font-medium">Total Records</p>
-                                <p className="text-xl font-bold text-blue-600">{accounts?.countAll ?? 0}</p>
-                            </div>
-                            <div className="w-px h-8 bg-gray-300" />
-                            <div className="text-center">
-                                <p className="text-xs text-gray-600 font-medium">Showing</p>
-                                <p className="text-xl font-bold text-gray-700">{accounts?.content?.length ?? 0}</p>
-                            </div>
+                        {/* Stats */}
+                        <div className="text-xs text-gray-600 font-medium flex gap-3">
+                            <span>Total: <span className="text-blue-600 font-bold">{accounts?.countAll ?? 0}</span></span>
+                            <span className="text-gray-300">|</span>
+                            <span>Showing: <span className="text-gray-700 font-bold">{accounts?.content?.length ?? 0}</span></span>
                         </div>
                     </div>
                 </div>

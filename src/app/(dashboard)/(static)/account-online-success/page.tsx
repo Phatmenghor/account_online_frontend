@@ -35,8 +35,6 @@ function SuccessAccountPageContent() {
   const [selectedAccount, setSelectedAccount] =
     useState<SuccessAccountOnlineModel | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [amlStatusFilter, setAmlStatusFilter] = useState("");
-  const [riskLevelFilter, setRiskLevelFilter] = useState("");
 
   const searchParams = useSearchParams();
 
@@ -78,16 +76,6 @@ function SuccessAccountPageContent() {
     loadAccounts();
   }, [loadAccounts, debouncedSearchQuery]);
 
-  // Filter accounts based on selected filters
-  const filteredAccounts = useCallback(() => {
-    if (!accounts) return [];
-
-    return accounts.content.filter((account) => {
-      const amlMatch = !amlStatusFilter || account.amlStatus === amlStatusFilter;
-      const riskMatch = !riskLevelFilter || account.amlRiskLevel === riskLevelFilter;
-      return amlMatch && riskMatch;
-    });
-  }, [accounts, amlStatusFilter, riskLevelFilter]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -161,95 +149,45 @@ function SuccessAccountPageContent() {
     }
   };
 
-  const uniqueAmlStatuses = Array.from(
-    new Set(accounts?.content?.map((acc) => acc.amlStatus) || [])
-  ).filter(Boolean);
-
-  const uniqueRiskLevels = Array.from(
-    new Set(accounts?.content?.map((acc) => acc.amlRiskLevel) || [])
-  ).filter(Boolean);
 
   return (
     <Card className="h-full flex flex-col">
       <CardContent className="space-y-6 p-6 flex flex-col h-full">
-        {/* Header with Search and Filters */}
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="relative flex-1 min-w-[200px] md:min-w-[350px]">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                aria-label="search-success-account"
-                autoComplete="search-success-account"
-                type="search"
-                placeholder="Search by CIF, Legal ID, Name..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="pl-8 w-full text-xs h-9"
-              />
-            </div>
+        {/* Header with Search and Export */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="relative flex-1 min-w-[250px] md:min-w-[400px]">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              aria-label="search-success-account"
+              autoComplete="search-success-account"
+              type="search"
+              placeholder="Search by CIF, Legal ID, Name..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="pl-8 w-full text-sm h-10"
+            />
+          </div>
 
-            <Button
-              onClick={handleExportToExcel}
-              disabled={isExporting || !accounts?.content?.length}
-              className="flex items-center gap-2 h-9"
-              title="Export to Excel"
-            >
-              {isExporting ? (
-                <>
-                  <ExcelLoading />
-                  Exporting...
-                </>
-              ) : (
-                <>
+          <Button
+            onClick={handleExportToExcel}
+            disabled={isExporting || !accounts?.content?.length}
+            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold h-10 flex items-center gap-2"
+            title="Export to Excel"
+          >
+            {isExporting ? (
+              <>
+                <div className="animate-spin">
                   <Download className="h-4 w-4" />
-                  Export Excel
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Filters Row */}
-          <div className="flex flex-wrap gap-3">
-            <select
-              value={amlStatusFilter}
-              onChange={(e) => setAmlStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-xs bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All AML Status</option>
-              {uniqueAmlStatuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={riskLevelFilter}
-              onChange={(e) => setRiskLevelFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-xs bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Risk Levels</option>
-              {uniqueRiskLevels.map((level) => (
-                <option key={level} value={level}>
-                  {level}
-                </option>
-              ))}
-            </select>
-
-            {(amlStatusFilter || riskLevelFilter) && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setAmlStatusFilter("");
-                  setRiskLevelFilter("");
-                }}
-                className="h-9 text-xs"
-              >
-                Clear Filters
-              </Button>
+                </div>
+                <span className="text-sm">Exporting...</span>
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4" />
+                <span className="text-sm">Export Excel</span>
+              </>
             )}
-          </div>
+          </Button>
         </div>
 
         <div className="w-full">
@@ -261,7 +199,7 @@ function SuccessAccountPageContent() {
           <div className="flex-1 rounded-md border overflow-hidden flex flex-col">
             <div className="flex-1 overflow-x-auto">
               <DataTable
-                data={filteredAccounts()}
+                data={accounts?.content || []}
                 columns={createSuccessAccountTableColumns({
                   data: accounts,
                   handlers: {
