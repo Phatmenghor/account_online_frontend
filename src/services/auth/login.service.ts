@@ -11,9 +11,13 @@ export async function loginService(credentials: LoginCredentials) {
     // Simulate async call and delay
     const response = await axiosClient.post("/api/v1/auth/login", credentials);
 
-    // On success, store token and role (simulate your original behavior)
-    storeToken(response.data.data.accessToken);
-    storeRefreshToken(response.data.data.refreshToken);
+    // On success, store token and role with expiration time
+    // If backend provides expiresIn, use it; otherwise use default (1 hour for access, 7 days for refresh)
+    const accessTokenExpiresIn = response.data.data.expiresIn || 3600; // default 1 hour
+    const refreshTokenExpiresIn = response.data.data.refreshTokenExpiresIn || 7 * 24 * 60 * 60; // default 7 days
+
+    storeToken(response.data.data.accessToken, accessTokenExpiresIn);
+    storeRefreshToken(response.data.data.refreshToken, refreshTokenExpiresIn);
     storeRole(response.data.data.userRole.userRole);
     storeUserInfo(response.data.data.userRole);
     storePermission(response?.data?.userRole?.userPermission);
