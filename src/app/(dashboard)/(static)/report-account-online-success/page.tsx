@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { ROUTES } from "@/constants/AppRoutes/routes";
 import { usePagination } from "@/hooks/use-pagination";
 import { useDebounce } from "@/utils/debounce/debounce";
-import { Search, FileSpreadsheet, Download, Tally1, XCircle } from "lucide-react";
+import { Search, FileSpreadsheet, Download, Filter, RotateCcw, Calendar } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import Loading from "@/components/shared/common/loading";
@@ -284,81 +284,118 @@ function SuccessAccountExcelPageContent() {
 
     return (
         <Card className="h-full flex flex-col">
-            <CardContent className="space-y-6 p-6 flex flex-col h-full">
-
-                {/* Search + Date Filter Row */}
-                <div className="flex flex-wrap items-end gap-3">
-                    {/* Search */}
-                    <div className="relative w-full md:w-[350px]">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <CardContent className="space-y-4 p-6 flex flex-col h-full">
+                {/* Header Section */}
+                <div className="space-y-4">
+                    {/* Search Bar */}
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             aria-label="search-success-account"
-                            autoComplete="search-success-account"
+                            autoComplete="off"
                             type="search"
-                            placeholder="Search by CIF, Legal ID, Name..."
+                            placeholder="Search by CIF, Legal ID, Account Number..."
                             value={searchQuery}
                             onChange={handleSearchChange}
-                            className="pl-8 w-full min-w-[200px] text-xs md:min-w-[300px] h-9"
+                            className="pl-10 w-full text-sm h-10"
                         />
                     </div>
 
-                    {/* Date Range + Actions */}
-                    <div className="flex flex-wrap items-end gap-4">
-                        <div className="flex flex-col gap-1">
-                            <Label className="text-xs">From Date</Label>
-                            <CustomDatePicker
-                                value={fromDate}
-                                onChange={(date) => setFromDate(date)}
-                                placeholder="From Date"
-                                className="w-[150px]"
-                            />
+                    {/* Filters Section */}
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 space-y-3">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Filter className="h-4 w-4 text-blue-600" />
+                            <h3 className="text-sm font-semibold text-gray-800">Date Range Filter</h3>
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                            <Label className="text-xs">To Date</Label>
-                            <CustomDatePicker
-                                value={toDate}
-                                onChange={(date) => setToDate(date)}
-                                placeholder="To Date"
-                                className="w-[150px]"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            {/* From Date */}
+                            <div className="flex flex-col gap-2">
+                                <Label className="text-xs font-medium text-gray-700 flex items-center gap-2">
+                                    <Calendar className="h-3.5 w-3.5" />
+                                    From Date
+                                </Label>
+                                <CustomDatePicker
+                                    value={fromDate}
+                                    onChange={(date) => setFromDate(date)}
+                                    placeholder="From Date"
+                                    className="h-9"
+                                />
+                            </div>
+
+                            {/* To Date */}
+                            <div className="flex flex-col gap-2">
+                                <Label className="text-xs font-medium text-gray-700 flex items-center gap-2">
+                                    <Calendar className="h-3.5 w-3.5" />
+                                    To Date
+                                </Label>
+                                <CustomDatePicker
+                                    value={toDate}
+                                    onChange={(date) => setToDate(date)}
+                                    placeholder="To Date"
+                                    className="h-9"
+                                />
+                            </div>
+
+                            {/* Reset Button */}
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleResetFilter}
+                                    className="h-9 flex-1 flex items-center justify-center gap-2 border-blue-300 text-blue-700 hover:bg-blue-50"
+                                >
+                                    <RotateCcw className="h-3.5 w-3.5" />
+                                    <span className="text-xs font-medium">Reset</span>
+                                </Button>
+                            </div>
                         </div>
+                    </div>
 
-                        <div className="flex items-center gap-2">
-                            {/* ✅ Excel export button — same style as ReportCamDx */}
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-9 px-3 border-gray-200 flex items-center justify-center"
-                                onClick={exportToExcel}
-                                disabled={isExportingExcel}
-                            >
-                                {isExportingExcel ? (
-                                    <Loading />
-                                ) : (
-                                    <>
-                                        <FileSpreadsheet className="h-4 w-4 text-green-500" />
-                                        <span className="ml-1 text-xs font-medium">Excel</span>
-                                        <Tally1 className="-mr-[12px] text-gray-300" />
-                                        <Download className="h-4 w-4" />
-                                    </>
-                                )}
-                            </Button>
+                    {/* Action Buttons & Stats */}
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        {/* Export Button - Primary */}
+                        <Button
+                            onClick={exportToExcel}
+                            disabled={isExportingExcel || (accounts?.countAll ?? 0) === 0}
+                            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all h-10 flex items-center gap-2"
+                        >
+                            {isExportingExcel ? (
+                                <>
+                                    <div className="animate-spin">
+                                        <FileSpreadsheet className="h-4 w-4" />
+                                    </div>
+                                    <span className="text-sm">Exporting...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <FileSpreadsheet className="h-4 w-4" />
+                                    <span className="text-sm">Export to Excel</span>
+                                    <Download className="h-3.5 w-3.5 ml-1" />
+                                </>
+                            )}
+                        </Button>
 
-                            <span className="text-sm font-medium text-muted-foreground flex gap-2">
-                                <p>All Data:</p>
-                                <span>{accounts?.countAll ?? 0}</span>
-                            </span>
+                        {/* Stats Card */}
+                        <div className="bg-white border border-gray-200 rounded-lg px-4 py-2 flex items-center gap-4">
+                            <div className="text-center">
+                                <p className="text-xs text-gray-600 font-medium">Total Records</p>
+                                <p className="text-xl font-bold text-blue-600">{accounts?.countAll ?? 0}</p>
+                            </div>
+                            <div className="w-px h-8 bg-gray-300" />
+                            <div className="text-center">
+                                <p className="text-xs text-gray-600 font-medium">Showing</p>
+                                <p className="text-xl font-bold text-gray-700">{accounts?.content?.length ?? 0}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="w-full">
-                    <Separator className="bg-gray-300" />
-                </div>
+                <Separator className="bg-gray-200" />
 
+                {/* Table Section */}
                 <div className="flex-1 flex flex-col min-h-0">
-                    <div className="flex-1 rounded-md border overflow-hidden flex flex-col">
+                    <div className="flex-1 rounded-md border border-gray-200 overflow-hidden flex flex-col bg-white">
                         <div className="flex-1 overflow-x-auto">
                             <DataTable
                                 data={accounts?.content || []}
