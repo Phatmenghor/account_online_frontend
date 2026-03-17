@@ -152,9 +152,9 @@ function SuccessAccountPageContent() {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardContent className="space-y-6 p-6 flex flex-col h-full">
+      <CardContent className="space-y-6 p-6 flex flex-col h-full max-w-full">
         {/* Header with Search and Export */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 max-w-7xl">
           <div className="relative flex-1 min-w-[250px] md:min-w-[400px]">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
