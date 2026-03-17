@@ -4,9 +4,13 @@ import axios from "axios";
 
 export async function createOpenAccountService(request: CreateOpenAccountReq) {
   try {
+    // Set longer timeout for account creation (120 seconds) due to multiple backend operations:
+    // - Customer matching, validation, AML processing, customer creation,
+    // - KHR/USD account creation, validation, mobile banking activation
     const response = await axiosClientWithAuth.post(
       "/api/v1/public/open-account",
       request,
+      { timeout: 120000 } // 120 seconds timeout for long-running account creation
     );
     return response.data;
   } catch (error) {

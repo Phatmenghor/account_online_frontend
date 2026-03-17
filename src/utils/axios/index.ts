@@ -264,7 +264,7 @@ const formatRequestData = (data: unknown): unknown => {
 const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
   const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    timeout: 30000,
+    timeout: 60000, // Increased from 30s to 60s for long-running operations like account creation
     headers: {
       "Content-Type": "application/json",
     },
