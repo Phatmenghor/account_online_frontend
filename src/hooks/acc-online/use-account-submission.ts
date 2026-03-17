@@ -76,6 +76,13 @@ export const useAccountSubmission = ({
     message: "",
     variant: "error",
   });
+  const [showAccountExistsModal, setShowAccountExistsModal] = useState(false);
+  const [accountExistsData, setAccountExistsData] = useState<{
+    cif?: string;
+    accountNumber?: string;
+    accountName?: string;
+    message?: string;
+  } | null>(null);
   const [loadingState, setLoadingState] = useState<LoadingState>({
     isLoading: false,
     title: "",
@@ -222,8 +229,25 @@ export const useAccountSubmission = ({
 
       // Extract actual error message from backend
       const errorMessage = error?.errorMessage || error?.message;
+      const errorResponse = error?.rawError;
 
-      if (errorMessage) {
+      // Check if account already exists
+      const isAccountExists =
+        errorMessage?.toLowerCase().includes("exist") ||
+        errorMessage?.toLowerCase().includes("already") ||
+        errorResponse?.message?.toLowerCase().includes("exist") ||
+        errorResponse?.message?.toLowerCase().includes("already");
+
+      if (isAccountExists && errorResponse?.data) {
+        // Show account exists modal with account details
+        setAccountExistsData({
+          cif: errorResponse.data.cif,
+          accountNumber: errorResponse.data.accountNumber || errorResponse.data.khrAccount,
+          accountName: errorResponse.data.accountName || errorResponse.data.legalHolderName,
+          message: errorMessage || "គណនីធនាគារលក់ដ៏ងរបស់អ្នកបានបង្កើតរួចរាល់។ អ្នកអាចបង្ហាញលេខគណនីរបស់អ្នក ឬបន្តប្រើប្រាស់វា។",
+        });
+        setShowAccountExistsModal(true);
+      } else if (errorMessage) {
         // Show actual backend error message
         showError({
           title: "មានបញ្ហាកើតឡើង",
@@ -249,6 +273,10 @@ export const useAccountSubmission = ({
     setShowSubmitErrorModal,
     submitErrorData,
     setSubmitErrorData,
+    showAccountExistsModal,
+    setShowAccountExistsModal,
+    accountExistsData,
+    setAccountExistsData,
     loadingState,
     setLoadingState,
   };

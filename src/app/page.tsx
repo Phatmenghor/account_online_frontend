@@ -13,6 +13,7 @@ import ValidationErrorModal from "@/components/acc-online/validateModal";
 import ErrorModal from "@/components/acc-online/errorModal";
 import ConfirmationModal from "@/components/acc-online/confirmModal";
 import LocationModal from "@/components/acc-online/addressModal";
+import AccountExistsModal from "@/components/acc-online/accountExistsModal";
 import LoadingModal from "@/components/shared/modal/extract-modal";
 import SubmitSuccessModal from "@/components/shared/modal/submit-success-modal";
 import SubmitErrorModal from "@/components/shared/modal/submit-error-modal";
@@ -155,6 +156,9 @@ export default function OpenAccountPage() {
     showSubmitErrorModal,
     setShowSubmitErrorModal,
     submitErrorData,
+    showAccountExistsModal,
+    setShowAccountExistsModal,
+    accountExistsData,
     loadingState,
   } = useAccountSubmission({
     formData,
@@ -509,6 +513,15 @@ export default function OpenAccountPage() {
           title={submitErrorData.title}
           message={submitErrorData.message}
           variant={submitErrorData.variant}
+        />
+        <AccountExistsModal
+          isOpen={showAccountExistsModal}
+          onClose={() => setShowAccountExistsModal(false)}
+          data={accountExistsData}
+          onContinue={() => {
+            // Clear form after account exists
+            setShowClearConfirm(true);
+          }}
         />
       </div>
     </FormStateProvider>
