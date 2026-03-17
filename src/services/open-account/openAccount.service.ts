@@ -1,16 +1,18 @@
 import { CreateOpenAccountReq } from "@/models/open-account/openAccount.request";
-import { axiosClientWithAuth } from "@/utils/axios";
+import { axiosClientWithAuth, ACCOUNT_CREATION_TIMEOUT } from "@/utils/axios";
 import axios from "axios";
 
 export async function createOpenAccountService(request: CreateOpenAccountReq) {
   try {
-    // Set longer timeout for account creation (120 seconds) due to multiple backend operations:
-    // - Customer matching, validation, AML processing, customer creation,
-    // - KHR/USD account creation, validation, mobile banking activation
+    // Account creation can take longer due to multiple backend operations:
+    // - Customer matching, validation, AML processing
+    // - Customer creation, KHR/USD account creation, validation
+    // - Mobile banking activation
+    // Timeout is configurable via NEXT_PUBLIC_ACCOUNT_CREATION_TIMEOUT env variable (default: 5 minutes)
     const response = await axiosClientWithAuth.post(
       "/api/v1/public/open-account",
       request,
-      { timeout: 120000 } // 120 seconds timeout for long-running account creation
+      { timeout: ACCOUNT_CREATION_TIMEOUT }
     );
     return response.data;
   } catch (error) {

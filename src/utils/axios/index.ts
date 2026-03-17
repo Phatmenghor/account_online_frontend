@@ -260,11 +260,16 @@ const formatRequestData = (data: unknown): unknown => {
   }
 };
 
+// Get timeout from environment variables (in milliseconds)
+// Backend config: connection-timeout-minutes: 5 (300000 ms), data-load timeout-hours: 5 (18000000 ms)
+const DEFAULT_TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || "300000", 10); // Default 5 minutes (300 seconds)
+const ACCOUNT_CREATION_TIMEOUT = parseInt(process.env.NEXT_PUBLIC_ACCOUNT_CREATION_TIMEOUT || "300000", 10); // Default 5 minutes (300 seconds)
+
 // Create axios instances with enhanced request body logging
 const createAxiosInstance = (requiresAuth = false): AxiosInstance => {
   const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    timeout: 60000, // Increased from 30s to 60s for long-running operations like account creation
+    timeout: DEFAULT_TIMEOUT,
     headers: {
       "Content-Type": "application/json",
     },
@@ -644,6 +649,9 @@ export const axiosServerWithAuth = createAxiosInstance(true);
 export const axiosServer = createAxiosInstance(false);
 export const axiosClientWithAuth = createAxiosInstance(true);
 export const axiosClient = createAxiosInstance(false);
+
+// Export timeout configurations for use in specific services
+export { DEFAULT_TIMEOUT, ACCOUNT_CREATION_TIMEOUT };
 
 // Export logger and utilities
 export { logger, formatRequestData };
